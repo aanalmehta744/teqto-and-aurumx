@@ -1,0 +1,31 @@
+<div>
+  <h2 mat-dialog-title>Add User</h2>
+  <div mat-dialog-content>
+    <form [formGroup]="addCusForm!" (ngSubmit)="onSubmitClick()">
+      <div class="text-inside">
+        <mat-form-field class="example-full-width">
+          <input matInput placeholder="First Name" value={{fname}} formControlName="firstname" required>
+        </mat-form-field>
+      </div>
+      <div class="text-inside">
+        <mat-form-field class="example-full-width">
+          <input matInput placeholder="Last Name" value={{lname}} formControlName="lastname" required>
+        </mat-form-field>
+      </div>
+      <div class="text-inside">
+        <mat-form-field class="example-full-width">
+          <input matInput placeholder="Email address" formControlName="email" required>
+        </mat-form-field>
+      </div>
+      <div class="text-inside">
+        <mat-form-field class="example-full-width">
+          <textarea matInput placeholder="Address"></textarea>
+        </mat-form-field>
+      </div>
+      <div class="btn-sec">
+        <button class="btn-space" mat-raised-button color="primary">Save</button>
+        <button type="button" mat-button (click)="closeDialog()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

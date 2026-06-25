@@ -1,0 +1,246 @@
+<section>
+  <div class="space-y-6">
+
+    <!-- Breadcrumb -->
+    <app-breadcrumb [title]="'Employee Attendance'" [items]="['Home']"
+      [active_item]="'Employee Attendance'"></app-breadcrumb>
+
+    <!-- Table Card -->
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+
+      <!-- Table Header -->
+      <div class="flex flex-col md:flex-row justify-between items-center px-4 py-3 border-b bg-[#00c4c4]">
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+          <h2 class="text-white text-lg font-medium">Employee Attendance</h2>
+
+          <div class="relative">
+            <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">search</mat-icon>
+            <input type="text" #filter placeholder="Search"
+              class="pl-10 pr-4 py-2 rounded-full border border-gray-300 text-[black] focus:outline-none  placeholder:text-[15px] w-[250px]"
+              aria-label="Search box" />
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 mt-3 md:mt-0">
+          <button mat-mini-fab class="!bg-[#D5EAEA] !text-[#00383F]" (click)="refresh()" matTooltip="REFRESH">
+            <mat-icon>refresh</mat-icon>
+          </button>
+          <img src="assets/images/icons/xlsx.png" alt="Export" (click)="exportExcel()" matTooltip="XLSX"
+            class="w-8 h-8 cursor-pointer" />
+        </div>
+      </div>
+
+      <!-- View Toggle -->
+      <div class="flex gap-3 px-4 py-3 border-b">
+        <button mat-button class="!text-[#00383F]" (click)="option = 0">Flat View</button>
+        <button mat-button class="!text-[#00383F]" (click)="option = 1">Grouped View</button>
+      </div>
+
+      <!-- Table Body -->
+      <div class="overflow-auto p-4">
+
+        <!-- Flat View -->
+        <div *ngIf="option === 0">
+          <table mat-table [dataSource]="dataSource" matSort class="min-w-full text-sm">
+
+            <!-- ID -->
+            <ng-container matColumnDef="id">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">ID</mat-header-cell>
+              <mat-cell *matCellDef="let row">{{ row.id }}</mat-cell>
+            </ng-container>
+
+            <!-- Name -->
+            <ng-container matColumnDef="name">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Name</mat-header-cell>
+              <mat-cell *matCellDef="let row">{{ row.employee_name || '-' }}</mat-cell>
+            </ng-container>
+
+            <!-- Date -->
+            <ng-container matColumnDef="date">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Date</mat-header-cell>
+              <mat-cell *matCellDef="let row">{{ row.date ? (row.date | date) : '-' }}</mat-cell>
+            </ng-container>
+
+            <!-- Check-In -->
+            <ng-container matColumnDef="check_in">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Punch-In</mat-header-cell>
+              <mat-cell *matCellDef="let row">{{ row.check_in ? (row.check_in | date: 'h:mm:ss a') : '-' }}</mat-cell>
+            </ng-container>
+
+            <!-- Check-Out -->
+            <ng-container matColumnDef="check_out">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Punch-Out</mat-header-cell>
+              <mat-cell *matCellDef="let row">{{ row.check_out ? (row.check_out | date: 'h:mm:ss a') : '-' }}</mat-cell>
+            </ng-container>
+
+            <!-- Hours -->
+            <ng-container matColumnDef="hours">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Hours</mat-header-cell>
+              <mat-cell *matCellDef="let row">{{ row.hours ?? '-' }}</mat-cell>
+            </ng-container>
+
+            <!-- Status -->
+            <ng-container matColumnDef="status">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">
+                Status
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row" class="px-4 py-2">
+                <!-- Present -->
+                <span *ngIf="row.status === 'Present'"
+                  class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.status }}
+                </span>
+
+                <!-- Absent -->
+                <span *ngIf="row.status === 'Absent'"
+                  class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.status }}
+                </span>
+                <!-- Half Day -->
+                <span *ngIf="row.status === 'Half Day'"
+                  class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.status }}
+                </span>
+                <!-- Leave -->
+                <span *ngIf="row.status === 'Leave'"
+                  class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.status }}
+                </span>
+                <!-- <span *ngIf="row.leave_status"
+                  class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.leave_status }}
+                </span> -->
+
+                <span *ngIf="row.final_status === 'Leave'"
+                  class="bg-yellow-100 text-yellow-800 px-3 py-1 ml-2 rounded-full text-xs font-medium">
+                  {{ row.final_status }}
+                </span>
+
+                <!-- Fallback for any other status -->
+                <span
+                  *ngIf="row.status !== 'Present' && row.status !== 'Absent' && row.status !== 'Leave' && row.status !== 'Half Day'"
+                  class=" bg-blue-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.status }}
+                </span>
+              </mat-cell>
+            </ng-container>
+
+            <!-- Break -->
+            <ng-container matColumnDef="break">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Break</mat-header-cell>
+              <mat-cell *matCellDef="let row">{{ row.break ?? '-' }}</mat-cell>
+            </ng-container>
+            <!-- Actions -->
+            <!-- <ng-container matColumnDef="actions">
+              <mat-header-cell *matHeaderCellDef class="font-medium">Actions</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <button mat-icon-button (click)="editCall(row)" matTooltip="Edit">
+                  <app-feather-icons icon="edit" class="text-blue-500"></app-feather-icons>
+                </button>
+              </mat-cell>
+            </ng-container> -->
+
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50 cursor-pointer" matRipple>
+            </mat-row>
+          </table>
+
+          <div *ngIf="(dataSource?.renderedData?.length || 0) === 0" class="text-center text-gray-500 mt-4">
+            No results
+          </div>
+        </div>
+
+        <!-- Grouped View -->
+        <div *ngIf="option === 1">
+          <ng-scrollbar style="height: 500px;">
+            <ng-container *ngFor="let group of groupedAttendance">
+              <h4 class="text-lg font-medium mb-2 text-[#00383f]">{{ group.date }}</h4>
+              <table mat-table [dataSource]="group.records" matSort class="min-w-full mb-6 text-sm">
+
+                <ng-container matColumnDef="date">
+                  <mat-header-cell *matHeaderCellDef class="font-medium">Date</mat-header-cell>
+                  <mat-cell *matCellDef="let row">{{ row.date | date }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="name">
+                  <mat-header-cell *matHeaderCellDef class="font-medium">Name</mat-header-cell>
+                  <mat-cell *matCellDef="let row">{{ row.employee_name }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="check_in">
+                  <mat-header-cell *matHeaderCellDef class="font-medium">Check-In</mat-header-cell>
+                  <mat-cell *matCellDef="let row">{{ row.check_in ? (row.check_in | date: 'h:mm:ss a') : '-'
+                    }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="check_out">
+                  <mat-header-cell *matHeaderCellDef class="font-medium">Check-Out</mat-header-cell>
+                  <mat-cell *matCellDef="let row">{{ row.check_out ? (row.check_out | date: 'h:mm:ss a') : '-'
+                    }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="hours">
+                  <mat-header-cell *matHeaderCellDef class="font-medium">Hours</mat-header-cell>
+                  <mat-cell *matCellDef="let row">{{ row.hours ?? '-' }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="status">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">
+                    Status
+                  </mat-header-cell>
+                  <mat-cell *matCellDef="let row">
+                    <span *ngIf="row.status === 'Present'"
+                      class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium">
+                      {{ row.status }}
+                    </span>
+
+                    <span *ngIf="row.status === 'Absent'"
+                      class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium">
+                      {{ row.status }}
+                    </span>
+
+                    <span *ngIf="row.status !== 'Present' && row.status !== 'Absent'"
+                      class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">
+                      {{ row.status || '-' }}
+                    </span>
+
+                    <span *ngIf="row.final_status === 'Leave'"
+                      class="bg-yellow-100 text-yellow-800 px-3 py-1 ml-2 rounded-full text-xs font-medium">
+                      {{ row.final_status }}
+                    </span>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Break -->
+                <ng-container matColumnDef="break">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Break</mat-header-cell>
+                  <mat-cell *matCellDef="let row">{{ row.break ?? '-' }}</mat-cell>
+                </ng-container>
+
+                <!-- <ng-container matColumnDef="actions">
+                  <mat-header-cell *matHeaderCellDef class="font-medium">Actions</mat-header-cell>
+                  <mat-cell *matCellDef="let row">
+                    <button mat-icon-button (click)="editCall(row)" matTooltip="Edit">
+                      <app-feather-icons icon="edit" class="text-blue-500"></app-feather-icons>
+                    </button>
+
+                  </mat-cell>
+                </ng-container> -->
+
+                <mat-header-row
+                  *matHeaderRowDef="['name', 'check_in', 'check_out', 'hours', 'status', 'break']"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: ['name', 'check_in', 'check_out', 'hours', 'status', 'break']"
+                  class="hover:bg-gray-50 cursor-pointer" matRipple>
+                </mat-row>
+              </table>
+            </ng-container>
+          </ng-scrollbar>
+        </div>
+
+      </div>
+
+      <mat-paginator *ngIf="option === 0" #paginator [length]="dataSource?.filteredData?.length || 0" [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25, 100]" class="mt-4"></mat-paginator>
+    </div>
+  </div>
+</section>

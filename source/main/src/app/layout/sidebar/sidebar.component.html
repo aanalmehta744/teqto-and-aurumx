@@ -1,0 +1,100 @@
+<aside class="h-full transition-all duration-300 bg-white text-gray-800 shadow-lg z-50 fixed lg:static"
+  (mouseenter)="mouseHover()" (mouseleave)="mouseOut()">
+  <div class="flex flex-col h-full">
+
+    
+    <!-- Scrollable menu -->
+    <ng-scrollbar [style.height]="listMaxHeight + 'px'" visibility="hover">
+      <ul class="flex flex-col space-y-3 p-2">
+
+        <!-- Profile section -->
+        <li class="py-4 px-2">
+          <div class="flex flex-col justify-center gap-3 items-center transition-all duration-300"
+            [ngClass]="{ 'opacity-0 pointer-events-none h-0 overflow-hidden': isCollapsed }">
+            <div class="p-2 image rounded-md bg-white shadow-xl">
+              <img [src]="getImgUrl(userGender || '')" class="h-16 w-16 rounded-full object-cover" alt="User Image" />
+            </div>
+            <div class="profile-usertitle text-center">
+              <div class="sidebar-userpic-name font-medium">{{ userFullName }}</div>
+              <div class="profile-usertitle-job text-gray-500 text-sm">{{ userType }}</div>
+            </div>
+          </div>
+        </li>
+
+        <!-- Main sidebar items -->
+        <li *ngFor="let sidebarItem of sidebarItems" class="rounded mb-1">
+
+          <!-- Group title -->
+          <div *ngIf="sidebarItem.groupTitle && (!isCollapsed || isHovered)"
+            class="header px-4 py-2 text-gray-500 uppercase text-sm">
+            {{ sidebarItem.title | translate }}
+          </div>
+
+          <!-- Menu link / toggle -->
+          <a *ngIf="!sidebarItem.groupTitle" (click)="navigateOrToggle(sidebarItem)"
+            [routerLink]="(!sidebarItem.submenu?.length && !sidebarItem.newTab) ? [sidebarItem.path] : null"
+            class="menu-top flex items-center px-4 py-2 hover:bg-[#D5EAEA] rounded transition-colors cursor-pointer"
+            [ngClass]="{ 'bg-[#D5EAEA]': isRouteActive(sidebarItem.path) }">
+            <i-feather [name]="sidebarItem.icon" class="sidebarIcon h-5 w-5 text-gray-600"></i-feather>
+            <span class="hide-menu ml-3" *ngIf="!isCollapsed || isHovered">{{ sidebarItem.title | translate }}</span>
+            <span *ngIf="sidebarItem.submenu?.length && (!isCollapsed || isHovered)"
+              class="ml-auto transform text-gray-600 transition-transform duration-200"
+              [class.rotate-90]="sidebarItem.isOpen">
+              <i-feather name="chevron-right" class="text-[12px]"></i-feather>
+            </span>
+            <span *ngIf="sidebarItem.badge && (!isCollapsed || isHovered)" [ngClass]="sidebarItem.badgeClass"
+              class="ml-2 text-xs px-2 py-1 rounded-full">
+              {{ sidebarItem.badge }}
+            </span>
+          </a>
+
+          <!-- Submenu -->
+          <!-- Submenu -->
+          <ul *ngIf="sidebarItem.submenu?.length && sidebarItem.isOpen && (!isCollapsed || isHovered)"
+            class="ml-4 mt-1">
+            <li *ngFor="let subItem of sidebarItem.submenu" class="rounded mb-1">
+
+              <!-- Submenu link / toggle -->
+
+              <a (click)="navigateOrToggle(subItem)" [routerLink]="!subItem.submenu?.length ? [subItem.path] : null"
+                class="flex items-center px-4 py-2 rounded transition-colors cursor-pointer" [ngClass]="{
+     'bg-[#D5EAEA]': isRouteActive(subItem.path),
+     'hover:bg-[#D5EAEA]': !isRouteActive(subItem.path)
+   }">
+                {{ subItem.title | translate }}
+                <span *ngIf="subItem.submenu?.length" class="ml-auto transform transition-transform duration-200"
+                  [class.rotate-90]="subItem.isOpen">
+                  <i-feather name="chevron-right" class="h-4 w-4"></i-feather>
+                </span>
+              </a>
+              <!-- Nested submenu -->
+              <ul *ngIf="subItem.submenu?.length && subItem.isOpen && (!isCollapsed || isHovered)" class="ml-4 mt-1">
+                <li *ngFor="let nestedItem of subItem.submenu" class="rounded">
+                  <a (click)="navigateSubmenu(nestedItem.path)"
+                    class="flex items-center px-4 py-2 rounded transition-colors cursor-pointer" [ngClass]="{
+     'bg-[#D5EAEA]': isRouteActive(nestedItem.path),
+     'hover:bg-[#D5EAEA]': !isRouteActive(nestedItem.path)
+   }">
+                    {{ nestedItem.title | translate }}
+                  </a>
+                </li>
+              </ul>
+
+            </li>
+          </ul>
+        </li>
+
+        <!-- Logout -->
+        <li>
+          <a (click)="logout()"
+            class="menu-top flex items-center px-4 py-3 hover:bg-[#D5EAEA] rounded transition-colors cursor-pointer">
+            <i-feather name="log-out" class="h-5 w-5 text-gray-600"></i-feather>
+            <span class="hide-menu ml-3" *ngIf="!isCollapsed || isHovered">Logout</span>
+          </a>
+        </li>
+
+      </ul>
+    </ng-scrollbar>
+
+  </div>
+</aside>

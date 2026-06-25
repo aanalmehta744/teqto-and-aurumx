@@ -1,0 +1,112 @@
+<section>
+  <div class="max-h-[80vh] overflow-auto bg-white rounded-xl shadow-xl">
+    <!-- Header -->
+    <div class="flex justify-between items-center px-6 py-4 border-b">
+      <h2 class="text-xl font-medium text-[#00383F]">{{ dialogTitle }}</h2>
+      <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Scrollable Form -->
+    <div class="p-6">
+      <form [formGroup]="interviewForm" (ngSubmit)="submit()" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <!-- Candidate -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Candidate</mat-label>
+            <mat-select formControlName="candidate_id" required>
+              <mat-option *ngFor="let c of candidates" [value]="c.id">{{ c.full_name }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Job -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Job</mat-label>
+            <mat-select formControlName="job_id" required>
+              <mat-option *ngFor="let j of jobs" [value]="j.id">{{ j.title }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Date -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Interview Date</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="interview_date" required>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+
+          <!-- Time -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Interview Time</mat-label>
+            <input matInput type="time" formControlName="interview_time" required placeholder="00:00 AM/PM" />
+          </mat-form-field>
+
+          <!-- Type -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Interview Type</mat-label>
+            <mat-select formControlName="interview_type" required>
+              <mat-option value="HR Round">HR Round</mat-option>
+              <mat-option value="Technical Round">Technical Round</mat-option>
+              <mat-option value="Managerial Round">Managerial Round</mat-option>
+              <mat-option value="Final Round">Final Round</mat-option>
+              <mat-option value="Other">Other</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Mode -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Mode</mat-label>
+            <mat-select formControlName="mode" required>
+              <mat-option value="Online">Online</mat-option>
+              <mat-option value="Offline">Offline</mat-option>
+              <mat-option value="Phone">Phone</mat-option>
+              <mat-option value="Other">Other</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Location -->
+          <mat-form-field appearance="outline" class="w-full col-span-full">
+            <mat-label>Location / Link</mat-label>
+            <input matInput formControlName="location" placeholder="Office / Zoom / Google Meet link" />
+          </mat-form-field>
+
+          <!-- Status -->
+          <mat-form-field appearance="outline" class="w-full col-span-full">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status">
+              <mat-option value="Scheduled">Scheduled</mat-option>
+              <mat-option value="Completed">Completed</mat-option>
+              <mat-option value="Rescheduled">Rescheduled</mat-option>
+              <mat-option value="Cancelled">Cancelled</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <!-- Assigned Employee -->
+          <mat-form-field appearance="outline" class="w-full col-span-full">
+            <mat-label>Interviewed By</mat-label>
+            <mat-select formControlName="assigned_to" required>
+              <mat-option *ngFor="let emp of employees" [value]="emp.id">
+                {{ emp.fullName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Remarks -->
+          <mat-form-field appearance="outline" class="w-full col-span-full">
+            <mat-label>Remarks</mat-label>
+            <textarea matInput rows="2" formControlName="remarks"></textarea>
+          </mat-form-field>
+        </div>
+
+        <!-- Buttons -->
+        <div class="pt-4 text-right">
+          <button mat-raised-button color="primary" type="submit" [disabled]="!interviewForm.valid" class="mr-2">
+            Save
+          </button>
+          <button mat-raised-button color="warn" type="button" (click)="onNoClick()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

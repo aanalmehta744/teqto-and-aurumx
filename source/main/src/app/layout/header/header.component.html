@@ -1,0 +1,46 @@
+<nav class="w-full h-auto py-2  bg-[white] sticky top-0 z-50 px-4 grid grid-cols-2 shadow-sm">
+
+  <div class="flex items-center justify-start h-full">
+
+    <!-- <a href="#" onClick="return false;" class="navbar-toggle collapsed !text-[#00383F]"
+      (click)="isNavbarCollapsed = !isNavbarCollapsed" aria-expanded="false"></a> -->
+
+    <a href="#" onClick="return false;" class="lg:!hidden block bars !text-[#00383F]"
+      (click)="mobileSidebarToggle.emit()"></a>
+
+
+    <a [routerLink]="homePage">
+      <img [src]="getLogUrl()" alt="logo"
+        class="object-contain h-[2rem] max-w-[11rem] max-h-[2rem] transition-all duration-300 ms-7 md:ms-10 lg:ms-0"
+        [ngClass]="{
+    'w-[2rem]': collapsed && !isHovered,
+    'w-[11rem]': !collapsed || isHovered   
+  }" />
+    </a>
+
+    <button mat-icon-button (click)="toggleSidebar.emit()" class="!hidden lg:!block ms-12" aria-label="Toggle Sidebar">
+      <app-feather-icons icon="menu" class="header-icon text-[#00383F]"></app-feather-icons>
+    </button>
+  </div>
+
+
+  <div class="flex items-center justify-end space-x-3 h-full" [ngClass]="isNavbarCollapsed ? '' : 'show'">
+
+
+    <button matButton [matMenuTriggerFor]="menu"
+      class="!flex !items-center !justify-center !gap-2 !bg-[#D5EAEA] hover:bg-[#00C4C4] px-1.5 py-1 md:px-4 md:py-1 rounded-full">
+      <span class="text-[14px] md:text-[15.5px] font-medium text-[#00383F] overflow-x-auto">{{ userName }}</span>
+      <img [src]="getImgUrl(userGender || '')" alt="User" class="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover" />
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item class="!text-[#00383f] !text-[13px]" (click)="goToProfile()">
+        <app-feather-icons icon="user" class="user-menu-icons mr-1 align-top"></app-feather-icons>
+        {{ userName }}
+      </button>
+      <button mat-menu-item (click)="logout()" class="!text-[#00383f] !text-[13px]">
+        <app-feather-icons icon="log-out" class="user-menu-icons mr-1 align-top"></app-feather-icons>
+        Logout
+      </button>
+    </mat-menu>
+  </div>
+</nav>

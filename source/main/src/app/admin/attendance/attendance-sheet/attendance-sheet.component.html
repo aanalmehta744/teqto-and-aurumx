@@ -1,0 +1,121 @@
+<section>
+  <div class="mx-auto">
+    <div>
+      <app-breadcrumb [title]="'Attendance Sheet'" [items]="['Attendance']" [active_item]="'Sheet'"></app-breadcrumb>
+    </div>
+
+    <div class="flex flex-wrap -mx-2">
+      <div class="w-full px-2">
+        <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+          <!-- Header -->
+          <div class="flex flex-col md:flex-row justify-between items-center p-4 border-b bg-[#00c4c4]">
+            <div class="w-full md:w-auto mb-4 md:mb-0">
+              <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+                <div>
+                  <h2 class="text-lg text-white mr-4">Attendance Sheet</h2>
+                </div>
+
+              </div>
+            </div>
+            <!-- Action Buttons -->
+            <div class="w-full md:w-auto">
+              <ul class="flex items-center md:justify-end gap-2">
+                <li>
+                  <div class="cursor-pointer p-2 rounded-xl bg-[#D5EAEA] hover:bg-gray-100 shadow" matTooltip="XLSX">
+                    <img src="assets/images/icons/xlsx.png" alt="Export" class="w-6 h-6" (click)="exportExcel()">
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- Form Section -->
+          <div class="p-4 border-b">
+            <form [formGroup]="attendanceForm" (ngSubmit)="searchAttendance()" class="example-container">
+              <div class="grid grid-cols-1  md:grid-cols-3 md:!flex md:!items-center">
+                <div class="w-full px-2 mb-4 md:mb-0">
+                  <mat-form-field class="w-full" appearance="outline">
+                    <mat-label>Choose start date</mat-label>
+                    <input matInput [matDatepicker]="picker" formControlName="fromDate">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                  </mat-form-field>
+                </div>
+
+                <div class="w-full px-2 mb-4 md:mb-0">
+                  <mat-form-field class="w-full" appearance="outline">
+                    <mat-label>Choose end date</mat-label>
+                    <input matInput [matDatepicker]="picker2" formControlName="toDate">
+                    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                    <mat-datepicker #picker2></mat-datepicker>
+                  </mat-form-field>
+                </div>
+
+                <div class="w-full px-2 mb-0 md:mb-7">
+                  <button mat-raised-button class="!w-full !h-[50px]  !bg-[#D5EAEA] !text-[#00383F]"
+                    type="submit">Search</button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- Attendance Table -->
+          <div class="overflow-auto p-4">
+            <table class="min-w-full border border-gray-200 !text-[black]">
+              <thead>
+                <tr class="bg-gray-50">
+                  <th class="py-3 px-4 text-left border-b border-gray-200 font-medium">Employee Name</th>
+                  <th *ngFor="let day of daysInMonth"
+                    class="py-3 px-2 border-b border-gray-200 text-center font-medium w-12">
+                    <div class="flex flex-col items-center">
+                      <span>{{ day.dayNumber }}</span>
+                      <small class="text-xs text-gray-500">{{ day.dayName }}</small>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr *ngFor="let employee of attendanceList" class="hover:bg-gray-50">
+                  <td class="py-3 px-4 border-b border-gray-200">
+                    <div class="flex items-center">
+                      <div>
+                        <h6 class="font-medium">{{ employee.employee_name }}</h6>
+                      </div>
+                    </div>
+                  </td>
+                  <td *ngFor="let day of daysInMonth" class="py-2 px-1 border-b border-gray-200 text-center w-12
+           {{ isWeekend(day.dayNumber) ? 'bg-blue-50' : '' }}
+           {{ getHolidayTitle(day.dayNumber) ? 'bg-gray-100' : '' }}"
+                    [matTooltip]="getAttendanceTooltip(employee, day.dayNumber)" matTooltipPosition="above">
+
+                    <ng-container *ngIf="isWeekend(day.dayNumber); else checkHoliday">
+                      <span class="text-blue-500 font-medium">WE</span>
+                    </ng-container>
+
+                    <ng-template #checkHoliday>
+                      <ng-container *ngIf="getHolidayTitle(day.dayNumber); else checkAttendance">
+                        <span class="font-medium">H</span>
+                      </ng-container>
+
+                      <ng-template #checkAttendance>
+                        <ng-container [ngSwitch]="employee.attendance?.[day.dayNumber]?.status">
+                          <span *ngSwitchCase="'P'" class="text-green-600 font-medium">P</span>
+                          <span *ngSwitchCase="'HD'" class="text-yellow-600 font-medium">HD</span>
+                          <span *ngSwitchCase="'HOL'" class="text-blue-700 font-medium">H</span>
+                          <!-- <span *ngSwitchCase="'L'" class="text-purple-700 font-medium">L</span> -->
+                          <span *ngSwitchCase="'A'" class="text-red-600 font-medium">A</span>
+                          <span *ngSwitchDefault class="text-gray-400">--</span>
+                        </ng-container>
+                      </ng-template>
+                    </ng-template>
+                  </td>
+
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

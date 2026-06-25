@@ -1,0 +1,28 @@
+.status-tag {
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+.today-tag {
+    color: #2196f3; // blue
+    font-weight: 500;
+}
+
+.due-tag {
+    color: #4caf50; // green
+    font-weight: 500;
+}
+
+.overdue-tag {
+    color: #f44336; // red
+    font-weight: 500;
+}
+
+.closed-tag {
+    color: #9e9e9e; // gray
+    font-style: italic;
+}
+
+.closed-task {
+    color: #999;
+}

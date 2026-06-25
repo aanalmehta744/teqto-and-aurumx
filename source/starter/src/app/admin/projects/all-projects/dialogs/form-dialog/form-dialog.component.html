@@ -1,0 +1,121 @@
+<div class="flex items-center justify-between p-4 border-b bg-[#00c4c4]">
+  <h2 class="text-xl font-semibold text-white">{{ action === 'edit' ? 'Edit Project' : 'Add Project' }}</h2>
+  <button mat-icon-button mat-dialog-close class="text-white">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<div class="form-container px-5 py-6" mat-dialog-content>
+  <form class="space-y-6" [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+
+    <!-- Project Title -->
+    <div>
+      <mat-form-field class="w-full" appearance="outline">
+        <mat-label>Project Title</mat-label>
+        <input matInput formControlName="projectTitle" placeholder="Project Title" required>
+        @if (projectForm.get('projectTitle')?.hasError('required')) {
+          <mat-error>Project Title is required</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Department & Priority -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <mat-form-field class="w-full" appearance="outline">
+        <mat-label>Department</mat-label>
+        <mat-select formControlName="department" required>
+          <mat-option value="Designing">Designing</mat-option>
+          <mat-option value="Development">Development</mat-option>
+          <mat-option value="Testing">Testing</mat-option>
+          <mat-option value="Marketing">Marketing</mat-option>
+          <mat-option value="Accounts">Accounts</mat-option>
+        </mat-select>
+        @if (projectForm.get('department')?.hasError('required')) {
+          <mat-error>Department is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="w-full" appearance="outline">
+        <mat-label>Project Priority</mat-label>
+        <mat-select formControlName="priority" required>
+          <mat-option value="Low">Low</mat-option>
+          <mat-option value="Medium">Medium</mat-option>
+          <mat-option value="High">High</mat-option>
+        </mat-select>
+        @if (projectForm.get('priority')?.hasError('required')) {
+          <mat-error>Project Priority is required</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Start & End Date -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <mat-form-field class="w-full" appearance="outline">
+        <mat-label>Project Start Date</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="startDate" required>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        @if (projectForm.get('startDate')?.hasError('required')) {
+          <mat-error>Please select date</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="w-full" appearance="outline">
+        <mat-label>Project End Date</mat-label>
+        <input matInput [matDatepicker]="picker1" formControlName="endDate" required>
+        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+        <mat-datepicker #picker1></mat-datepicker>
+        @if (projectForm.get('endDate')?.hasError('required')) {
+          <mat-error>Please select date</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Client -->
+    <div>
+      <mat-form-field class="w-full" appearance="outline">
+        <mat-label>Client Name</mat-label>
+        <input matInput formControlName="client" placeholder="Client Name">
+      </mat-form-field>
+    </div>
+
+    <!-- Team -->
+    <div>
+      <mat-form-field class="w-full" appearance="outline">
+        <mat-label>Team</mat-label>
+        <input matInput formControlName="team" placeholder="Team (comma separated)">
+      </mat-form-field>
+    </div>
+
+    <!-- Status -->
+    <div>
+      <mat-label class="block mb-2 font-medium">Work Status:</mat-label>
+      <mat-radio-group formControlName="status" class="flex flex-wrap gap-4">
+        <mat-radio-button value="Active">Active</mat-radio-button>
+        <mat-radio-button value="Completed">Completed</mat-radio-button>
+        <mat-radio-button value="Running">Running</mat-radio-button>
+        <mat-radio-button value="Pending">Pending</mat-radio-button>
+        <mat-radio-button value="Not Started">Not Started</mat-radio-button>
+        <mat-radio-button value="Canceled">Canceled</mat-radio-button>
+      </mat-radio-group>
+    </div>
+
+    <!-- Description -->
+    <div>
+      <mat-label class="block mb-2 font-medium">Descriptions:</mat-label>
+      <div class="NgxEditor__Wrapper">
+        <ngx-editor-menu [editor]="editor!" class="text-gray-500" [toolbar]="toolbar"></ngx-editor-menu>
+        <ngx-editor [editor]="editor" [placeholder]="'Type here...'" formControlName="description"
+          class="NgxEditorStyles">
+        </ngx-editor>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="flex gap-4">
+      <button class="primary" [disabled]="!projectForm.valid" mat-raised-button color="primary">Submit</button>
+      <button mat-raised-button color="warn" type="button" (click)="onNoClick()" tabindex="-1">Cancel</button>
+    </div>
+
+  </form>
+</div>

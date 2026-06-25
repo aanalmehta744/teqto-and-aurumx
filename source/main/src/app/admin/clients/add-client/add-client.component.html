@@ -1,0 +1,153 @@
+<section class="p-4">
+  <div class="bg-white shadow rounded-lg">
+    <!-- Breadcrumb Header -->
+    <div class="border-b px-6 py-4">
+      <app-breadcrumb [title]="'Add Client'" [items]="['Clients']" [active_item]="'Add Client'"></app-breadcrumb>
+    </div>
+    <!-- Card Header -->
+    <div class="border-b px-6 py-3">
+      <h2 class="text-lg font-semibold text-gray-800">Add Client</h2>
+    </div>
+    <!-- Form Body -->
+    <div class="p-6">
+      <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Row 1 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Full Name</mat-label>
+            <input matInput formControlName="fullName" required />
+            <mat-error *ngIf="clientForm.get('fullName')?.hasError('required')">
+              Full Name is required.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Mobile</mat-label>
+            <input matInput formControlName="mobile" type="text" required />
+            <mat-error *ngIf="clientForm.get('mobile')?.hasError('required')">
+              Mobile number is required.
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" required />
+            <mat-error *ngIf="clientForm.get('email')?.hasError('email')">
+              Enter a valid email address.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>LinkedIn ID</mat-label>
+            <input matInput formControlName="linkedinId" required />
+            <mat-error *ngIf="clientForm.get('linkedinId')?.hasError('required')">
+              LinkedIn ID is required.
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Country</mat-label>
+            <mat-select formControlName="country" required>
+              <mat-option *ngFor="let country of countryList" [value]="country.name">
+                {{ country.name }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="clientForm.get('country')?.hasError('required')">
+              Select a country.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Address</mat-label>
+            <textarea matInput formControlName="address" required></textarea>
+            <mat-error *ngIf="clientForm.get('address')?.hasError('required')">
+              Address is required.
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Row 4 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Client Type</mat-label>
+            <mat-select formControlName="clientType" required>
+              <mat-option *ngFor="let type of clientTypes" [value]="type">
+                {{ type }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="clientForm.get('clientType')?.hasError('required')">
+              Select Client Type.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Date</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="date" required />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="clientForm.get('date')?.hasError('required')">
+              Please select a date.
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Row 5 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Platform</mat-label>
+            <input matInput formControlName="platform" required />
+            <mat-error *ngIf="clientForm.get('platform')?.hasError('required')">
+              Platform is required.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Technology</mat-label>
+            <input matInput formControlName="technology" required />
+            <mat-error *ngIf="clientForm.get('technology')?.hasError('required')">
+              Technology is required.
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Row 6: Price Tag -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Price Tag</mat-label>
+            <mat-select formControlName="prizeTag" (selectionChange)="onPrizeTagChange($event.value)" required>
+              <mat-option *ngFor="let tag of prizeTags" [value]="tag">
+                {{ tag }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="clientForm.get('prizeTag')?.hasError('required')">
+              Select Price Tag (Hourly/Monthly).
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Conditional Input -->
+          <div *ngIf="showPrizeInput">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Price Amount ({{ selectedPrizeTag }})</mat-label>
+              <input matInput formControlName="prizeAmount" type="number" required />
+              <mat-error *ngIf="clientForm.get('prizeAmount')?.hasError('required')">
+                Price amount is required.
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="pt-4 flex justify-end gap-4">
+          <button [disabled]="!clientForm.valid" mat-raised-button color="primary">Submit</button>
+          <button type="button" mat-raised-button color="warn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

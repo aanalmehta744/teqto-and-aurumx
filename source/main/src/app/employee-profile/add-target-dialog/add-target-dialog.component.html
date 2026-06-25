@@ -1,0 +1,52 @@
+<div class="p-4 w-full max-w-lg mx-auto">
+  <!-- Modal Header -->
+  <div class="flex justify-between items-start mb-4 border-b pb-2">
+    <div class="flex items-center gap-4">
+      <img *ngIf="employees?.img" [src]="employees?.img" alt="avatar"
+        class="w-12 h-12 rounded-full object-cover border border-gray-300" />
+      <div class="text-lg font-medium text-[#00383F]">
+        {{ dialogTitle }}
+      </div>
+    </div>
+    <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Form Content -->
+  <mat-dialog-content>
+    <form [formGroup]="targetForm" (ngSubmit)="onSubmit()" class="space-y-4">
+
+      <!-- Amount Field -->
+      <div>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Amount</mat-label>
+          <input matInput formControlName="amount" required />
+          <mat-icon matSuffix>face</mat-icon>
+          <mat-error *ngIf="targetForm.get('amount')?.hasError('required')">
+            Amount is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Target Date Field -->
+      <div>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Target Date</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="target_date" required />
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="targetForm.get('target_date')?.hasError('required')">
+            Target Date is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end gap-4 pt-4">
+        <button mat-stroked-button color="warn" type="button" (click)="onCancel()">Cancel</button>
+        <button mat-flat-button color="primary" type="submit" [disabled]="targetForm.invalid">Save</button>
+      </div>
+    </form>
+  </mat-dialog-content>
+</div>

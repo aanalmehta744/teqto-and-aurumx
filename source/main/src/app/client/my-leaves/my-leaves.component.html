@@ -1,0 +1,221 @@
+<section>
+  <div>
+    <div class="mb-3">
+      <!-- breadcrumb -->
+      <app-breadcrumb [title]="'My Leaves'" [items]="['Home']" [active_item]="'My Leaves'">
+      </app-breadcrumb>
+    </div>
+    <div class="flex flex-wrap">
+      <div class="w-full">
+        <div class="rounded-lg shadow-xl overflow-auto">
+
+          <!-- Table Header -->
+          <div class="flex flex-col md:flex-row justify-between items-center p-4 border-b bg-[#00c4c4]">
+            <div class="w-full md:w-auto mb-4 md:mb-0">
+              <ul class="flex flex-col md:flex-row items-start md:items-center gap-4">
+                <li>
+                  <h2 class="text-lg text-white mr-2">My Leaves</h2>
+                </li>
+                <div class="flex items-center justify-center">
+                  <div
+                    class="border border-[#CCCCCC] rounded-full bg-white flex items-center text-gray-500 shadow w-full max-w-md">
+                    <mat-icon class="ms-3">search</mat-icon>
+                    <input type="text" #filter
+                      class="w-full h-[40px] rounded-full ps-2 focus:outline-none placeholder:text-[16px]"
+                      placeholder="Search" matInput (keyup)="applyFilter($event)" id="inputoutline"
+                      aria-label="Search box">
+                  </div>
+                </div>
+              </ul>
+            </div>
+
+            <div class="w-full md:w-auto">
+              <ul class="flex items-center md:justify-end gap-2">
+                <li>
+                  <div class="ml-2" matTooltip="ADD">
+                    <button mat-mini-fab class="!bg-[#D5EAEA] hover:!bg-gray-100 !text-[#00383F]" (click)="addNew()">
+                      <mat-icon>add</mat-icon>
+                    </button>
+                  </div>
+                </li>
+                <li>
+                  <div class="ml-2" matTooltip="REFRESH">
+                    <button mat-mini-fab class="!bg-[#D5EAEA] hover:!bg-gray-100 !text-[#00383F]" (click)="refresh()">
+                      <mat-icon>refresh</mat-icon>
+                    </button>
+                  </div>
+                </li>
+                <li>
+                  <div class="ml-2" [hidden]=!selection.hasValue() matTooltip="DELETE">
+                    <button mat-mini-fab class="!bg-[#D5EAEA] hover:!bg-gray-100 !text-[#00383F]"
+                      (click)="removeSelectedRows()">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </li>
+                <li>
+                  <div class="cursor-pointer p-2 rounded-xl bg-[#D5EAEA] hover:bg-gray-100 shadow-xl" matTooltip="XLSX">
+                    <img src="assets/images/icons/xlsx.png" alt="" class="w-6 h-6" (click)="exportExcel()" />
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Table Body -->
+          <div class="overflow-auto">
+            <div class="min-w-full">
+              <table mat-table [dataSource]="dataSource" matSort class="w-full text-sm">
+
+                <!-- Checkbox Column -->
+                <ng-container matColumnDef="select">
+                  <mat-header-cell *matHeaderCellDef class="w-[6%]">
+                    <mat-checkbox (change)="$event ? masterToggle() : null"
+                      [checked]="selection.hasValue() && isAllSelected()"
+                      [indeterminate]="selection.hasValue() && !isAllSelected()" class="tbl-checkbox">
+                    </mat-checkbox>
+                  </mat-header-cell>
+                  <mat-cell *matCellDef="let row" class="w-[6%]">
+                    <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                      [checked]="selection.isSelected(row)" class="tbl-checkbox">
+                    </mat-checkbox>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- ID Column -->
+                <ng-container matColumnDef="id">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header>Id</mat-header-cell>
+                  <mat-cell *matCellDef="let row">{{row.id}}</mat-cell>
+                </ng-container>
+
+                <!-- Start Date Column -->
+                <ng-container matColumnDef="start_date">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header>From Date</mat-header-cell>
+                  <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
+                    {{row.start_date | date }}
+                  </mat-cell>
+                </ng-container>
+
+                <!-- End Date Column -->
+                <ng-container matColumnDef="end_date">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header>To Date</mat-header-cell>
+                  <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
+                    {{row.end_date | date}}
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Half Day Column -->
+                <ng-container matColumnDef="halfDay">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header>Half Day</mat-header-cell>
+                  <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
+                    {{row.halfDay ? (row.halfDay) : '--'}}
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Type Column -->
+                <ng-container matColumnDef="type">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header>Type</mat-header-cell>
+                  <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
+                    {{row.leave_type}}
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header>Status</mat-header-cell>
+                  <mat-cell mat-cell *matCellDef="let row">
+
+                    @if (row.status==='Approved') {
+                    <div>
+                      <span
+                        class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                        {{row.status}}
+                      </span>
+                    </div>
+                    }
+                    @if (row.status==='Rejected') {
+                    <div>
+                      <span
+                        class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                        {{row.status}}
+                      </span>
+                    </div>
+                    }
+                    @if (row.status==='Pending') {
+                    <div>
+                      <span
+                        class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                        {{row.status}}
+                      </span>
+                    </div>
+                    }
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Reason Column -->
+                <ng-container matColumnDef="reason">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header>Reason</mat-header-cell>
+                  <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)" class="whitespace-nowrap">
+
+                    <span class="reason-cell" [title]="row.reason">{{ row.reason }}</span>
+                  </mat-cell>
+                </ng-container>
+
+
+                <!-- Number of Days Column -->
+                <ng-container matColumnDef="no_of_day">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header>No of day</mat-header-cell>
+                  <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)" class="whitespace-nowrap">
+                    {{row.no_of_days}}
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                  <mat-header-cell *matHeaderCellDef class="pr-0">Actions</mat-header-cell>
+                  <mat-cell *matCellDef="let row; let i=index;" class="pr-0">
+                    <button mat-icon-button color="accent" (click)="$event.stopPropagation()" (click)="editCall(row)"
+                      class="tbl-action-btn" matTooltip="Edit">
+                      <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'">
+                      </app-feather-icons>
+                    </button>
+                    <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
+                      (click)="deleteItem(i, row)" class="tbl-action-btn" matTooltip="Delete">
+                      <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'">
+                      </app-feather-icons>
+                    </button>
+                  </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="editCall(row)" class="cursor-pointer"
+                  matRipple>
+                </mat-row>
+              </table>
+
+              @if (exampleDatabase?.isTblLoading) {
+              <div class="flex justify-center items-center py-8">
+                <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate">
+                </mat-progress-spinner>
+              </div>
+              }
+
+
+
+              @if (!exampleDatabase?.isTblLoading) {
+              <div class="py-8 text-center text-gray-500"
+                [style.display]="dataSource.renderedData.length === 0 ? '' : 'none'">
+                No results
+              </div>
+              }
+
+            </div>
+          </div>
+          <mat-paginator #paginator [length]="dataSource?.filteredData?.length" [pageIndex]="0" [pageSize]="10"
+            [pageSizeOptions]="[5, 10, 25, 100]">
+          </mat-paginator>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

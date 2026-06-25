@@ -1,0 +1,127 @@
+<div class="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-auto">
+  <!-- Modal Header -->
+  <div class="flex justify-between items-center p-4 border-b">
+    <h2 class="text-lg font-medium text-[#00383F]">{{ dialogTitle }}</h2>
+    <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Modal Content -->
+  <div mat-dialog-content class="p-4">
+    <form [formGroup]="jobsListForm" (ngSubmit)="submit">
+
+      <!-- Job Title -->
+      <div class="mb-4">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Job Title</mat-label>
+          <input matInput formControlName="title" required>
+          <mat-icon matSuffix class="material-icons-outlined">description</mat-icon>
+          @if (jobsListForm.get('title')?.hasError('required')) {
+          <mat-error>Job Title is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Department & Job Type -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Department</mat-label>
+          <mat-select formControlName="department" required>
+            <mat-option value="HR">HR</mat-option>
+            <mat-option value="BDE">BDE</mat-option>
+            <mat-option value="Frontend Developer">Frontend Developer</mat-option>
+            <mat-option value="Backend Developer">Backend Developer</mat-option>
+            <mat-option value="Fullstack Developer">Fullstack Developer</mat-option>
+            <mat-option value="Graphic">Graphic</mat-option>
+          </mat-select>
+          @if (jobsListForm.get('department')?.hasError('required')) {
+          <mat-error>Department is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Job Type</mat-label>
+          <mat-select formControlName="jobType" required>
+            <mat-option value="Full Time">Full Time</mat-option>
+            <mat-option value="Part Time">Part Time</mat-option>
+            <mat-option value="Internship">Internship</mat-option>
+            <mat-option value="Other">Other</mat-option>
+          </mat-select>
+          @if (jobsListForm.get('jobType')?.hasError('required')) {
+          <mat-error>Job Type is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Vacancies & Status -->
+      <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Vacancies</mat-label>
+          <input matInput formControlName="vacancies" type="number" min="0">
+          <mat-icon matSuffix class="material-icons-outlined">people_alt</mat-icon>
+          @if (jobsListForm.get('vacancies')?.hasError('required')) {
+          <mat-error>Vacancies is required</mat-error>
+          }
+        </mat-form-field>
+
+        
+      </div> -->
+      <!-- Vacancies & Filled Vacancies -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Vacancies</mat-label>
+          <input matInput formControlName="vacancies" type="number" min="0">
+          <mat-icon matSuffix class="material-icons-outlined">people_alt</mat-icon>
+          <mat-error *ngIf="jobsListForm.get('vacancies')?.hasError('required')">
+            Vacancies is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Closed Vacancies</mat-label>
+          <input matInput formControlName="closedVacancies" type="number" min="0">
+          <mat-icon matSuffix class="material-icons-outlined">check_circle</mat-icon>
+          <mat-error *ngIf="jobsListForm.get('closedVacancies')?.hasError('closedExceeds') 
+   && jobsListForm.get('closedVacancies')?.touched">
+            Closed cannot exceed total vacancies
+          </mat-error>
+
+        </mat-form-field>
+
+      </div>
+      <div>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status" required>
+            <mat-option value="Open">Open</mat-option>
+            <mat-option value="Closed">Closed</mat-option>
+            <mat-option value="Cancelled">Cancelled</mat-option>
+          </mat-select>
+          @if (jobsListForm.get('status')?.hasError('required')) {
+          <mat-error>Status is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
+      <!-- Job Description -->
+      <div class="mb-4">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Job Description</mat-label>
+          <textarea matInput formControlName="description" rows="4"></textarea>
+          <mat-icon matSuffix class="material-icons-outlined">notes</mat-icon>
+          @if (jobsListForm.get('description')?.hasError('required')) {
+          <mat-error>Description is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex justify-end space-x-3 pt-2">
+        <button mat-raised-button color="primary" [disabled]="!jobsListForm.valid" [mat-dialog-close]="1"
+          (click)="confirmAdd()">Save</button>
+        <button mat-raised-button color="warn" type="button" (click)="onNoClick()" tabindex="-1">Cancel</button>
+      </div>
+
+    </form>
+  </div>
+</div>

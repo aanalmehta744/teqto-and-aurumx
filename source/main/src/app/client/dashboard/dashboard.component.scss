@@ -1,0 +1,17 @@
+.responsive_table {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table.mat-table {
+    min-width: 800px;
+    width: 100%;
+}
+
+.mat-cell,
+.mat-header-cell {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 200px;
+}

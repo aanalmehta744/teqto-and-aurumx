@@ -1,0 +1,25 @@
+<section class="content">
+  <div class="content-block">
+    <div class="block-header">
+      <!-- breadcrumb -->
+      <app-breadcrumb [title]="'Editors'" [items]="['Home','Forms']" [active_item]="'Editors'"></app-breadcrumb>
+    </div>
+    <!-- ngx editor -->
+    <div class="row clearfix">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+          <div class="header">
+            <h2>ngx editor</h2>
+          </div>
+          <div class="body">
+            <div class="NgxEditor__Wrapper">
+              <ngx-editor-menu [editor]="editor!" [toolbar]="toolbar!"> </ngx-editor-menu>
+              <ngx-editor [editor]="editor!" [placeholder]="'Type here...'" class="NgxEditorStyles"></ngx-editor>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- #END# ngx editor -->
+  </div>
+</section>

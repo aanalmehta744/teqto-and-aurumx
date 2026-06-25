@@ -1,0 +1,132 @@
+const express = require('express');
+const router = express.Router();
+const db = require('../connection'); // <-- use promise interface
+
+// Fetch all tasks
+router.get('/', async (req, res) => {
+  try {
+    // const [rows] = await db.query('SELECT * FROM tasks ORDER BY create_date DESC');
+    const [rows] = await db.query(`
+       SELECT 
+    tasks.*, 
+    projects.projectTitle,
+    employees.fullName AS employee_name
+FROM 
+    tasks
+ LEFT JOIN 
+    projects ON tasks.project_id = projects.id
+JOIN
+    employees ON tasks.employee_id = employees.id
+ORDER BY 
+    tasks.id DESC;
+`,
+      [req.params.userId]
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// Fetch a specific task by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT * FROM tasks WHERE id = ?', [req.params.id]);
+    if (rows.length === 0) return res.status(404).json({ message: 'Task not found' });
+    res.json(rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+// Fetch a specific task by employee ID
+router.get('/mytask/:userId', async (req, res) => {
+  console.log("Employee ID", req.params.userId);
+  try {
+    // Join tasks with projects on project_id to fetch project title
+    const [rows] = await db.query(`
+        SELECT 
+          tasks.*, 
+          projects.projectTitle,
+          employees.fullName AS employee_name
+        FROM 
+          tasks
+        LEFT JOIN 
+          projects ON tasks.project_id = projects.id
+        JOIN
+          employees ON tasks.employee_id = employees.id
+        WHERE 
+          tasks.employee_id = ?
+        ORDER BY 
+        tasks.id DESC`,
+      [req.params.userId]
+    );
+
+    if (rows.length === 0) return res.status(404).json({ message: 'Task not found' });
+
+    res.json(rows);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// Create a new task
+router.post('/', async (req, res) => {
+  const { employee_id, project_id, trainer_project_name, employee_type, title, done, note, priority, due_date } = req.body;
+
+  try {
+    await db.query(
+      `INSERT INTO tasks (employee_id, project_id, trainer_project_name, employee_type, title, done, note, priority, due_date)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        employee_id,
+        project_id || null,
+        trainer_project_name || null,
+        employee_type,
+        title,
+        done,
+        note,
+        priority,
+        due_date
+      ]
+    );
+
+    res.json({ message: 'Task created successfully' });
+  } catch (err) {
+    console.error('Insert error:', err);  // Add logging
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
+// Update an existing task
+router.put('/:id', async (req, res) => {
+  const { employee_id, project_id, title, done, note, priority, due_date } = req.body;
+  try {
+    await db.query(
+      `UPDATE tasks
+       SET employee_id = ?, project_id = ?, title = ?, done = ?, note = ?, priority = ?, due_date = ?
+       WHERE id = ?`,
+      [employee_id, project_id, title, done, note, priority, due_date, req.params.id]
+    );
+    res.json({ message: 'Task updated successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete a task
+router.delete('/:id', async (req, res) => {
+  try {
+    await db.query('DELETE FROM tasks WHERE id = ?', [req.params.id]);
+    res.json({ message: 'Task deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+module.exports = router;

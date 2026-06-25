@@ -1,0 +1,153 @@
+<section>
+    <div class="mx-auto">
+        <!-- Breadcrumb -->
+        <div>
+            <app-breadcrumb [title]="'Daily Updates'" [items]="['Home']"
+                [active_item]="'Daily Updates'"></app-breadcrumb>
+        </div>
+
+        <!-- Card -->
+        <div class="w-full">
+            <div class="bg-white rounded-lg shadow-xl">
+                <!-- Table Header -->
+                <div
+                    class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4 border-b bg-[#00C4C4] rounded-t-lg">
+                    <!-- Left: Title + Search -->
+                    <div class="flex flex-wrap items-center gap-4">
+                        <h2 class="text-lg text-white">Daily Updates</h2>
+                        <div class="flex items-center justify-center">
+                            <div
+                                class="border border-[#CCCCCC] rounded-full bg-white flex items-center text-gray-500 shadow w-full max-w-md">
+                                <mat-icon class="ms-3">search</mat-icon>
+                                <input id="search-input" placeholder="Search" type="text" #filter
+                                    (keyup)="applyFilter(filter.value)"
+                                    class="w-full h-[40px] rounded-full ps-2 focus:outline-none placeholder:text-[17px]" />
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right: Add + Refresh Buttons -->
+                    <!-- <div class="flex items-center gap-2">
+                        <button mat-mini-fab class="!bg-[#D5EAEA] hover:!bg-gray-100 !text-[#00383F]" matTooltip="ADD"
+                            (click)="addNew()">
+                            <mat-icon>add</mat-icon>
+                        </button>
+                        <button mat-mini-fab class="!bg-[#D5EAEA] hover:!bg-gray-100 !text-[#00383F]"
+                            matTooltip="REFRESH" (click)="refresh()">
+                            <mat-icon>refresh</mat-icon>
+                        </button>
+                    </div> -->
+                </div>
+
+                <!-- Table Body -->
+                <div class="overflow-auto max-h-[70vh]">
+                    <ng-scrollbar class="max-h-[70vh]">
+                        <div class="p-4">
+                            <!-- No Results -->
+                            <div *ngIf="!isTblLoading && groupedData.length === 0"
+                                class="text-center py-4 text-gray-500">
+                                No results
+                            </div>
+
+                            <!-- Grouped Table -->
+                            <div *ngFor="let group of filteredGroupedData" class="mb-6">
+                                <!-- Group Header -->
+                                <h6 class="text-lg font-medium text-[#009F9F] mb-2">
+                                    {{ group.date | date: "MMM d, y '('EEE')'" }}
+                                </h6>
+
+                                <!-- Table -->
+                                <table mat-table [dataSource]="group.dataSource" matSort
+                                    class="w-full border rounded text-sm">
+                                    <!-- Employee Name -->
+                                    <ng-container matColumnDef="employee_name">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header
+                                            class="bg-gray-100 p-2">Employee Name</mat-header-cell>
+                                        <mat-cell *matCellDef="let row" class="p-2">
+                                            <span class="font-medium text-[#00383F]">{{ row.employee_name }}</span>
+                                        </mat-cell>
+                                    </ng-container>
+
+                                    <!-- Department -->
+                                    <ng-container matColumnDef="department">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header
+                                            class="bg-gray-100 p-2">Department</mat-header-cell>
+                                        <mat-cell *matCellDef="let row" class="p-2">{{ row.department || '-'
+                                            }}</mat-cell>
+                                    </ng-container>
+
+                                    <!-- Project -->
+                                    <ng-container matColumnDef="project">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header
+                                            class="bg-gray-100 p-2">Project</mat-header-cell>
+                                        <mat-cell *matCellDef="let row" class="p-2">{{ row.projectTitle || '-'
+                                            }}</mat-cell>
+                                    </ng-container>
+
+                                    <!-- Task Title -->
+                                    <ng-container matColumnDef="taskTitle">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header class="bg-gray-100 p-2">Task
+                                            Title</mat-header-cell>
+                                        <mat-cell *matCellDef="let row" class="p-2">{{ row.task_title || '-'
+                                            }}</mat-cell>
+                                    </ng-container>
+
+                                    <!-- Task Details -->
+                                    <ng-container matColumnDef="taskDetails">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header class="bg-gray-100 p-2">Task
+                                            Details</mat-header-cell>
+                                        <mat-cell *matCellDef="let row" class="p-2">{{ row.note || '-' }}</mat-cell>
+                                    </ng-container>
+
+                                    <!-- Update Details -->
+                                    <ng-container matColumnDef="update">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header
+                                            class="bg-gray-100 p-2">Update Details</mat-header-cell>
+                                        <mat-cell *matCellDef="let row" class="p-2">{{ row.update_details || '-'
+                                            }}</mat-cell>
+                                    </ng-container>
+
+                                    <!-- Status -->
+                                    <ng-container matColumnDef="status">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header
+                                            class="bg-gray-100 p-2">Status</mat-header-cell>
+                                        <mat-cell *matCellDef="let row" class="p-2">{{ row.status || '-' }}</mat-cell>
+                                    </ng-container>
+
+                                    <!-- Actions -->
+                                    <ng-container matColumnDef="actions">
+                                        <mat-header-cell *matHeaderCellDef
+                                            class="bg-gray-100 p-2 text-right">Actions</mat-header-cell>
+                                        <mat-cell *matCellDef="let row" class="p-2 text-right">
+                                            <!-- Actions (commented out) -->
+                                            <!-- <button mat-icon-button (click)="$event.stopPropagation(); editCall(row)"
+                                                [disabled]="['hr', 'bde'].includes(row.department?.toLowerCase())"
+                                                matTooltip="Edit">
+                                                <app-feather-icons [icon]="'edit'"
+                                                    [class]="'tbl-fav-edit'"></app-feather-icons>
+                                            </button> -->
+                                            <!-- View Button -->
+                                            <button mat-icon-button color="primary"
+                                                (click)="$event.stopPropagation(); viewCall(row)" matTooltip="View">
+                                                <app-feather-icons [icon]="'eye'"
+                                                    [class]="'tbl-fav-view'"></app-feather-icons>
+                                            </button>
+                                        </mat-cell>
+                                    </ng-container>
+
+                                    <!-- Table Rows -->
+                                    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                                    <mat-row *matRowDef="let row; columns: displayedColumns"
+                                        class="hover:bg-gray-50 "></mat-row>
+                                </table>
+
+                                <!-- Paginator -->
+                                <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons></mat-paginator>
+                                <hr class="my-4 border-gray-300" />
+                            </div>
+                        </div>
+                    </ng-scrollbar>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

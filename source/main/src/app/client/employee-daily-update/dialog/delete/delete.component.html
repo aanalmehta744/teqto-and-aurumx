@@ -1,0 +1,27 @@
+<!-- Dialog Title -->
+<h3 mat-dialog-title class="text-xl font-semibold text-[#00383F]">Are you sure?</h3>
+
+<!-- Dialog Content -->
+<div mat-dialog-content class="p-4">
+  <ul class="space-y-2">
+    <li>
+      <p><span class="font-semibold text-[#00383F]">Task Title:</span> {{ data.title }}</p>
+    </li>
+    <li>
+      <p><span class="font-semibold text-[#00383F]">Date:</span> {{ data.update_date | date }}</p>
+    </li>
+    <li>
+      <p><span class="font-semibold text-[#00383F]">Project Title:</span> {{ data.projectTitle }}</p>
+    </li>
+  </ul>
+</div>
+
+<!-- Dialog Actions -->
+<div mat-dialog-actions class="flex justify-end gap-4 px-4 pb-4">
+  <button mat-raised-button color="warn" [mat-dialog-close]="1" (click)="confirmDelete()">
+    Delete
+  </button>
+  <button mat-raised-button (click)="onNoClick()" tabindex="-1" class="!bg-gray-100 !text-[#00383F] hover:!bg-gray-200">
+    Cancel
+  </button>
+</div>

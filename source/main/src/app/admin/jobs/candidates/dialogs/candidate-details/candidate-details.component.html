@@ -1,0 +1,73 @@
+
+<section>
+  <div class="mx-auto">
+    <!-- Breadcrumb -->
+    <div>
+      <app-breadcrumb [title]="'Candidate'" [items]="['Home','Jobs']" [active_item]="'Candidate'"></app-breadcrumb>
+    </div>
+
+    <!-- Card Wrapper -->
+    <div class="bg-white shadow-xl rounded-lg p-6">
+      <!-- Heading -->
+      <h4 class="text-lg font-medium text-[#009F9F] mb-6">
+        Candidate Details :
+      </h4>
+
+      <!-- Grid Info -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-[#444]">
+        <div class="flex gap-1" ><strong class="text-[#0E264A] font-medium">Full Name :</strong> {{ candidate?.full_name }}</div>
+        <div class="flex gap-1" ><strong class="text-[#0E264A] font-medium">Last CTC :</strong> {{ candidate?.last_ctc }}</div>
+        <div class="flex gap-1" ><strong class="text-[#0E264A] font-medium">Email :</strong> {{ candidate?.email }}</div>
+        <div class="flex gap-1" ><strong class="text-[#0E264A] font-medium">Experience :</strong> {{ candidate?.experience }}</div>
+        <div class="flex gap-1" ><strong class="text-[#0E264A] font-medium">Mobile :</strong> {{ candidate?.mobile }}</div>
+        <div class="flex gap-1" ><strong class="text-[#0E264A] font-medium">Last Company :</strong> {{ candidate?.last_company }}</div>
+        <div class="flex gap-1" ><strong class="text-[#0E264A] font-medium">Gender :</strong> {{ candidate?.gender }}</div>
+        <div class="flex gap-1" >
+          <strong class="text-[#0E264A] font-medium">LinkedIn :</strong>
+          <a [href]="candidate?.linkedin" target="_blank" rel="noopener" class="text-blue-600 underline">
+            {{ candidate?.linkedin }}
+          </a>
+        </div>
+        <div class="flex gap-1" ><strong class="text-[#0E264A] font-medium">Address :</strong> {{ candidate?.address }}</div>
+        <div class="flex gap-1" ><strong class="text-[#0E264A] font-medium">Created At :</strong> {{ candidate?.created_at | date }}</div>
+        <div></div>
+        <div>
+          <a *ngIf="candidate?.resume" [href]="getResumeUrl(candidate.resume)" target="_blank" download
+            class="inline-flex items-center px-3 py-2 text-sm border border-blue-500 text-blue-500 rounded hover:bg-blue-50 transition mt-2">
+            <i class="fa fa-download mr-2"></i>Download Resume
+          </a>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <hr class="my-6">
+
+      <!-- Job Details Grid -->
+      <h5 class="text-lg font-medium text-[#009F9F] mb-4">Job Details :</h5>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-[#444]">
+        <div><strong class="text-[#0E264A] font-medium">Job Title :</strong> {{ candidate?.title }}</div>
+        <div><strong class="text-[#0E264A] font-medium">Department :</strong> {{ candidate?.department }}</div>
+        <div class="md:col-span-2">
+          <strong class="text-[#0E264A] font-medium">Description :</strong> <span class="ms-2">{{ candidate?.description }}</span>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <hr class="my-6">
+
+      <!-- Status Flow -->
+      <h5 class="text-lg font-medium text-[#009F9F] mb-4">Status Flow :</h5>
+      <div class="flex flex-wrap items-center gap-2">
+        <ng-container *ngFor="let status of displayedStatuses; let i = index">
+          <span class="px-3 py-1 text-sm font-medium rounded-full"
+            [ngClass]="getStatusClass(status)">
+            {{ status | titlecase }}
+          </span>
+          <ng-container *ngIf="i !== displayedStatuses.length - 1">
+            <i class="fa fa-arrow-right text-gray-400"></i>
+          </ng-container>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</section>

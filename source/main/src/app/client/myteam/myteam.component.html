@@ -1,0 +1,123 @@
+<div *ngFor="let client of clients" class="mb-8">
+  <!-- Client Header -->
+  <div class="bg-white rounded-lg shadow-xl pb-5">
+    <div class="hidden lg:block">
+      <div class="p-6 flex flex-wrap space-x-8">
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-id-card text-[#00C4C4]"></i>
+          <span class="font-semibold text-gray-700">Client Details</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-user text-[#00C4C4]"></i>
+          <span class="text-gray-700">{{ client.client?.fullName || 'N/A' }}</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-envelope text-[#00C4C4]"></i>
+          <span class="text-gray-700">{{ client.client?.email || 'N/A' }}</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-phone text-[#00C4C4]"></i>
+          <span class="text-gray-700">{{ client.client?.mobile || 'N/A' }}</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-map-marker-alt text-[#00C4C4]"></i>
+          <span class="text-gray-700">{{ client.client?.country || 'N/A' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOBILE VIEW -->
+    <div class="block lg:hidden">
+      <div class="p-6 rounded-lg bg-white">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+
+          <!-- Title -->
+          <div class="col-span-full flex items-center gap-2">
+            <i class="fas fa-id-card text-[#00C4C4] text-lg"></i>
+            <span class="font-semibold text-gray-800 text-lg">Client Details</span>
+          </div>
+
+          <!-- Name -->
+          <div class="flex items-center gap-3">
+            <i class="fas fa-user text-[#00C4C4] text-xl"></i>
+            <span class="text-gray-700">{{ client.client?.fullName || 'N/A' }}</span>
+          </div>
+
+          <!-- Email -->
+          <div class="flex items-center gap-3">
+            <i class="fas fa-envelope text-[#00C4C4] text-xl"></i>
+            <span class="text-gray-700">{{ client.client?.email || 'N/A' }}</span>
+          </div>
+
+          <!-- Phone -->
+          <div class="flex items-center gap-3">
+            <i class="fas fa-phone text-[#00C4C4] text-xl"></i>
+            <span class="text-gray-700">{{ client.client?.mobile || 'N/A' }}</span>
+          </div>
+
+          <!-- Location -->
+          <div class="flex items-center gap-3">
+            <i class="fas fa-map-marker-alt text-[#00C4C4] text-xl"></i>
+            <span class="text-gray-700">{{ client.client?.country || 'N/A' }}</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Projects -->
+    <div *ngFor="let project of client.projects" class="m-4 border rounded-lg">
+      <div class="bg-[#00C4C4] text-white text-center py-2 rounded-t-lg">
+        <h5>{{ project.projectTitle?.toUpperCase() || 'PROJECT' }}</h5>
+      </div>
+
+      <!-- Team Members (Card Layout) -->
+      <div class="p-4 h-[50vh] overflow-auto">
+        <ng-container *ngIf="project.team?.length; else singleEmployee">
+          <div *ngFor="let member of project.team" class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6 items-center">
+            <!-- Profile Image -->
+            <div class="md:col-span-2 flex justify-center">
+              <img class="rounded-full w-[120px] h-[120px] object-cover" [src]="
+                     member.gender === 'Male' ? 'assets/images/male-profile.png' :
+                     member.gender === 'Female' ? 'assets/images/female-profile.png' :
+                     'assets/images/user/usrbig1.jpg'
+                   " alt="Profile" />
+            </div>
+
+            <!-- Basic Info -->
+            <div class="md:col-span-6 border-r pr-4">
+              <h5 class="text-xl font-medium text-[#00383F] mb-1">{{ member.fullName | titlecase }}</h5>
+              <p class="text-gray-700 mb-2">
+                <i class="fas fa-briefcase mr-2 text-gray-500"></i>{{ member.department || 'N/A' }}
+              </p>
+              <p class="text-gray-700">
+                <i class="fas fa-birthday-cake mr-2 text-gray-500"></i>{{ member.dob | date }}
+              </p>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="md:col-span-4 space-y-1">
+              <p class="text-gray-700">
+                <i class="fas fa-map-marker-alt mr-2 text-gray-500"></i>{{ member.address || 'N/A' }}
+              </p>
+              <p class="text-gray-700">
+                <i class="fas fa-mobile-alt mr-2 text-gray-500"></i>{{ member.mobile || 'N/A' }}
+              </p>
+              <p class="text-gray-700">
+                <i class="far fa-envelope mr-2 text-gray-500"></i>{{ member.email || 'N/A' }}
+              </p>
+            </div>
+          </div>
+          <!-- <hr class="border-t border-gray-300 mb-4" /> -->
+        </ng-container>
+
+        <ng-template #singleEmployee>
+          <div class="text-gray-700">{{ project.fullName || 'N/A' }}</div>
+          <div class="text-gray-700">{{ project.email || 'N/A' }}</div>
+          <div class="text-gray-700">{{ project.mobile || 'N/A' }}</div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,209 @@
+<div class="p-4" id="addContainer">
+  @if (!isDetails) {
+  <div class="rounded">
+    <!-- Modal Header -->
+    <div class="flex justify-between items-start mb-2 border-b">
+      <div class="mb-4 text-lg font-medium text-[#00383F] pt-3">
+        {{ dialogTitle }}
+      </div>
+      <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Form Content -->
+    <div mat-dialog-content>
+      <form class="space-y-4" [formGroup]="leavesForm" (ngSubmit)="submit()">
+        <!-- Row 1 -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          <mat-form-field class="w-full" appearance="outline">
+            <mat-label>Select Employee</mat-label>
+            <mat-select formControlName="employee_id" required>
+              <mat-option *ngFor="let employee of employees" [value]="employee.id">
+                {{ employee.fullName }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="leavesForm.get('employee_id')?.hasError('required')">
+              Employee is required
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="w-full" appearance="outline">
+            <mat-label>Leave From</mat-label>
+            <input matInput [matDatepicker]="picker2" formControlName="start_date" required />
+            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+            <mat-datepicker #picker2></mat-datepicker>
+            <mat-error *ngIf="leavesForm.get('start_date')?.hasError('required')">
+              Please select a start date
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+
+
+          <mat-form-field class="w-full" appearance="outline">
+            <mat-label>Leave To</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="end_date" required />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="leavesForm.get('end_date')?.hasError('required')">
+              Please select an end date
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="w-full" appearance="outline">
+            <mat-label>Leave Type</mat-label>
+            <mat-select formControlName="leave_type" required>
+              <mat-option value="Paid">Paid</mat-option>
+              <mat-option value="Sick">Sick</mat-option>
+              <mat-option value="Unpaid">Unpaid</mat-option>
+            </mat-select>
+            <mat-error *ngIf="leavesForm.get('leave_type')?.hasError('required')">
+              {{ leaveError }}
+            </mat-error>
+
+          </mat-form-field>
+
+        </div>
+
+        <!-- Row 3 -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          <mat-form-field class="w-full" appearance="outline">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status" required>
+              <mat-option value="Pending">Pending</mat-option>
+              <mat-option value="Approved">Approved</mat-option>
+              <mat-option value="Rejected">Rejected</mat-option>
+            </mat-select>
+            <mat-error *ngIf="leavesForm.get('status')?.hasError('required')">
+              Status is required
+            </mat-error>
+
+          </mat-form-field>
+
+          <mat-form-field class="w-full" appearance="outline">
+            <mat-label>Duration</mat-label>
+            <mat-select formControlName="halfDay">
+              <mat-option value="">--</mat-option>
+              <mat-option value="Full Day">Full Day</mat-option>
+              <mat-option value="First Half">First Half</mat-option>
+              <mat-option value="Second Half">Second Half</mat-option>
+            </mat-select>
+            @if (leavesForm.get('halfDay')?.hasError('required')) {
+            <mat-error>
+              Please select Duration
+            </mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <!-- Reason -->
+        <mat-form-field class="w-full" appearance="outline">
+          <mat-label>Reason</mat-label>
+          <textarea matInput formControlName="reason"></textarea>
+        </mat-form-field>
+
+        <!-- Show checkbox only if sandwich leave applies -->
+        <div *ngIf="isSandwichLeave" class="my-4">
+          <mat-checkbox formControlName="sandwich_confirm" required>
+            I acknowledge the Sandwich Rule applies to my leave
+          </mat-checkbox>
+          <div *ngIf="leavesForm.get('sandwich_confirm')?.invalid && leavesForm.get('sandwich_confirm')?.touched"
+            class="text-red-500 text-sm mt-1">
+            You must confirm the Sandwich Rule to proceed
+          </div>
+
+        </div>
+
+        <!-- Warnings -->
+        <div class="text-center space-y-2 mt-4">
+          <div *ngIf="leaveError " class="text-red-600 text-sm mt-2 bg-yellow-100 p-2 rounded">
+            {{ leaveError }}
+          </div>
+        </div>
+        <!-- <div class="text-center space-y-2 mt-4">
+          <div *ngIf="sandwicherror" class="text-red-600 text-sm mt-2 bg-yellow-100 p-2 rounded"
+            [innerHTML]="sandwicherror">
+            
+          </div>
+        </div> -->
+        <div class="text-center space-y-2 mt-4">
+          <div *ngIf="halfdayError" class="text-red-600 text-sm mt-2 bg-yellow-100 p-2 rounded">
+            {{ halfdayError }}
+          </div>
+        </div>
+        <div *ngIf="leaveOverlapError" class="text-red-600 text-sm mt-2 bg-yellow-100 p-2 rounded">
+          {{leaveOverlapError}}
+        </div>
+
+        <div class="text-center space-y-2 mt-4">
+          <div *ngIf="holidayWarning" class="text-yellow-700 bg-yellow-100 p-2 rounded">
+            ⚠️ Your leave period overlaps with a holiday.
+          </div>
+          <div *ngIf="sandwichWarning" class="text-yellow-700 bg-yellow-100 p-2 rounded">
+            ⚠️ The selected dates fall under the sandwich rule.
+          </div>
+        </div>
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-4 pt-2">
+
+          <div class="text-center" *ngIf="isLoading" style="margin: 1rem 0;">
+            <mat-progress-spinner color="primary" mode="indeterminate" diameter="40"></mat-progress-spinner>
+            <p>Please wait…</p>
+          </div>
+
+          <!-- Disable buttons while loading -->
+          <button mat-raised-button color="primary" (click)="confirmAdd()"
+            [disabled]="isLoading || leavesForm.invalid || isSubmitDisabled">Submit</button>
+          <button mat-button mat-dialog-close color="warn" [disabled]="isLoading">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
+  <!--leave-details -->
+  @if (isDetails) {
+  <div class="rounded">
+
+    <!-- Modal Header -->
+    <div class="flex justify-between items-start mb-2 border-b">
+
+      <div class="mb-4 text-xl font-medium text-[#00383F] pt-3">{{ leaves.employee_name }}</div>
+
+      <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Leave Details -->
+    <div mat-dialog-content>
+      <mat-card-content class="space-y-3 text-sm">
+        <div class="flex items-center gap-3">
+          <i class="material-icons-outlined text-[#00383F]">receipt</i>
+          <div>{{ leaves.leave_type }}</div>
+        </div>
+        <div class="flex items-center gap-3">
+          <i class="material-icons-outlined text-[#00383F]">today</i>
+          <div>{{ leaves.start_date | date: 'MMMM d, yyyy' }}</div>
+        </div>
+        <div class="flex items-center gap-3">
+          <i class="material-icons-outlined text-[#00383F]">fact_check</i>
+          <div>{{ leaves.end_date | date: 'MMMM d, yyyy' }}</div>
+        </div>
+        <div class="flex items-center gap-3">
+          <i class="material-icons-outlined text-[#00383F]">tag</i>
+          <div>{{ leaves.no_of_days }}</div>
+        </div>
+        <div class="flex items-center gap-3">
+          <i class="material-icons-outlined text-[#00383F]">info</i>
+          <div>{{ leaves.status }}</div>
+        </div>
+        <div class="flex items-start gap-3">
+          <i class="material-icons-outlined text-[#00383F]">description</i>
+          <div>{{ leaves.reason }}</div>
+        </div>
+      </mat-card-content>
+    </div>
+  </div>
+  }
+</div>

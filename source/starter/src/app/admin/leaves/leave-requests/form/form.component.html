@@ -1,0 +1,197 @@
+<div class="flex items-center justify-between p-4 border-b bg-[#00c4c4]">
+  <h2 class="text-xl font-semibold text-white">{{ dialogTitle }}</h2>
+  <button mat-icon-button mat-dialog-close class="text-white">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<div mat-dialog-content class="p-6">
+
+  <!-- ===== DETAILS VIEW ===== -->
+  @if (isDetails) {
+    <div class="space-y-3 text-sm">
+      <div class="flex gap-2">
+        <span class="font-semibold text-[#00383F] w-36">Employee:</span>
+        <span>{{ leaves.employee_name }}</span>
+      </div>
+      <div class="flex gap-2">
+        <span class="font-semibold text-[#00383F] w-36">Leave Type:</span>
+        <span>{{ leaves.leave_type }}</span>
+      </div>
+      <div class="flex gap-2">
+        <span class="font-semibold text-[#00383F] w-36">From:</span>
+        <span>{{ leaves.start_date | date }}</span>
+      </div>
+      <div class="flex gap-2">
+        <span class="font-semibold text-[#00383F] w-36">To:</span>
+        <span>{{ leaves.end_date | date }}</span>
+      </div>
+      <div class="flex gap-2">
+        <span class="font-semibold text-[#00383F] w-36">No. of Days:</span>
+        <span>{{ leaves.no_of_days }}</span>
+      </div>
+      <div class="flex gap-2">
+        <span class="font-semibold text-[#00383F] w-36">Duration:</span>
+        <span>{{ (leaves.halfDay && leaves.halfDay !== '0') ? leaves.halfDay : 'Full Day' }}</span>
+      </div>
+      <div class="flex gap-2">
+        <span class="font-semibold text-[#00383F] w-36">Reason:</span>
+        <span>{{ leaves.reason }}</span>
+      </div>
+      <div class="flex gap-2">
+        <span class="font-semibold text-[#00383F] w-36">Status:</span>
+        <span [class]="
+          leaves.status === 'Approved' ? 'px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium' :
+          leaves.status === 'Rejected' ? 'px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-medium' :
+          'px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium'
+        ">{{ leaves.status }}</span>
+      </div>
+    </div>
+  }
+
+  <!-- ===== ADD / EDIT FORM ===== -->
+  @if (!isDetails) {
+    <form [formGroup]="leavesForm" class="space-y-4">
+
+      <!-- Employee: name display for edit, ID input for add, info box for employees -->
+      @if (isAdminOrHR && action === 'edit') {
+        <!-- Admin/HR editing: show employee name read-only -->
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm">
+          <span class="font-semibold text-[#00383F]">Employee:</span>
+          <span class="ml-1 font-medium">{{ leaves.employee_name }}</span>
+          <span class="ml-2 text-xs text-gray-400">(ID: {{ leaves.employee_id }})</span>
+        </div>
+      } @else if (isAdminOrHR && action === 'add') {
+        <!-- Admin/HR adding new: editable employee ID -->
+        <mat-form-field class="w-full" appearance="outline">
+          <mat-label>Employee ID</mat-label>
+          <input matInput type="number" formControlName="employee_id"
+            placeholder="Enter Employee ID" />
+          @if (leavesForm.get('employee_id')?.hasError('required') && leavesForm.get('employee_id')?.touched) {
+            <mat-error>Employee ID is required</mat-error>
+          }
+        </mat-form-field>
+      } @else if (action === 'add') {
+        <!-- Employee submitting own leave -->
+        <div class="bg-teal-50 border border-teal-200 rounded-lg p-3 text-sm text-teal-800">
+          <span class="font-medium">Submitting as:</span> {{ loggedUser?.fullName || 'You' }}
+          <span class="ml-2 text-xs text-teal-500">(Employee ID: {{ loggedUser?.id }})</span>
+        </div>
+      }
+
+      <!-- Leave Type -->
+      <mat-form-field class="w-full" appearance="outline">
+        <mat-label>Leave Type</mat-label>
+        <mat-select formControlName="leave_type">
+          <mat-option value="Paid">Paid</mat-option>
+          <mat-option value="Unpaid">Unpaid</mat-option>
+          <mat-option value="Sick">Sick</mat-option>
+        </mat-select>
+        @if (leavesForm.get('leave_type')?.hasError('required') && leavesForm.get('leave_type')?.touched) {
+          <mat-error>Leave type is required</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Start & End Date -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <mat-form-field class="w-full" appearance="outline">
+          <mat-label>Leave From</mat-label>
+          <input matInput [matDatepicker]="startPicker" formControlName="start_date" />
+          <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+          @if (leavesForm.get('start_date')?.hasError('required') && leavesForm.get('start_date')?.touched) {
+            <mat-error>Start date is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field class="w-full" appearance="outline">
+          <mat-label>Leave To</mat-label>
+          <input matInput [matDatepicker]="endPicker" formControlName="end_date" />
+          <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+          @if (leavesForm.get('end_date')?.hasError('required') && leavesForm.get('end_date')?.touched) {
+            <mat-error>End date is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Duration -->
+      <mat-form-field class="w-full" appearance="outline">
+        <mat-label>Duration</mat-label>
+        <mat-select formControlName="halfDay">
+          <mat-option value="">Full Day</mat-option>
+          <mat-option value="Half Day">Half Day</mat-option>
+          <mat-option value="First Half">First Half</mat-option>
+          <mat-option value="Second Half">Second Half</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Reason -->
+      <mat-form-field class="w-full" appearance="outline">
+        <mat-label>Reason</mat-label>
+        <textarea matInput formControlName="reason" rows="3" placeholder="Enter reason for leave"></textarea>
+      </mat-form-field>
+
+      <!-- ===== STATUS (only Admin / eligible HR can change) ===== -->
+      @if (action === 'edit') {
+        @if (canApprove) {
+          <mat-form-field class="w-full" appearance="outline">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status">
+              <mat-option value="Pending">Pending</mat-option>
+              <mat-option value="Approved">Approved</mat-option>
+              <mat-option value="Rejected">Rejected</mat-option>
+            </mat-select>
+            @if (leavesForm.get('status')?.hasError('required') && leavesForm.get('status')?.touched) {
+              <mat-error>Status is required</mat-error>
+            }
+          </mat-form-field>
+        } @else if (statusDisabledForHR) {
+          <!-- HR trying to edit HR-employee leave -->
+          <div class="bg-orange-50 border border-orange-200 rounded-lg p-3 text-sm text-orange-700">
+            ⚠️ Only <strong>Admin</strong> can approve or reject leave requests for HR employees.
+          </div>
+          <div class="flex gap-2 items-center mt-1">
+            <span class="text-sm text-gray-600">Current Status:</span>
+            <span [class]="
+              leaves.status === 'Approved' ? 'px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium' :
+              leaves.status === 'Rejected' ? 'px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-medium' :
+              'px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium'
+            ">{{ leaves.status }}</span>
+          </div>
+        } @else {
+          <!-- BA/BDE/Employee — status read-only -->
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700">
+            ℹ️ Only <strong>Admin</strong> or <strong>HR</strong> can approve or reject leave requests.
+          </div>
+          <div class="flex gap-2 items-center mt-1">
+            <span class="text-sm text-gray-600">Current Status:</span>
+            <span [class]="
+              leaves.status === 'Approved' ? 'px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium' :
+              leaves.status === 'Rejected' ? 'px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-medium' :
+              'px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium'
+            ">{{ leaves.status }}</span>
+          </div>
+        }
+      }
+
+    </form>
+  }
+</div>
+
+<!-- ===== FOOTER BUTTONS ===== -->
+@if (!isDetails) {
+  <div class="flex justify-end gap-3 px-6 pb-6">
+    @if (isLoading) {
+      <mat-spinner diameter="30"></mat-spinner>
+    }
+    @if (action === 'add' || canApprove) {
+      <button mat-raised-button color="primary" (click)="submit()" [disabled]="isLoading">
+        {{ action === 'edit' ? 'Update / Approve' : 'Save Request' }}
+      </button>
+    }
+    <button mat-raised-button color="warn" (click)="onNoClick()" [disabled]="isLoading">
+      Cancel
+    </button>
+  </div>
+}

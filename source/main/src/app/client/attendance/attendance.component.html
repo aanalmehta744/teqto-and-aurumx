@@ -1,0 +1,170 @@
+<section>
+  <div class="rounded-lg">
+    <!-- Breadcrumb -->
+    <app-breadcrumb [title]="'Attendance'" [items]="['Home']" [active_item]="'Attendance'"></app-breadcrumb>
+    <!-- Clockity Card -->
+    <div class="bg-white rounded-xl shadow mb-6 p-4 sm:flex justify-between items-center">
+      <h2 class="text-xl font-medium text-[#00383F]">Clockity</h2>
+      <div class="flex flex-wrap items-center gap-3 mt-2 sm:mt-0">
+
+        <input type="text" class="border border-gray-300 rounded px-3 py-2 w-[80px] text-md text-[#00383F]"
+          [value]="timerDisplay" readonly />
+
+        <button *ngIf="!isTiming" mat-raised-button (click)="onCheckIn()"
+          class="bg-[#D5EAEA] text-[#00383F] px-4 py-2 rounded shadow-lg" [disabled]="hasCheckedInToday">
+          Punch-In
+        </button>
+
+        <button *ngIf="hasCheckedInToday && isTiming" mat-raised-button (click)="onCheckOut()"
+          class="bg-[#00383F] text-[#D5EAEA] px-4 py-2 rounded shadow-lg">
+          Punch-Out
+        </button>
+
+        <!-- <button *ngIf="isTiming" mat-raised-button color="warn"
+          class="bg-orange-600 text-[#D5EAEA] px-4 py-2 rounded shadow-lg" (click)="togglePauseResume()">
+          {{ isPaused ? 'Resume' : 'Pause' }}
+        </button> -->
+
+        <button *ngIf="isTiming" mat-raised-button color="warn"
+          class="bg-orange-600 text-[#D5EAEA] px-4 py-2 rounded shadow-lg" (click)="togglePauseResume()">
+          {{ isPaused ? 'Resume' : 'Pause' }}
+        </button>
+      </div>
+    </div>
+    <!-- Attendance Table Card -->
+    <div class="!bg-[white] rounded-xl shadow-xl overflow-hidden">
+      <!-- Table Header -->
+      <div class="flex flex-col md:flex-row justify-between items-center p-4 border-b bg-[#00c4c4]">
+        <div class="w-full md:w-auto mb-4 md:mb-0">
+          <ul class="flex flex-col md:flex-row items-start md:items-center gap-4">
+            <li>
+              <h2 class="text-lg text-white mr-2">Attendances</h2>
+            </li>
+            <div class="flex items-center justify-center">
+              <div
+                class="border border-[#CCCCCC] rounded-full bg-white flex items-center text-gray-500 shadow w-full max-w-md">
+                <mat-icon class="ms-3">search</mat-icon>
+                <input placeholder="Search" type="text" #filter (keyup)="applyFilter($event)"
+                  class="w-full h-[40px] rounded-full ps-2 focus:outline-none placeholder:text-[16px]"
+                  aria-label="Search box">
+              </div>
+            </div>
+          </ul>
+        </div>
+
+        <ng-template #noDataTemplate>
+          <div class="text-center mt-10 text-gray-500">
+            <i class="fa fa-info-circle text-2xl mb-2 text-blue-500"></i>
+            <p class="text-lg">No payslip generated: No attendance or leave activity recorded for this month.</p>
+          </div>
+        </ng-template>
+
+        <div class="w-full md:w-auto">
+          <ul class="flex items-center md:justify-end gap-2">
+            <!-- <li>
+
+              <button mat-icon-button color="accent" (click)="employeeSalary && downloadCall(employeeSalary)">
+                <app-feather-icons [icon]="'download'" matTooltip="Download"></app-feather-icons>
+              </button>
+
+            </li> -->
+            <li>
+              <div class="cursor-pointer p-2 rounded-xl bg-[#D5EAEA] hover:bg-gray-100 shadow-xl" matTooltip="XLSX">
+                <img src="assets/images/icons/xlsx.png" alt="" class="w-6 h-6" (click)="exportExcel()" />
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Table Body -->
+      <div class="overflow-auto">
+        <div class="min-w-full">
+          <table mat-table [dataSource]="dataSource" matSort class="w-full text-sm">
+            <!-- ID Column -->
+            <ng-container matColumnDef="id">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">Id</mat-header-cell>
+              <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.id }}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="date">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">Date</mat-header-cell>
+              <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.date | date }}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="check_in">
+              <mat-header-cell *matHeaderCellDef mat-sort-header
+                class="px-4 py-2 font-medium">Punch-In</mat-header-cell>
+              <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.check_in ? (row.check_in | date:'h:mm:ss a') :
+                '--' }}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="check_out">
+              <mat-header-cell *matHeaderCellDef mat-sort-header
+                class="px-4 py-2 font-medium">Punch-Out</mat-header-cell>
+              <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.check_out ? (row.check_out | date:'h:mm:ss a') :
+                '--' }}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="hours">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">Hours</mat-header-cell>
+              <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.hours ? row.hours : '--' }}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="break">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">Break</mat-header-cell>
+              <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.break ? row.break : '--' }}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">
+                Status
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row" class="px-4 py-2">
+                <!-- Present -->
+                <span *ngIf="row.final_status === 'Present'"
+                  class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.final_status }}
+                </span>
+
+                <!-- Absent -->
+                <span *ngIf="row.final_status === 'Absent'"
+                  class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.final_status }}
+                </span>
+                <!-- Half Day -->
+                <span *ngIf="row.status === 'Half Day'"
+                  class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.final_status }}
+                </span>
+                <!-- Leave -->
+                <span *ngIf="row.final_status === 'Leave'"
+                  class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.final_status }}
+                </span>
+                <!-- Fallback for any other status -->
+                <span
+                  *ngIf="row.final_status !== 'Present' && row.final_status !== 'Absent' && row.final_status !== 'Leave' && row.final_status !== 'Half Day'"
+                  class=" bg-blue-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.final_status }}
+                </span>
+              </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="detailsCall(row)"
+              class="hover:bg-gray-50 cursor-pointer"></mat-row>
+          </table>
+
+          <!-- <div *ngIf="!exampleDatabase?.isTblLoading && dataSource?.renderedData.length === 0" class="text-center py-4 text-gray-500">
+            No results
+          </div> -->
+
+        </div>
+      </div>
+
+      <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0" [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25, 100]" class="!border-t !p-2 !bg-[#FAF9FD]"></mat-paginator>
+    </div>
+  </div>
+</section>

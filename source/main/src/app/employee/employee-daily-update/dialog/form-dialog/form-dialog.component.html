@@ -1,0 +1,161 @@
+<div *ngIf="!isDetails" class="p-4 bg-white rounded-lg shadow-md w-full max-w-4xl mx-auto">
+    <!-- Modal Header -->
+    <div class="flex justify-between items-center border-b pb-2">
+        <div class="text-lg font-medium text-[#00383F]">{{ dialogTitle }}</div>
+        <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <!-- Modal Content (Form) -->
+    <div mat-dialog-content>
+        <form [formGroup]="dailyUpdateForm" (ngSubmit)="onSubmit()" class="space-y-4">
+            <input type="hidden" formControlName="employee_id" />
+
+            <!-- Project & Task Fields (Non-HR only) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" *ngIf="!isHrDepartment()">
+                <!-- Task Dropdown -->
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Task</mat-label>
+                    <mat-select formControlName="task_id">
+                        <mat-option *ngFor="let task of tasks" [value]="task.id" [disabled]="task.done === 1">
+                            {{ task.title }}
+                            <span *ngIf="isToday(task.create_date) && task.done === 0">(Today)</span>
+                            <span *ngIf="isToday(task.due_date) && task.done === 0 && !isToday(task.create_date)">(Due
+                                Today)</span>
+                            <span *ngIf="isOverdue(task.due_date) && task.done === 0">(Overdue)</span>
+                            <span *ngIf="task.done === 1">(Closed)</span>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <!-- Project Dropdown / Trainer Project -->
+                <mat-form-field appearance="outline" class="w-full" *ngIf="!selectedTrainerProject">
+                    <mat-label>Project</mat-label>
+                    <mat-select formControlName="project_id">
+                        <mat-option *ngFor="let project of projects" [value]="project.id">{{ project.projectTitle
+                            }}</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="dailyUpdateForm.get('project_id')?.hasError('required')">
+                        Project is required
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="w-full" *ngIf="selectedTrainerProject">
+                    <mat-label>Trainer Project</mat-label>
+                    <input matInput [value]="selectedTrainerProject" readonly />
+                </mat-form-field>
+
+                <!-- Status -->
+                <mat-form-field appearance="outline" class="w-full md:col-span-2">
+                    <mat-label>Status</mat-label>
+                    <mat-select formControlName="status" required>
+                        <mat-option value="Not Started">Not Started</mat-option>
+                        <mat-option value="In Progress">In Progress</mat-option>
+                        <mat-option value="Completed">Completed</mat-option>
+                        <mat-option value="Pending">Pending</mat-option>
+                        <mat-option value="Error / Issue">Error / Issue</mat-option>
+                        <mat-option value="Cancelled">Cancelled</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="dailyUpdateForm.get('status')?.hasError('required')">Status is
+                        required</mat-error>
+                </mat-form-field>
+            </div>
+
+            <!-- Date Picker -->
+            <div class="w-full">
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Date</mat-label>
+                    <input matInput [matDatepicker]="picker" formControlName="update_date" />
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                    <mat-error *ngIf="dailyUpdateForm.get('update_date')?.hasError('required')">
+                        Please select a date
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <!-- Update Details -->
+            <div class="w-full">
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Update</mat-label>
+                    <textarea matInput rows="4" formControlName="update_details" required></textarea>
+                    <mat-error *ngIf="dailyUpdateForm.get('update_details')?.hasError('required')">
+                        Update details are required
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end space-x-2 pt-2">
+                <button mat-raised-button color="primary" [disabled]="!dailyUpdateForm.valid">Save</button>
+                <button mat-raised-button color="warn" type="button" (click)="onCancel()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Details View -->
+<div *ngIf="isDetails" class="p-4 bg-white rounded-lg shadow-md w-full max-w-4xl mx-auto">
+    <div class="flex justify-between items-center border-b pb-2">
+        <div class="text-lg font-medium text-[#00383F]">Daily Update Details</div>
+        <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <div mat-dialog-content class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="text-gray-600 font-bold ">Employee</label>
+                <div class="mt-1 text-[#00383F]">{{ dailyUpdate.employeeName }}</div>
+            </div>
+            <div>
+                <label class="text-gray-600 font-bold">Project</label>
+                <div class="mt-1 text-[#00383F]">{{ dailyUpdate.projectTitle || dailyUpdate.trainer_project_name ||
+                    '--'}}
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <label class="text-gray-600 font-bold">Task</label>
+            <div class="mt-1 text-[#00383F]">{{ dailyUpdate.taskTitle || '--' }}</div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="text-gray-600 font-bold">Status</label>
+                <div class="mt-1 text-[#00383F]">{{ dailyUpdate.status || '--' }}</div>
+            </div>
+            <div>
+                <label class="text-gray-600 font-bold">Priority</label>
+                <div class="mt-1 text-[#00383F]">{{ dailyUpdate.priority || '--' }}</div>
+            </div>
+        </div>
+
+        <div>
+            <label class="text-gray-600 font-bold">Date</label>
+            <div class="mt-1 text-[#00383F]">{{ dailyUpdate.update_date | date:'MMM d, y' || '--' }}</div>
+        </div>
+        <div *ngIf="dailyUpdate.note">
+            <label class="text-gray-600 font-bold">Task Details</label>
+            <div class="mt-1 p-2 border rounded text-[#00383F] whitespace-pre-wrap bg-gray-50 max-h-48 overflow-auto"
+                [innerHTML]="dailyUpdate.note || '--'">
+            </div>
+        </div>
+
+        <div>
+            <label class="text-gray-600 font-bold">Update Details</label>
+            <div class="mt-1 p-2 border rounded text-[#00383F] whitespace-pre-wrap bg-gray-50 max-h-48 overflow-auto">
+                {{ dailyUpdate.update_details || '--' }}
+            </div>
+        </div>
+
+
+
+        <div class="flex justify-end space-x-2 pt-2">
+            <button mat-raised-button color="primary" (click)="dialogRef.close()">Close</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,154 @@
+<section>
+  <div class="space-y-6">
+    <!-- Breadcrumb -->
+    <div>
+      <app-breadcrumb [title]="'Jobs List'" [items]="['Jobs']" [active_item]="'Jobs List'"></app-breadcrumb>
+    </div>
+
+    <div class="bg-white shadow-md rounded-xl">
+      <!-- Header Section -->
+      <div
+        class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4 border-b bg-[#00C4C4] rounded-t-xl">
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+          <h2 class="text-lg font-medium text-white">Jobs List</h2>
+          <div class="relative">
+            <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">search</mat-icon>
+            <input type="text" #filter placeholder="Search"
+              class="pl-10 pr-4 py-2 border border-gray-300 rounded-full  focus:outline-none text-[black] placeholder:text-[14px]" />
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 flex-wrap">
+          <button mat-mini-fab color="primary" class="!text-[#00383F] !bg-[#D5EAEA]" (click)="addNew()"
+            matTooltip="ADD">
+            <mat-icon>add</mat-icon>
+          </button>
+          <button mat-mini-fab color="primary" class="!text-[#00383F] !bg-[#D5EAEA]" (click)="refresh()"
+            matTooltip="REFRESH">
+            <mat-icon>refresh</mat-icon>
+          </button>
+          <button mat-mini-fab color="warn" class="!text-[#00383F] !bg-[#D5EAEA]" *ngIf="selection.hasValue()"
+            (click)="removeSelectedRows()" matTooltip="DELETE">
+            <mat-icon>delete</mat-icon>
+          </button>
+          <div matTooltip="XLSX" class="cursor-pointer" (click)="exportExcel()">
+            <img src="assets/images/icons/xlsx.png" alt="Export XLSX" class="w-8 h-8" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="overflow-auto">
+        <table mat-table [dataSource]="dataSource" matSort class="min-w-full text-sm">
+          <!-- Header Row -->
+          <mat-header-row *matHeaderRowDef="displayedColumns"
+            class="bg-[#00c4c4] text-white font-medium"></mat-header-row>
+
+          <!-- Checkbox -->
+          <ng-container matColumnDef="select">
+            <mat-header-cell *matHeaderCellDef class="px-4 py-2">
+              <mat-checkbox (change)="$event ? masterToggle() : null"
+                [checked]="selection.hasValue() && isAllSelected()"
+                [indeterminate]="selection.hasValue() && !isAllSelected()"></mat-checkbox>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">
+              <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                [checked]="selection.isSelected(row)"></mat-checkbox>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Job Columns -->
+          <ng-container matColumnDef="id">
+            <mat-header-cell *matHeaderCellDef class="px-4 py-2">Id</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.id }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="title">
+            <mat-header-cell *matHeaderCellDef class="px-4 py-2">Job Title</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2 truncate">{{ row.title }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="department">
+            <mat-header-cell *matHeaderCellDef class="px-4 py-2">Department</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.department }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="role">
+            <mat-header-cell *matHeaderCellDef class="px-4 py-2">Role</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.role }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="jobType">
+            <mat-header-cell *matHeaderCellDef class="px-4 py-2 whitespace-nowrap">Job Type</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">
+              <span class="badge px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap" [ngClass]="{
+                  'bg-green-100 text-green-700': row.jobType === 'Full Time',
+                  'bg-red-100 text-red-700': row.jobType === 'Part Time',
+                  'bg-purple-100 text-purple-700': row.jobType === 'Internship',
+                  'bg-blue-100 text-blue-700': row.jobType === 'Other'
+                }">
+                {{ row.jobType }}
+              </span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="vacancies">
+            <mat-header-cell *matHeaderCellDef class="px-4 py-2">Vacancies</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.vacancies }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="closedVacancies">
+            <mat-header-cell *matHeaderCellDef class="px-4 py-2">Closed Vacancies</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.closedVacancies }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="px-4 py-2">Status</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">
+              <span class="badge px-2 py-1 rounded-full text-xs font-medium" [ngClass]="{
+                  'bg-green-100 text-green-700': row.status === 'Open',
+                  'bg-red-100 text-red-700': row.status === 'Closed',
+                  'bg-purple-100 text-purple-700': row.status === 'Cancelled'
+                }">
+                {{ row.status }}
+              </span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="date">
+            <mat-header-cell *matHeaderCellDef class="px-4 py-2">Expire Date</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.date | date: 'MM/dd/yyyy' }}</mat-cell>
+          </ng-container>
+
+          <!-- Actions -->
+          <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="px-4 py-2">Actions</mat-header-cell>
+            <mat-cell *matCellDef="let row; let i = index" class="px-4 py-2 flex items-center gap-2">
+              <button mat-icon-button (click)="$event.stopPropagation(); editCall(row)" matTooltip="Edit">
+                <app-feather-icons icon="edit" class="tbl-fav-edit"></app-feather-icons>
+              </button>
+              <button mat-icon-button color="warn" (click)="$event.stopPropagation(); deleteItem(i, row)"
+                matTooltip="Delete">
+                <app-feather-icons icon="trash-2" class="tbl-fav-delete"></app-feather-icons>
+              </button>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Row Click -->
+          <mat-row *matRowDef="let row; columns: displayedColumns" class="hover:bg-gray-50 cursor-pointer" matRipple
+            (click)="editCall(row)"></mat-row>
+        </table>
+
+        <!-- No Results -->
+        <div *ngIf="!exampleDatabase?.isTblLoading && dataSource.renderedData.length === 0"
+          class="text-center text-gray-500 py-4">
+          No results
+        </div>
+
+      </div>
+    </div>
+    <!-- Paginator -->
+    <mat-paginator #paginator [length]="dataSource?.filteredData?.length || 0" [pageSize]="10"
+      [pageSizeOptions]="[5, 10, 25, 100]" class="!border-t !p-2 !bg-gray-50"></mat-paginator>
+  </div>
+</section>

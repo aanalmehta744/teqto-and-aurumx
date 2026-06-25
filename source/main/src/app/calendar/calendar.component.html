@@ -1,0 +1,53 @@
+<section class="w-full min-h-screen px-2 md:px-4 lg:px-8 py-4">
+  <div class="mx-auto max-w-7xl">
+    <!-- Breadcrumb -->
+    <div class="mb-4">
+      <app-breadcrumb [title]="'Calendar'" [items]="['Home']" [active_item]="'Calendar'">
+      </app-breadcrumb>
+    </div>
+
+    <!-- Main Container -->
+    <div class="bg-white rounded-lg shadow-xl p-4">
+      <div class="flex flex-col lg:flex-row gap-6">
+
+        <!-- Left Sidebar -->
+        <div class="w-full lg:w-1/4 xl:w-1/5 px-2">
+          <!-- Add Event Button -->
+          <div class="mb-6">
+            <button mat-raised-button class="!bg-[#D5EAEA] !text-[#00383F] w-full md:w-auto" (click)="addNewEvent()">
+              Add Event
+            </button>
+          </div>
+
+          <!-- Calendar Filters -->
+          <p class="font-medium text-[#009F9F] mb-3">My Calendars</p>
+          <ul class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-1 gap-2">
+            @for (filter of filters; track filter) {
+            <li>
+              <mat-checkbox [checked]="filter.checked" [value]="filter.value" color="primary"
+                (change)="changeCategory($event, filter)">
+                {{ filter.value }}
+              </mat-checkbox>
+            </li>
+            }
+          </ul>
+        </div>
+
+        <!-- Calendar Display -->
+        <div class="w-full px-2">
+          <div class="bg-[#F2F6F9] rounded-md shadow-inner p-3 sm:p-4 w-full">
+            <!-- <full-calendar [options]="calendarOptions" class="!text-[#00383F] w-full block overflow-x-auto">
+            </full-calendar> -->
+
+            <div class="w-full overflow-x-auto">
+              <full-calendar [options]="calendarOptions" class="!text-[#00383F] w-full">
+              </full-calendar>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>

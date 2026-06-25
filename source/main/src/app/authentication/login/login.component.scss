@@ -1,0 +1,198 @@
+::ng-deep .mat-snack-bar-container {
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 12px 24px;
+}
+
+// styles.scss
+::ng-deep .custom-snackbar-success {
+    background-color: #16a34a !important; // Tailwind bg-green-600
+    color: white !important;
+}
+
+::ng-deep .custom-snackbar-error {
+    background-color: #dc2626 !important; // Tailwind bg-red-600
+    color: white !important;
+}
+
+
+/* Login section clip-path */
+@media (min-width: 375px) and (max-width:425px) {
+    #loginsection {
+        clip-path: polygon(25px 0, 100% 0, 100% calc(100% - 25px), calc(100% - 25px) 100%, 0 100%, 0 25px);
+    }
+}
+
+@media (min-width: 425px) and (max-width:640px) {
+    #loginsection {
+        clip-path: polygon(30px 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%, 0 30px);
+    }
+}
+
+@media (min-width: 640px) and (max-width: 768px) {
+    #loginsection {
+        clip-path: polygon(40px 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%, 0 40px);
+    }
+}
+
+@media (min-width: 768px) and (max-width:1024px) {
+    #loginsection {
+        clip-path: polygon(50px 0, 100% 0, 100% calc(100% - 50px), calc(100% - 50px) 100%, 0 100%, 0 50px);
+    }
+}
+
+@media (min-width: 1024px) and (max-width: 1280px) {
+    #loginsection {
+        clip-path: polygon(60px 0, 100% 0, 100% calc(100% - 60px), calc(100% - 60px) 100%, 0 100%, 0 60px);
+    }
+}
+
+@media (min-width: 1280px) {
+    #loginsection {
+        clip-path: polygon(70px 0, 100% 0, 100% calc(100% - 70px), calc(100% - 70px) 100%, 0 100%, 0 70px);
+    }
+}
+
+
+// clip-logo
+@media (min-width: 320px) and (max-width: 375px) {
+    #clip-logo {
+        clip-path: polygon(0% 0, 100% 0, 100% 100%, 0 100%, 0 5%);
+    }
+}
+
+@media (min-width: 375px) and (max-width:425px) {
+    #clip-logo {
+        clip-path: polygon(6% 0, 100% 0, 100% 100%, 0 100%, 0 7%);
+    }
+}
+
+@media (min-width: 425px) and (max-width:640px) {
+    #clip-logo {
+        clip-path: polygon(5.5% 0, 100% 0, 100% 100%, 0 100%, 0 10%) !important;
+    }
+}
+
+@media (min-width: 640px) and (max-width: 768px) {
+    #clip-logo {
+        clip-path: polygon(4.5% 0, 100% 0, 100% 100%, 0 100%, 0 9%);
+    }
+}
+
+@media (min-width: 768px) and (max-width:1024px) {
+    #clip-logo {
+        clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 100%, 0 7%);
+    }
+}
+
+
+@media (min-width: 1024px) and (max-width:1280px) {
+    #clip-logo {
+        clip-path: polygon(3.5% 0, 100% 0, 100% 100%, 0 100%, 0 7%);
+    }
+}
+
+@media (min-width: 1280px) and (max-width:1536px) {
+    #clip-logo {
+        clip-path: polygon(8% 0, 100% 0, 100% 100%, 0 100%, 0 10%);
+    }
+}
+
+@media (min-width: 1536px) and (max-width: 2560px) {
+    #clip-logo {
+        clip-path: polygon(8% 0, 100% 0, 100% 100%, 0 100%, 0 10%);
+    }
+}
+
+@media (min-width: 2560px) {
+    #clip-logo {
+        clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 100%, 0 10%);
+
+    }
+}
+
+
+/* Orbit animation styles */
+#icondiv {
+    position: relative;
+    border-radius: 33% 67% 32% 68% / 41% 32% 68% 59%;
+}
+
+.orbit-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    animation: rotateOrbit 25s linear infinite;
+}
+
+.orbit-item {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+}
+
+.orbit-item>div {
+    position: absolute;
+    will-change: transform;
+}
+
+/* Position adjustments for different screen sizes */
+.orbit-item:nth-child(1)>div {
+    left: 0%;
+    top: 0%;
+}
+
+.orbit-item:nth-child(2)>div {
+    right: 0%;
+    top: 0%;
+}
+
+.orbit-item:nth-child(3)>div {
+    left: 0%;
+    bottom: 9%;
+}
+
+.orbit-item:nth-child(4)>div {
+    right: 0%;
+    bottom: 5%;
+}
+
+::ng-deep .custom-field .mat-mdc-form-field-flex {
+    background-color: transparent !important;
+    transition: none !important;
+}
+
+::ng-deep .custom-field .mat-mdc-form-field-flex:hover {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+::ng-deep .custom-field .mat-mdc-form-field-focus-overlay {
+    background: transparent !important;
+}
+
+::ng-deep .custom-field .mdc-text-field--filled {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+::ng-deep .custom-field .mdc-text-field--filled:hover {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    padding-right: 0px !important;
+}
+
+::ng-deep .custom-field .mdc-text-field--focused {
+    background-color: transparent !important;
+}
+
+::ng-deep .mat-mdc-form-field-has-icon-suffix .mat-mdc-text-field-wrapper {
+    padding-right: 0px !important;
+    padding-left: 2px !important;
+}

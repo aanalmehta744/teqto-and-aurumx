@@ -1,0 +1,152 @@
+<section>
+  <div>
+    <!-- Breadcrumb -->
+    <div class="mb-6">
+      <app-breadcrumb [title]="'My Projects'" [items]="['Home']" [active_item]="'My Projects'">
+      </app-breadcrumb>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <!-- Table Header -->
+      <div class="flex flex-col md:flex-row justify-between items-center px-4 py-3 border-b bg-[#00c4c4]">
+        <div class="flex items-center gap-4 mb-3 md:mb-0">
+          <h2 class="text-xl font-medium text-[white]">My Projects</h2>
+          <div class="flex items-center justify-center">
+            <div
+              class="border border-[#CCCCCC] rounded-full bg-white flex items-center text-gray-500 shadow w-full max-w-md">
+              <mat-icon class="ms-3">search</mat-icon>
+              <input type="text" #filter
+                class="w-full h-[40px] rounded-full ps-2 focus:outline-none placeholder:text-[16px]"
+                placeholder="Search" matInput (keyup)="applyFilter($event)" aria-label="Search box">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table Body -->
+      <div class="overflow-auto">
+        <table mat-table [dataSource]="dataSource" matSort
+          class="min-w-full table-auto text-sm text-left text-gray-700">
+          <!-- ID Column -->
+          <ng-container matColumnDef="id">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2">ID</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">
+              <span class="block md:hidden font-semibold">ID:</span>{{ row.id }}
+            </mat-cell>
+          </ng-container>
+
+          <!-- Project Title -->
+          <ng-container matColumnDef="title">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2">Project Title</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">
+              {{ row.projectTitle }}
+            </mat-cell>
+          </ng-container>
+
+          <!-- Client Name -->
+          <ng-container matColumnDef="clientName">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2">Client Name</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">
+              {{ row.clientName }}
+            </mat-cell>
+          </ng-container>
+
+          <!-- Start Date -->
+          <ng-container matColumnDef="startDate">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2">Start Date</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">
+              {{ row.startDate | date }}
+            </mat-cell>
+          </ng-container>
+
+          <!-- End Date -->
+          <ng-container matColumnDef="endDate">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2">End Date</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">
+              {{ row.endDate | date }}
+            </mat-cell>
+          </ng-container>
+
+          <!-- Deadline -->
+          <ng-container matColumnDef="deadLine">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2">Deadline</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">
+
+              {{ row.deadLine ? (row.deadLine | date: 'MM/dd/yyyy') : '--' }}
+            </mat-cell>
+          </ng-container>
+
+          <!-- Members -->
+          <ng-container matColumnDef="noOfMembers">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2">Members</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">
+
+              <span *ngIf="row.teamName; else noMembers">{{ row.teamName }}</span>
+              <ng-template #noMembers>--</ng-template>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Priority -->
+          <ng-container matColumnDef="priority">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2">Priority</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">
+
+              <span class="inline-block px-2 py-0.5 rounded text-white text-xs" [ngClass]="{
+                  'bg-red-500': row.priority === 'High',
+                  'bg-blue-500': row.priority === 'Medium',
+                  'bg-green-500': row.priority === 'Low'
+                }">
+                {{ row.priority }}
+              </span>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Progress -->
+          <ng-container matColumnDef="progress">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2">Progress</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">
+
+              <mat-progress-bar mode="determinate" [value]="row.progress" class="w-4/5"></mat-progress-bar>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Status -->
+          <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2">Status</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="px-4 py-2">
+
+              <span class="inline-block px-2 py-0.5 rounded text-white text-xs" [ngClass]="{
+                  'bg-green-500': row.status === 'Active',
+                  'bg-blue-600': row.status === 'Completed',
+                  'bg-purple-500': row.status === 'Running',
+                  'bg-orange-500': row.status === 'Pending',
+                  'bg-gray-500': row.status === 'Not Started',
+                  'bg-red-600': row.status === 'Cancled',
+                  'bg-gray-400': !['Active','Completed','Running','Pending','Not Started','Cancled'].includes(row.status)
+                }">
+                {{ row.status }}
+              </span>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Table Rows -->
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="detailsCall(row)"
+            class="hover:bg-gray-100 cursor-pointer" matRipple></mat-row>
+        </table>
+
+        <!-- No Results -->
+        @if (!exampleDatabase?.isTblLoading) {
+        <div class="text-center py-4 text-gray-500" [class.hidden]="dataSource.renderedData.length !== 0">
+          No results
+        </div>
+        }
+
+      </div>
+    </div>
+
+    <!-- Paginator -->
+    <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0" [pageSize]="10"
+      [pageSizeOptions]="[5, 10, 25, 100]" class="border-t p-2 bg-gray-50"></mat-paginator>
+  </div>
+</section>

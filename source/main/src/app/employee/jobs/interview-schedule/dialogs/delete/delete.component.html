@@ -1,0 +1,31 @@
+<div class="p-4">
+    <!-- Dialog Title -->
+    <h3 class="text-lg font-medium text-gray-800 mb-2">Cancel Interview?</h3>
+
+    <!-- Dialog Content -->
+    <div class="mb-4">
+        <ul class="space-y-2">
+            <li>
+                <p><span class="font-semibold text-[#00383f]">Candidate:</span> {{ data.candidate_name }}</p>
+            </li>
+            <li>
+                <p><span class="font-semibold text-[#00383f]">Interview Date:</span> {{ data.interview_date| date }}</p>
+            </li>
+            <li>
+                <p><span class="font-semibold text-[#00383f]">Interview Time:</span> {{ '1970-01-01T' +
+                    data.interview_time |
+                    date:'hh:mm a' }}</p>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Dialog Actions -->
+    <div class="flex justify-end gap-2 mt-4">
+        <button mat-raised-button color="warn" (click)="confirmDelete()">
+            Delete
+        </button>
+        <button mat-raised-button (click)="onNoClick()" tabindex="-1">
+            Cancel
+        </button>
+    </div>
+</div>

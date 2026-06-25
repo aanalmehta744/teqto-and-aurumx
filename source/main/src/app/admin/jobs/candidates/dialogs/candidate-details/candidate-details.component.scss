@@ -1,0 +1,42 @@
+.status-flow {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 0.9rem;
+}
+
+.badge {
+  padding: 0.35em 0.9em;
+  border-radius: 15px;
+  display: inline-flex;
+  align-items: center;
+  user-select: none;
+  transition: background-color 0.3s ease;
+  color: white;
+}
+
+.badge-passed {
+  background-color: #6c757d; /* gray */
+  color: white;
+}
+
+.badge-active {
+  background-color: #007bff; /* blue */
+  color: white;
+}
+
+.badge-rejected {
+  background-color: #dc3545; /* red */
+  color: white;
+}
+
+.badge-previous {
+  background-color: #28a745; /* green */
+  color: white;
+}
+.badge-backout {
+  background-color: #929693; /* green */
+  color: white;
+}

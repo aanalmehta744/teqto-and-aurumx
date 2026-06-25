@@ -1,0 +1,162 @@
+<section>
+  <div class="mx-auto">
+    <!-- Breadcrumb Header -->
+    <div>
+      <app-breadcrumb [title]="'Client Details'" [items]="['Home','Clients']"
+        [active_item]="'Client Details'"></app-breadcrumb>
+    </div>
+
+    <div class="flex flex-wrap -mx-3">
+      <div class="w-full px-3">
+        <div class="bg-white rounded-lg p-4 shadow-xl">
+          <div class="wrapper wrapper-content animate-fadeInUp">
+            <div class="ibox">
+              <div class="p-4">
+                <div class="flex flex-wrap mb-4">
+                  <div class="w-full mb-2">
+                    <h3 class="text-2xl font-medium text-[#00383F]">{{ client?.fullName | titlecase }}</h3>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div>
+                    <dl class="space-y-2">
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">Created by:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.bde_name || 'Unknown' }}</dd>
+                      </div>
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">BDE Account ID:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.bde_account_id || 'N/A' }}</dd>
+                      </div>
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">BDE Account Email:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.bde_account_email || 'N/A' }}</dd>
+                      </div>
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">Mobile:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.mobile || 'N/A' }}</dd>
+                      </div>
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">Email:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.email || 'N/A' }}</dd>
+                      </div>
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">Website:</dt>
+                        <dd class="text-[#7C6D84]">
+                          <a href="https://www.linkedin.com/in/{{ client?.website_link }}"
+                            class="text-blue-600 underline" target="_blank">{{ client?.website_link || 'N/A' }}</a>
+                        </dd>
+                      </div>
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">LinkedIn:</dt>
+                        <dd class="text-[#7C6D84]">
+                          <a href="https://www.linkedin.com/in/{{ client?.linkedin_id }}"
+                            class="text-blue-600 underline" target="_blank">{{ client?.linkedin_id || 'N/A' }}</a>
+                        </dd>
+                      </div>
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">Prize Amount:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.prize_amount || 'N/A' }}</dd>
+                      </div>
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">Prize Tag:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.prize_tag || 'N/A' }}</dd>
+                      </div>
+                    </dl>
+                  </div>
+
+                  <div>
+                    <dl class="space-y-2">
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">Created At:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.created_at | date }}</dd>
+                      </div>
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">Date:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.date | date }}</dd>
+                      </div>
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">Country:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.country || 'N/A' }}</dd>
+                      </div>
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">Technology:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.technology || 'N/A' }}</dd>
+                      </div>
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">Client Connect Type:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.client_Connect_Type || 'N/A' }}</dd>
+                      </div>
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">Platform:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.platform || 'N/A' }}</dd>
+                      </div>
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">Address:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.address || 'N/A' }}</dd>
+                      </div>
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">Note:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.client_note || 'N/A' }}</dd>
+                      </div>
+                    </dl>
+                  </div>
+                </div>
+
+                <div class="mt-6">
+                  <mat-tab-group>
+                    <mat-tab [disabled]="true">
+                      <ng-template mat-tab-label>
+                        <mat-icon class="me-2 text-black">local_activity</mat-icon>
+                        Follow-ups
+                      </ng-template>
+
+                      <div class="flex justify-end mb-3 mt-4">
+                        <button mat-raised-button class="!bg-[#D5EAEA] !text-[#00383F]"
+                          (click)="openAddFollowupDialog()">
+                          <mat-icon>add</mat-icon> Add Follow-up
+                        </button>
+                      </div>
+
+                      <table class="min-w-full text-sm text-left border border-gray-200 !text-[black]">
+                        <thead class="!bg-[#00C4C4]">
+                          <tr class="!text-white">
+                            <th class="p-3 !font-medium border">Status</th>
+                            <th class="p-3 !font-medium border">Date</th>
+                            <th class="p-3 !font-medium border">Notes</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let followup of followups"
+                            [ngClass]="{'opacity-50': isFollowupComplete(followup.followup_date)}">
+                            <td class="p-2 border">
+                              <span class="px-2 py-1 text-white rounded" [ngClass]="{
+                                  'bg-green-500': followup.status === 'Hot',
+                                  'bg-yellow-500': followup.status === 'Cold',
+                                  'bg-red-500': followup.status === 'Closed'
+                                }">
+                                {{ followup.status }}
+                              </span>
+                            </td>
+                            <td class="p-2 border">{{ followup.followup_date | date }}</td>
+                            <td class="p-2 border">{{ followup.notes }}</td>
+                          </tr>
+                          <tr *ngIf="followups.length === 0">
+                            <td colspan="5" class="text-center p-4">No follow-ups found.</td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                    </mat-tab>
+                  </mat-tab-group>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

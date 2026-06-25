@@ -1,0 +1,378 @@
+<section>
+  <div>
+    <!-- Breadcrumb Header -->
+    <div>
+      <app-breadcrumb [title]="'All Clients'" [items]="['Clients']" [active_item]="'All Clients'"></app-breadcrumb>
+    </div>
+
+    <!-- Main Card -->
+    <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+
+      <!-- Table Header with Teal Background -->
+      <div class="flex flex-col md:flex-row justify-between items-center p-4 border-b bg-[#00c4c4]">
+        <!-- Left Side: Title + Search -->
+        <div class="w-full md:w-auto mb-4 md:mb-0">
+          <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+            <h2 class="text-lg text-white mr-4">Clients</h2>
+            <!-- Search Box -->
+            <div class="flex items-center justify-center w-full max-w-md">
+              <div class="border border-[#CCCCCC] rounded-full bg-white flex items-center text-gray-500 shadow w-full">
+                <mat-icon class="ms-3">search</mat-icon>
+                <input placeholder="Search" type="text" #filter (input)="applyFilter(filter.value)"
+                  class="w-full h-[40px] rounded-full ps-2 focus:outline-none placeholder:text-[16px]"
+                  aria-label="Search box">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side: Action Buttons -->
+        <div class="w-full md:w-auto">
+          <ul class="flex items-center md:justify-end gap-2">
+            <li>
+              <button mat-mini-fab id="headerBtn" (click)="addNew()" matTooltip="ADD"
+                class="!bg-[#D5EAEA] hover:!bg-gray-100">
+                <mat-icon class="!text-[#00383F]">add</mat-icon>
+              </button>
+            </li>
+            <li>
+              <button mat-mini-fab (click)="refresh()" matTooltip="REFRESH" class="!bg-[#D5EAEA] hover:!bg-gray-100">
+                <mat-icon class="!text-[#00383F]">refresh</mat-icon>
+              </button>
+            </li>
+            <li>
+              <button *ngIf="selection.hasValue()" mat-mini-fab (click)="removeSelectedRows()" matTooltip="DELETE"
+                class="!bg-[#D5EAEA] hover:!bg-gray-100">
+                <mat-icon class="!text-[#00383F]">delete</mat-icon>
+              </button>
+            </li>
+            <li>
+              <div class="cursor-pointer p-2 rounded-xl bg-[#D5EAEA] hover:bg-gray-100 shadow" matTooltip="XLSX">
+                <img src="assets/images/icons/xlsx.png" alt="Export" class="w-6 h-6" (click)="exportExcel()">
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- View Toggle Buttons -->
+      <div class="p-4 border-b">
+        <div class="flex gap-4 flex-wrap">
+          <button mat-button (click)="setView(false)" [ngClass]="{'!bg-[#D5EAEA] !text-[#00383F]': !groupByBDE}">
+            All Clients
+          </button>
+          <button mat-button (click)="setView(true)" [ngClass]="{'!bg-[#D5EAEA] !text-[#00383F]': groupByBDE}">
+            Group by BDE
+          </button>
+
+          <!-- Tabs for All Clients only -->
+          <div *ngIf="!groupByBDE" class="flex justify-center">
+            <div class="flex bg-[#EAF8F8] rounded-full overflow-hidden">
+              <button class="px-4 py-1.5 text-sm font-medium transition-all"
+                [class.bg-[#00C4C4]]="activeClientType === 'All'" [class.text-white]="activeClientType === 'All'"
+                [class.text-[#00383F]]="activeClientType !== 'All'" (click)="setClientType('All')">
+                All
+              </button>
+              <button class="px-4 py-1.5 text-sm font-medium transition-all"
+                [class.bg-[#00C4C4]]="activeClientType === 'Cold'" [class.text-white]="activeClientType === 'Cold'"
+                [class.text-[#00383F]]="activeClientType !== 'Cold'" (click)="setClientType('Cold')">
+                Cold
+              </button>
+              <button class="px-4 py-1.5 text-sm font-medium transition-all"
+                [class.bg-[#00C4C4]]="activeClientType === 'Hot'" [class.text-white]="activeClientType === 'Hot'"
+                [class.text-[#00383F]]="activeClientType !== 'Hot'" (click)="setClientType('Hot')">
+                Hot
+              </button>
+              <button class="px-4 py-1.5 text-sm font-medium transition-all"
+                [class.bg-[#00C4C4]]="activeClientType === 'Close'" [class.text-white]="activeClientType === 'Close'"
+                [class.text-[#00383F]]="activeClientType !== 'Close'" (click)="setClientType('Close')">
+                Closed
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Flat Table View -->
+      <div class="overflow-x-auto" *ngIf="!groupByBDE">
+        <table mat-table [dataSource]="dataSource" matSort class="w-full">
+
+          <!-- Checkbox Column -->
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef class="w-[7%]">
+              <mat-checkbox (change)="$event ? masterToggle() : null"
+                [checked]="selection.hasValue() && isAllSelected()"
+                [indeterminate]="selection.hasValue() && !isAllSelected()">
+              </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row" class="w-[7%]">
+              <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                [checked]="selection.isSelected(row)">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+
+          <!-- Other Columns -->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
+            <td mat-cell *matCellDef="let row">{{row.id}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="bde_name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="whitespace-nowrap">BDE Name</th>
+            <td mat-cell *matCellDef="let row" class="whitespace-nowrap">{{row.bde_name | titlecase}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="bde_account_id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="whitespace-nowrap">Account ID</th>
+            <td mat-cell *matCellDef="let row" class="whitespace-nowrap">{{row.bde_account_id || '-'}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="bde_account_email">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="whitespace-nowrap">Account Email</th>
+            <td mat-cell *matCellDef="let row" class="whitespace-nowrap">{{row.bde_account_email || '-'}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="whitespace-nowrap">Client Name</th>
+            <td mat-cell *matCellDef="let row" class="whitespace-nowrap">{{row.fullName | titlecase}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="mobile">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Mobile</th>
+            <td mat-cell *matCellDef="let row">{{row.mobile || '-'}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+            <td mat-cell *matCellDef="let row" class="whitespace-nowrap">{{row.email}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="technology">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Technology</th>
+            <td mat-cell *matCellDef="let row" class="whitespace-nowrap">{{row.technology || '-'}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="client_type">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="whitespace-nowrap">Client Type</th>
+            <td mat-cell *matCellDef="let row" class="whitespace-nowrap">{{row.client_type}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="client_Connect_Type">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="whitespace-nowrap">Connenct Type</th>
+            <td mat-cell *matCellDef="let row" class="whitespace-nowrap">{{row.client_Connect_Type}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="last_followup_date">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="whitespace-nowrap">Last Follow-up Date</th>
+            <td mat-cell *matCellDef="let row">
+              {{ row.last_followup_date ? (row.last_followup_date | date: 'MMM d, y') : '—' }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="last_followup_note">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="whitespace-nowrap">Follow-up Note</th>
+            <td mat-cell *matCellDef="let row">
+              {{ row.last_followup_note || '—' }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="country">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Country</th>
+            <td mat-cell *matCellDef="let row">{{row.country}}</td>
+          </ng-container>
+
+          <!-- Actions -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let row; let i=index;">
+              <div class="flex items-center space-x-1">
+                <button mat-icon-button color="primary" (click)="$event.stopPropagation(); viewItem(row)"
+                  matTooltip="View">
+                  <app-feather-icons icon="eye" class="tbl-fav-view"></app-feather-icons>
+                </button>
+                <button mat-icon-button (click)="$event.stopPropagation(); editCall(row)" matTooltip="Edit">
+                  <app-feather-icons icon="edit" class="tbl-fav-edit"></app-feather-icons>
+                </button>
+                <button mat-icon-button (click)="$event.stopPropagation(); deleteItem(i, row)" matTooltip="Delete">
+                  <app-feather-icons icon="trash-2" class="tbl-fav-delete"></app-feather-icons>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Rows -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns" class="bg-[#FAF9FD]"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="cursor-pointer hover:bg-[#FAF9FD]"
+            matRipple></tr>
+        </table>
+
+        <!-- No Results -->
+        <div *ngIf="dataSource?.filteredData?.length === 0" class="py-8 text-center text-gray-500">
+          No results
+        </div>
+
+      </div>
+
+      <!-- Paginator -->
+      <mat-paginator *ngIf="!groupByBDE" #paginator [length]="dataSource?.filteredData?.length" [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25, 100]" class="!p-2 !border-t !bg-[#FAF9FD]">
+      </mat-paginator>
+
+      <!-- Group by BDE View -->
+      <div *ngIf="groupByBDE" class="p-4">
+        <mat-accordion>
+          <mat-expansion-panel *ngFor="let bde of bdeGroups">
+            <mat-expansion-panel-header>
+              <div class="w-full flex justify-between">
+                <div class="flex gap-2">
+                  <mat-panel-title class="font-semibold whitespace-nowrap">{{ bde.bde_name |
+                    titlecase}}</mat-panel-title>
+                  <mat-panel-description>({{ bde.clients.length }} Clients)</mat-panel-description>
+                </div>
+
+                <div class="cursor-pointer p-2 rounded-xl bg-[#D5EAEA] hover:bg-gray-100 shadow mr-5"
+                  matTooltip="Export {{ bde.bde_name }} Clients to XLSX">
+                  <img src="assets/images/icons/xlsx.png" alt="Export" class="w-6 h-6" (click)="exportExcelBDE(bde)" />
+                </div>
+              </div>
+            </mat-expansion-panel-header>
+
+            <div class="flex justify-center items-center">
+              <div class="w-fit flex bg-[#EAF8F8] rounded-full overflow-hidden">
+                <button class="px-4 py-2.5 text-sm font-medium transition-all"
+                  [class.bg-[#00C4C4]]="activeClientType === 'All'" [class.text-white]="activeClientType === 'All'"
+                  [class.text-[#00383F]]="activeClientType !== 'All'" (click)="setClientType('All')">
+                  All
+                </button>
+                <button class="px-4 py-2.5 text-sm font-medium transition-all"
+                  [class.bg-[#00C4C4]]="activeClientType === 'Cold'" [class.text-white]="activeClientType === 'Cold'"
+                  [class.text-[#00383F]]="activeClientType !== 'Cold'" (click)="setClientType('Cold')">
+                  Cold
+                </button>
+                <button class="px-4 py-2.5 text-sm font-medium transition-all"
+                  [class.bg-[#00C4C4]]="activeClientType === 'Hot'" [class.text-white]="activeClientType === 'Hot'"
+                  [class.text-[#00383F]]="activeClientType !== 'Hot'" (click)="setClientType('Hot')">
+                  Hot
+                </button>
+                <button class="px-4 py-2.5 text-sm font-medium transition-all"
+                  [class.bg-[#00C4C4]]="activeClientType === 'Close'" [class.text-white]="activeClientType === 'Close'"
+                  [class.text-[#00383F]]="activeClientType !== 'Close'" (click)="setClientType('Close')">
+                  Closed
+                </button>
+              </div>
+            </div>
+
+            <!-- Nested Table -->
+            <div class="overflow-x-auto mt-2">
+              <table mat-table [dataSource]="bde.paginatedClients" class="mat-elevation-z1 w-full">
+
+                <ng-container matColumnDef="bde_account_id">
+                  <th mat-header-cell *matHeaderCellDef class="whitespace-nowrap">BDE Account ID</th>
+                  <td mat-cell *matCellDef="let client" class="whitespace-nowrap">{{ client.bde_account_id || '-' }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="bde_account_email">
+                  <th mat-header-cell *matHeaderCellDef class="whitespace-nowrap">BDE Account Email</th>
+                  <td mat-cell *matCellDef="let client" class="whitespace-nowrap">{{ client.bde_account_email || '-' }}</td>
+                </ng-container>
+
+                <!-- Client Name -->
+                <ng-container matColumnDef="name">
+                  <th mat-header-cell *matHeaderCellDef class="whitespace-nowrap">Client Name</th>
+                  <td mat-cell *matCellDef="let client" class="whitespace-nowrap">{{ client.fullName | titlecase }}</td>
+                </ng-container>
+
+                <!-- Email -->
+                <ng-container matColumnDef="email">
+                  <th mat-header-cell *matHeaderCellDef>Email</th>
+                  <td mat-cell *matCellDef="let client" class="whitespace-nowrap">{{ client.email }}</td>
+                </ng-container>
+
+                <!-- Technology -->
+                <ng-container matColumnDef="technology">
+                  <th mat-header-cell *matHeaderCellDef>Technology</th>
+                  <td mat-cell *matCellDef="let client whitespace-nowrap">{{ client.technology || '-' }}</td>
+                </ng-container>
+
+                <!-- Client Type -->
+                <ng-container matColumnDef="client_type">
+                  <th mat-header-cell *matHeaderCellDef class="whitespace-nowrap">Client Type</th>
+                  <td mat-cell *matCellDef="let client">{{ client.client_type || '-' }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="client_Connect_Type">
+                  <th mat-header-cell *matHeaderCellDef class="whitespace-nowrap">Connenct Type</th>
+                  <td mat-cell *matCellDef="let client">{{ client.client_Connect_Type || '-' }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="last_followup_date">
+                  <th mat-header-cell *matHeaderCellDef class="whitespace-nowrap">Last Follow-up Date</th>
+                  <td mat-cell *matCellDef="let client">
+                    {{ client.last_followup_date
+                    ? (client.last_followup_date | date:'MMM d, y')
+                    : '—' }}
+                    <!-- {{ client.last_followup_date || '-' }} -->
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="last_followup_note">
+                  <th mat-header-cell *matHeaderCellDef class="whitespace-nowrap">Follow-up Note</th>
+                  <td mat-cell *matCellDef="let client">{{ client.last_followup_note || '-' }}</td>
+                </ng-container>
+
+                <!-- Country -->
+                <ng-container matColumnDef="country">
+                  <th mat-header-cell *matHeaderCellDef>Country</th>
+                  <td mat-cell *matCellDef="let client">{{ client.country }}</td>
+                </ng-container>
+
+                <!-- Mobile -->
+                <ng-container matColumnDef="mobile">
+                  <th mat-header-cell *matHeaderCellDef>Mobile</th>
+                  <td mat-cell *matCellDef="let client">{{ client.mobile || '-' }}</td>
+                </ng-container>
+
+                <!-- Actions -->
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
+                  <td mat-cell *matCellDef="let row; let i=index;">
+                    <div class="flex items-center space-x-1 w-[500px] md:w-auto">
+                      <button mat-icon-button color="primary" (click)="$event.stopPropagation(); viewItem(row)"
+                        matTooltip="View">
+                        <app-feather-icons icon="eye" class="tbl-fav-view"></app-feather-icons>
+                      </button>
+                      <button mat-icon-button (click)="$event.stopPropagation(); editCall(row)" matTooltip="Edit">
+                        <app-feather-icons icon="edit" class="tbl-fav-edit"></app-feather-icons>
+                      </button>
+                      <button mat-icon-button (click)="$event.stopPropagation(); deleteItem(i, row)"
+                        matTooltip="Delete">
+                        <app-feather-icons icon="trash-2" class="tbl-fav-delete"></app-feather-icons>
+                      </button>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Render Header + Rows -->
+                <tr mat-header-row
+                  *matHeaderRowDef="['bde_account_id','bde_account_email','name','email','technology','client_type','client_Connect_Type','last_followup_date','last_followup_note','country','mobile','actions']">
+                </tr>
+                <tr mat-row
+                  *matRowDef="let row; columns: ['bde_account_id','bde_account_email','name','email','technology','client_type','client_Connect_Type','last_followup_date','last_followup_note','country','mobile','actions'];">
+                </tr>
+              </table>
+
+            </div>
+            <!-- Paginator -->
+            <mat-paginator [length]="bde.clients.length" [pageSize]="5" [pageSizeOptions]="[5, 10, 25]"
+              (page)="onGroupPageChange($event, bde)">
+            </mat-paginator>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+
+
+    </div>
+  </div>
+</section>

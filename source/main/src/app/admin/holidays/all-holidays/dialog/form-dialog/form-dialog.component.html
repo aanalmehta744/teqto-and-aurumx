@@ -1,0 +1,59 @@
+ <div class="addContainer bg-white rounded-lg shadow-md w-full max-w-3xl mx-auto">
+  <!-- Header -->
+  <div class="flex justify-between items-center px-4 py-2 border-b">
+    <div class="text-lg font-medium text-[#00383F]">{{ dialogTitle }}</div>
+    <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog" class="text-gray-600 hover:text-red-600">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Dialog Content -->
+  <div mat-dialog-content class="p-4">
+    <form [formGroup]="holidayForm" (ngSubmit)="submit()" class="space-y-4">
+
+      <!-- Holiday Name & Date -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Holiday Name -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Holiday Name</mat-label>
+          <input matInput formControlName="hName" required>
+          <mat-icon matSuffix>article</mat-icon>
+          <mat-error *ngIf="holidayForm.get('hName')?.hasError('required')">
+            Holiday Name is required
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Holiday Date -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Date</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="date">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="holidayForm.get('date')?.hasError('required')">
+            Please select date
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Details -->
+      <div>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Details</mat-label>
+          <textarea matInput formControlName="details" rows="3"></textarea>
+        </mat-form-field>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end gap-3 pt-2">
+        <button mat-raised-button color="primary" [disabled]="!holidayForm.valid" [mat-dialog-close]="1" (click)="confirmAdd()">
+          Save
+        </button>
+        <button mat-raised-button color="warn" type="button" (click)="onNoClick()" tabindex="-1">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
