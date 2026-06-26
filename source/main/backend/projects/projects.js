@@ -49,33 +49,14 @@ router.post('/', async (req, res) => {
 
     const formattedStartDate = startDateObj.toISOString().slice(0, 19).replace('T', ' ');
     const formattedEndDate = endDateObj.toISOString().slice(0, 19).replace('T', ' ');
-    const tagsString = Array.isArray(tags) ? tags.join(',') : (tags || '');
+
+    // Store team as comma-separated IDs so FIND_IN_SET works correctly
     const teamString = Array.isArray(team) ? team.join(',') : (team || '');
+    const tagsString = Array.isArray(tags) ? tags.join(',') : (tags || '');
     const descriptionStr = typeof description === 'string' ? description : JSON.stringify(description || '');
 
-    // const sqlQuery = `INSERT INTO projects (projectTitle, department, priority, client, startDate, endDate, team, status, description, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-const sql = `
-INSERT INTO projects (
-  projectTitle, department, priority, client,
-  startDate, endDate, team, status, description, tags
-)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-`;
+    const sqlQuery = `INSERT INTO projects (projectTitle, department, priority, client, startDate, endDate, team, status, description, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-const values = [
-  projectTitle,
-  department,
-  priority,
-  client,
-  startDate,
-  endDate,
-  JSON.stringify(team),   // ✅ fix
-  status,
-  description,
-  JSON.stringify(tags)    // ✅ fix
-];
-
-db.query(sql, values);
     const [result] = await db.query(sqlQuery, [
       projectTitle, department, priority, client || null,
       formattedStartDate, formattedEndDate, teamString, status, descriptionStr, tagsString

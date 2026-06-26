@@ -34,6 +34,8 @@ import { environment } from 'environments/environment';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+// added code below is — FormsModule for inline incentive input
+import { FormsModule } from '@angular/forms';
 // Define the Employee interface for type safety
 interface Employee {
   id: number;
@@ -62,7 +64,9 @@ interface Employee {
     MatCheckboxModule,
     MatButtonModule,
     MatTooltipModule,
-    MatRippleModule
+    MatRippleModule,
+    // added code below is
+    FormsModule,
   ],
   templateUrl: './bde-employee.component.html',
   styleUrls: ['./bde-employee.component.scss']
@@ -70,7 +74,6 @@ interface Employee {
 export class BdeEmployeeComponent extends UnsubscribeOnDestroyAdapter
   implements OnInit {
   displayedColumns = [
-
     // 'img',
     'name',
     'department',
@@ -78,8 +81,15 @@ export class BdeEmployeeComponent extends UnsubscribeOnDestroyAdapter
     'email',
     'joindate',
     'status',
+    // added code below is — incentive column for BDE employees
+    'incentive',
     'actions',
   ];
+
+  // added code below is — incentive inline edit state (admin only)
+  editingIncentiveId: number | null = null;
+  tempIncentive: number = 0;
+  savingIncentiveId: number | null = null;
   exampleDatabase?: EmployeesService;
   dataSource!: ExampleDataSource;
   selection = new SelectionModel<Employees>(true, []);
@@ -266,6 +276,47 @@ export class BdeEmployeeComponent extends UnsubscribeOnDestroyAdapter
       'center'
     );
   }
+  // added code below is — check if logged-in user is admin (only admin can edit incentive)
+  get isAdmin(): boolean {
+    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    return (user?.role || '').toLowerCase() === 'admin';
+  }
+
+  // added code below is — start inline incentive editing
+  startEditIncentive(row: any): void {
+    this.editingIncentiveId = row.id;
+    this.tempIncentive = Number(row.incentive) || 0;
+  }
+
+  // added code below is — cancel incentive edit
+  cancelEditIncentive(): void {
+    this.editingIncentiveId = null;
+    this.tempIncentive = 0;
+  }
+
+  // added code below is — save incentive via PATCH /api/employees/:id/incentive
+  saveIncentive(row: any): void {
+    if (this.tempIncentive < 0 || isNaN(this.tempIncentive)) {
+      this.showNotification('snackbar-danger', 'Invalid incentive amount', 'bottom', 'center');
+      return;
+    }
+    this.savingIncentiveId = row.id;
+    this.httpClient.patch(`${environment.apiUrl}/employees/${row.id}/incentive`, {
+      incentive: this.tempIncentive
+    }).subscribe({
+      next: () => {
+        row.incentive = this.tempIncentive;
+        this.editingIncentiveId = null;
+        this.savingIncentiveId = null;
+        this.showNotification('snackbar-success', 'Incentive updated successfully', 'bottom', 'center');
+      },
+      error: () => {
+        this.savingIncentiveId = null;
+        this.showNotification('snackbar-danger', 'Failed to update incentive', 'bottom', 'center');
+      }
+    });
+  }
+
   public loadData() {
     this.exampleDatabase = this.employeesService;
     this.dataSource = new ExampleDataSource(

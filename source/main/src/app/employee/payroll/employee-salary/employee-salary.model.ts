@@ -37,6 +37,12 @@ export class EmployeeSalary {
   workingDays: number;
   totalDays: number;
   halfDays: number;
+  sandwichDays?: number;
+  totalLeaveDays?: number;
+  totalWorkingDays?: number;
+  addonAmount?: number;
+  // added code below is — BDE incentive amount
+  incentiveAmount?: number;
   constructor(employeeSalary: EmployeeSalary) {
     {
       this.id = employeeSalary.id || this.getRandomID();
@@ -70,6 +76,12 @@ export class EmployeeSalary {
       this.workingDays = employeeSalary.workingDays || 0;
       this.totalDays = employeeSalary.totalDays || 0;
       this.halfDays = employeeSalary.halfDays || 0;
+      this.sandwichDays = employeeSalary.sandwichDays || 0;
+      this.totalLeaveDays = employeeSalary.totalLeaveDays || 0;
+      this.totalWorkingDays = employeeSalary.totalWorkingDays || 0;
+      this.addonAmount = Number(employeeSalary.addonAmount) || 0;
+      // added code below is
+      this.incentiveAmount = Number(employeeSalary.incentiveAmount) || 0;
     }
 
   }

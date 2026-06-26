@@ -49,7 +49,7 @@ export const APP_ROUTE: Route[] = [
           role: Role.BA,
         },
         loadChildren: () =>
-          import('./admin/admin.routes').then((m) => m.ADMIN_ROUTE),
+          import('./ba/ba.routes').then((m) => m.BA_ROUTE),
       },
       {
         path: 'calendar',

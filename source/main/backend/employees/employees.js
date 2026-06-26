@@ -76,6 +76,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// added code below is — ensure incentive column exists in employees table (MySQL 5.7 compatible)
+db.query(`
+  SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'employees' AND COLUMN_NAME = 'incentive'
+`).then(([rows]) => {
+  if (rows[0].cnt === 0) {
+    return db.query(`ALTER TABLE employees ADD COLUMN incentive DECIMAL(10, 2) DEFAULT 0`);
+  }
+}).catch(() => {});
+
 // 🟢 GET all employees
 router.get('/', async (req, res) => {
   try {
@@ -431,6 +441,22 @@ router.delete('/:targetId/targets', async (req, res) => {
   } catch (error) {
     console.error('Error deleting target:', error);
     res.status(500).json({ message: 'Failed to delete target' });
+  }
+});
+
+// added code below is — PATCH /api/employees/:id/incentive — admin updates BDE incentive amount
+router.patch('/:id/incentive', async (req, res) => {
+  const { id } = req.params;
+  const incentive = parseFloat(req.body.incentive ?? 0);
+  if (isNaN(incentive) || incentive < 0) {
+    return res.status(400).json({ error: 'Invalid incentive value' });
+  }
+  try {
+    await db.query('UPDATE employees SET incentive = ? WHERE id = ?', [incentive, id]);
+    res.json({ message: 'Incentive updated successfully', incentive });
+  } catch (err) {
+    console.error('Error updating incentive:', err);
+    res.status(500).json({ error: 'Failed to update incentive' });
   }
 });
 

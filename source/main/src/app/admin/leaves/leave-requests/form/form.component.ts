@@ -282,11 +282,15 @@ export class FormComponent implements OnInit {
     });
   }
 
+  // createContactForm(): UntypedFormGroup {
+  //   return this.fb.group({
+  //     id: [this.leaves.id],
+  //     employee_id: [this.leaves.employee_id],
   createContactForm(): UntypedFormGroup {
-    return this.fb.group({
-      id: [this.leaves.id],
-      // employee_id: [this.leaves.employee_id],
-employee_id: [null, Validators.required],
+  return this.fb.group({
+    id: [this.leaves.id],
+
+    employee_id: [this.leaves.employee_id, Validators.required],
 
       leave_type: [this.leaves.leave_type, Validators.required],
       start_date: [this.leaves.start_date, Validators.required],
@@ -452,8 +456,19 @@ employee_id: [null, Validators.required],
     this.isLoading = true;
     const formData = this.leavesForm.getRawValue();
 
+    
+    //   formData.approvedBy =
+    // JSON.parse(localStorage.getItem('user') || '{}').id;
+    const currentUser = JSON.parse(
+  localStorage.getItem('currentUser') || '{}'
+);
+
+formData.approvedBy = currentUser.id;
+
+  console.log('UPDATE PAYLOAD', formData);
+
     formData.start_date = this.formatDateForDB(formData.start_date);
-formData.end_date = this.formatDateForDB(formData.end_date);
+    formData.end_date = this.formatDateForDB(formData.end_date);
     // formData.start_date = this.formatDateForDB(formData.start_date);
     // formData.end_date = this.formatDateForDB(formData.end_date);
     const onComplete = () => {
@@ -473,9 +488,20 @@ formData.end_date = this.formatDateForDB(formData.end_date);
           });
 
         },
-        error: () => {
-          Swal.fire('Error', 'Failed to update leave.', 'error');
-        },
+        // error: () => {
+        //   Swal.fire('Error', 'Failed to update leave.', 'error');
+        // },
+        error: (err) => {
+  console.log('UPDATE ERROR', err);
+
+  Swal.fire(
+    'Error',
+    err.error?.error ||
+    err.error?.message ||
+    'Failed to update leave.',
+    'error'
+  );
+},
         complete: onComplete
       });
     } else {

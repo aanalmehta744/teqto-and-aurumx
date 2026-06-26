@@ -132,6 +132,47 @@
                   </mat-cell>
                 </ng-container>
 
+                <!-- added code below is — Incentive column (editable for admin, read-only for others) -->
+                <ng-container matColumnDef="incentive">
+                  <mat-header-cell *matHeaderCellDef>Incentive (₹)</mat-header-cell>
+                  <mat-cell *matCellDef="let row" (click)="$event.stopPropagation()">
+                    <!-- Admin: inline edit mode -->
+                    <ng-container *ngIf="isAdmin">
+                      <ng-container *ngIf="editingIncentiveId === row.id; else viewMode">
+                        <div class="flex items-center gap-1">
+                          <input
+                            type="number"
+                            [(ngModel)]="tempIncentive"
+                            min="0"
+                            class="w-24 border border-indigo-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            (keyup.enter)="saveIncentive(row)"
+                            (keyup.escape)="cancelEditIncentive()" />
+                          <button mat-icon-button (click)="saveIncentive(row)" matTooltip="Save"
+                            class="!text-green-600 !h-7 !w-7">
+                            <mat-icon class="!text-base">check</mat-icon>
+                          </button>
+                          <button mat-icon-button (click)="cancelEditIncentive()" matTooltip="Cancel"
+                            class="!text-gray-400 !h-7 !w-7">
+                            <mat-icon class="!text-base">close</mat-icon>
+                          </button>
+                        </div>
+                      </ng-container>
+                      <ng-template #viewMode>
+                        <div class="flex items-center gap-1 cursor-pointer group" (click)="startEditIncentive(row)">
+                          <span class="text-sm font-medium text-gray-700">
+                            ₹{{ (row.incentive || 0) | number:'1.2-2' }}
+                          </span>
+                          <mat-icon class="!text-xs text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity !h-4 !w-4">edit</mat-icon>
+                        </div>
+                      </ng-template>
+                    </ng-container>
+                    <!-- Non-admin: read-only -->
+                    <ng-container *ngIf="!isAdmin">
+                      <span class="text-sm font-medium text-gray-700">₹{{ (row.incentive || 0) | number:'1.2-2' }}</span>
+                    </ng-container>
+                  </mat-cell>
+                </ng-container>
+
                 <ng-container matColumnDef="actions">
                   <mat-header-cell *matHeaderCellDef class="pr-0">Actions</mat-header-cell>
                   <mat-cell *matCellDef="let row; let i=index;" class="pr-0 flex items-center gap-1">

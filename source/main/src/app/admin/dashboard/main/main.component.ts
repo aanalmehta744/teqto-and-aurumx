@@ -37,6 +37,7 @@ import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { LeavesService } from 'app/admin/leaves/leave-requests/leaves.service';
 import { AuthService } from '@core';
+import { AnnouncementBannerComponent } from '@shared/components/announcement-banner/announcement-banner.component';
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -55,7 +56,8 @@ import { AuthService } from '@core';
     CommonModule,
     NgScrollbarModule,
     NgApexchartsModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    AnnouncementBannerComponent,
   ],
 })
 export class MainComponent implements OnInit {

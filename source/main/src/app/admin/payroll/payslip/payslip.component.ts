@@ -30,8 +30,10 @@ export class PayslipComponent implements OnInit {
   selectedEmployee: any = null;
   payslipID: any;
   empID: any;
-  isEditingDays = false;   // toggle for edit mode
-  tempWorkingDays: number | null = null; // temporary value while editing
+  isEditingDays = false;
+  tempWorkingDays: number | null = null;
+  isEditingAddon = false;
+  tempAddonAmount: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -39,11 +41,50 @@ export class PayslipComponent implements OnInit {
     private employeeSalaryService: EmployeeSalaryService,
     private employeeService: EmployeesService,
   ) { }
+
+  get monthName(): string {
+    const names = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+    return names[this.employeeSalary?.month || 0] || '';
+  }
+
   enableEditDays() {
     if (this.employeeSalary) {
       this.tempWorkingDays = this.employeeSalary.workingDays;
       this.isEditingDays = true;
     }
+  }
+
+  enableEditAddon() {
+    if (this.employeeSalary) {
+      this.tempAddonAmount = +(this.employeeSalary.addonAmount || 0);
+      this.isEditingAddon = true;
+    }
+  }
+
+  saveAddonAmount() {
+    if (this.employeeSalary && this.tempAddonAmount !== null) {
+      this.employeeSalary.addonAmount = this.tempAddonAmount;
+      this.employeeSalaryService.updatePayslipOverride(
+        this.employeeSalary.employeeId,
+        this.employeeSalary.month,
+        this.employeeSalary.year,
+        {
+          workingDays: this.employeeSalary.workingDays,
+          paidLeaveDays: this.employeeSalary.paidLeaveDays || 0,
+          unpaidLeaveDays: this.employeeSalary.unpaidLeaveDays || 0,
+          netSalary: this.employeeSalary.netSalary,
+          addonAmount: this.tempAddonAmount,
+        }
+      ).subscribe({
+        next: () => { this.isEditingAddon = false; },
+        error: (err) => { console.error('Error saving addon amount:', err); }
+      });
+    }
+  }
+
+  cancelEditAddon() {
+    this.isEditingAddon = false;
+    this.tempAddonAmount = null;
   }
 
   ngOnInit(): void {
@@ -133,10 +174,10 @@ export class PayslipComponent implements OnInit {
           return;
         }
 
-        this.employeeSalary = data;
 
         // Use backend-calculated values
-        this.selectedEmployee.finalSalary = parseFloat(data.netSalary) || 0;
+        // this.selectedEmployee.finalSalary = parseFloat(data.netSalary) || 0;
+        this.employeeSalary = data;
 
         console.log('Final Salary (from backend):', this.selectedEmployee.finalSalary);
       },
@@ -148,7 +189,6 @@ export class PayslipComponent implements OnInit {
   }
   printPayslip() {
     if (this.employeeSalary) {
-      //  Ensure DB always has the payslip (even if no manual change)
       this.employeeSalaryService
         .updatePayslipOverride(
           this.employeeSalary.employeeId,
@@ -159,6 +199,7 @@ export class PayslipComponent implements OnInit {
             paidLeaveDays: this.employeeSalary.paidLeaveDays || 0,
             unpaidLeaveDays: this.employeeSalary.unpaidLeaveDays || 0,
             netSalary: this.employeeSalary.netSalary,
+            addonAmount: this.employeeSalary.addonAmount || 0,
           }
         )
         .subscribe({

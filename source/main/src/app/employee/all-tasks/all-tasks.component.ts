@@ -123,18 +123,7 @@ export class AllTasksComponent
     });
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
       if (result === 1) {
-        // After dialog is closed we're doing frontend updates
-        // For add we're just pushing a new row inside DataServicex
-        this.exampleDatabase?.dataChange.value.unshift(
-          this.myTasksService.getDialogData()
-        );
-        this.refreshTable();
-        this.showNotification(
-          'snackbar-success',
-          'Add Record Successfully...!!!',
-          'bottom',
-          'center'
-        );
+        this.loadData();
       }
     });
   }
@@ -193,21 +182,11 @@ export class AllTasksComponent
       direction: tempDirection,
     });
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
-      if (result === 1) {
-        const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-          (x) => x.id === this.id
-        );
-        // for delete we use splice in order to remove single object from DataService
-        if (foundIndex !== undefined && this.exampleDatabase !== undefined) {
-          this.exampleDatabase?.dataChange.value.splice(foundIndex, 1);
-          this.refreshTable();
-          this.showNotification(
-            'snackbar-danger',
-            'Delete Record Successfully...!!!',
-            'bottom',
-            'center'
-          );
-        }
+      if (result === 1 && this.id) {
+        this.myTasksService.deleteMyTasks(this.id).subscribe(() => {
+          this.loadData();
+          this.showNotification('snackbar-danger', 'Delete Record Successfully...!!!', 'bottom', 'center');
+        });
       }
     });
   }

@@ -86,8 +86,10 @@
             <mat-select formControlName="halfDay">
               <mat-option value="">--</mat-option>
               <mat-option value="Full Day">Full Day</mat-option>
-              <mat-option value="First Half">First Half</mat-option>
-              <mat-option value="Second Half">Second Half</mat-option>
+                <mat-option value="Half Day">Half Day</mat-option>
+
+              <!-- <mat-option value="First Half">First Half</mat-option> -->
+              <!-- <mat-option value="Second Half">Second Half</mat-option> -->
             </mat-select>
             @if (leavesForm.get('halfDay')?.hasError('required')) {
             <mat-error>

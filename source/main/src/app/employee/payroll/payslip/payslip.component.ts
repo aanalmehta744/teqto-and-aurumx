@@ -11,6 +11,7 @@ import html2canvas from 'html2canvas';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-payslip',
@@ -22,7 +23,8 @@ import { FormsModule } from '@angular/forms';
     CommonModule,
     MatButtonModule,
     MatIconModule,
-    FormsModule
+    FormsModule,
+    MatTooltipModule,
   ],
 })
 export class PayslipComponent implements OnInit {
@@ -34,6 +36,11 @@ export class PayslipComponent implements OnInit {
   tempWorkingDays: number | null = null; // temporary value while editing
 
   isHR = false;
+
+  get monthName(): string {
+    const names = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+    return names[this.employeeSalary?.month || 0] || '';
+  }
 
   constructor(
     private route: ActivatedRoute,

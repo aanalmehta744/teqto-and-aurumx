@@ -10,17 +10,24 @@ import { MyProjectsComponent } from './my-projects/my-projects.component';
 import { MyTeamsComponent } from './myteam/myteam.component';
 import { EmployeeDailyUpdateComponent } from './employee-daily-update/employee-daily-update.component';
 import { LeaveBalanceComponent } from './my-leaves/leave-balance/leave-balance.component';
+import { AllTasksComponent } from '../employee/all-tasks/all-tasks.component';
 export const CLIENT_ROUTE: Route[] = [
   {
     path: 'dashboard',
     component: DashboardComponent,
-    // loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
   },
   {
     path: 'projects',
+    loadChildren: () =>
+      import('../admin/projects/projects.routes').then((m) => m.PROJECT_ROUTE),
+  },
+  {
+    path: 'myprojects',
     component: MyProjectsComponent,
-    // loadChildren: () =>
-    //   import('./projects/projects.routes').then((m) => m.PROJECTS_ROUTE),
+  },
+  {
+    path: 'alltasks',
+    component: AllTasksComponent,
   },
   {
     path: 'supports',

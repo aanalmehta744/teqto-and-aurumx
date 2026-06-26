@@ -33,6 +33,6 @@ export class DeleteComponent {
     this.dialogRef.close();
   }
   confirmDelete(): void {
-    this.myTasksService.deleteMyTasks(this.data.id);
+    this.dialogRef.close(1);
   }
 }

@@ -221,8 +221,15 @@ export class AddprojectsComponent implements OnInit, OnDestroy {
           confirmButtonColor: '#3085d6',
         }).then(() => {
           this.projectForm.reset();
-          // window.location.reload();
-          this.router.navigate(['/admin/projects/allProjects']);
+          // Navigate back to the projects list for whichever role is logged in
+          const currentUrl = this.router.url;
+          if (currentUrl.startsWith('/ba/')) {
+            this.router.navigate(['/ba/projects/allProjects']);
+          } else if (currentUrl.startsWith('/client/')) {
+            this.router.navigate(['/client/projects/allProjects']);
+          } else {
+            this.router.navigate(['/admin/projects/allProjects']);
+          }
         });
       },
       error: (error) => {

@@ -20,6 +20,7 @@ import { InterviewService } from '../jobs/interview-schedule/interview.service';
 import { LeavesService } from 'app/admin/leaves/leave-requests/leaves.service';
 import { AllTasksService } from '../all-tasks/all-tasks.service';
 import { Subject, takeUntil } from 'rxjs';
+import { AnnouncementBannerComponent } from '@shared/components/announcement-banner/announcement-banner.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -37,6 +38,7 @@ import { Subject, takeUntil } from 'rxjs';
     MatTooltipModule,
     NgClass,
     CommonModule,
+    AnnouncementBannerComponent,
   ],
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {

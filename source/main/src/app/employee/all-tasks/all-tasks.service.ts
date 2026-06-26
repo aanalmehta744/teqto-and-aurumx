@@ -37,43 +37,32 @@ export class AllTasksService extends UnsubscribeOnDestroyAdapter {
 
 
 
-  addMyTasks(myTasks: MyTasks): void {
+  addMyTasks(myTasks: any): Observable<any> {
     this.dialogData = myTasks;
-
-    // this.httpClient.post(this.API_URL, myTasks)
-    //   .subscribe({
-    //     next: (data) => {
-    //       this.dialogData = myTasks;
-    //     },
-    //     error: (error: HttpErrorResponse) => {
-    //        // error code here
-    //     },
-    //   });
+    return this.httpClient.post(this.API_URL, myTasks).pipe(
+      catchError((error: HttpErrorResponse) => {
+        console.error('Error adding task:', error.message);
+        return of(null);
+      })
+    );
   }
-  updateMyTasks(myTasks: MyTasks): void {
+
+  updateMyTasks(myTasks: MyTasks): Observable<any> {
     this.dialogData = myTasks;
-
-    // this.httpClient.put(this.API_URL + myTasks.id, myTasks)
-    //     .subscribe({
-    //       next: (data) => {
-    //         this.dialogData = myTasks;
-    //       },
-    //       error: (error: HttpErrorResponse) => {
-    //          // error code here
-    //       },
-    //     });
+    return this.httpClient.put(`${this.API_URL}/${myTasks.id}`, myTasks).pipe(
+      catchError((error: HttpErrorResponse) => {
+        console.error('Error updating task:', error.message);
+        return of(null);
+      })
+    );
   }
-  deleteMyTasks(id: number): void {
-    console.log(id);
 
-    // this.httpClient.delete(this.API_URL + id)
-    //     .subscribe({
-    //       next: (data) => {
-    //         console.log(id);
-    //       },
-    //       error: (error: HttpErrorResponse) => {
-    //          // error code here
-    //       },
-    //     });
+  deleteMyTasks(id: number): Observable<any> {
+    return this.httpClient.delete(`${this.API_URL}/${id}`).pipe(
+      catchError((error: HttpErrorResponse) => {
+        console.error('Error deleting task:', error.message);
+        return of(null);
+      })
+    );
   }
 }

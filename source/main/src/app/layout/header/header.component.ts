@@ -70,7 +70,7 @@ export class HeaderComponent
     if (isMobile) {
       return 'assets/images/favicon-150x150.jpg'; // Mobile view
     }
-    return this.collapsed && !this.isHovered ? 'assets/images/favicon-150x150.jpg' : 'assets/images/logo-placeholder-png-2.png';
+    return this.collapsed && !this.isHovered ? 'assets/images/favicon-150x150.jpg' : '../../../../assets/images/teqto_infotech_logo.png';
   }
 
   ngOnInit() {

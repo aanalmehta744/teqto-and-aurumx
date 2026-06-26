@@ -1,39 +1,26 @@
 <div class="p-2">
+
+  <!-- DETAILS VIEW -->
   @if (isDetails) {
   <div class="rounded-lg w-full max-w-3xl mx-auto">
-    <!-- Header -->
     <div class="flex justify-between items-center px-4 py-3 border-b">
       <h2 class="text-xl font-medium text-[#00383f]">{{ myTasks.projectTitle }}</h2>
       <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
         <mat-icon>close</mat-icon>
       </button>
     </div>
-
-    <!-- Content -->
     <div mat-dialog-content class="p-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-4">
-
-        <!-- Task Title -->
         <div class="font-medium text-gray-600">Task Title:</div>
         <div class="text-gray-700">{{ myTasks.title }}</div>
-
-        <!-- Project Title -->
         <div class="font-medium text-gray-600">Project Title:</div>
         <div class="text-gray-700">{{ myTasks.projectTitle }}</div>
-
-        <!-- Employee Name -->
         <div class="font-medium text-gray-600">Employee Name:</div>
         <div class="flex items-center gap-2 text-gray-800">
           {{ myTasks.employee_name ? myTasks.employee_name : '--' }}
         </div>
-
-        <!-- Due Date -->
         <div class="font-medium text-gray-600">Due Date:</div>
-        <div class="flex items-center gap-2 text-gray-800">
-          {{ myTasks.due_date | date }}
-        </div>
-
-        <!-- Status -->
+        <div class="flex items-center gap-2 text-gray-800">{{ myTasks.due_date | date }}</div>
         <div class="font-medium text-gray-600">Status:</div>
         <div class="status-pill" [ngClass]="{
               'pill-open-today': myTasks.done === 0 && isToday(myTasks.create_date),
@@ -48,21 +35,94 @@
             <span *ngIf="isOverdue(myTasks.due_date) && !isToday(myTasks.due_date)">(Overdue)</span>
           </div>
         </div>
-
-        <!-- Priority -->
         <div class="font-medium text-gray-600">Priority:</div>
         <div>
           <span *ngIf="myTasks.priority === 'High'" class="bg-red-500 text-white text-sm px-2 py-1 rounded">High</span>
-          <span *ngIf="myTasks.priority === 'Normal'"
-            class="bg-blue-500 text-white text-sm px-2 py-1 rounded">Normal</span>
+          <span *ngIf="myTasks.priority === 'Normal'" class="bg-blue-500 text-white text-sm px-2 py-1 rounded">Normal</span>
           <span *ngIf="myTasks.priority === 'Low'" class="bg-green-500 text-white text-sm px-2 py-1 rounded">Low</span>
         </div>
-
-        <!-- Description -->
         <div class="font-medium text-gray-600">Task Details:</div>
         <div class="text-gray-700" [innerHTML]="myTasks.note || '--'"></div>
       </div>
     </div>
   </div>
   }
+
+  <!-- ADD TASK FORM -->
+  @if (action === 'add') {
+  <div class="rounded-lg w-full" style="min-width: 400px;">
+    <div class="flex justify-between items-center px-4 py-3 border-b">
+      <h2 class="text-xl font-medium text-[#00383f]">{{ dialogTitle }}</h2>
+      <button mat-icon-button (click)="onNoClick()" aria-label="Close dialog">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div mat-dialog-content class="p-4">
+      <form [formGroup]="myTasksForm" class="flex flex-col gap-4">
+
+        <!-- Assign To Employee -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Assign To Employee</mat-label>
+          <mat-select formControlName="employee_id" required>
+            <mat-option *ngFor="let emp of employees" [value]="emp.id">
+              {{ emp.fullName || (emp.first_name + ' ' + emp.last_name) }}
+            </mat-option>
+          </mat-select>
+          <mat-error>Employee is required</mat-error>
+        </mat-form-field>
+
+        <!-- Project (Optional) -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Project (Optional)</mat-label>
+          <mat-select formControlName="project_id">
+            <mat-option [value]="null">-- No Project --</mat-option>
+            <mat-option *ngFor="let proj of projects" [value]="proj.id">
+              {{ proj.projectTitle || proj.title }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Task Title -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Task Title</mat-label>
+          <input matInput formControlName="title" placeholder="Enter task title" required />
+          <mat-error>Title is required</mat-error>
+        </mat-form-field>
+
+        <!-- Priority -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Priority</mat-label>
+          <mat-select formControlName="priority" required>
+            <mat-option value="High">High</mat-option>
+            <mat-option value="Normal">Normal</mat-option>
+            <mat-option value="Low">Low</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Due Date -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Due Date</mat-label>
+          <input matInput [matDatepicker]="dueDatePicker" formControlName="due_date" required />
+          <mat-datepicker-toggle matIconSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #dueDatePicker></mat-datepicker>
+          <mat-error>Due date is required</mat-error>
+        </mat-form-field>
+
+        <!-- Notes -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Task Notes</mat-label>
+          <textarea matInput formControlName="note" rows="3" placeholder="Enter task description"></textarea>
+        </mat-form-field>
+
+      </form>
+    </div>
+    <div class="flex justify-end gap-2 px-4 pb-4">
+      <button mat-stroked-button (click)="onNoClick()">Cancel</button>
+      <button mat-flat-button color="primary" class="!bg-[#00383f]" (click)="confirmAdd()" [disabled]="myTasksForm.invalid">
+        Add Task
+      </button>
+    </div>
+  </div>
+  }
+
 </div>

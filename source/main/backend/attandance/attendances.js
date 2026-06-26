@@ -12,6 +12,7 @@ router.get('/check/:employeeId', async (req, res) => {
     [employeeId, date]
   );
 
+  
   if (result.length > 0) {
     return res.json({ hasCheckedIn: true });
   } else {

@@ -27,6 +27,7 @@ const chatRoutes = require("./chat/chatRoutes");
 
 const admindashboardRoutes = require('./dashboard/admindashboard');
 const dailyUpdatesRoutes = require('./daily-updates/daily-updates');
+const announcementRoutes = require('./announcements/announcements');
 const db = require('./connection');
 const app = express();
 
@@ -40,6 +41,16 @@ const app = express();
             console.log('ℹ️  halfDay column already VARCHAR or migration not needed:', err.message);
         }
     }
+    // Ensure announcements table exists
+    await db.query(`CREATE TABLE IF NOT EXISTS announcements (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255),
+        text TEXT NOT NULL,
+        image_path VARCHAR(255),
+        created_by INT,
+        is_active TINYINT DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`).catch(() => {});
 })();
 
 const server = http.createServer(app);
@@ -125,6 +136,7 @@ app.use('/api/jobs', jobRoutes); // Prefix for job routes
 app.use('/api/interviews', interviewRoutes); // Prefix for job routes
 app.use('/api/admindashboard', admindashboardRoutes);
 app.use('/api/dailyUpdates', dailyUpdatesRoutes);
+app.use('/api/announcements', announcementRoutes);
 
 
 
