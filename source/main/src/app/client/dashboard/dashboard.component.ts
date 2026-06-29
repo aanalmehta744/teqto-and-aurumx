@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { EmployeesService } from 'app/admin/employees/allEmployees/employees.service';
 import { Subject, takeUntil } from 'rxjs';
+import { AnnouncementBannerComponent } from '@shared/components/announcement-banner/announcement-banner.component';
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -24,7 +25,8 @@ import { Subject, takeUntil } from 'rxjs';
     MatTableModule,
     MatPaginatorModule,
     MatIconModule,
-    CommonModule
+    CommonModule,
+    AnnouncementBannerComponent,
   ],
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {

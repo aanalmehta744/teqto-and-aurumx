@@ -48,7 +48,7 @@ export class AddClientComponent {
 
   clientConnectType: string[] = ['Call', 'Whatsapp', 'Email', 'Linkedin', 'Other'];
   clientTypes: string[] = ['Cold', 'Hot', 'Close'];
-  prizeTags: string[] = ['Hourly', 'Monthly'];
+  prizeTags: string[] = ['Full Time', 'Part Time', 'Hourly', 'Project Based'];
   showPrizeInput: boolean = false;
   selectedPrizeTag: string = '';
   countryList: { name: string }[] = [];

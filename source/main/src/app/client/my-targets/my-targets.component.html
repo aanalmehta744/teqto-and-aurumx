@@ -1,0 +1,186 @@
+<section>
+  <app-breadcrumb [title]="'My Targets'" [items]="['Home']" [active_item]="'My Targets'"></app-breadcrumb>
+
+  <!-- Month/Year filter -->
+  <div class="bg-white rounded-xl shadow p-4 mb-6 flex flex-wrap gap-4 items-end">
+    <div>
+      <label class="block text-xs text-gray-500 mb-1">Month</label>
+      <select [(ngModel)]="month" (change)="loadTarget()"
+        class="border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 text-red-500">
+        <option *ngFor="let m of months" [value]="m.val">{{ m.label }}</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs text-gray-500 mb-1">Year</label>
+      <input [(ngModel)]="year" (change)="loadTarget()" type="number"
+        class="border rounded px-3 py-2 text-sm w-24 focus:outline-none focus:ring-2 focus:ring-indigo-300 text-red-500" />
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-12 text-gray-400 text-sm">Loading targets...</div>
+
+  <ng-container *ngIf="!loading">
+
+    <!-- No target assigned -->
+    <div *ngIf="!target" class="bg-white rounded-xl shadow p-12 text-center">
+      <div class="text-5xl mb-4">🎯</div>
+      <p class="text-gray-600 font-medium text-base">No targets assigned for {{ monthLabel }} {{ year }}</p>
+      <p class="text-gray-400 text-sm mt-2">Your manager will assign targets soon. Check back later.</p>
+    </div>
+
+    <!-- Target cards -->
+    <ng-container *ngIf="target">
+
+      <!-- Overall summary cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-xl shadow p-4 text-center border-t-4 border-indigo-500">
+          <p class="text-xs text-gray-500 mb-1">Full Time Client</p>
+          <p class="text-2xl font-bold text-indigo-600">{{ target.full_time_achieved }}<span class="text-gray-400 text-base font-normal"> / {{ target.full_time }}</span></p>
+          <div class="mt-2 h-1.5 bg-gray-100 rounded-full"><div [class]="'h-full rounded-full ' + bar(target.ftPct)" [style.width.%]="target.ftPct"></div></div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-4 text-center border-t-4 border-purple-500">
+          <p class="text-xs text-gray-500 mb-1">Part Time Client</p>
+          <p class="text-2xl font-bold text-purple-600">{{ target.part_time_achieved }}<span class="text-gray-400 text-base font-normal"> / {{ target.part_time }}</span></p>
+          <div class="mt-2 h-1.5 bg-gray-100 rounded-full"><div [class]="'h-full rounded-full ' + bar(target.ptPct)" [style.width.%]="target.ptPct"></div></div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-4 text-center border-t-4 border-teal-500">
+          <p class="text-xs text-gray-500 mb-1">Hourly Client</p>
+          <p class="text-2xl font-bold text-teal-600">{{ target.hourly_achieved }}<span class="text-gray-400 text-base font-normal"> / {{ target.hourly }}</span></p>
+          <div class="mt-2 h-1.5 bg-gray-100 rounded-full"><div [class]="'h-full rounded-full ' + bar(target.hPct)" [style.width.%]="target.hPct"></div></div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-4 text-center border-t-4 border-orange-500">
+          <p class="text-xs text-gray-500 mb-1">Project Based</p>
+          <p class="text-2xl font-bold text-orange-600">{{ target.project_base_achieved }}<span class="text-gray-400 text-base font-normal"> / {{ target.project_base }}</span></p>
+          <div class="mt-2 h-1.5 bg-gray-100 rounded-full"><div [class]="'h-full rounded-full ' + bar(target.pbPct)" [style.width.%]="target.pbPct"></div></div>
+        </div>
+      </div>
+
+      <!-- Detailed breakdown -->
+      <div class="bg-white rounded-xl shadow overflow-hidden">
+        <div class="bg-indigo-600 text-white px-5 py-3 flex justify-between items-center">
+          <span class="font-semibold text-sm">Target Details — {{ monthLabel }} {{ year }}</span>
+          <span [class]="'text-xs font-bold px-3 py-1 rounded-full ' + badge(target.overall)">
+            Overall {{ target.overall }}%
+          </span>
+        </div>
+
+        <!-- Rows for each type -->
+        <div class="divide-y">
+
+          <!-- Full Time -->
+          <div class="flex items-center gap-4 px-6 py-4 hover:bg-gray-50">
+            <div class="w-36 flex-shrink-0">
+              <p class="text-sm font-semibold text-gray-700">Full Time Client</p>
+            </div>
+            <div class="flex-1">
+              <div class="flex justify-between text-xs text-gray-500 mb-1">
+                <span>Achieved: <strong class="text-green-600">{{ target.full_time_achieved }}</strong></span>
+                <span>Target: <strong class="text-gray-700">{{ target.full_time }}</strong></span>
+              </div>
+              <div class="h-2.5 bg-gray-100 rounded-full">
+                <div [class]="'h-full rounded-full transition-all ' + bar(target.ftPct)" [style.width.%]="target.ftPct"></div>
+              </div>
+            </div>
+            <span [class]="'w-14 text-center text-xs font-bold px-2 py-1 rounded-full ' + badge(target.ftPct)">
+              {{ target.ftPct }}%
+            </span>
+          </div>
+
+          <!-- Part Time -->
+          <div class="flex items-center gap-4 px-6 py-4 hover:bg-gray-50">
+            <div class="w-36 flex-shrink-0">
+              <p class="text-sm font-semibold text-gray-700">Part Time Client</p>
+            </div>
+            <div class="flex-1">
+              <div class="flex justify-between text-xs text-gray-500 mb-1">
+                <span>Achieved: <strong class="text-green-600">{{ target.part_time_achieved }}</strong></span>
+                <span>Target: <strong class="text-gray-700">{{ target.part_time }}</strong></span>
+              </div>
+              <div class="h-2.5 bg-gray-100 rounded-full">
+                <div [class]="'h-full rounded-full transition-all ' + bar(target.ptPct)" [style.width.%]="target.ptPct"></div>
+              </div>
+            </div>
+            <span [class]="'w-14 text-center text-xs font-bold px-2 py-1 rounded-full ' + badge(target.ptPct)">
+              {{ target.ptPct }}%
+            </span>
+          </div>
+
+          <!-- Hourly -->
+          <div class="flex items-center gap-4 px-6 py-4 hover:bg-gray-50">
+            <div class="w-36 flex-shrink-0">
+              <p class="text-sm font-semibold text-gray-700">Hourly Client</p>
+            </div>
+            <div class="flex-1">
+              <div class="flex justify-between text-xs text-gray-500 mb-1">
+                <span>Achieved: <strong class="text-green-600">{{ target.hourly_achieved }}</strong></span>
+                <span>Target: <strong class="text-gray-700">{{ target.hourly }}</strong></span>
+              </div>
+              <div class="h-2.5 bg-gray-100 rounded-full">
+                <div [class]="'h-full rounded-full transition-all ' + bar(target.hPct)" [style.width.%]="target.hPct"></div>
+              </div>
+            </div>
+            <span [class]="'w-14 text-center text-xs font-bold px-2 py-1 rounded-full ' + badge(target.hPct)">
+              {{ target.hPct }}%
+            </span>
+          </div>
+
+          <!-- Project Based -->
+          <div class="flex items-center gap-4 px-6 py-4 hover:bg-gray-50">
+            <div class="w-36 flex-shrink-0">
+              <p class="text-sm font-semibold text-gray-700">Project Based</p>
+            </div>
+            <div class="flex-1">
+              <div class="flex justify-between text-xs text-gray-500 mb-1">
+                <span>Achieved: <strong class="text-green-600">{{ target.project_base_achieved }}</strong></span>
+                <span>Target: <strong class="text-gray-700">{{ target.project_base }}</strong></span>
+              </div>
+              <div class="h-2.5 bg-gray-100 rounded-full">
+                <div [class]="'h-full rounded-full transition-all ' + bar(target.pbPct)" [style.width.%]="target.pbPct"></div>
+              </div>
+            </div>
+            <span [class]="'w-14 text-center text-xs font-bold px-2 py-1 rounded-full ' + badge(target.pbPct)">
+              {{ target.pbPct }}%
+            </span>
+          </div>
+
+          <!-- Amount (last row) -->
+          <div class="flex items-center gap-4 px-6 py-4 bg-gray-50 hover:bg-gray-100">
+            <div class="w-36 flex-shrink-0">
+              <p class="text-sm font-semibold text-gray-700">Amount ($)</p>
+              <p class="text-xs text-gray-400">Revenue target</p>
+            </div>
+            <div class="flex-1">
+              <div class="flex justify-between text-xs text-gray-500 mb-1">
+                <span>Achieved: <strong class="text-green-600">₹{{ target.amount_achieved | number }}</strong></span>
+                <span>Target: <strong class="text-gray-700">₹{{ target.amount | number }}</strong></span>
+              </div>
+              <div class="h-2.5 bg-gray-200 rounded-full">
+                <div [class]="'h-full rounded-full transition-all ' + bar(target.amtPct)" [style.width.%]="target.amtPct"></div>
+              </div>
+              <p class="text-xs text-red-500 mt-1">
+                Remaining: ₹{{ (target.amount - target.amount_achieved < 0 ? 0 : target.amount - target.amount_achieved) | number }}
+              </p>
+            </div>
+            <span [class]="'w-14 text-center text-xs font-bold px-2 py-1 rounded-full ' + badge(target.amtPct)">
+              {{ target.amtPct }}%
+            </span>
+          </div>
+
+        </div>
+
+        <!-- Overall footer bar -->
+        <div class="border-t px-6 py-4 flex items-center gap-4 bg-white">
+          <span class="text-sm font-semibold text-gray-700 w-36 flex-shrink-0">Overall Progress</span>
+          <div class="flex-1 h-3 bg-gray-200 rounded-full">
+            <div [class]="'h-full rounded-full transition-all ' + bar(target.overall)" [style.width.%]="target.overall"></div>
+          </div>
+          <span [class]="'text-sm font-bold px-3 py-1 rounded-full ' + badge(target.overall)">
+            {{ target.overall }}%
+          </span>
+        </div>
+      </div>
+
+    </ng-container>
+  </ng-container>
+</section>

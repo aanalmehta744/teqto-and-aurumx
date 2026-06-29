@@ -11,6 +11,12 @@ import { MyTeamsComponent } from './myteam/myteam.component';
 import { EmployeeDailyUpdateComponent } from './employee-daily-update/employee-daily-update.component';
 import { LeaveBalanceComponent } from './my-leaves/leave-balance/leave-balance.component';
 import { AllTasksComponent } from '../employee/all-tasks/all-tasks.component';
+import { CallsComponent } from './calls/calls.component';
+import { MeetingsComponent } from './meetings/meetings.component';
+import { DealsComponent } from './deals/deals.component';
+import { PerformanceComponent } from './performance/performance.component';
+import { MyTargetsComponent } from './my-targets/my-targets.component';
+import { DailyNotesComponent } from './daily-notes/daily-notes.component';
 export const CLIENT_ROUTE: Route[] = [
   {
     path: 'dashboard',
@@ -77,6 +83,12 @@ export const CLIENT_ROUTE: Route[] = [
     component: EmployeeDailyUpdateComponent,
   },
 
+  { path: 'calls', component: CallsComponent },
+  { path: 'meetings', component: MeetingsComponent },
+  { path: 'deals', component: DealsComponent },
+  { path: 'performance', component: PerformanceComponent },
+  { path: 'my-targets', component: MyTargetsComponent },
+  { path: 'daily-notes', component: DailyNotesComponent },
   { path: '**', component: Page404Component },
 ];
 

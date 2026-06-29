@@ -180,6 +180,27 @@ export class MainComponent implements OnInit {
     }
   };
 
+  // BDE Activity Chart (calls / meetings / deals)
+  bdePerformanceSummary: any[] = [];
+  public bdeChartSeries: ApexAxisChartSeries = [];
+  public bdeChartOptions: ApexChart = { type: 'bar', height: 320, toolbar: { show: false } };
+  public bdeChartXAxis: ApexXAxis = { categories: [] };
+  public bdeChartDataLabels: ApexDataLabels = { enabled: true };
+  public bdeChartTooltip: ApexTooltip = { shared: true, intersect: false };
+  public bdeChartColors: string[] = ['#00C4C4', '#f59e0b', '#10b981'];
+
+  // BDE KPI Target Achievement Chart (completed / partial / missed)
+  bdeKpiAchievement: any[] = [];
+  public kpiAchievementSeries: ApexAxisChartSeries = [];
+  public kpiAchievementChart: ApexChart = { type: 'bar', height: 320, stacked: true, toolbar: { show: false } };
+  public kpiAchievementXAxis: ApexXAxis = { categories: [] };
+  public kpiAchievementDataLabels: ApexDataLabels = { enabled: true };
+  public kpiAchievementTooltip: ApexTooltip = { shared: true, intersect: false };
+  public kpiAchievementColors: string[] = ['#10b981', '#f59e0b', '#ef4444'];
+  public kpiAchievementLegend: ApexLegend = { position: 'top' };
+
+  // Leaderboard
+  bdeLeaderboard: any[] = [];
 
   ngOnInit() {
     this.loadFollowupsByBDE();
@@ -190,6 +211,48 @@ export class MainComponent implements OnInit {
     this.loadClients();
     this.loadInterviews();
     this.loadPendingLeaves();
+    this.loadBdePerformanceSummary();
+    this.loadBdeKpiAchievement();
+  }
+
+  loadBdePerformanceSummary(): void {
+    this.dashboardService.getBdePerformanceSummary().subscribe({
+      next: (data) => {
+        this.bdePerformanceSummary = data;
+        const names = data.map((b: any) => b.bde_name);
+        this.bdeChartXAxis = { categories: names };
+        this.bdeChartSeries = [
+          { name: 'Calls', data: data.map((b: any) => b.calls) },
+          { name: 'Meetings', data: data.map((b: any) => b.meetings) },
+          { name: 'Deals Won', data: data.map((b: any) => b.deals_won) },
+        ];
+      },
+      error: (err) => console.error('Error loading BDE performance:', err),
+    });
+  }
+
+  loadBdeKpiAchievement(): void {
+    this.dashboardService.getBdeKpiAchievement().subscribe({
+      next: (data) => {
+        this.bdeKpiAchievement = data;
+        this.bdeLeaderboard = data; // already sorted by avg_achievement desc from backend
+        const names = data.map((b: any) => b.bde_name);
+        this.kpiAchievementXAxis = { categories: names };
+        this.kpiAchievementSeries = [
+          { name: 'Completed (≥100%)', data: data.map((b: any) => b.completed) },
+          { name: 'Partial (70–99%)', data: data.map((b: any) => b.partial) },
+          { name: 'Missed (<70%)', data: data.map((b: any) => b.missed) },
+        ];
+      },
+      error: (err) => console.error('Error loading BDE KPI achievement:', err),
+    });
+  }
+
+  rankMedal(index: number): string {
+    if (index === 0) return '🥇';
+    if (index === 1) return '🥈';
+    if (index === 2) return '🥉';
+    return `#${index + 1}`;
   }
   ngAfterViewInit(): void {
     if (this.followupPaginator) {

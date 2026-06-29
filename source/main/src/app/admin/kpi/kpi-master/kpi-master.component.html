@@ -1,0 +1,89 @@
+<section>
+  <app-breadcrumb [title]="'KPI Master'" [items]="['Admin','KPI']" [active_item]="'KPI Master'"></app-breadcrumb>
+
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-lg font-semibold text-gray-700">KPI Definitions</h2>
+    <button mat-raised-button color="primary" (click)="openAdd()">+ Add KPI</button>
+  </div>
+
+  <!-- Form -->
+  <div *ngIf="showForm" class="bg-white rounded-xl shadow p-6 mb-6">
+    <h3 class="text-md font-semibold mb-4 text-gray-700">{{ editMode ? 'Edit KPI' : 'New KPI' }}</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">KPI Name *</label>
+        <input [(ngModel)]="form.kpi_name" class="w-full border rounded px-3 py-2 text-sm" placeholder="e.g. Monthly Calls" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">KPI Type *</label>
+        <select [(ngModel)]="form.kpi_type" class="w-full border rounded px-3 py-2 text-sm">
+          <option value="">-- Select Type --</option>
+          <option *ngFor="let t of kpiTypes" [value]="t.value">{{ t.label }}</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Unit *</label>
+        <input [(ngModel)]="form.unit" class="w-full border rounded px-3 py-2 text-sm" placeholder="count / ₹ / %" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Active</label>
+        <select [(ngModel)]="form.is_active" class="w-full border rounded px-3 py-2 text-sm">
+          <option [ngValue]="1">Yes</option>
+          <option [ngValue]="0">No</option>
+        </select>
+      </div>
+      <div class="sm:col-span-2">
+        <label class="block text-sm text-gray-600 mb-1">Description</label>
+        <textarea [(ngModel)]="form.kpi_description" rows="2" class="w-full border rounded px-3 py-2 text-sm" placeholder="Optional description"></textarea>
+      </div>
+    </div>
+    <div class="flex gap-3 mt-4">
+      <button mat-raised-button color="primary" (click)="submit()" [disabled]="submitting">
+        {{ submitting ? 'Saving...' : (editMode ? 'Update' : 'Create') }}
+      </button>
+      <button mat-stroked-button (click)="cancel()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="bg-white rounded-xl shadow overflow-hidden">
+    <table mat-table [dataSource]="kpis" class="w-full text-sm">
+      <ng-container matColumnDef="kpi_name">
+        <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-3 font-semibold">KPI Name</th>
+        <td mat-cell *matCellDef="let k" class="p-3">{{ k.kpi_name }}</td>
+      </ng-container>
+      <ng-container matColumnDef="kpi_type">
+        <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-3 font-semibold">Type</th>
+        <td mat-cell *matCellDef="let k" class="p-3">{{ kpiTypeLabel(k.kpi_type) }}</td>
+      </ng-container>
+      <ng-container matColumnDef="unit">
+        <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-3 font-semibold">Unit</th>
+        <td mat-cell *matCellDef="let k" class="p-3">{{ k.unit }}</td>
+      </ng-container>
+      <ng-container matColumnDef="is_active">
+        <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-3 font-semibold">Active</th>
+        <td mat-cell *matCellDef="let k" class="p-3">
+          <span [class]="k.is_active ? 'bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs' : 'bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs'">
+            {{ k.is_active ? 'Yes' : 'No' }}
+          </span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-3 font-semibold">Actions</th>
+        <td mat-cell *matCellDef="let k" class="p-3">
+          <button mat-icon-button color="primary" (click)="openEdit(k)" matTooltip="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="delete(k.kpi_id)" matTooltip="Delete">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50"></tr>
+      <tr *matNoDataRow>
+        <td [attr.colspan]="displayedColumns.length" class="p-6 text-center text-gray-400">No KPIs defined yet</td>
+      </tr>
+    </table>
+  </div>
+</section>

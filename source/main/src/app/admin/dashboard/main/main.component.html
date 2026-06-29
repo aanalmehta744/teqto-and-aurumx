@@ -59,6 +59,137 @@
         </div>
       </div>
     </div>
+    <!-- ── BDE Dashboard Section ── -->
+    <div class="w-full mt-4" *ngIf="bdePerformanceSummary.length > 0 || bdeKpiAchievement.length > 0">
+
+      <!-- Row 1: Activity chart + KPI achievement chart -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+        <!-- BDE Activity Comparison (Calls / Meetings / Deals) -->
+        <div class="bg-white rounded-lg !shadow-xl">
+          <div class="bg-[#00C4C4] text-white px-4 py-2.5 rounded-t-md">
+            <h6 class="m-0 text-md font-normal">BDE Activity — This Month</h6>
+            <p class="text-xs opacity-80 mt-0.5">Calls · Meetings · Deals Won</p>
+          </div>
+          <div class="p-4">
+            <apx-chart
+              [series]="bdeChartSeries"
+              [chart]="bdeChartOptions"
+              [xaxis]="bdeChartXAxis"
+              [dataLabels]="bdeChartDataLabels"
+              [tooltip]="bdeChartTooltip"
+              [colors]="bdeChartColors">
+            </apx-chart>
+          </div>
+        </div>
+
+        <!-- KPI Target Completion (Completed / Partial / Missed) -->
+        <div class="bg-white rounded-lg !shadow-xl" *ngIf="bdeKpiAchievement.length > 0">
+          <div class="bg-[#7c3aed] text-white px-4 py-2.5 rounded-t-md">
+            <h6 class="m-0 text-md font-normal">KPI Target Completion — This Month</h6>
+            <p class="text-xs opacity-80 mt-0.5">Stacked per BDE: Completed · Partial · Missed</p>
+          </div>
+          <div class="p-4">
+            <apx-chart
+              [series]="kpiAchievementSeries"
+              [chart]="kpiAchievementChart"
+              [xaxis]="kpiAchievementXAxis"
+              [dataLabels]="kpiAchievementDataLabels"
+              [tooltip]="kpiAchievementTooltip"
+              [colors]="kpiAchievementColors"
+              [legend]="kpiAchievementLegend">
+            </apx-chart>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: Revenue cards + Leaderboard -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+
+        <!-- Revenue Cards -->
+        <div class="bg-white rounded-lg !shadow-xl">
+          <div class="bg-[#0891b2] text-white px-4 py-2.5 rounded-t-md">
+            <h6 class="m-0 text-md font-normal">Revenue This Month</h6>
+          </div>
+          <div class="p-4 grid grid-cols-2 gap-3">
+            <div *ngFor="let bde of bdePerformanceSummary"
+                 class="bg-teal-50 border border-teal-100 rounded-xl p-3 text-center">
+              <p class="text-xs font-semibold text-gray-600 truncate">{{ bde.bde_name }}</p>
+              <p class="text-xl font-bold text-teal-600 mt-1">₹{{ bde.revenue | number }}</p>
+              <div class="flex justify-center gap-3 mt-2 text-xs text-gray-500">
+                <span>📞 {{ bde.calls }}</span>
+                <span>🤝 {{ bde.meetings }}</span>
+                <span>✅ {{ bde.deals_won }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="bg-white rounded-lg !shadow-xl" *ngIf="bdeLeaderboard.length > 0">
+          <div class="bg-[#b45309] text-white px-4 py-2.5 rounded-t-md">
+            <h6 class="m-0 text-md font-normal">🏆 BDE Leaderboard — KPI Achievement</h6>
+            <p class="text-xs opacity-80 mt-0.5">Ranked by average KPI completion %</p>
+          </div>
+          <div class="p-4">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-amber-50 text-gray-600">
+                  <th class="text-left py-2 px-3 font-semibold">Rank</th>
+                  <th class="text-left py-2 px-3 font-semibold">BDE Name</th>
+                  <th class="text-center py-2 px-3 font-semibold">KPIs</th>
+                  <th class="text-center py-2 px-3 font-semibold">✅ Done</th>
+                  <th class="text-center py-2 px-3 font-semibold">⚠️ Partial</th>
+                  <th class="text-center py-2 px-3 font-semibold">❌ Missed</th>
+                  <th class="text-right py-2 px-3 font-semibold">Avg %</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let bde of bdeLeaderboard; let i = index"
+                    class="border-b border-gray-100 hover:bg-amber-50 transition-colors"
+                    [class.bg-yellow-50]="i === 0">
+                  <td class="py-2.5 px-3 text-xl">{{ rankMedal(i) }}</td>
+                  <td class="py-2.5 px-3 font-medium text-gray-800">{{ bde.bde_name }}</td>
+                  <td class="py-2.5 px-3 text-center text-gray-600">{{ bde.total_kpis }}</td>
+                  <td class="py-2.5 px-3 text-center">
+                    <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-semibold">{{ bde.completed }}</span>
+                  </td>
+                  <td class="py-2.5 px-3 text-center">
+                    <span class="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs font-semibold">{{ bde.partial }}</span>
+                  </td>
+                  <td class="py-2.5 px-3 text-center">
+                    <span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-semibold">{{ bde.missed }}</span>
+                  </td>
+                  <td class="py-2.5 px-3 text-right">
+                    <span [ngClass]="{
+                      'text-green-600': bde.avg_achievement >= 100,
+                      'text-yellow-600': bde.avg_achievement >= 70 && bde.avg_achievement < 100,
+                      'text-red-500': bde.avg_achievement < 70
+                    }" class="font-bold text-sm">{{ bde.avg_achievement }}%</span>
+                    <div class="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                      <div
+                        [style.width.%]="bde.avg_achievement > 100 ? 100 : bde.avg_achievement"
+                        [ngClass]="{
+                          'bg-green-500': bde.avg_achievement >= 100,
+                          'bg-yellow-400': bde.avg_achievement >= 70 && bde.avg_achievement < 100,
+                          'bg-red-400': bde.avg_achievement < 70
+                        }"
+                        class="h-1.5 rounded-full transition-all">
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="bdeLeaderboard.length === 0">
+                  <td colspan="7" class="py-6 text-center text-gray-400">No KPI targets set yet</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <div class="w-full mt-4" *ngIf="userRole !== 'ba'">
       <div class="bg-white rounded-lg !shadow-xl">
         <div class="bg-[#00C4C4] text-white px-4 py-2.5 rounded-t-md">

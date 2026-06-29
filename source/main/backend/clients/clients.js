@@ -208,26 +208,75 @@ router.get('/:id', async (req, res) => {
         res.status(500).json({ message: 'Database error', error });
     }
 });
+// Helper: map prize_tag label to bde_conversions.client_type ENUM value
+function prizeTagToClientType(tag) {
+    const map = {
+        'Full Time': 'full_time',
+        'Part Time': 'part_time',
+        'Hourly': 'hourly',
+        'Project Based': 'project_base',
+    };
+    return map[tag] || null;
+}
+
 // ✅ 4. UPDATE: Edit Client by ID
 router.put('/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const {
-            fullName, mobile, email, linkedinId, websiteLink, clientNote, country, address, clientType, clientConnectType, bdeAccountId , bdeAccountEmail, date, platform, technology, prizeTag, prizeAmount
+            fullName, mobile, email, linkedinId, websiteLink, clientNote, country, address,
+            clientType, clientConnectType, bdeAccountId, bdeAccountEmail,
+            date, platform, technology, prizeTag, prizeAmount
         } = req.body;
 
+        // Fetch the existing record before update
+        const [[existing]] = await db.query(`SELECT * FROM clients WHERE id=?`, [id]);
+        if (!existing) return res.status(404).json({ message: 'Client not found' });
 
-
-        const sql = `UPDATE clients SET 
-            fullName=?, mobile=?, email=?, linkedin_id=?, website_link=?, client_note=?, country=?, address=?, 
-            client_type=?, client_Connect_Type=?, bde_account_id=?, bde_account_email=?, date=?, platform=?, technology=?, prize_tag=?, prize_amount=? 
+        const sql = `UPDATE clients SET
+            fullName=?, mobile=?, email=?, linkedin_id=?, website_link=?, client_note=?, country=?, address=?,
+            client_type=?, client_Connect_Type=?, bde_account_id=?, bde_account_email=?, date=?, platform=?, technology=?, prize_tag=?, prize_amount=?
             WHERE id=?`;
 
-        const [result] = await db.query(sql, [fullName, mobile, email, linkedinId, websiteLink, clientNote, country, address, clientType, clientConnectType, bdeAccountId, bdeAccountEmail,
-            date, platform, technology, prizeTag, prizeAmount, id]);
+        const [result] = await db.query(sql, [
+            fullName, mobile, email, linkedinId, websiteLink, clientNote, country, address,
+            clientType, clientConnectType, bdeAccountId, bdeAccountEmail,
+            date, platform, technology, prizeTag, prizeAmount, id
+        ]);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: 'Client not found' });
+        }
+
+        const closedNow = clientType === 'Close';
+        const wasAlreadyClosed = existing.client_type === 'Close';
+        const clientTypeEnum = prizeTagToClientType(prizeTag);
+        const convDate = new Date().toISOString().split('T')[0];
+
+        // ── When client is closed → always upsert into bde_conversions ──────────
+        if (closedNow) {
+            await db.query(`
+                INSERT INTO bde_conversions
+                    (client_id, user_id, client_name, deal_value, client_type, conversion_status, conversion_date, closing_notes)
+                VALUES (?, ?, ?, ?, ?, 'won', ?, 'Auto-closed from client record')
+                ON DUPLICATE KEY UPDATE
+                    deal_value = VALUES(deal_value),
+                    client_type = VALUES(client_type),
+                    conversion_date = VALUES(conversion_date),
+                    user_id = VALUES(user_id),
+                    client_name = VALUES(client_name)
+            `, [id, existing.employee_id, fullName, prizeAmount || 0, clientTypeEnum || null, convDate])
+            .catch(e => console.error('Conversion upsert error:', e.message));
+        }
+
+        // ── When prize_tag changes on a CLOSED client → notify admin ─────────
+        if (wasAlreadyClosed && closedNow && existing.prize_tag !== prizeTag) {
+            const msg = `BDE changed price tag for client "${fullName}" from "${existing.prize_tag || 'none'}" to "${prizeTag}"`;
+            await db.query(`
+                INSERT INTO notifications (type, message, client_id, bde_id)
+                VALUES ('prize_tag_change', ?, ?, ?)
+            `, [msg, id, existing.employee_id])
+            .catch(e => console.error('Notification insert error:', e.message));
         }
 
         res.status(200).json({ message: 'Client updated successfully' });
@@ -241,6 +290,9 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
+
+        // Remove linked conversion record so achievement counts stay accurate
+        await db.query('DELETE FROM bde_conversions WHERE client_id = ?', [id]).catch(() => {});
 
         const [result] = await db.query('DELETE FROM clients WHERE id = ?', [id]);
 

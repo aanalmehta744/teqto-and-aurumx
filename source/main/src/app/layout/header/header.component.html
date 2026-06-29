@@ -26,6 +26,40 @@
 
   <div class="flex items-center justify-end space-x-3 h-full" [ngClass]="isNavbarCollapsed ? '' : 'show'">
 
+    <!-- Admin notification bell -->
+    <div *ngIf="userRole === 'Admin'" class="relative">
+      <button (click)="toggleNotifPanel()" class="relative p-2 text-gray-600 hover:text-indigo-600 transition-colors">
+        <mat-icon class="text-[#00383F]">notifications</mat-icon>
+        <span *ngIf="notifCount > 0"
+          class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center leading-none">
+          {{ notifCount > 9 ? '9+' : notifCount }}
+        </span>
+      </button>
+
+      <!-- Backdrop to close panel -->
+      <div *ngIf="showNotifPanel" class="fixed inset-0 z-40" (click)="showNotifPanel = false"></div>
+
+      <!-- Dropdown panel -->
+      <div *ngIf="showNotifPanel"
+        class="absolute right-0 top-12 w-80 bg-white shadow-2xl rounded-xl z-50 border border-gray-100 overflow-hidden">
+        <div class="bg-[#00383F] text-white px-4 py-2.5 flex justify-between items-center">
+          <span class="text-sm font-semibold">Notifications</span>
+          <button (click)="markAllRead()" class="text-xs underline opacity-80 hover:opacity-100">Mark all read</button>
+        </div>
+        <div class="max-h-72 overflow-y-auto">
+          <div *ngFor="let n of notifications"
+            (click)="markRead(n)"
+            class="px-4 py-3 border-b border-gray-100 text-sm hover:bg-gray-50 cursor-pointer"
+            [class.bg-indigo-50]="!n.is_read">
+            <p class="text-gray-800 leading-snug">{{ n.message }}</p>
+            <p class="text-xs text-gray-400 mt-1">{{ n.created_at | date:'MMM d, y, h:mm a' }}</p>
+          </div>
+          <div *ngIf="notifications.length === 0" class="p-5 text-center text-gray-400 text-sm">
+            No new notifications
+          </div>
+        </div>
+      </div>
+    </div>
 
     <button matButton [matMenuTriggerFor]="menu"
       class="!flex !items-center !justify-center !gap-2 !bg-[#D5EAEA] hover:bg-[#00C4C4] px-1.5 py-1 md:px-4 md:py-1 rounded-full">

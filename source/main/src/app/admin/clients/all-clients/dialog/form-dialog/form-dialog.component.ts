@@ -53,7 +53,7 @@ export class FormDialogComponent implements OnInit {
   countryList: { name: string }[] = [];
   clientConnectType: string[] = ['Call', 'Whatsapp', 'Email', 'Linkedin', 'Other'];
   clientTypes: string[] = ['Hot', 'Cold', 'Close'];
-  prizeTags: string[] = ['Hourly', 'Monthly'];
+  prizeTags: string[] = ['Full Time', 'Part Time', 'Hourly', 'Project Based'];
 
   countries: { name: string, flag: string, dialCode: string }[] = [];
   selectedCountry = this.countries[66]; // Default India

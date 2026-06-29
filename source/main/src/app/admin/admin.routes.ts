@@ -64,5 +64,9 @@ export const ADMIN_ROUTE: Route[] = [
     path: 'daily-update',
     component: EmployeeDailyUpdateComponent,
   },
+  {
+    path: 'kpi',
+    loadChildren: () => import('./kpi/kpi.routes').then((m) => m.KPI_ROUTE),
+  },
 ];
 
