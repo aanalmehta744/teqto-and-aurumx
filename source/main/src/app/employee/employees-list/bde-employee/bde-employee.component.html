@@ -8,7 +8,7 @@
         <div class="rounded-lg shadow-xl overflow-hidden">
 
           <!-- table-header -->
-          <div class="flex flex-col md:flex-row justify-between items-center p-4 border-b bg-[#00c4c4]">
+          <div class="flex flex-col md:flex-row justify-between items-center p-4 border-b bg-[#0b0b88]">
             <div class="w-full md:w-auto mb-4 md:mb-0">
               <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
                 <div>
@@ -32,21 +32,21 @@
 
                 <li>
                   <div class="ml-2" matTooltip="REFRESH">
-                    <button mat-mini-fab class="!bg-[#D5EAEA] hover:!bg-gray-100">
+                    <button mat-mini-fab class="!bg-[#d6d5ea] hover:!bg-gray-100">
                       <mat-icon class="!text-[#00383F]">refresh</mat-icon>
                     </button>
                   </div>
                 </li>
                 <li>
                   <div class="ml-2" [hidden]=!selection.hasValue() matTooltip="DELETE">
-                    <button mat-mini-fab color="warn" class="!bg-[#D5EAEA] hover:!bg-gray-100">
+                    <button mat-mini-fab color="warn" class="!bg-[#d6d5ea] hover:!bg-gray-100">
                       <mat-icon class="!text-[#00383F]">delete</mat-icon>
                     </button>
                   </div>
                 </li>
                 <li>
                   <button (click)="exportExcel()" matTooltip="XLSX"
-                    class="p-2 rounded-xl bg-[#D5EAEA] hover:bg-gray-100 shadow-xl">
+                    class="p-2 rounded-xl bg-[#d6d5ea] hover:bg-gray-100 shadow-xl">
                     <img src="assets/images/icons/xlsx.png" alt="Export to Excel" class="w-6 h-6">
                   </button>
                 </li>

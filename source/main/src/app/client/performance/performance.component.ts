@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
 import { HttpClient } from '@angular/common/http';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { environment } from 'environments/environment';
@@ -13,7 +15,7 @@ import {
   selector: 'app-performance',
   templateUrl: './performance.component.html',
   standalone: true,
-  imports: [CommonModule, FormsModule, BreadcrumbComponent, NgApexchartsModule],
+  imports: [CommonModule, FormsModule, BreadcrumbComponent, NgApexchartsModule, MatProgressSpinnerModule, MatIconModule],
 })
 export class PerformanceComponent implements OnInit {
   kpis: any[] = [];

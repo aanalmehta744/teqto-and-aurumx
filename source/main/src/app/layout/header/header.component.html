@@ -26,8 +26,8 @@
 
   <div class="flex items-center justify-end space-x-3 h-full" [ngClass]="isNavbarCollapsed ? '' : 'show'">
 
-    <!-- Admin notification bell -->
-    <div *ngIf="userRole === 'Admin'" class="relative">
+    <!-- Notification bell (Admin, BDE, BA, Employee) -->
+    <div *ngIf="userRole === 'Admin' || userRole === 'BDE' || userRole === 'BA' || userRole === 'Employee'" class="relative">
       <button (click)="toggleNotifPanel()" class="relative p-2 text-gray-600 hover:text-indigo-600 transition-colors">
         <mat-icon class="text-[#00383F]">notifications</mat-icon>
         <span *ngIf="notifCount > 0"
@@ -42,9 +42,9 @@
       <!-- Dropdown panel -->
       <div *ngIf="showNotifPanel"
         class="absolute right-0 top-12 w-80 bg-white shadow-2xl rounded-xl z-50 border border-gray-100 overflow-hidden">
-        <div class="bg-[#00383F] text-white px-4 py-2.5 flex justify-between items-center">
+        <div class="bg-white text-gray-800 border-b border-gray-100 px-4 py-2.5 flex justify-between items-center">
           <span class="text-sm font-semibold">Notifications</span>
-          <button (click)="markAllRead()" class="text-xs underline opacity-80 hover:opacity-100">Mark all read</button>
+          <button (click)="markAllRead()" class="text-xs text-gray-500 underline hover:text-gray-800">Mark all read</button>
         </div>
         <div class="max-h-72 overflow-y-auto">
           <div *ngFor="let n of notifications"
@@ -62,9 +62,9 @@
     </div>
 
     <button matButton [matMenuTriggerFor]="menu"
-      class="!flex !items-center !justify-center !gap-2 !bg-[#D5EAEA] hover:bg-[#00C4C4] px-1.5 py-1 md:px-4 md:py-1 rounded-full">
+      class="!flex !items-center !justify-center !gap-2 !bg-[#d6d5ea] hover:bg-[#0b0b88] px-1.5 py-1 md:px-4 md:py-1 rounded-full">
       <span class="text-[14px] md:text-[15.5px] font-medium text-[#00383F] overflow-x-auto">{{ userName }}</span>
-      <img [src]="getImgUrl(userGender || '')" alt="User" class="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover" />
+      <img [src]="getProfileImgUrl()" alt="User" class="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover" />
     </button>
     <mat-menu #menu="matMenu">
       <button mat-menu-item class="!text-[#00383f] !text-[13px]" (click)="goToProfile()">

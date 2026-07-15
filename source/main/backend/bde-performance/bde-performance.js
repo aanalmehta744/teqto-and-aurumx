@@ -112,4 +112,28 @@ router.get('/all-bde', async (req, res) => {
   }
 });
 
+// GET client stats per BDE for admin analytics graph
+router.get('/client-stats', async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT
+        e.id        AS bde_id,
+        e.fullName  AS bde_name,
+        COUNT(CASE WHEN c.client_type = 'Close' THEN 1 END) AS closed,
+        COUNT(CASE WHEN c.client_type = 'Hot'   THEN 1 END) AS hot,
+        COUNT(CASE WHEN c.client_type = 'Cold'  THEN 1 END) AS cold,
+        COUNT(c.id) AS total
+      FROM employees e
+      LEFT JOIN clients c ON c.employee_id = e.id
+      WHERE e.department = 'BDE'
+      GROUP BY e.id, e.fullName
+      ORDER BY closed DESC, total DESC
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error('BDE client-stats error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

@@ -83,6 +83,18 @@ router.post('/', async (req, res) => {
 
     try {
         const [result] = await db.query(sql, values);
+
+        // Notify all BDE and BA users about the new daily update
+        const [empRow] = await db.query('SELECT fullName FROM employees WHERE id = ?', [employee_id]).catch(() => [[]]);
+        const empName = empRow[0]?.fullName || 'An employee';
+        const [bdebaUsers] = await db.query("SELECT id, role FROM employees WHERE role IN ('BDE', 'BA')").catch(() => [[]]);
+        for (const user of bdebaUsers) {
+            await db.query(
+                `INSERT INTO notifications (type, message, recipient_id, recipient_role) VALUES (?, ?, ?, ?)`,
+                ['daily_update', `${empName} added a daily update`, user.id, user.role]
+            ).catch(() => {});
+        }
+
         res.status(201).send({ id: result.insertId, message: "Daily update created" });
     } catch (err) {
         console.error('Insert error:', err.message);

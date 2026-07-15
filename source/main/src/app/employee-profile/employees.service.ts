@@ -91,4 +91,10 @@ deleteMonthlyTarget(targetId: number) {
   return this.httpClient.delete(`${this.API_URL}/${targetId}/targets`);
 }
 
+uploadPhoto(employeeId: number, file: File): Observable<any> {
+  const formData = new FormData();
+  formData.append('photo', file);
+  return this.httpClient.patch(`${this.API_URL}/${employeeId}/upload-photo`, formData);
+}
+
 }

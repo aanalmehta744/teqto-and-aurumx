@@ -8,9 +8,9 @@
     <div class="bg-white shadow-md rounded-xl">
       <!-- Header Section -->
       <div
-        class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4 border-b bg-[#00C4C4] rounded-t-xl">
+        class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4 border-b bg-white rounded-t-xl">
         <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
-          <h2 class="text-lg font-medium text-white">Jobs List</h2>
+          <h2 class="text-lg font-medium text-gray-800">Jobs List</h2>
           <div class="relative">
             <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">search</mat-icon>
             <input type="text" #filter placeholder="Search"
@@ -19,15 +19,15 @@
         </div>
 
         <div class="flex items-center gap-3 flex-wrap">
-          <button mat-mini-fab color="primary" class="!text-[#00383F] !bg-[#D5EAEA]" (click)="addNew()"
+          <button mat-mini-fab color="primary" class="!text-[#00383F] !bg-[#d6d5ea]" (click)="addNew()"
             matTooltip="ADD">
             <mat-icon>add</mat-icon>
           </button>
-          <button mat-mini-fab color="primary" class="!text-[#00383F] !bg-[#D5EAEA]" (click)="refresh()"
+          <button mat-mini-fab color="primary" class="!text-[#00383F] !bg-[#d6d5ea]" (click)="refresh()"
             matTooltip="REFRESH">
             <mat-icon>refresh</mat-icon>
           </button>
-          <button mat-mini-fab color="warn" class="!text-[#00383F] !bg-[#D5EAEA]" *ngIf="selection.hasValue()"
+          <button mat-mini-fab color="warn" class="!text-[#00383F] !bg-[#d6d5ea]" *ngIf="selection.hasValue()"
             (click)="removeSelectedRows()" matTooltip="DELETE">
             <mat-icon>delete</mat-icon>
           </button>
@@ -42,7 +42,7 @@
         <table mat-table [dataSource]="dataSource" matSort class="min-w-full text-sm">
           <!-- Header Row -->
           <mat-header-row *matHeaderRowDef="displayedColumns"
-            class="bg-[#00c4c4] text-white font-medium"></mat-header-row>
+            class="bg-[#0b0b88] text-white font-medium"></mat-header-row>
 
           <!-- Checkbox -->
           <ng-container matColumnDef="select">

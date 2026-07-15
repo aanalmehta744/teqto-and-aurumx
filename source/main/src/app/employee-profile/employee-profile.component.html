@@ -15,15 +15,24 @@
             <div class="text-center">
 
               <!-- Top Banner -->
-              <div class="bg-[#00383F] text-white min-h-[145px] py-6 rounded-t-xl">
+              <div class="bg-gray-100 text-gray-800 min-h-[145px] py-6 rounded-t-xl border-b border-gray-200">
                 <div class="text-xl font-medium">{{ employee.fullName | titlecase }}</div>
-                <div class="text-gray-300">{{ employee.department || 'Employee' }}</div>
+                <div class="text-gray-500">{{ employee.department || 'Employee' }}</div>
               </div>
 
               <!-- Profile Image (fixed) -->
-              <div class="flex justify-center -mt-16">
+              <div class="flex flex-col items-center -mt-16 gap-2">
                 <div class="w-32 h-32 rounded-full border-4 border-white overflow-hidden shadow-lg bg-white">
                   <img [src]="getProfileImage()" alt="Profile Image" class="w-full h-full object-cover" />
+                </div>
+                <!-- Upload / Change Photo button -->
+                <div>
+                  <label class="cursor-pointer inline-flex items-center gap-1 text-xs bg-[#d6d5ea] text-[#00383F] px-3 py-1.5 rounded-full shadow hover:bg-[#c3c2de] transition-colors font-medium">
+                    <mat-icon class="!text-[14px] !w-[14px] !h-[14px]">upload</mat-icon>
+                    <span>{{ photoUploading ? 'Uploading…' : (employee?.uploadImg ? 'Change Photo' : 'Choose Photo') }}</span>
+                    <input type="file" accept="image/*" class="hidden" [disabled]="photoUploading" (change)="onPhotoSelected($event)" />
+                  </label>
+                  <div *ngIf="photoUploadError" class="text-red-500 text-xs mt-1">{{ photoUploadError }}</div>
                 </div>
               </div>
 
@@ -132,7 +141,7 @@
             <div class="h-[400px] overflow-auto border border-gray-200 rounded-lg">
               <div class="h-full w-[200%] sm:w-[100%] md:w-[100%]">
                 <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-[#00C4C4] sticky top-0 text-[white] z-10">
+                  <thead class="bg-gray-50 sticky top-0 text-gray-700 z-10">
                     <tr>
                       <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Date</th>
                       <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
@@ -176,7 +185,7 @@
             <div class="max-h-96 block overflow-auto border border-gray-200 rounded-lg">
               <div *ngIf="leaveRecords.data.length > 0; else noLeaves" class="h-full w-[200%] sm:w-[100%] md:w-[100%]">
                 <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-[#00C4C4] sticky top-0 text-[white] z-10">
+                  <thead class="bg-gray-50 sticky top-0 text-gray-700 z-10">
                     <tr>
                       <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Start Date</th>
                       <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">End Date</th>
@@ -215,7 +224,7 @@
             <div class="max-h-96 block overflow-auto border border-gray-200 rounded-lg">
               <div *ngIf="projects.data.length > 0; else noProjects" class="h-full w-[200%] sm:w-[100%] md:w-[100%]">
                 <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-[#00C4C4] sticky top-0 text-[white] z-10">
+                  <thead class="bg-gray-50 sticky top-0 text-gray-700 z-10">
                     <tr>
                       <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Project Name</th>
                       <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
@@ -252,7 +261,7 @@
             <div class="max-h-96 block overflow-auto border border-gray-200 rounded-lg">
               <div class="h-full w-[200%] sm:w-[100%] md:w-[100%]">
                 <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-[#00C4C4] sticky top-0 text-[white] z-10">
+                  <thead class="bg-gray-50 sticky top-0 text-gray-700 z-10">
                     <tr>
                       <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Month</th>
                       <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Salary</th>
@@ -286,7 +295,7 @@
             <div class="max-h-96 block overflow-auto border border-gray-200 rounded-lg">
               <div class="h-full w-[200%] sm:w-[100%] md:w-[100%]">
                 <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-[#00C4C4] sticky top-0 text-[white] z-10">
+                  <thead class="bg-gray-50 sticky top-0 text-gray-700 z-10">
                     <tr>
                       <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Target Amount</th>
                       <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Target Date</th>
@@ -317,7 +326,7 @@
             </div>
 
             <div class="mt-6">
-              <button mat-raised-button (click)="addTarget()" class="!bg-[#D5EAEA] !text-[#00383F] !shadow-lg">
+              <button mat-raised-button (click)="addTarget()" class="!bg-[#d6d5ea] !text-[#00383F] !shadow-lg">
                 Add Target
               </button>
             </div>

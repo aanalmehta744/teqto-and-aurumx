@@ -4,7 +4,10 @@ import { AttendancesComponent } from '../employee/attendance/attendance.componen
 import { EmployeeAttendanceComponent } from '../employee/attendance/employee-attendance/employee-attendance.component';
 import { TodayComponent } from '../employee/attendance/today/today.component';
 import { EmployeeDailyUpdateComponent } from '../employee/employee-daily-update/employee-daily-update.component';
+import { AllEmployeeDailyUpdateComponent } from '../employee/employee-daily-update/allemployee-daily-update/allemployee-daily-update.component';
 import { AllTasksComponent } from '../employee/all-tasks/all-tasks.component';
+import { MyLeavesComponent } from '../employee/my-leaves/my-leaves.component';
+import { LeaveBalanceComponent } from '../employee/my-leaves/leave-balance/leave-balance.component';
 
 export const BA_ROUTE: Route[] = [
   {
@@ -18,9 +21,12 @@ export const BA_ROUTE: Route[] = [
       import('../admin/clients/clients.routes').then((m) => m.ADMIN_CLIENT_ROUTE),
   },
   {
-    path: 'leaves',
-    loadChildren: () =>
-      import('../admin/leaves/leaves.routes').then((m) => m.LEAVE_ROUTE),
+    path: 'myleaves',
+    component: MyLeavesComponent,
+  },
+  {
+    path: 'myleaves/leave-balance',
+    component: LeaveBalanceComponent,
   },
   {
     path: 'employees',
@@ -56,6 +62,10 @@ export const BA_ROUTE: Route[] = [
   {
     path: 'daily-update',
     component: EmployeeDailyUpdateComponent,
+  },
+  {
+    path: 'employee-updates',
+    component: AllEmployeeDailyUpdateComponent,
   },
   { path: '**', component: Page404Component },
 ];

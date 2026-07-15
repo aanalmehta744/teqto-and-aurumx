@@ -38,6 +38,8 @@ import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { LeavesService } from 'app/admin/leaves/leave-requests/leaves.service';
 import { AuthService } from '@core';
 import { AnnouncementBannerComponent } from '@shared/components/announcement-banner/announcement-banner.component';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'environments/environment';
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -58,6 +60,7 @@ import { AnnouncementBannerComponent } from '@shared/components/announcement-ban
     NgApexchartsModule,
     MatPaginatorModule,
     AnnouncementBannerComponent,
+    MatTableModule,
   ],
 })
 export class MainComponent implements OnInit {
@@ -86,6 +89,7 @@ export class MainComponent implements OnInit {
 
 
   userRole: string = '';
+  baLeaveBalance: any = null;
   private projectStatusMap: { [status: string]: string[] } = {};
   constructor(
     private dashboardService: DashboardService,
@@ -96,6 +100,7 @@ export class MainComponent implements OnInit {
     private interviewService: InterviewService,
     private ieavesService: LeavesService,
     private authService: AuthService,
+    private http: HttpClient,
   ) {
     this.userRole = this.authService.currentUserValue?.role?.toLowerCase() ?? '';
   }
@@ -187,7 +192,7 @@ export class MainComponent implements OnInit {
   public bdeChartXAxis: ApexXAxis = { categories: [] };
   public bdeChartDataLabels: ApexDataLabels = { enabled: true };
   public bdeChartTooltip: ApexTooltip = { shared: true, intersect: false };
-  public bdeChartColors: string[] = ['#00C4C4', '#f59e0b', '#10b981'];
+  public bdeChartColors: string[] = ['#0b0b88', '#f59e0b', '#10b981'];
 
   // BDE KPI Target Achievement Chart (completed / partial / missed)
   bdeKpiAchievement: any[] = [];
@@ -213,6 +218,19 @@ export class MainComponent implements OnInit {
     this.loadPendingLeaves();
     this.loadBdePerformanceSummary();
     this.loadBdeKpiAchievement();
+    if (this.userRole === 'ba') {
+      this.loadBaLeaveBalance();
+    }
+  }
+
+  loadBaLeaveBalance(): void {
+    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const userId = user?.id;
+    if (!userId) return;
+    this.http.get<any>(`${environment.apiUrl}/leaveRequests/leave-balance/${userId}`).subscribe({
+      next: (data) => { this.baLeaveBalance = data; },
+      error: (err) => console.error('Error fetching BA leave balance:', err),
+    });
   }
 
   loadBdePerformanceSummary(): void {

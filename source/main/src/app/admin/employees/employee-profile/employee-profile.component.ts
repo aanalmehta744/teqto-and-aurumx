@@ -181,6 +181,9 @@ export class EmployeeProfileComponent implements OnInit, AfterViewInit {
   }
 
   getProfileImage(): string {
+    if (this.employee?.uploadImg) {
+      return `http://localhost:3000/uploads/employees/${this.employee.uploadImg}`;
+    }
     const gender = this.employee?.gender?.toLowerCase();
     if (gender === 'female') return 'assets/images/female-profile.png';
     if (gender === 'male') return 'assets/images/male-profile.png';

@@ -57,19 +57,28 @@ router.get('/grouped-by-bde', async (req, res) => {
 // ✅ 1. CREATE: Add New Client
 router.post('/', async (req, res) => {
     try {
+        // OLD: const { ..., bdeAccountId, bdeAccountEmail, ... } = req.body;
+        // NEW CODE: Replaced bdeAccountId/bdeAccountEmail with bankName, bankAccountNumber, ifscCode
         const {
-            fullName, mobile, email, linkedinId, websiteLink, clientNote, country, address, clientType, clientConnectType, bdeAccountId, bdeAccountEmail, date, platform, technology, prizeTag, prizeAmount, employee_id
+            fullName, mobile, email, linkedinId, websiteLink, clientNote, country, address, clientType, clientConnectType, date, platform, technology, prizeTag, prizeAmount, employee_id, tag,
+            clientConnectSource, platformId, platformPassword,
+            bankName, bankAccountNumber, ifscCode
         } = req.body;
 
+        // OLD INSERT had bde_account_id, bde_account_email
+        // NEW CODE: INSERT now includes bank_name, bank_account_number, ifsc_code instead
+        const sql = `INSERT INTO clients
+            (fullName, mobile, email, linkedin_id, website_link, client_note, country, address, client_type, client_Connect_Type, date,
+            platform, technology, prize_tag, prize_amount, employee_id, tag, client_connect_source, platform_id, platform_password,
+            bank_name, bank_account_number, ifsc_code)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-
-        const sql = `INSERT INTO clients 
-            (fullName, mobile, email, linkedin_id, website_link, client_note, country, address, client_type, client_Connect_Type, bde_account_id, bde_account_email, date, 
-            platform, technology, prize_tag, prize_amount,employee_id) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-        const [result] = await db.query(sql, [fullName, mobile, email, linkedinId, websiteLink, clientNote, country, address, clientType, clientConnectType, bdeAccountId, bdeAccountEmail,
-            date, platform, technology, prizeTag, prizeAmount, employee_id]);
+        const [result] = await db.query(sql, [
+            fullName, mobile, email, linkedinId, websiteLink, clientNote, country, address, clientType, clientConnectType, date,
+            platform, technology, prizeTag, prizeAmount, employee_id, tag || null,
+            clientConnectSource || null, platformId || null, platformPassword || null,
+            bankName || null, bankAccountNumber || null, ifscCode || null
+        ]);
 
         res.status(201).json({ message: 'Client added successfully', clientId: result.insertId });
     } catch (error) {
@@ -223,25 +232,35 @@ function prizeTagToClientType(tag) {
 router.put('/:id', async (req, res) => {
     try {
         const { id } = req.params;
+        // OLD: const { ..., bdeAccountId, bdeAccountEmail, ... } = req.body;
+        // NEW CODE: Replaced bdeAccountId/bdeAccountEmail with bankName, bankAccountNumber, ifscCode
         const {
             fullName, mobile, email, linkedinId, websiteLink, clientNote, country, address,
-            clientType, clientConnectType, bdeAccountId, bdeAccountEmail,
-            date, platform, technology, prizeTag, prizeAmount
+            clientType, clientConnectType,
+            date, platform, technology, prizeTag, prizeAmount, tag,
+            clientConnectSource, platformId, platformPassword,
+            bankName, bankAccountNumber, ifscCode
         } = req.body;
 
         // Fetch the existing record before update
         const [[existing]] = await db.query(`SELECT * FROM clients WHERE id=?`, [id]);
         if (!existing) return res.status(404).json({ message: 'Client not found' });
 
+        // OLD UPDATE had bde_account_id, bde_account_email
+        // NEW CODE: UPDATE now includes bank_name, bank_account_number, ifsc_code instead
         const sql = `UPDATE clients SET
             fullName=?, mobile=?, email=?, linkedin_id=?, website_link=?, client_note=?, country=?, address=?,
-            client_type=?, client_Connect_Type=?, bde_account_id=?, bde_account_email=?, date=?, platform=?, technology=?, prize_tag=?, prize_amount=?
+            client_type=?, client_Connect_Type=?, date=?, platform=?, technology=?, prize_tag=?, prize_amount=?, tag=?,
+            client_connect_source=?, platform_id=?, platform_password=?,
+            bank_name=?, bank_account_number=?, ifsc_code=?
             WHERE id=?`;
 
         const [result] = await db.query(sql, [
             fullName, mobile, email, linkedinId, websiteLink, clientNote, country, address,
-            clientType, clientConnectType, bdeAccountId, bdeAccountEmail,
-            date, platform, technology, prizeTag, prizeAmount, id
+            clientType, clientConnectType,
+            date, platform, technology, prizeTag, prizeAmount, tag || null,
+            clientConnectSource || null, platformId || null, platformPassword || null,
+            bankName || null, bankAccountNumber || null, ifscCode || null, id
         ]);
 
         if (result.affectedRows === 0) {

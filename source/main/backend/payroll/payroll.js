@@ -396,6 +396,78 @@ const getDatesBetween = (start, end) => {
 };
 
 /**
+ * SANDWICH LEAVE RULE
+ *
+ * Rules:
+ *  1. Leave adjacent to a holiday → include the holiday AND any weekend days
+ *     immediately bordering that holiday.
+ *  2. Two leave days separated only by weekends/holidays → include all days
+ *     between them (fills the "bridge" gap).
+ *
+ * Returns { allDeductible: string[], sandwichExtraDays: number }
+ */
+const computeDeductibleDays = (rawLeaveDates, holidayDates) => {
+  if (!rawLeaveDates.length) return { allDeductible: [], sandwichExtraDays: 0 };
+
+  const leaveDateSet = new Set(rawLeaveDates);
+  const holidaySet   = new Set(holidayDates);
+  const deductibleSet = new Set(rawLeaveDates);
+
+  // Rule 1: leave adjacent to a holiday → include holiday + its bordering weekend
+  rawLeaveDates.forEach(dateStr => {
+    const d = moment(dateStr);
+    for (const offset of [-1, 1]) {
+      const adj    = d.clone().add(offset, 'days');
+      const adjStr = adj.format('YYYY-MM-DD');
+      if (!holidaySet.has(adjStr)) continue;
+
+      deductibleSet.add(adjStr);
+
+      // Expand to any weekend days touching this holiday
+      for (const o2 of [-1, 1]) {
+        const w = adj.clone().add(o2, 'days');
+        if (![0, 6].includes(w.day())) continue;
+        deductibleSet.add(w.format('YYYY-MM-DD'));
+        // Include both Saturday and Sunday as a pair
+        const pair = w.day() === 6 ? w.clone().add(1, 'days') : w.clone().subtract(1, 'days');
+        deductibleSet.add(pair.format('YYYY-MM-DD'));
+      }
+    }
+  });
+
+  // Rule 2: gap between two leave dates filled only by weekends/holidays → fill it
+  const sortedLeaves = [...leaveDateSet].sort();
+  for (let i = 0; i < sortedLeaves.length - 1; i++) {
+    const d1   = moment(sortedLeaves[i]);
+    const d2   = moment(sortedLeaves[i + 1]);
+    const diff = d2.diff(d1, 'days');
+    if (diff <= 1) continue;
+
+    const gap = [];
+    let allNonWorking = true;
+    for (let j = 1; j < diff; j++) {
+      const between    = d1.clone().add(j, 'days');
+      const betweenStr = between.format('YYYY-MM-DD');
+      gap.push(betweenStr);
+      if (![0, 6].includes(between.day()) && !holidaySet.has(betweenStr)) {
+        allNonWorking = false;
+        break;
+      }
+    }
+    if (allNonWorking) gap.forEach(ds => deductibleSet.add(ds));
+  }
+
+  const sandwichExtraDays = [...deductibleSet].filter(d => {
+    if (leaveDateSet.has(d)) return false;          // actual leave day, not "extra"
+    const day = moment(d).day();
+    if (day === 0 || day === 6) return false;       // weekends are always paid
+    if (holidaySet.has(d)) return false;            // holidays are always paid
+    return true;
+  }).length;
+  return { allDeductible: [...deductibleSet], sandwichExtraDays };
+};
+
+/**
  * MAIN PAYSLIP API
  */
 router.get('/payslip/:employeeId', async (req, res) => {
@@ -489,6 +561,7 @@ router.get('/payslip/:employeeId', async (req, res) => {
 
     const leaveMap = {};
     let totalLeaveDays = 0;
+    const rawLeaveDateSet = new Set(); // all leave dates including weekends/holidays
 
     leaveRows.forEach(lv => {
       const start = moment.max(moment(lv.start_date), startDate);
@@ -499,6 +572,8 @@ router.get('/payslip/:employeeId', async (req, res) => {
       getDatesBetween(start, end).forEach(date => {
         const d = moment(date);
         const dateStr = d.format('YYYY-MM-DD');
+
+        rawLeaveDateSet.add(dateStr); // collect for sandwich detection
 
         if ([0, 6].includes(d.day())) return; // weekends ignored in leave calc
         if (holidayDates.includes(dateStr)) return;
@@ -544,6 +619,7 @@ router.get('/payslip/:employeeId', async (req, res) => {
         totalLeaveDays = Math.max(0, totalLeaveDays - leaveMap[date]);
         delete leaveMap[date];
       }
+      rawLeaveDateSet.delete(date); // attendance overrides leave for sandwich detection too
 
       if (att === 0.5) {
         halfDays++;
@@ -582,17 +658,15 @@ router.get('/payslip/:employeeId', async (req, res) => {
 
     /**
      * SANDWICH LEAVE DETECTION
-     * Leave on Friday + leave on the following Monday → Sat & Sun consume leave
-     * balance (salary unaffected — weekends are always paid).
+     * Full multi-day bridge rule:
+     *  - Leave adjacent to holiday → also deduct the holiday + any bordering weekends
+     *  - Two leave days bridged only by weekends/holidays → deduct the whole span
      */
-    let sandwichDays = 0;
-    Object.keys(leaveMap).forEach(dateStr => {
-      const d = moment(dateStr);
-      if (d.day() === 5) {
-        const monday = d.clone().add(3, 'days').format('YYYY-MM-DD');
-        if (leaveMap[monday] !== undefined) sandwichDays += 2;
-      }
-    });
+    const { sandwichExtraDays } = computeDeductibleDays(
+      [...rawLeaveDateSet],
+      holidayDates
+    );
+    const sandwichDays = sandwichExtraDays;
 
     /**
      * NET SALARY — deduction-based formula
@@ -606,7 +680,7 @@ router.get('/payslip/:employeeId', async (req, res) => {
      */
     const absentWeekdays = Math.max(0, totalWorkingDays - presentWeekdays - totalLeaveDays);
     const absentDays     = absentWeekdays;
-    const deductDays     = unpaidLeaveDays + absentWeekdays;
+    const deductDays     = unpaidLeaveDays + sandwichExtraDays + absentWeekdays;
     const netPaidDays    = Math.max(0, totalMonthDays - deductDays);
 
     const hasActivity  = presentWeekdays > 0 || presentWeekends > 0 || totalLeaveDays > 0;

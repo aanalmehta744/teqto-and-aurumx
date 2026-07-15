@@ -4,23 +4,23 @@
     <div class="hidden lg:block">
       <div class="p-6 flex flex-wrap space-x-8">
         <div class="flex items-center space-x-2">
-          <i class="fas fa-id-card text-[#00C4C4]"></i>
+          <i class="fas fa-id-card text-[#0b0b88]"></i>
           <span class="font-semibold text-gray-700">Client Details</span>
         </div>
         <div class="flex items-center space-x-2">
-          <i class="fas fa-user text-[#00C4C4]"></i>
+          <i class="fas fa-user text-[#0b0b88]"></i>
           <span class="text-gray-700">{{ client.client?.fullName || 'N/A' }}</span>
         </div>
         <div class="flex items-center space-x-2">
-          <i class="fas fa-envelope text-[#00C4C4]"></i>
+          <i class="fas fa-envelope text-[#0b0b88]"></i>
           <span class="text-gray-700">{{ client.client?.email || 'N/A' }}</span>
         </div>
         <div class="flex items-center space-x-2">
-          <i class="fas fa-phone text-[#00C4C4]"></i>
+          <i class="fas fa-phone text-[#0b0b88]"></i>
           <span class="text-gray-700">{{ client.client?.mobile || 'N/A' }}</span>
         </div>
         <div class="flex items-center space-x-2">
-          <i class="fas fa-map-marker-alt text-[#00C4C4]"></i>
+          <i class="fas fa-map-marker-alt text-[#0b0b88]"></i>
           <span class="text-gray-700">{{ client.client?.country || 'N/A' }}</span>
         </div>
       </div>
@@ -33,31 +33,31 @@
 
           <!-- Title -->
           <div class="col-span-full flex items-center gap-2">
-            <i class="fas fa-id-card text-[#00C4C4] text-lg"></i>
+            <i class="fas fa-id-card text-[#0b0b88] text-lg"></i>
             <span class="font-semibold text-gray-800 text-lg">Client Details</span>
           </div>
 
           <!-- Name -->
           <div class="flex items-center gap-3">
-            <i class="fas fa-user text-[#00C4C4] text-xl"></i>
+            <i class="fas fa-user text-[#0b0b88] text-xl"></i>
             <span class="text-gray-700">{{ client.client?.fullName || 'N/A' }}</span>
           </div>
 
           <!-- Email -->
           <div class="flex items-center gap-3">
-            <i class="fas fa-envelope text-[#00C4C4] text-xl"></i>
+            <i class="fas fa-envelope text-[#0b0b88] text-xl"></i>
             <span class="text-gray-700">{{ client.client?.email || 'N/A' }}</span>
           </div>
 
           <!-- Phone -->
           <div class="flex items-center gap-3">
-            <i class="fas fa-phone text-[#00C4C4] text-xl"></i>
+            <i class="fas fa-phone text-[#0b0b88] text-xl"></i>
             <span class="text-gray-700">{{ client.client?.mobile || 'N/A' }}</span>
           </div>
 
           <!-- Location -->
           <div class="flex items-center gap-3">
-            <i class="fas fa-map-marker-alt text-[#00C4C4] text-xl"></i>
+            <i class="fas fa-map-marker-alt text-[#0b0b88] text-xl"></i>
             <span class="text-gray-700">{{ client.client?.country || 'N/A' }}</span>
           </div>
 
@@ -68,7 +68,7 @@
 
     <!-- Projects -->
     <div *ngFor="let project of client.projects" class="m-4 border rounded-lg">
-      <div class="bg-[#00C4C4] text-white text-center py-2 rounded-t-lg">
+      <div class="bg-gray-100 text-gray-800 text-center py-2 rounded-t-lg border-b border-gray-200">
         <h5>{{ project.projectTitle?.toUpperCase() || 'PROJECT' }}</h5>
       </div>
 
@@ -79,6 +79,7 @@
             <!-- Profile Image -->
             <div class="md:col-span-2 flex justify-center">
               <img class="rounded-full w-[120px] h-[120px] object-cover" [src]="
+                     member.uploadImg ? 'http://localhost:3000/uploads/employees/' + member.uploadImg :
                      member.gender === 'Male' ? 'assets/images/male-profile.png' :
                      member.gender === 'Female' ? 'assets/images/female-profile.png' :
                      'assets/images/user/usrbig1.jpg'

@@ -1,160 +1,216 @@
 <link rel="stylesheet" href="./login-tailwind.scss">
-<section id="mainsection"
-    class="w-full min-h-screen bg-[#00383F] flex justify-center items-center bg-repeat-x bg-top p-5 "
-    style="background-image: url('https://eliteinfotec.in/wp-content/uploads/2024/10/bg-2-5.png');">
 
-    <!-- Login Section -->
-    <div id="loginsection"
-        class="w-[95%] md:w-[80%] bg-[#F2F6F9] rounded-lg grid grid-cols-1 xl:grid-cols-2 p-5 md:p-10">
+<!-- <section
+  id="mainsection"
+  class="w-full min-h-screen bg-[#E5E7EB] flex justify-center items-center p-6">
+   -->
+<section
+  id="mainsection"
+  class="w-full min-h-screen bg-white flex justify-center items-center py-[30px] px-[125px]">
 
-        <!-- Left Section -->
-        <div id="clip-logo"
-            class="w-full h-full pt-5 sm:mt-0 flex flex-col justify-evenly items-center rounded-2xl bg-[#d5eaea] bg-[url('https://eliteinfotec.in/wp-content/uploads/2024/10/bg-2-5.png')] ">
+  <div
+    id="loginsection"
+    class="w-full max-w-7xl bg-white rounded-[22px] shadow-2xl overflow-hidden grid grid-cols-2 lg:grid-cols-2">
 
-            <div class="w-full h-auto text-center">
-                <div class="w-full h-auto flex justify-center items-center">
-                    <img 
-                            src="../../../assets/images/Teqto(bg).png"
+    
+    <!-- ================= LEFT PANEL ================= -->
 
-                        alt="Logoooooooo" class="w-40 md:w-50 lg:w-[18rem]" />
-                </div>
-            </div>
+    <div class="flex flex-col justify-center items-center px-8 md:px-16 py-12">
 
-            <div class="w-full h-auto flex flex-col justify-center items-center mt-2 p-5 md:p-7">
+      <!-- Logo -->
+      <div class="flex items-center gap-3 mb-12 w-full max-w-md">
+        <img
+          src="../../../assets/images/Teqto(bg).png"
+          alt="Logo"
+          class="w-10 h-10 rounded-lg">
 
-                <div id="icondiv"
-                    class="w-[10rem] h-[10rem] sm:w-[15rem] sm:h-[15rem] md:w-[18rem] md:h-[18rem]  bg-[#F2F6F9] relative shadow-xl">
+        <span class="text-2xl font-semibold text-black">
+          Teqto
+        </span>
+      </div>
 
-                    <div class="orbit-container">
+      <div class="w-full max-w-md">
 
-                        <div class="orbit-item" style="--i:0">
-                            <div class="w-auto h-auto rounded-full bg-white p-2 md:p-3 shadow-2xl">
-                                <img src="../../../assets/login/user.png" alt="Calendar"
-                                    class="w-8 h-8 md:w-9 md:h-9" />
-                            </div>
-                        </div>
+        <!-- Heading -->
 
+        <h1 class="text-5xl font-bold text-center text-[#111827]">
+          Welcome Back
+        </h1>
 
-                        <div class="orbit-item" style="--i:1">
-                            <div class="w-auto h-auto rounded-full bg-white p-2 md:p-3.5 shadow-2xl">
-                                <img src="../../../assets/login/holidays.png" alt="Software Engineer"
-                                    class="w-10 h-10 md:w-10 md:h-10" />
-                            </div>
-                        </div>
+        <p class="text-center text-gray-400 mt-3 mb-8">
+          Please enter your login detailsssssss
+        </p>
 
+        <!-- Role Buttons -->
 
-                        <div class="orbit-item" style="--i:2">
-                            <div class="w-auto h-auto rounded-full bg-white p-2 md:p-2.5 shadow-2xl">
-                                <img src="../../../assets/login/employee (1).png" alt="Employees"
-                                    class="w-10 h-10 md:w-12 md:h-12" />
-                            </div>
-                        </div>
+        <div class="grid grid-cols-4 bg-gray-100 rounded-xl p-1 mb-8">
 
+          <button
+            type="button"
+            (click)="setRole('Admin')"
+            class="py-2 rounded-lg text-sm font-medium transition-all"
+            [ngClass]="selectedRole==='Admin'
+            ? 'bg-white shadow text-black'
+            : 'text-gray-500'">
+            Admin
+          </button>
 
-                        <div class="orbit-item" style="--i:3">
-                            <div class="w-auto h-auto rounded-full bg-white p-2 md:p-3.5 shadow-2xl">
-                                <img src="../../../assets/login/verification.png" alt="Verification"
-                                    class="w-8 h-8 md:w-10 md:h-10" />
-                            </div>
-                        </div>
-                    </div>
+          <button
+            type="button"
+            (click)="setRole('Employee')"
+            class="py-2 rounded-lg text-sm font-medium transition-all"
+            [ngClass]="selectedRole==='Employee'
+            ? 'bg-white shadow text-black'
+            : 'text-gray-500'">
+            Employee
+          </button>
 
-                    <img src="../../../assets/login/administrator.png" alt="Chronometer"
-                        class="absolute top-1/2 left-1/2 w-8 h-8 md:w-12 md:h-12 -translate-x-1/2 -translate-y-1/2" />
+          <button
+            type="button"
+            (click)="setRole('BDE')"
+            class="py-2 rounded-lg text-sm font-medium transition-all"
+            [ngClass]="selectedRole==='BDE'
+            ? 'bg-white shadow text-black'
+            : 'text-gray-500'">
+            BDE
+          </button>
 
-                </div>
-            </div>
+          <button
+            type="button"
+            (click)="setRole('BA')"
+            class="py-2 rounded-lg text-sm font-medium transition-all"
+            [ngClass]="selectedRole==='BA'
+            ? 'bg-white shadow text-black'
+            : 'text-gray-500'">
+            BA
+          </button>
 
         </div>
 
-        <!-- Right Section -->
-        <div class="w-full h-full py-4 md:py-5 px-4 md:px-10 flex flex-col justify-between items-center">
+        <!-- FORM -->
 
-            <div class="w-full h-auto flex flex-col sm:flex-row justify-between gap-2 md:gap-4 my-4 md:my-6">
-                <!-- Admin -->
-                <button class="py-3 px-6 rounded-full shadow-xl role-btn" [ngClass]="{
-    '!bg-[#009E9E] !text-white': selectedRole !== 'Admin',
-    '!bg-[#D5EAEA] !text-[#009E9E]': selectedRole === 'Admin'
-  }" (click)="setRole('Admin')">
-                    Admin
-                </button>
+        <form
+          [formGroup]="authForm"
+          (ngSubmit)="onSubmit()"
+          class="space-y-5">
 
-                <!-- Employee -->
-                <button class="py-3 px-6 rounded-full shadow-xl role-btn" [ngClass]="{
-    '!bg-[#009E9E] !text-white': selectedRole !== 'Employee',
-    '!bg-[#D5EAEA] !text-[#009E9E]': selectedRole === 'Employee'
-  }" (click)="setRole('Employee')">
-                    Employee
-                </button>
+          <!-- Username -->
 
-                <!-- BDE -->
-                <button class="py-3 px-6 rounded-full shadow-xl role-btn" [ngClass]="{
-    '!bg-[#009E9E] !text-white': selectedRole !== 'BDE',
-    '!bg-[#D5EAEA] !text-[#009E9E]': selectedRole === 'BDE'
-  }" (click)="setRole('BDE')">
-                    BDE
-                </button>
+          <mat-form-field appearance="outline" class="w-full">
 
-                 <button class="py-3 px-6 rounded-full shadow-xl role-btn" [ngClass]="{
-    '!bg-[#009E9E] !text-white': selectedRole !== 'BA',
-    '!bg-[#D5EAEA] !text-[#009E9E]': selectedRole === 'BA'
-  }" (click)="setRole('BA')">
-                    BA
-                </button>
+            <mat-label>Username</mat-label>
 
-            </div>
+            <input
+              matInput
+              formControlName="username">
 
-            <!-- Form -->
-            <form class="w-full h-auto flex flex-col gap-3 md:gap-5 sm:py-5 sm:px-5" [formGroup]="authForm"
-                (ngSubmit)="onSubmit()">
-                <!-- Username -->
-                <div class="w-full">
-                    <mat-form-field appearance="fill" class="w-full custom-field">
-                        <mat-label class="!text-[14px]">Enter your username</mat-label>
-                        <input matInput formControlName="username" required>
-                        <mat-icon matSuffix style="color: #009E9E;">person</mat-icon>
-                        <mat-error *ngIf="authForm.get('username')?.hasError('required')">
-                            Username is required
-                        </mat-error>
-                    </mat-form-field>
-                </div>
+            <mat-icon matSuffix>person</mat-icon>
 
-                <!-- Password -->
-                <div class="w-full mt-4">
-                    <mat-form-field appearance="fill" class="w-full custom-field">
-                        <mat-label class="!text-[14px]">Enter your password</mat-label>
-                        <input matInput [type]="hide ? 'password' : 'text'" formControlName="password" required>
-                        <button mat-icon-button matSuffix (click)="toggleHide()" type="button">
-                            <mat-icon style="color: #009E9E;">{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
-                        </button>
+            <mat-error
+              *ngIf="authForm.get('username')?.hasError('required')">
+              Username is required
+            </mat-error>
 
-                        <mat-error *ngIf="authForm.get('password')?.hasError('required')">
-                            Password is required
-                        </mat-error>
-                    </mat-form-field>
-                </div>
+          </mat-form-field>
 
-                <!-- Error Message -->
-                <div *ngIf="error" class="text-red-500 mt-2 text-center">{{ error }}</div>
+          <!-- Password -->
 
-                <!-- Submit Button -->
-                <div class="w-full h-auto flex justify-center items-center mt-2 md:mt-4">
-                    <button
-                        class="w-full sm:w-[15rem] h-10 md:h-12 !bg-[#009E9E] hover:!bg-[#D5EAEA] !text-white !hover:text-[#009E9E] shadow-xl rounded-full cursor-pointer role-btn"
-                        [disabled]="!authForm.valid || loading" [class.opacity-50]="loading" type="submit">
-                        {{ loading ? 'Logging in...' : 'Login' }}
-                    </button>
-                </div>
-            </form>
-            <!-- Forgot Password -->
-            <div class="text-right mt-1">
-                <a (click)="goToForgot()" style="color: #009E9E; font-weight:500;"
-                    class="text-sm hover:underline cursor-pointer">
-                    Forgot Password?
-                </a>
-            </div>
+          <mat-form-field appearance="outline" class="w-full">
+
+            <mat-label>Password</mat-label>
+
+            <input
+              matInput
+              [type]="hide ? 'password':'text'"
+              formControlName="password">
+
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="toggleHide()">
+
+              <mat-icon>
+                {{hide ? 'visibility_off' : 'visibility'}}
+              </mat-icon>
+
+            </button>
+
+            <mat-error
+              *ngIf="authForm.get('password')?.hasError('required')">
+
+              Password is required
+
+            </mat-error>
+
+          </mat-form-field>
+
+          <!-- Error -->
+
+          <div
+            *ngIf="error"
+            class="text-center text-red-500">
+
+            {{error}}
+
+          </div>
+
+          <!-- Button -->
+
+          <button
+            type="submit"
+            [disabled]="!authForm.valid || loading"
+            class="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition">
+
+            {{loading ? 'Logging in...' : 'Continue'}}
+
+          </button>
+
+        </form>
+
+        <!-- Forgot Password -->
+
+        <div class="text-center mt-6">
+
+          <a
+            (click)="goToForgot()"
+            class="text-gray-500 hover:underline cursor-pointer">
+
+            Forgot Password?
+
+          </a>
+
         </div>
+
+      </div>
 
     </div>
+
+    <!-- ================= RIGHT PANEL ================= -->
+
+    <div
+      class="hidden lg:flex flex-col justify-center items-center bg-[#F8FAFC] border-l border-gray-100 gap-6 py-10">
+
+      <div class="w-[75%]">
+
+        <img
+          [src]="loginImage || defaultImage"
+          alt="Login Illustration"
+          class="w-full object-contain rounded-xl">
+
+      </div>
+
+      <div *ngIf="loginHeading || loginDescription" class="w-[75%] text-left">
+        <h2 *ngIf="loginHeading" class="text-xl font-bold text-gray-800 mb-1">
+          {{ loginHeading }}
+        </h2>
+        <p *ngIf="loginDescription" class="text-sm text-gray-500 leading-relaxed">
+          {{ loginDescription }}
+        </p>
+      </div>
+
+    </div>
+
+  </div>
 
 </section>

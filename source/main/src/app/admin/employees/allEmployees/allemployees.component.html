@@ -4,39 +4,29 @@
       <app-breadcrumb [title]="'All Employee'" [items]="['Employees']" [active_item]="'All Employee'"></app-breadcrumb>
     </div>
 
-    <div class="bg-white rounded-lg shadow-xl overflow-auto">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
       <!-- Table Header -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-[#00c4c4] rounded-t-md">
-        <!-- Left Section (Title) -->
-        <div class="md:flex items-center">
-          <h2 class="text-lg text-white mr-4">Employees</h2>
-          <div class="flex items-center justify-center">
-            <div
-              class="mt-1.5 md:mt-0 border-[#CCCCCC] rounded-full bg-white flex items-center text-gray-500 shadow w-full max-w-md">
-              <mat-icon class="ms-3">search</mat-icon>
-              <input type="text" class="w-full h-[40px] rounded-full ps-2 focus:outline-none placeholder:text-[16px]"
-                placeholder="Search" matInput (keyup)="applyFilter($event)" #filter id="inputoutline">
-            </div>
+      <div class="flex flex-col md:flex-row justify-between items-center px-5 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-4 mb-3 md:mb-0">
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-[#0b0b88]"></span>
+            <h6 class="text-sm font-semibold text-[#1B1B2F]">Employees</h6>
+          </div>
+          <div class="relative">
+            <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 !text-[18px]">search</mat-icon>
+            <input type="text" class="pl-9 pr-4 py-2 rounded-full border border-gray-200 bg-gray-50 text-sm focus:outline-none w-[220px] placeholder:text-gray-400"
+              placeholder="Search" matInput (keyup)="applyFilter($event)" #filter id="inputoutline">
           </div>
         </div>
 
-        <!-- Right Section (Buttons) -->
-        <div class="flex md:justify-end items-center space-x-2">
-          <!-- <button mat-mini-fab id="headerBtn" (click)="addNew()" matTooltip="ADD" class="!shadow-sm">
-            <mat-icon class="!text-[#00383F]">add</mat-icon>
-          </button> -->
-
-          <button mat-mini-fab id="headerBtn" (click)="refresh()" matTooltip="REFRESH" class="!shadow-sm">
+        <div class="flex items-center gap-2">
+          <button mat-mini-fab class="!bg-[#d6d5ea] !shadow-none hover:!bg-gray-100" (click)="refresh()" matTooltip="REFRESH">
             <mat-icon class="!text-[#00383F]">refresh</mat-icon>
           </button>
-
-          <button mat-mini-fab id="headerBtn" (click)="removeSelectedRows()" [hidden]="!selection.hasValue()"
-            matTooltip="DELETE" class="!shadow-sm">
+          <button mat-mini-fab class="!bg-[#d6d5ea] !shadow-none hover:!bg-gray-100" (click)="removeSelectedRows()" [hidden]="!selection.hasValue()" matTooltip="DELETE">
             <mat-icon class="!text-[#00383F]">delete</mat-icon>
           </button>
-
-          <button (click)="exportExcel()" matTooltip="XLSX"
-            class="p-2 rounded-xl bg-[#D5EAEA] hover:bg-gray-100 shadow-xl">
+          <button (click)="exportExcel()" matTooltip="XLSX" class="p-2 rounded-xl bg-[#d6d5ea] hover:bg-gray-100">
             <img src="assets/images/icons/xlsx.png" alt="Export to Excel" class="w-6 h-6">
           </button>
         </div>
@@ -210,7 +200,7 @@
 
       <!-- Pagination -->
       <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0" [pageSize]="10"
-        [pageSizeOptions]="[5, 10, 25, 100]" class="!border-t !p-2">
+        [pageSizeOptions]="[5, 10, 25, 100]" class="!border-t border-gray-100 !bg-white">
       </mat-paginator>
     </div>
   </div>

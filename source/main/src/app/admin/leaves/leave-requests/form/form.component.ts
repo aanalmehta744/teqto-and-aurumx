@@ -102,6 +102,7 @@ export class FormComponent implements OnInit {
   // minDate: Date = new Date();
 
   isSandwichLeave = false;
+  isBdeOrBa = false;
 
   constructor(
     public dialogRef: MatDialogRef<FormComponent>,
@@ -167,9 +168,12 @@ export class FormComponent implements OnInit {
       if (selectedEmployee) {
         this.availablePaidLeave = selectedEmployee.leave_balance || 0;
         this.employeeId = selectedEmployee.id || 0;
+        const role = (selectedEmployee.role || '').toUpperCase();
+        this.isBdeOrBa = role === 'BDE' || role === 'BA';
         console.log("availablePaidLeave", this.availablePaidLeave);
       } else {
         this.availablePaidLeave = 0;
+        this.isBdeOrBa = false;
       }
     });
 
@@ -245,38 +249,45 @@ export class FormComponent implements OnInit {
           console.warn('⚠️ Your leave period overlaps with a holiday!');
         }
 
+        const adjacentToHoliday = this.isLeaveAdjacentToHoliday(start, end);
         const sandwichResult = this.applySandwichRule(start, end);
-        if (sandwichResult.applies) {
-          this.isSandwichLeave = sandwichResult.applies;
-          this.sandwichWarning = sandwichResult.applies;
+        const leaveTypeCtrl = this.leavesForm.get('leave_type');
 
-          if (sandwichResult.applies) {
-            this.isSandwichLeave = true;
-            this.sandwicherror = `  
-            ⚠️ Your leave request falls under the <b>Sandwich Rule</b>.<br>
-            <b>Reason:</b> ${sandwichResult.reason}.<br><br>
-            According to company policy, weekends and holidays that fall 
-            between two leave periods are also counted as leave days.
-          `;
+        if (adjacentToHoliday || sandwichResult.applies) {
+          this.isSandwichLeave = true;
+          this.sandwichWarning = true;
+
+          if (this.isBdeOrBa) {
+            leaveTypeCtrl?.setValue('Paid', { emitEvent: false });
+            leaveTypeCtrl?.disable({ emitEvent: false });
+          } else {
+            this.sandwicherror = `
+              ⚠️ Your leave request falls under the <b>Sandwich Rule</b>.<br>
+              According to company policy, weekends and holidays that fall
+              between two leave periods are also counted as leave days.
+            `;
           }
+        } else {
+          this.isSandwichLeave = false;
+          this.sandwichWarning = false;
+          leaveTypeCtrl?.enable({ emitEvent: false });
         }
-
 
         this.leavesService.getLeavesByEmployee(this.employeeId).subscribe(existingLeaves => {
           const sandwichCheck = this.applySandwichRule(start, end, existingLeaves);
-
-          if (sandwichCheck.applies) {
+          if (sandwichCheck.applies && !this.isSandwichLeave) {
             this.isSandwichLeave = true;
-            console.warn('⚠️ Sandwich rule applies for this leave!');
-            this.sandwicherror = `
-              ⚠️ Your leave request falls under the <b>Sandwich Rule</b>.<br>
-              <b>Reason:</b> ${sandwichCheck.reason}.<br><br>
-              According to company policy, weekends and holidays that fall 
-              between two leave periods are also counted as leave days.
-            `;
-            // this.isSubmitDisabled = true;
+            if (this.isBdeOrBa) {
+              leaveTypeCtrl?.setValue('Paid', { emitEvent: false });
+              leaveTypeCtrl?.disable({ emitEvent: false });
+            } else {
+              this.sandwicherror = `
+                ⚠️ Your leave request falls under the <b>Sandwich Rule</b>.<br>
+                According to company policy, weekends and holidays that fall
+                between two leave periods are also counted as leave days.
+              `;
+            }
           }
-
         });
       }
     });
@@ -328,6 +339,15 @@ export class FormComponent implements OnInit {
     const start = group.get('start_date')?.value;
     const end = group.get('end_date')?.value;
     return start && end && start > end ? { dateRangeInvalid: true } : null;
+  }
+
+  isLeaveAdjacentToHoliday(start: Date, end: Date): boolean {
+    const format = (d: Date) => formatDate(d, 'yyyy-MM-dd', 'en');
+    const dayBefore = new Date(start);
+    dayBefore.setDate(dayBefore.getDate() - 1);
+    const dayAfter = new Date(end);
+    dayAfter.setDate(dayAfter.getDate() + 1);
+    return this.holidays.includes(format(dayBefore)) || this.holidays.includes(format(dayAfter));
   }
 
   applySandwichRule(start: Date, end: Date, employeeLeaves: any[] = []): { applies: boolean, reason?: string } {

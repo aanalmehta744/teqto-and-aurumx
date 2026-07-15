@@ -63,7 +63,6 @@ export class AllTasksComponent
     'priority',
     'details',
     'due_date',
-    // 'actions',
   ];
 
   exampleDatabase?: AllTasksService | null;
@@ -88,9 +87,28 @@ export class AllTasksComponent
     this.subs.sink = this.myTasksService.dataChange.subscribe(data => {
       console.log('Task List Loaded:', data);  // Log from component side too
     });
+
+    // BDE and BA can edit/delete tasks
+    const userJson = localStorage.getItem('currentUser');
+    if (userJson) {
+      const user = JSON.parse(userJson);
+      if (user.role === 'BDE' || user.role === 'BA') {
+        this.displayedColumns = [...this.displayedColumns, 'actions'];
+      }
+    }
   }
   refresh() {
     this.loadData();
+  }
+
+  toggleStatus(row: MyTasks) {
+    const updated = { ...(row as any), done: (row as any).done === 1 ? 0 : 1 };
+    this.myTasksService.updateMyTasks(updated as MyTasks).subscribe({
+      next: () => {
+        (row as any).done = updated.done;
+        this.refreshTable();
+      }
+    });
   }
 
   applyFilter(event: Event) {

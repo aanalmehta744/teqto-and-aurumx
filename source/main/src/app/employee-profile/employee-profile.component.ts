@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, ChangeDetectorRef, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -25,6 +25,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { FeatherIconsComponent } from '@shared/components/feather-icons/feather-icons.component';
+import { AuthService } from '@core';
 
 @Component({
   selector: 'app-employee-profile',
@@ -81,6 +82,11 @@ export class EmployeeProfileComponent implements OnInit, AfterViewInit {
   contextMenu?: MatMenuTrigger;
   contextMenuPosition = { x: '0px', y: '0px' };
 
+  photoUploading = false;
+  photoUploadError = '';
+
+  private authService = inject(AuthService);
+
   constructor(
     private route: ActivatedRoute,
     private employeesService: EmployeesService,
@@ -88,7 +94,8 @@ export class EmployeeProfileComponent implements OnInit, AfterViewInit {
     private myLeavesService: MyLeavesService,
     private employeeSalaryService: EmployeeSalaryService,
     private myProjectsService: MyProjectsService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -188,10 +195,38 @@ export class EmployeeProfileComponent implements OnInit, AfterViewInit {
   }
 
   getProfileImage(): string {
+    if (this.employee?.uploadImg) {
+      return `http://localhost:3000/uploads/employees/${this.employee.uploadImg}`;
+    }
     const gender = this.employee?.gender?.toLowerCase();
     if (gender === 'female') return 'assets/images/female-profile.png';
     if (gender === 'male') return 'assets/images/male-profile.png';
     return 'assets/images/user/default.jpg';
+  }
+
+  onPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const file = input.files[0];
+    this.photoUploading = true;
+    this.photoUploadError = '';
+    this.employeesService.uploadPhoto(this.employeeId, file).subscribe({
+      next: (res) => {
+        this.employee.uploadImg = res.filename;
+        this.photoUploading = false;
+        // Sync to localStorage so header/sidebar reflect the new photo
+        const stored = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        stored.img = res.filename;
+        stored.uploadImg = res.filename;
+        localStorage.setItem('currentUser', JSON.stringify(stored));
+        this.authService.setUserData({ ...stored }, stored.token ?? localStorage.getItem('authToken') ?? '');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.photoUploadError = err?.error?.error || 'Upload failed';
+        this.photoUploading = false;
+      }
+    });
   }
 
   getMonthName(month: number): string {

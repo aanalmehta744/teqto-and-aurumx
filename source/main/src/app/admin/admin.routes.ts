@@ -1,5 +1,6 @@
 import { Route } from '@angular/router';
 import { EmployeeDailyUpdateComponent } from './employee-daily-update/employee-daily-update.component';
+import { LoginSettingsComponent } from './login-settings/login-settings.component';
 export const ADMIN_ROUTE: Route[] = [
   {
     path: 'dashboard',
@@ -67,6 +68,10 @@ export const ADMIN_ROUTE: Route[] = [
   {
     path: 'kpi',
     loadChildren: () => import('./kpi/kpi.routes').then((m) => m.KPI_ROUTE),
+  },
+  {
+    path: 'login-settings',
+    component: LoginSettingsComponent,
   },
 ];
 

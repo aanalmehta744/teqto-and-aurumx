@@ -4,7 +4,7 @@ const db = require('../connection');
 
 // GET all clients for a BDE with their latest note + stats
 router.get('/dashboard', async (req, res) => {
-    const { bde_id, date, status, search } = req.query;
+    const { bde_id, date, status, search, tag } = req.query;
     if (!bde_id) return res.status(400).json({ error: 'bde_id required' });
 
     try {
@@ -22,7 +22,7 @@ router.get('/dashboard', async (req, res) => {
         // Clients with latest note
         let sql = `
             SELECT c.id, c.fullName, c.email, c.mobile, c.client_type, c.prize_tag,
-                   c.country, c.date, c.platform, c.technology,
+                   c.country, c.date, c.platform, c.technology, c.tag,
                    n.note_text AS latest_note,
                    n.note_date AS latest_note_date,
                    n.mood AS latest_mood,
@@ -39,6 +39,7 @@ router.get('/dashboard', async (req, res) => {
 
         if (status) { sql += ` AND c.client_type = ?`; params.push(status); }
         if (search) { sql += ` AND c.fullName LIKE ?`; params.push(`%${search}%`); }
+        if (tag) { sql += ` AND c.tag LIKE ?`; params.push(`%${tag}%`); }
         if (date) {
             sql += ` AND EXISTS (
                 SELECT 1 FROM client_daily_notes

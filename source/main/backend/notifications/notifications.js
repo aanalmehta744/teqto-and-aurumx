@@ -2,6 +2,42 @@ const express = require('express');
 const router = express.Router();
 const db = require('../connection');
 
+// GET notifications for a specific user (Employee / BDE / BA)
+router.get('/user/:userId', async (req, res) => {
+    try {
+        const [rows] = await db.query(
+            `SELECT * FROM notifications WHERE recipient_id = ? ORDER BY created_at DESC LIMIT 50`,
+            [req.params.userId]
+        );
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// GET unread count for a specific user
+router.get('/user/:userId/count', async (req, res) => {
+    try {
+        const [[row]] = await db.query(
+            `SELECT COUNT(*) AS count FROM notifications WHERE recipient_id = ? AND is_read = 0`,
+            [req.params.userId]
+        );
+        res.json({ count: row.count });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// PUT mark all notifications as read for a specific user
+router.put('/user/:userId/read-all', async (req, res) => {
+    try {
+        await db.query(`UPDATE notifications SET is_read = 1 WHERE recipient_id = ? AND is_read = 0`, [req.params.userId]);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // GET all notifications (admin), optionally only unread
 router.get('/', async (req, res) => {
     const { unread } = req.query;

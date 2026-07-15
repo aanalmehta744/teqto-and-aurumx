@@ -86,16 +86,18 @@ export class FormDialogComponent implements OnInit {
   }
 
   createTaskForm(): UntypedFormGroup {
+    const raw = this.myTasks as any;
     return this.fb.group({
-      employee_id: [this.myTasks.id || null, Validators.required],
-      project_id: [null],
+      id: [raw?.id || null],
+      employee_id: [raw?.employee_id || null, Validators.required],
+      project_id: [raw?.project_id || null],
       title: [this.myTasks.title || '', Validators.required],
       priority: [this.myTasks.priority || 'Normal', Validators.required],
       due_date: [this.myTasks.due_date || null, Validators.required],
       note: [this.myTasks.note || ''],
-      done: [0],
-      employee_type: ['Employee'],
-      trainer_project_name: [null],
+      done: [raw?.done ?? 0],
+      employee_type: [raw?.employee_type || 'Employee'],
+      trainer_project_name: [raw?.trainer_project_name || null],
     });
   }
 
@@ -106,7 +108,6 @@ export class FormDialogComponent implements OnInit {
   public confirmAdd(): void {
     if (this.myTasksForm.invalid) return;
     const payload = this.myTasksForm.getRawValue();
-    // Normalize due_date to yyyy-MM-dd (handles native Date and Moment objects)
     if (payload.due_date) {
       const d = new Date(payload.due_date);
       payload.due_date = d.toISOString().slice(0, 10);
@@ -118,6 +119,24 @@ export class FormDialogComponent implements OnInit {
       },
       error: () => {
         Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to add task.' });
+      }
+    });
+  }
+
+  public confirmEdit(): void {
+    if (this.myTasksForm.invalid) return;
+    const payload = this.myTasksForm.getRawValue();
+    if (payload.due_date) {
+      const d = new Date(payload.due_date);
+      payload.due_date = d.toISOString().slice(0, 10);
+    }
+    this.myTasksService.updateMyTasks(payload).subscribe({
+      next: () => {
+        Swal.fire({ icon: 'success', title: 'Updated!', text: 'Task updated successfully.', timer: 1500, showConfirmButton: false });
+        this.dialogRef.close(1);
+      },
+      error: () => {
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to update task.' });
       }
     });
   }

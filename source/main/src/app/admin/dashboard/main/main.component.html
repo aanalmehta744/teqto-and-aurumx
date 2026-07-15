@@ -1,467 +1,410 @@
 <section>
-  <div class="rounded-lg">
-    <div>
-      <!-- breadcrumb -->
-      <app-breadcrumb [title]="'Dashboad'" [items]="['Home']" [active_item]="'Dashboad'"></app-breadcrumb>
-    </div>
+  <div class="min-h-screen bg-white p-4 md:p-6 space-y-5">
+
+    <!-- breadcrumb -->
+    <app-breadcrumb [title]="'Dashboard'" [items]="['Home']" [active_item]="'Dashboard'"></app-breadcrumb>
 
     <!-- ── Announcements ── -->
     <app-announcement-banner></app-announcement-banner>
 
-    <div class="w-full">
-      <div class="bg-white rounded-lg !shadow-xl">
-        <div class="bg-[#00C4C4] text-white px-4 py-2.5 rounded-t-md">
-          <h6 class="m-0 text-md font-normal">Today's Follow-ups by BDE</h6>
-        </div>
-        <div class="p-2">
-          <ng-scrollbar track="all" visibility="hover">
-            <div *ngFor="let bde of todayFollowupsByBDE" class="mb-4 pb-2">
-              <div class="flex justify-between items-center text-[#00383f]">
-                <h6 class="font-medium">{{ bde.bde_name }}</h6>
-                <span class="bg-gray-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
-                  {{ bde.followup_count }} Follow-ups
-                </span>
-              </div>
-              <div class="overflow-x-auto">
-                <table class="min-w-full text-sm mt-2">
-                  <thead>
-                    <tr class="bg-gray-100 text-[#76667E]">
-                      <th class="text-left py-2 px-3 font-medium">Client Name</th>
-                      <th class="text-left py-2 px-3 font-medium">Email</th>
-                      <th class="text-left py-2 px-3 font-medium">Mobile</th>
-                      <th class="text-left py-2 px-3 font-medium">Status</th>
-                      <th class="text-left py-2 px-3 font-medium">Follow-up Notes</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let client of bde.clients"
-                      class="border-b border-gray-200 hover:bg-gray-50 text-[black]">
-                      <td class="py-2 px-3">{{ client.fullName }}</td>
-                      <td class="py-2 px-3">{{ client.email }}</td>
-                      <td class="py-2 px-3">{{ client.mobile || '-' }}</td>
-                      <td class="py-2 px-3">{{ client.status }}</td>
-                      <td class="py-2 px-3">{{ client.notes }}</td>
-                    </tr>
-                    <tr *ngIf="!bde.clients || bde.clients.length === 0" class="border-b border-gray-200">
-                      <td colspan="5" class="py-4 px-3 text-center text-gray-500">No client follow-ups available</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <mat-paginator #followupPaginator [length]="todayFollowupsByBDE.length" [pageSize]="5"
-                  [pageSizeOptions]="[2, 5, 10]" showFirstLastButtons (page)="updateFollowupPagination()">
-                </mat-paginator>
+    <!-- ── KPI Summary Row ── -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-              </div>
-            </div>
-          </ng-scrollbar>
-          <div *ngIf="todayFollowupsByBDE.length === 0" class="text-center text-gray-500 py-4">No follow-ups for today
-          </div>
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div class="flex items-center gap-2 text-gray-500 text-sm">
+          <span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span>
+          BDEs with Follow-ups
+        </div>
+        <div class="mt-2 text-3xl font-semibold text-[#1B1B2F]">{{ todayFollowupsByBDE.length }}</div>
+        <div class="mt-1 text-xs text-gray-400">as of today</div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5" *ngIf="userRole !== 'ba'">
+        <div class="flex items-center gap-2 text-gray-500 text-sm">
+          <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+          Attendance Logged
+        </div>
+        <div class="mt-2 text-3xl font-semibold text-[#1B1B2F]">{{ todayAttendance.length }}</div>
+        <div class="mt-1 text-xs text-gray-400">records today</div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div class="flex items-center gap-2 text-gray-500 text-sm">
+          <span class="h-1.5 w-1.5 rounded-full bg-indigo-500"></span>
+          Upcoming Interviews
+        </div>
+        <div class="mt-2 text-3xl font-semibold text-[#1B1B2F]">{{ interviewDataSource.data.length }}</div>
+        <div class="mt-1 text-xs text-gray-400">scheduled</div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5" *ngIf="userRole !== 'ba'">
+        <div class="flex items-center gap-2 text-gray-500 text-sm">
+          <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+          Pending Leaves
+        </div>
+        <div class="mt-2 text-3xl font-semibold text-[#1B1B2F]">{{ pendingLeaves.length }}</div>
+        <div class="mt-1 text-xs text-gray-400">awaiting approval</div>
+      </div>
+
+    </div>
+
+    <!-- ── BA Leave Balance Card ── -->
+    <div *ngIf="userRole === 'ba' && baLeaveBalance" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+      <div class="flex items-center gap-2 mb-4 border-b border-gray-100 pb-4">
+        <span class="h-2 w-2 rounded-full bg-[#0b0b88]"></span>
+        <h6 class="text-sm font-semibold text-[#1B1B2F]">My Leave Balance</h6>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="text-center p-3 rounded-xl bg-green-50">
+          <p class="text-2xl font-bold text-green-700">{{ baLeaveBalance.remaining_paid_leave ?? 0 }}</p>
+          <p class="text-xs text-gray-500 mt-1">Paid Leaves Left</p>
+        </div>
+        <div class="text-center p-3 rounded-xl bg-blue-50">
+          <p class="text-2xl font-bold text-blue-700">{{ baLeaveBalance.total_paid_leave ?? 0 }}</p>
+          <p class="text-xs text-gray-500 mt-1">Total Paid</p>
+        </div>
+        <div class="text-center p-3 rounded-xl bg-orange-50">
+          <p class="text-2xl font-bold text-orange-700">{{ baLeaveBalance.used_paid_leave ?? 0 }}</p>
+          <p class="text-xs text-gray-500 mt-1">Paid Used</p>
+        </div>
+        <div class="text-center p-3 rounded-xl bg-purple-50">
+          <p class="text-2xl font-bold text-purple-700">{{ baLeaveBalance.used_sick_leave ?? 0 }}</p>
+          <p class="text-xs text-gray-500 mt-1">Sick Used</p>
         </div>
       </div>
     </div>
-    <!-- ── BDE Dashboard Section ── -->
-    <div class="w-full mt-4" *ngIf="bdePerformanceSummary.length > 0 || bdeKpiAchievement.length > 0">
 
-      <!-- Row 1: Activity chart + KPI achievement chart -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-        <!-- BDE Activity Comparison (Calls / Meetings / Deals) -->
-        <div class="bg-white rounded-lg !shadow-xl">
-          <div class="bg-[#00C4C4] text-white px-4 py-2.5 rounded-t-md">
-            <h6 class="m-0 text-md font-normal">BDE Activity — This Month</h6>
-            <p class="text-xs opacity-80 mt-0.5">Calls · Meetings · Deals Won</p>
-          </div>
-          <div class="p-4">
-            <apx-chart
-              [series]="bdeChartSeries"
-              [chart]="bdeChartOptions"
-              [xaxis]="bdeChartXAxis"
-              [dataLabels]="bdeChartDataLabels"
-              [tooltip]="bdeChartTooltip"
-              [colors]="bdeChartColors">
-            </apx-chart>
-          </div>
-        </div>
-
-        <!-- KPI Target Completion (Completed / Partial / Missed) -->
-        <div class="bg-white rounded-lg !shadow-xl" *ngIf="bdeKpiAchievement.length > 0">
-          <div class="bg-[#7c3aed] text-white px-4 py-2.5 rounded-t-md">
-            <h6 class="m-0 text-md font-normal">KPI Target Completion — This Month</h6>
-            <p class="text-xs opacity-80 mt-0.5">Stacked per BDE: Completed · Partial · Missed</p>
-          </div>
-          <div class="p-4">
-            <apx-chart
-              [series]="kpiAchievementSeries"
-              [chart]="kpiAchievementChart"
-              [xaxis]="kpiAchievementXAxis"
-              [dataLabels]="kpiAchievementDataLabels"
-              [tooltip]="kpiAchievementTooltip"
-              [colors]="kpiAchievementColors"
-              [legend]="kpiAchievementLegend">
-            </apx-chart>
-          </div>
+    <!-- ── Today's Follow-ups by BDE ── -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-gray-400"></span>
+          <h6 class="text-sm font-semibold text-[#1B1B2F]">Today's Follow-ups by BDE</h6>
         </div>
       </div>
 
-      <!-- Row 2: Revenue cards + Leaderboard -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-
-        <!-- Revenue Cards -->
-        <div class="bg-white rounded-lg !shadow-xl">
-          <div class="bg-[#0891b2] text-white px-4 py-2.5 rounded-t-md">
-            <h6 class="m-0 text-md font-normal">Revenue This Month</h6>
-          </div>
-          <div class="p-4 grid grid-cols-2 gap-3">
-            <div *ngFor="let bde of bdePerformanceSummary"
-                 class="bg-teal-50 border border-teal-100 rounded-xl p-3 text-center">
-              <p class="text-xs font-semibold text-gray-600 truncate">{{ bde.bde_name }}</p>
-              <p class="text-xl font-bold text-teal-600 mt-1">₹{{ bde.revenue | number }}</p>
-              <div class="flex justify-center gap-3 mt-2 text-xs text-gray-500">
-                <span>📞 {{ bde.calls }}</span>
-                <span>🤝 {{ bde.meetings }}</span>
-                <span>✅ {{ bde.deals_won }}</span>
-              </div>
+      <div class="p-4">
+        <ng-scrollbar track="all" visibility="hover">
+          <div *ngFor="let bde of todayFollowupsByBDE" class="mb-5 last:mb-0">
+            <div class="flex justify-between items-center px-1 mb-2">
+              <h6 class="font-medium text-sm text-[#1B1B2F]">{{ bde.bde_name }}</h6>
+              <span class="bg-[##d6d5ea] text-[#00383F] text-xs font-medium px-2.5 py-1 rounded-full">
+                {{ bde.followup_count }} Follow-ups
+              </span>
             </div>
-          </div>
-        </div>
-
-        <!-- Leaderboard -->
-        <div class="bg-white rounded-lg !shadow-xl" *ngIf="bdeLeaderboard.length > 0">
-          <div class="bg-[#b45309] text-white px-4 py-2.5 rounded-t-md">
-            <h6 class="m-0 text-md font-normal">🏆 BDE Leaderboard — KPI Achievement</h6>
-            <p class="text-xs opacity-80 mt-0.5">Ranked by average KPI completion %</p>
-          </div>
-          <div class="p-4">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="bg-amber-50 text-gray-600">
-                  <th class="text-left py-2 px-3 font-semibold">Rank</th>
-                  <th class="text-left py-2 px-3 font-semibold">BDE Name</th>
-                  <th class="text-center py-2 px-3 font-semibold">KPIs</th>
-                  <th class="text-center py-2 px-3 font-semibold">✅ Done</th>
-                  <th class="text-center py-2 px-3 font-semibold">⚠️ Partial</th>
-                  <th class="text-center py-2 px-3 font-semibold">❌ Missed</th>
-                  <th class="text-right py-2 px-3 font-semibold">Avg %</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let bde of bdeLeaderboard; let i = index"
-                    class="border-b border-gray-100 hover:bg-amber-50 transition-colors"
-                    [class.bg-yellow-50]="i === 0">
-                  <td class="py-2.5 px-3 text-xl">{{ rankMedal(i) }}</td>
-                  <td class="py-2.5 px-3 font-medium text-gray-800">{{ bde.bde_name }}</td>
-                  <td class="py-2.5 px-3 text-center text-gray-600">{{ bde.total_kpis }}</td>
-                  <td class="py-2.5 px-3 text-center">
-                    <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-semibold">{{ bde.completed }}</span>
-                  </td>
-                  <td class="py-2.5 px-3 text-center">
-                    <span class="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs font-semibold">{{ bde.partial }}</span>
-                  </td>
-                  <td class="py-2.5 px-3 text-center">
-                    <span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-semibold">{{ bde.missed }}</span>
-                  </td>
-                  <td class="py-2.5 px-3 text-right">
-                    <span [ngClass]="{
-                      'text-green-600': bde.avg_achievement >= 100,
-                      'text-yellow-600': bde.avg_achievement >= 70 && bde.avg_achievement < 100,
-                      'text-red-500': bde.avg_achievement < 70
-                    }" class="font-bold text-sm">{{ bde.avg_achievement }}%</span>
-                    <div class="w-full bg-gray-200 rounded-full h-1.5 mt-1">
-                      <div
-                        [style.width.%]="bde.avg_achievement > 100 ? 100 : bde.avg_achievement"
-                        [ngClass]="{
-                          'bg-green-500': bde.avg_achievement >= 100,
-                          'bg-yellow-400': bde.avg_achievement >= 70 && bde.avg_achievement < 100,
-                          'bg-red-400': bde.avg_achievement < 70
-                        }"
-                        class="h-1.5 rounded-full transition-all">
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-                <tr *ngIf="bdeLeaderboard.length === 0">
-                  <td colspan="7" class="py-6 text-center text-gray-400">No KPI targets set yet</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="w-full mt-4" *ngIf="userRole !== 'ba'">
-      <div class="bg-white rounded-lg !shadow-xl">
-        <div class="bg-[#00C4C4] text-white px-4 py-2.5 rounded-t-md">
-          <h6 class="m-0 text-md font-normal">Today's Attendance Records</h6>
-        </div>
-        <div class="p-2">
-          <ng-scrollbar track="all" visibility="hover">
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto rounded-xl border border-gray-100">
               <table class="min-w-full text-sm">
                 <thead>
-                  <tr class="bg-gray-100 text-[#76667E]">
-                    <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Employee Name</th>
-                    <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Date</th>
-                    <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Punch In</th>
-                    <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Punch Out</th>
-                    <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Hours</th>
-                    <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Break</th>
-                    <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Status</th>
+                  <tr class="bg-gray-50">
+                    <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide">Client Name</th>
+                    <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide">Email</th>
+                    <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide">Mobile</th>
+                    <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide">Status</th>
+                    <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide">Follow-up Notes</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let record of paginatedAttendance"
-                    class="border-b border-gray-200 hover:bg-gray-50 text-[black]">
-                    <td class="py-2 px-3 whitespace-nowrap">{{ record.fullName }}</td>
-                    <td class="py-2 px-3 whitespace-nowrap">{{ record.date | date:'mediumDate' }}</td>
-                    <td class="py-2 px-3 whitespace-nowrap">{{ record.check_in ? (record.check_in | date:'h:mm:ss a') :
-                      '-' }}</td>
-                    <td class="py-2 px-3 whitespace-nowrap">{{ record.check_out ? (record.check_out | date:'h:mm:ss a')
-                      : '-' }}</td>
-                    <td class="py-2 px-3 whitespace-nowrap">{{ record.hours ? (record.hours) : '-' }}</td>
-                    <td class="py-2 px-3 whitespace-nowrap">{{ record.break ? (record.break) : '-' }}</td>
-                    <!-- Status -->
-                    <td class="py-2 px-3">
-                      <span *ngIf="record.status === 'Present'"
-                        class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium">
-                        {{ record.status }}
-                      </span>
-                      <span *ngIf="record.status === 'Absent'"
-                        class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium">
-                        {{ record.status }}
-                      </span>
-                      <!-- Half Day -->
-                      <span *ngIf="record.status === 'Half Day'"
-                        class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
-                        {{ record.status }}
-                      </span>
-                      <span
-                        *ngIf="record.status !== 'Present' && record.status !== 'Absent' && record.status !== 'Leave' && record.status !== 'Half Day'"
-                        class=" bg-blue-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
-                        {{ record.status }}
-                      </span>
-
-                      <span *ngIf="record.final_status === 'Leave'"
-                        class="bg-yellow-100 text-yellow-800 px-3 py-1 ml-2 rounded-full text-xs font-medium">
-                        {{ record.final_status }}
-                      </span>
-                    </td>
-                    <!-- <td class="py-2 px-3">
-                      <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium" [ngClass]="{
-                      'bg-green-100 text-green-800': record.status === 'Present',
-                      'bg-red-100 text-red-800': record.status === 'Absent',
-                      'bg-gray-100 text-gray-800': record.status !== 'Present' && record.status !== 'Absent'
-                    }">
-                        {{ record.status }}
-                      </span>
-                    </td> -->
+                  <tr *ngFor="let client of bde.clients"
+                    class="border-t border-gray-50 hover:bg-gray-50/70 transition-colors">
+                    <td class="py-2.5 px-4 text-gray-700">{{ client.fullName }}</td>
+                    <td class="py-2.5 px-4 text-gray-500">{{ client.email }}</td>
+                    <td class="py-2.5 px-4 text-gray-500">{{ client.mobile || '-' }}</td>
+                    <td class="py-2.5 px-4 text-gray-700">{{ client.status }}</td>
+                    <td class="py-2.5 px-4 text-gray-500">{{ client.notes }}</td>
                   </tr>
-                  <tr *ngIf="!todayAttendance || todayAttendance.length === 0" class="border-b border-gray-200">
-                    <td colspan="5" class="py-4 px-3 text-center text-gray-500">No attendance records for today</td>
+                  <tr *ngIf="!bde.clients || bde.clients.length === 0" class="border-t border-gray-50">
+                    <td colspan="5" class="py-4 px-4 text-center text-gray-400">No client follow-ups available</td>
                   </tr>
                 </tbody>
               </table>
-              <mat-paginator #attendancePaginator [length]="todayAttendance.length" [pageSize]="5"
-                [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons (page)="updateAttendancePagination()">
-              </mat-paginator>
-
+              <div class="border-t border-gray-100">
+                <mat-paginator #followupPaginator [length]="todayFollowupsByBDE.length" [pageSize]="5"
+                  [pageSizeOptions]="[2, 5, 10]" showFirstLastButtons (page)="updateFollowupPagination()">
+                </mat-paginator>
+              </div>
             </div>
-          </ng-scrollbar>
+          </div>
+        </ng-scrollbar>
+        <div *ngIf="todayFollowupsByBDE.length === 0" class="text-center text-gray-400 py-6 text-sm">
+          No follow-ups for today
         </div>
       </div>
     </div>
-    <div class="w-full mt-4">
-      <!-- Interviews Table -->
-      <div class="bg-white rounded-lg shadow-xl mt-6">
-        <div class="bg-[#00C4C4] text-white px-4 py-2.5 rounded-t-md">
-          <h6 class="m-0 text-xl font-normal">Upcoming Interviews</h6>
+
+    <!-- ── Today's Attendance Records ── -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm" *ngIf="userRole !== 'ba'">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+          <h6 class="text-sm font-semibold text-[#1B1B2F]">Today's Attendance Records</h6>
         </div>
-        <div class="h-auto p-2 overflow-x-auto">
+      </div>
+
+      <div class="p-4">
+        <ng-scrollbar track="all" visibility="hover">
+          <div class="overflow-x-auto rounded-xl border border-gray-100">
+            <table class="min-w-full text-sm">
+              <thead>
+                <tr class="bg-gray-50">
+                  <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Employee Name</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Date</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Punch In</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Punch Out</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Hours</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Break</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let record of paginatedAttendance"
+                  class="border-t border-gray-50 hover:bg-gray-50/70 transition-colors">
+                  <td class="py-2.5 px-4 text-gray-700 whitespace-nowrap">{{ record.fullName }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ record.date | date:'mediumDate' }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ record.check_in ? (record.check_in | date:'h:mm:ss a') : '-' }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ record.check_out ? (record.check_out | date:'h:mm:ss a') : '-' }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ record.hours ? (record.hours) : '-' }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ record.break ? (record.break) : '-' }}</td>
+                  <!-- Status -->
+                  <td class="py-2.5 px-4">
+                    <span *ngIf="record.status === 'Present'"
+                      class="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-medium">
+                      {{ record.status }}
+                    </span>
+                    <span *ngIf="record.status === 'Absent'"
+                      class="bg-red-50 text-red-700 px-2.5 py-1 rounded-full text-xs font-medium">
+                      {{ record.status }}
+                    </span>
+                    <!-- Half Day -->
+                    <span *ngIf="record.status === 'Half Day'"
+                      class="bg-orange-50 text-orange-700 px-2.5 py-1 rounded-full text-xs font-medium">
+                      {{ record.status }}
+                    </span>
+                    <span
+                      *ngIf="record.status !== 'Present' && record.status !== 'Absent' && record.status !== 'Leave' && record.status !== 'Half Day'"
+                      class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full text-xs font-medium">
+                      {{ record.status }}
+                    </span>
+
+                    <span *ngIf="record.final_status === 'Leave'"
+                      class="bg-amber-50 text-amber-700 px-2.5 py-1 ml-2 rounded-full text-xs font-medium">
+                      {{ record.final_status }}
+                    </span>
+                  </td>
+                </tr>
+                <tr *ngIf="!todayAttendance || todayAttendance.length === 0" class="border-t border-gray-50">
+                  <td colspan="7" class="py-4 px-4 text-center text-gray-400">No attendance records for today</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="border-t border-gray-100">
+              <mat-paginator #attendancePaginator [length]="todayAttendance.length" [pageSize]="5"
+                [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons (page)="updateAttendancePagination()">
+              </mat-paginator>
+            </div>
+          </div>
+        </ng-scrollbar>
+      </div>
+    </div>
+
+    <!-- ── Upcoming Interviews ── -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-indigo-500"></span>
+          <h6 class="text-sm font-semibold text-[#1B1B2F]">Upcoming Interviews</h6>
+        </div>
+      </div>
+
+      <div class="p-4">
+        <div class="overflow-x-auto rounded-xl border border-gray-100">
           <table class="min-w-full text-sm">
             <thead>
-              <tr class="bg-gray-100 text-[#76667E]">
-                <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Candidate Name</th>
-                <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Job Title</th>
-                <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Interviewed By</th>
-                <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Date</th>
-                <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Time</th>
-                <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Type</th>
-                <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Mode</th>
-                <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Status</th>
+              <tr class="bg-gray-50">
+                <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Candidate Name</th>
+                <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Job Title</th>
+                <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Interviewed By</th>
+                <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Date</th>
+                <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Time</th>
+                <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Type</th>
+                <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Mode</th>
+                <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Status</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let interview of paginatedInterviews" class="border-b hover:bg-gray-50 text-black">
-                <td class="py-2 px-3 whitespace-nowrap">{{ interview.candidate_name }}</td>
-                <td class="py-2 px-3 whitespace-nowrap">{{ interview.job_name }}</td>
-                <td class="py-2 px-3 whitespace-nowrap">{{ interview.assigned_employee_name }}</td>
-                <td class="py-2 px-3 whitespace-nowrap">{{ interview.interview_date | date:'mediumDate' }}</td>
-                <td class="py-2 px-3 whitespace-nowrap">{{ interview.interview_time }}</td>
-                <td class="py-2 px-3 whitespace-nowrap">{{ interview.interview_type }}</td>
-                <td class="py-2 px-3 whitespace-nowrap">{{ interview.mode }}</td>
-                <td class="py-2 px-3">
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium" [ngClass]="{
-                      'bg-green-100 text-green-800': interview.status === 'Scheduled',
-                      'bg-red-100 text-red-800': interview.status === 'Cancelled',
-                      'bg-gray-100 text-gray-800': interview.status !== 'Scheduled' && interview.status !== 'Cancelled'
+              <tr *ngFor="let interview of paginatedInterviews" class="border-t border-gray-50 hover:bg-gray-50/70 transition-colors">
+                <td class="py-2.5 px-4 text-gray-700 whitespace-nowrap">{{ interview.candidate_name }}</td>
+                <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ interview.job_name }}</td>
+                <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ interview.assigned_employee_name }}</td>
+                <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ interview.interview_date | date:'mediumDate' }}</td>
+                <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ interview.interview_time }}</td>
+                <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ interview.interview_type }}</td>
+                <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ interview.mode }}</td>
+                <td class="py-2.5 px-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" [ngClass]="{
+                      'bg-emerald-50 text-emerald-700': interview.status === 'Scheduled',
+                      'bg-red-50 text-red-700': interview.status === 'Cancelled',
+                      'bg-gray-100 text-gray-600': interview.status !== 'Scheduled' && interview.status !== 'Cancelled'
                     }">
                     {{ interview.status }}
                   </span>
                 </td>
               </tr>
-              <tr *ngIf="!paginatedInterviews || paginatedInterviews.length === 0" class="border-b">
-                <td colspan="7" class="py-4 px-3 text-center text-gray-500">No interviews scheduled</td>
+              <tr *ngIf="!paginatedInterviews || paginatedInterviews.length === 0" class="border-t border-gray-50">
+                <td colspan="8" class="py-4 px-4 text-center text-gray-400">No interviews scheduled</td>
               </tr>
             </tbody>
           </table>
-
+          <div class="border-t border-gray-100">
+            <mat-paginator #interviewPaginator [length]="interviewDataSource.data.length" [pageSize]="5"
+              [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons (page)="updateInterviewPagination()">
+            </mat-paginator>
+          </div>
         </div>
-        <mat-paginator #interviewPaginator [length]="interviewDataSource.data.length" [pageSize]="5"
-          [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons (page)="updateInterviewPagination()">
-        </mat-paginator>
-
       </div>
     </div>
-    <div class="w-full mt-4" *ngIf="userRole !== 'ba'">
-      <div class="bg-white rounded-lg shadow-xl">
-        <!-- Header -->
-        <div class="bg-[#00C4C4] text-white px-4 py-2.5 rounded-t-md">
-          <h6 class="m-0 text-md font-normal">Pending Leave Requests</h6>
+
+    <!-- ── Pending Leave Requests ── -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm" *ngIf="userRole !== 'ba'">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+          <h6 class="text-sm font-semibold text-[#1B1B2F]">Pending Leave Requests</h6>
         </div>
+      </div>
 
-        <div class="p-2">
-          <ng-scrollbar track="all" visibility="hover">
-            <div class="overflow-x-auto">
-              <table class="min-w-full text-sm">
-                <thead>
-                  <tr class="bg-gray-100 text-[#76667E]">
-                    <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Employee Name</th>
-                    <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Leave Type</th>
-                    <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Start Date</th>
-                    <th class="text-left py-2 px-3 font-medium whitespace-nowrap">End Date</th>
-                    <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Days</th>
-                    <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Reason</th>
-                    <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let leave of pendingLeaves"
-                    class="border-b border-gray-200 hover:bg-gray-50 text-[black]">
-                    <td class="py-2 px-3 whitespace-nowrap">{{ leave.employee_name }}</td>
-                    <td class="py-2 px-3 whitespace-nowrap">{{ leave.leave_type }}</td>
-                    <td class="py-2 px-3 whitespace-nowrap">{{ leave.start_date | date:'mediumDate' }}</td>
-                    <td class="py-2 px-3 whitespace-nowrap">{{ leave.end_date | date:'mediumDate' }}</td>
-                    <td class="py-2 px-3 whitespace-nowrap">{{ leave.total_days }}</td>
-                    <!-- <td class="py-2 px-3 max-w-[400px]">{{ leave.reason }}</td> -->
-                    <td class="py-2 px-3 min-w-[500px] max-w-[500px] break-words whitespace-normal">
-                      {{ leave.reason }}
-                    </td>
-
-                    <td class="py-2 px-3">
-                      <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium" [ngClass]="{
-                      'bg-yellow-100 text-yellow-800': leave.status === 'Pending',
-                      'bg-green-100 text-green-800': leave.status === 'Approved',
-                      'bg-red-100 text-red-800': leave.status === 'Rejected'
+      <div class="p-4">
+        <ng-scrollbar track="all" visibility="hover">
+          <div class="overflow-x-auto rounded-xl border border-gray-100">
+            <table class="min-w-full text-sm">
+              <thead>
+                <tr class="bg-gray-50">
+                  <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Employee Name</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Leave Type</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Start Date</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">End Date</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Days</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Reason</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let leave of pendingLeaves"
+                  class="border-t border-gray-50 hover:bg-gray-50/70 transition-colors">
+                  <td class="py-2.5 px-4 text-gray-700 whitespace-nowrap">{{ leave.employee_name }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ leave.leave_type }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ leave.start_date | date:'mediumDate' }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ leave.end_date | date:'mediumDate' }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ leave.total_days }}</td>
+                  <td class="py-2.5 px-4 min-w-[400px] max-w-[500px] break-words whitespace-normal text-gray-500">
+                    {{ leave.reason }}
+                  </td>
+                  <td class="py-2.5 px-4">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" [ngClass]="{
+                      'bg-amber-50 text-amber-700': leave.status === 'Pending',
+                      'bg-emerald-50 text-emerald-700': leave.status === 'Approved',
+                      'bg-red-50 text-red-700': leave.status === 'Rejected'
                     }">
-                    
-                        {{ leave.status }}
-                      </span>
-                    </td>
-                  </tr>
+                      {{ leave.status }}
+                    </span>
+                  </td>
+                </tr>
 
-                  <tr *ngIf="!pendingLeaves || pendingLeaves.length === 0" class="border-b border-gray-200">
-                    <td colspan="7" class="py-4 px-3 text-center text-gray-500">No pending leave requests</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <!-- Paginator -->
+                <tr *ngIf="!pendingLeaves || pendingLeaves.length === 0" class="border-t border-gray-50">
+                  <td colspan="7" class="py-4 px-4 text-center text-gray-400">No pending leave requests</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="border-t border-gray-100">
               <mat-paginator #leavePaginator [length]="pendingLeaves.length" [pageSize]="5"
                 [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons (page)="updateLeavePagination()">
               </mat-paginator>
-
             </div>
-          </ng-scrollbar>
-        </div>
+          </div>
+        </ng-scrollbar>
       </div>
     </div>
 
-    <div class="w-full mt-4">
-      <div class="bg-white rounded-lg !shadow-xl">
-        <div class="bg-[#00C4C4] text-white px-4 py-2.5 rounded-t-md">
-          <h6 class="m-0 text-md font-normal">Projects and Their Teams</h6>
+    <!-- ── Projects and Their Teams ── -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-violet-500"></span>
+          <h6 class="text-sm font-semibold text-[#1B1B2F]">Projects and Their Teams</h6>
         </div>
-        <div class="p-2">
-          <ng-scrollbar class="h-[250px]" track="all" visibility="hover">
-            <div class="space-y-4 px-2">
-              <div *ngFor="let project of allProjectsWithTeams" class="pb-4 border-gray-200">
-                <div class="flex justify-between items-center text-[#00383F] mb-2">
-                  <h6 class="font-medium">{{ project.projectTitle }}</h6>
-                  <span class="bg-[#D5EAEA] text-[#00383F] text-sm px-2.5 py-1 rounded-full">
-                    {{ project.team.length }} Team Members
-                  </span>
-                </div>
-                <div class="overflow-x-auto">
-                  <table class="min-w-full text-sm">
-                    <thead>
-                      <tr class="bg-gray-100 text-[#7B6C84]">
-                        <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Full Name</th>
-                        <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Email</th>
-                        <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Mobile</th>
-                        <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Department</th>
-                        <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Gender</th>
-                        <th class="text-left py-2 px-3 font-medium whitespace-nowrap">Address</th>
+      </div>
 
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr *ngFor="let member of project.team"
-                        class="border-b border-gray-200 hover:bg-gray-50 text-[black]">
-                        <td class="py-2 px-3 whitespace-nowrap">{{ member.fullName }}</td>
-                        <td class="py-2 px-3 whitespace-nowrap">{{ member.email }}</td>
-                        <td class="py-2 px-3 whitespace-nowrap">{{ member.mobile }}</td>
-                        <td class="py-2 px-3 whitespace-nowrap">{{ member.department }}</td>
-                        <td class="py-2 px-3 whitespace-nowrap">{{ member.gender }}</td>
-                        <!-- <td class="py-2 px-3">{{ member.address }}</td> -->
-                        <td class="py-2 px-3 min-w-[500px] max-w-[500px] break-words whitespace-normal">{{
-                          member.address }}</td>
-
-                      </tr>
-                      <tr *ngIf="!project.team || project.team.length === 0" class="border-b border-gray-200">
-                        <td colspan="7" class="py-4 px-3 text-center text-gray-500">No team members</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+      <div class="p-4">
+        <ng-scrollbar class="h-[280px]" track="all" visibility="hover">
+          <div class="space-y-5 px-1">
+            <div *ngFor="let project of allProjectsWithTeams">
+              <div class="flex justify-between items-center mb-2">
+                <h6 class="font-medium text-sm text-[#1B1B2F]">{{ project.projectTitle }}</h6>
+                <span class="bg-[#d6d5ea] text-[#00383F] text-xs font-medium px-2.5 py-1 rounded-full">
+                  {{ project.team.length }} Team Members
+                </span>
+              </div>
+              <div class="overflow-x-auto rounded-xl border border-gray-100">
+                <table class="min-w-full text-sm">
+                  <thead>
+                    <tr class="bg-gray-50">
+                      <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Full Name</th>
+                      <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Email</th>
+                      <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Mobile</th>
+                      <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Department</th>
+                      <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Gender</th>
+                      <th class="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Address</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let member of project.team"
+                      class="border-t border-gray-50 hover:bg-gray-50/70 transition-colors">
+                      <td class="py-2.5 px-4 text-gray-700 whitespace-nowrap">{{ member.fullName }}</td>
+                      <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ member.email }}</td>
+                      <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ member.mobile }}</td>
+                      <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ member.department }}</td>
+                      <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ member.gender }}</td>
+                      <td class="py-2.5 px-4 min-w-[400px] max-w-[500px] break-words whitespace-normal text-gray-500">
+                        {{ member.address }}
+                      </td>
+                    </tr>
+                    <tr *ngIf="!project.team || project.team.length === 0" class="border-t border-gray-50">
+                      <td colspan="6" class="py-4 px-4 text-center text-gray-400">No team members</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
-          </ng-scrollbar>
-        </div>
+          </div>
+        </ng-scrollbar>
       </div>
     </div>
 
-    <div class="w-full mt-4">
-      <div class="bg-white rounded-lg shadow-xl">
-        <div class="bg-[#00C4C4] text-white px-4 py-2.5 rounded-t-md">
-          <h6 class="m-0 text-md">Employee Daily Update</h6>
+    <!-- ── Employee Daily Update ── -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-gray-400"></span>
+          <h6 class="text-sm font-semibold text-[#1B1B2F]">Employee Daily Update</h6>
         </div>
-        <div class="p-2 flex justify-center items-center">
-          <apx-chart [series]="chartSeries" [chart]="chartOptions" [xaxis]="xaxis" [yaxis]="yaxis"
-            [dataLabels]="dataLabels" [stroke]="stroke" [tooltip]="tooltip" [legend]="legend"
-            class="min-h-[350px] w-full text-[black]"></apx-chart>
-        </div>
+      </div>
+      <div class="p-4 flex justify-center items-center">
+        <apx-chart [series]="chartSeries" [chart]="chartOptions" [xaxis]="xaxis" [yaxis]="yaxis"
+          [dataLabels]="dataLabels" [stroke]="stroke" [tooltip]="tooltip" [legend]="legend"
+          class="min-h-[350px] w-full text-[black]"></apx-chart>
       </div>
     </div>
 
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+    <!-- ── Charts Row ── -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
       <!-- Project Status Summary Card -->
-      <div class="bg-white rounded-lg shadow-xl">
-        <div class="bg-[#00C4C4] text-white px-4 py-2.5 rounded-t-md">
-          <h6 class="m-0 text-md">Project Status Summary</h6>
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-blue-500"></span>
+            <h6 class="text-sm font-semibold text-[#1B1B2F]">Project Status Summary</h6>
+          </div>
         </div>
-        <div class="p-2 flex justify-center items-center">
+        <div class="p-4 flex justify-center items-center">
           <apx-chart [series]="projectStatusSeries" [chart]="projectStatusChart" [labels]="projectStatusLabels"
             [colors]="projectStatusColors" [legend]="projectStatusLegend" [dataLabels]="projectStatusDataLabels"
             [tooltip]="projectStatusTooltip" class="w-full min-h-[300px] text-[black]"></apx-chart>
@@ -469,16 +412,19 @@
       </div>
 
       <!-- Clients by Country Card -->
-      <div class="bg-white rounded-lg shadow-xl">
-        <div class="bg-[#00C4C4] text-white px-4 py-2.5 rounded-t-md">
-          <h6 class="m-0 text-md">Clients by Country</h6>
+      <!-- <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-gray-400"></span>
+            <h6 class="text-sm font-semibold text-[#1B1B2F]">Clients by Country</h6>
+          </div>
         </div>
-        <div class="p-2 flex justify-center items-center">
+        <div class="p-4 flex justify-center items-center">
           <apx-chart [series]="clientCountrySeries" [chart]="clientCountryChart" [xaxis]="clientCountryXAxis"
             [dataLabels]="clientCountryDataLabels" [tooltip]="clientCountryTooltip"
             class="w-full min-h-[300px] text-[black]"></apx-chart>
         </div>
-      </div>
+      </div> -->
     </div>
 
   </div>

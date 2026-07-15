@@ -97,6 +97,7 @@ export class FormDialogComponent implements OnInit {
   sandwicherror = '';
   isSubmitDisabled: boolean = false;
   isSandwichLeave = false;
+  isBdeOrBa = false;
   employeeId!: number;
   employeeLeaves: any[] = [];
   constructor(
@@ -129,6 +130,8 @@ export class FormDialogComponent implements OnInit {
     this.employeeId = user.id || 0;
     this.availablePaidLeave = user.leave_balance || 0;
     this.leaveTypes = user.gender === 'Female' ? ['Paid', 'Unpaid', 'Sick'] : ['Paid', 'Unpaid'];
+    const role = (user.role || '').toUpperCase();
+    this.isBdeOrBa = role === 'BDE' || role === 'BA';
     this.myLeavesForm.patchValue({ employee_id: this.employeeId });
 
     this.myLeavesForm.get('halfDay')?.valueChanges.subscribe((value) => {
@@ -277,18 +280,26 @@ export class FormDialogComponent implements OnInit {
     });
 
     // 🔹 Sandwich rule
+    const adjacentToHoliday = this.isLeaveAdjacentToHoliday(start, end);
     const sandwichResult = this.applySandwichRule(start, end, this.employeeLeaves || []);
-    if (sandwichResult.applies) {
+    const leaveTypeCtrl = form.get('leave_type');
+
+    if (adjacentToHoliday || sandwichResult.applies) {
       this.isSandwichLeave = true;
       this.sandwichWarning = true;
-      this.sandwicherror = `⚠️ Your leave request falls under the <b>Sandwich Rule</b>.<br>
-      <b>Reason:</b> ${sandwichResult.reason}.<br>
-      Weekends and holidays between leave days are counted as leave.`;
+
+      // All roles including BDE/BA: force Unpaid, lock, require confirmation
+      leaveTypeCtrl?.setValue('Unpaid', { emitEvent: false });
+      leaveTypeCtrl?.disable({ emitEvent: false });
       form.get('sandwich_confirm')?.setValidators([Validators.requiredTrue]);
     } else {
       this.isSandwichLeave = false;
+      this.sandwichWarning = false;
       form.get('sandwich_confirm')?.clearValidators();
-      this.sandwicherror = '';
+      // Re-enable leave type (unless Half Day locks it)
+      if (form.get('halfDay')?.value !== 'Half Day') {
+        leaveTypeCtrl?.enable({ emitEvent: false });
+      }
     }
     form.get('sandwich_confirm')?.updateValueAndValidity({ emitEvent: false });
 
@@ -449,6 +460,15 @@ export class FormDialogComponent implements OnInit {
   onNoClick(): void {
     this.dialogRef.close();
   }
+  isLeaveAdjacentToHoliday(start: Date, end: Date): boolean {
+    const format = (d: Date) => formatDate(d, 'yyyy-MM-dd', 'en');
+    const dayBefore = new Date(start);
+    dayBefore.setDate(dayBefore.getDate() - 1);
+    const dayAfter = new Date(end);
+    dayAfter.setDate(dayAfter.getDate() + 1);
+    return this.holidays.includes(format(dayBefore)) || this.holidays.includes(format(dayAfter));
+  }
+
   applySandwichRule(start: Date, end: Date, employeeLeaves: any[] = []): { applies: boolean, reason?: string } {
     const format = (d: Date) => formatDate(d, 'yyyy-MM-dd', 'en');
 

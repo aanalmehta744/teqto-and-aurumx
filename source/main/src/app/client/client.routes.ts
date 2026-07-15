@@ -1,5 +1,6 @@
 import { Page404Component } from '../authentication/page404/page404.component';
 import { Route } from '@angular/router';
+import { AllEmployeeDailyUpdateComponent } from '../employee/employee-daily-update/allemployee-daily-update/allemployee-daily-update.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { BillingComponent } from './billing/billing.component';
 import { SettingsComponent } from './settings/settings.component';
@@ -81,6 +82,10 @@ export const CLIENT_ROUTE: Route[] = [
   {
     path: 'daily-update',
     component: EmployeeDailyUpdateComponent,
+  },
+  {
+    path: 'employee-updates',
+    component: AllEmployeeDailyUpdateComponent,
   },
 
   { path: 'calls', component: CallsComponent },

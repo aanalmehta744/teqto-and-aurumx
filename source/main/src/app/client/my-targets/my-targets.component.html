@@ -44,7 +44,7 @@
           <p class="text-2xl font-bold text-purple-600">{{ target.part_time_achieved }}<span class="text-gray-400 text-base font-normal"> / {{ target.part_time }}</span></p>
           <div class="mt-2 h-1.5 bg-gray-100 rounded-full"><div [class]="'h-full rounded-full ' + bar(target.ptPct)" [style.width.%]="target.ptPct"></div></div>
         </div>
-        <div class="bg-white rounded-xl shadow p-4 text-center border-t-4 border-teal-500">
+        <div class="bg-white rounded-xl shadow p-4 text-center border-t-4 border-#0b0b88">
           <p class="text-xs text-gray-500 mb-1">Hourly Client</p>
           <p class="text-2xl font-bold text-teal-600">{{ target.hourly_achieved }}<span class="text-gray-400 text-base font-normal"> / {{ target.hourly }}</span></p>
           <div class="mt-2 h-1.5 bg-gray-100 rounded-full"><div [class]="'h-full rounded-full ' + bar(target.hPct)" [style.width.%]="target.hPct"></div></div>
@@ -152,14 +152,14 @@
             </div>
             <div class="flex-1">
               <div class="flex justify-between text-xs text-gray-500 mb-1">
-                <span>Achieved: <strong class="text-green-600">₹{{ target.amount_achieved | number }}</strong></span>
-                <span>Target: <strong class="text-gray-700">₹{{ target.amount | number }}</strong></span>
+                <span>Achieved: <strong class="text-green-600">${{ target.amount_achieved | number }}</strong></span>
+                <span>Target: <strong class="text-gray-700">${{ target.amount | number }}</strong></span>
               </div>
               <div class="h-2.5 bg-gray-200 rounded-full">
                 <div [class]="'h-full rounded-full transition-all ' + bar(target.amtPct)" [style.width.%]="target.amtPct"></div>
               </div>
               <p class="text-xs text-red-500 mt-1">
-                Remaining: ₹{{ (target.amount - target.amount_achieved < 0 ? 0 : target.amount - target.amount_achieved) | number }}
+                Remaining: ${{ (target.amount - target.amount_achieved < 0 ? 0 : target.amount - target.amount_achieved) | number }}
               </p>
             </div>
             <span [class]="'w-14 text-center text-xs font-bold px-2 py-1 rounded-full ' + badge(target.amtPct)">

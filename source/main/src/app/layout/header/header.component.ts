@@ -105,13 +105,23 @@ export class HeaderComponent
         this.notifInterval = setInterval(() => this.loadNotifCount(), 30000);
       } else if (userRole === 'BDE') {
         this.homePage = 'client/dashboard';
+        this.loadUserNotifications(user.id);
+        this.notifInterval = setInterval(() => this.loadUserNotifCount(user.id), 30000);
+      } else if (userRole === 'BA') {
+        this.homePage = 'admin/dashboard/main';
+        this.loadUserNotifications(user.id);
+        this.notifInterval = setInterval(() => this.loadUserNotifCount(user.id), 30000);
       } else if (userRole === 'Employee') {
         this.homePage = 'employee/dashboard';
+        this.loadUserNotifications(user.id);
+        this.notifInterval = setInterval(() => this.loadUserNotifCount(user.id), 30000);
       } else {
         this.homePage = 'admin/dashboard/main';
       }
     }
   }
+
+  private currentUserId: number | null = null;
 
   loadNotifCount() {
     this.http.get<{ count: number }>(`${environment.apiUrl}/notifications/count`)
@@ -123,14 +133,36 @@ export class HeaderComponent
       .subscribe({ next: d => { this.notifications = d; this.notifCount = d.filter(n => !n.is_read).length; }, error: () => {} });
   }
 
+  loadUserNotifCount(userId: number) {
+    this.http.get<{ count: number }>(`${environment.apiUrl}/notifications/user/${userId}/count`)
+      .subscribe({ next: r => this.notifCount = r.count, error: () => {} });
+  }
+
+  loadUserNotifications(userId: number) {
+    this.currentUserId = userId;
+    this.http.get<any[]>(`${environment.apiUrl}/notifications/user/${userId}`)
+      .subscribe({ next: d => { this.notifications = d; this.notifCount = d.filter(n => !n.is_read).length; }, error: () => {} });
+  }
+
   toggleNotifPanel() {
     this.showNotifPanel = !this.showNotifPanel;
-    if (this.showNotifPanel) this.loadNotifications();
+    if (this.showNotifPanel) {
+      if (this.currentUserId) {
+        this.loadUserNotifications(this.currentUserId);
+      } else {
+        this.loadNotifications();
+      }
+    }
   }
 
   markAllRead() {
-    this.http.put(`${environment.apiUrl}/notifications/read-all`, {})
-      .subscribe({ next: () => { this.notifCount = 0; this.notifications.forEach(n => n.is_read = 1); }, error: () => {} });
+    if (this.currentUserId) {
+      this.http.put(`${environment.apiUrl}/notifications/user/${this.currentUserId}/read-all`, {})
+        .subscribe({ next: () => { this.notifCount = 0; this.notifications.forEach(n => n.is_read = 1); }, error: () => {} });
+    } else {
+      this.http.put(`${environment.apiUrl}/notifications/read-all`, {})
+        .subscribe({ next: () => { this.notifCount = 0; this.notifications.forEach(n => n.is_read = 1); }, error: () => {} });
+    }
   }
 
   markRead(n: any) {
@@ -146,14 +178,16 @@ export class HeaderComponent
 
 
   getImgUrl(gender: string): string {
+    if (gender.toLowerCase() === 'female') return 'assets/images/female-profile.png';
+    if (gender.toLowerCase() === 'male') return 'assets/images/male-profile.png';
+    return 'assets/images/default-profile.png';
+  }
 
-    if (gender.toLowerCase() === 'female') {
-      return 'assets/images/female-profile.png';
-    } else if (gender.toLowerCase() === 'male') {
-      return 'assets/images/male-profile.png';
+  getProfileImgUrl(): string {
+    if (this.userImg) {
+      return `${environment.apiUrl.replace('/api', '')}/uploads/employees/${this.userImg}`;
     }
-
-    return 'assets/images/default-profile.png'; // Fallback
+    return this.getImgUrl(this.userGender || '');
   }
 
 

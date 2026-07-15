@@ -48,8 +48,8 @@
   </div>
   }
 
-  <!-- ADD TASK FORM -->
-  @if (action === 'add') {
+  <!-- ADD / EDIT TASK FORM -->
+  @if (action === 'add' || action === 'edit') {
   <div class="rounded-lg w-full" style="min-width: 400px;">
     <div class="flex justify-between items-center px-4 py-3 border-b">
       <h2 class="text-xl font-medium text-[#00383f]">{{ dialogTitle }}</h2>
@@ -114,13 +114,31 @@
           <textarea matInput formControlName="note" rows="3" placeholder="Enter task description"></textarea>
         </mat-form-field>
 
+        <!-- Status (only show when editing) -->
+        @if (action === 'edit') {
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="done">
+              <mat-option [value]="0">Open</mat-option>
+              <mat-option [value]="1">Closed</mat-option>
+            </mat-select>
+          </mat-form-field>
+        }
+
       </form>
     </div>
     <div class="flex justify-end gap-2 px-4 pb-4">
       <button mat-stroked-button (click)="onNoClick()">Cancel</button>
-      <button mat-flat-button color="primary" class="!bg-[#00383f]" (click)="confirmAdd()" [disabled]="myTasksForm.invalid">
-        Add Task
-      </button>
+      @if (action === 'add') {
+        <button mat-flat-button color="primary" class="!bg-[#00383f]" (click)="confirmAdd()" [disabled]="myTasksForm.invalid">
+          Add Task
+        </button>
+      }
+      @if (action === 'edit') {
+        <button mat-flat-button color="primary" class="!bg-[#00383f]" (click)="confirmEdit()" [disabled]="myTasksForm.invalid">
+          Update Task
+        </button>
+      }
     </div>
   </div>
   }

@@ -27,6 +27,7 @@ import Swal from 'sweetalert2';
   templateUrl: './client-details.component.html',
   styleUrls: ['./client-details.component.scss']
 })
+
 export class ClientDetailsComponent implements OnInit {
   clientId: string | null = null;
   client: any = null;
@@ -35,6 +36,8 @@ export class ClientDetailsComponent implements OnInit {
   followups: any[] = [];
   loggedInBdeId: number | null = null;
   loggedInUserName: string | null = null;
+  showPlatformPopup = false;
+  showPlatformPassword = false;
   constructor(
     private route: ActivatedRoute,
     private clientService: ClientsService,
@@ -120,6 +123,16 @@ export class ClientDetailsComponent implements OnInit {
     //   }
     // });
   }
+  openPlatformPopup(): void {
+    this.showPlatformPassword = false;
+    this.showPlatformPopup = true;
+  }
+
+  closePlatformPopup(): void {
+    this.showPlatformPopup = false;
+    this.showPlatformPassword = false;
+  }
+
   isFollowupComplete(followupDate: string): boolean {
     // Get today's date (reset the time part) and format it as 'yyyy-MM-dd'
     const today = new Date();

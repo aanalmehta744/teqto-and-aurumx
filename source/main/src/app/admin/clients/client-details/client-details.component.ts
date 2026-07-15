@@ -34,6 +34,8 @@ export class ClientDetailsComponent implements OnInit {
   error: string | null = null;
   followups: any[] = [];
   loggedInBdeId: number | null = null;
+  showPlatformPopup = false;
+  showPlatformPassword = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -117,6 +119,16 @@ export class ClientDetailsComponent implements OnInit {
     //   }
     // });
   }
+  openPlatformPopup(): void {
+    this.showPlatformPassword = false;
+    this.showPlatformPopup = true;
+  }
+
+  closePlatformPopup(): void {
+    this.showPlatformPopup = false;
+    this.showPlatformPassword = false;
+  }
+
   isFollowupComplete(followupDate: string): boolean {
     // Get today's date (reset the time part) and format it as 'yyyy-MM-dd'
     const today = new Date();

@@ -4,9 +4,12 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/api',
+  apiUrl: 
+  'http://localhost:3000/api' 
+  // 'https://denver-doe-vacation-sustained.trycloudflare.com/api'
 };
 console.log("Development Enviorment Loaded. API URL", environment.apiUrl);
+
 
 /*
  * For easier debugging in development mode, you can import the following file

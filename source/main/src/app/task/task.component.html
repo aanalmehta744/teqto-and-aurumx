@@ -11,22 +11,22 @@
           <h4 class="text-xl font-medium text-[#00383F]">Tasks</h4>
           <p class="text-sm text-[#009F9F]">{{tasks.length}} Total task</p>
         </div>
-        <button mat-raised-button class="!bg-[#D5EAEA] !shadow-md !text-[#00383F]" (click)="addNewTask()">Add
+        <button mat-raised-button class="!bg-[#d6d5ea] !shadow-md !text-[#00383F]" (click)="addNewTask()">Add
           Task</button>
       </div>
 
       <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2">
         <div>
           <div class="flex justify-center mb-4 mt-2">
-            <div class="flex bg-[#D5EAEA] rounded-full overflow-hidden">
+            <div class="flex bg-gray-100 rounded-full overflow-hidden">
               <button class="px-5 py-2 text-sm font-medium transition-all"
-                [class.bg-[#00C4C4]]="activeTab === 'pending'" [class.text-white]="activeTab === 'pending'"
-                [class.text-[#00383F]]="activeTab !== 'pending'" (click)="setTab('pending')">
+                [class.bg-gray-800]="activeTab === 'pending'" [class.text-black]="activeTab === 'pending'"
+                [class.text-gray-600]="activeTab !== 'pending'" (click)="setTab('pending')">
                 Pending
               </button>
               <button class="px-5 py-2 text-sm font-medium transition-all"
-                [class.bg-[#00C4C4]]="activeTab === 'completed'" [class.text-white]="activeTab === 'completed'"
-                [class.text-[#00383F]]="activeTab !== 'completed'" (click)="setTab('completed')">
+                [class.bg-gray-800]="activeTab === 'completed'" [class.text-black]="activeTab === 'completed'"
+                [class.text-gray-600]="activeTab !== 'completed'" (click)="setTab('completed')">
                 Completed
               </button>
             </div>
@@ -35,25 +35,25 @@
 
         <div>
           <div *ngIf="activeTab === 'pending'" class="flex justify-center mb-4 mt-2">
-            <div class="flex bg-[#EAF8F8] rounded-full overflow-hidden">
+            <div class="flex bg-gray-100 rounded-full overflow-hidden">
               <button class="px-4 py-1.5 text-sm font-medium transition-all"
-                [class.bg-[#00C4C4]]="activePriority === 'All'" [class.text-white]="activePriority === 'All'"
-                [class.text-[#00383F]]="activePriority !== 'All'" (click)="setPriorityFilter('All')">
+                [class.bg-gray-800]="activePriority === 'All'" [class.text-black]="activePriority === 'All'"
+                [class.text-gray-600]="activePriority !== 'All'" (click)="setPriorityFilter('All')">
                 All
               </button>
               <button class="px-4 py-1.5 text-sm font-medium transition-all"
-                [class.bg-[#00C4C4]]="activePriority === 'High'" [class.text-white]="activePriority === 'High'"
-                [class.text-[#00383F]]="activePriority !== 'High'" (click)="setPriorityFilter('High')">
+                [class.bg-gray-800]="activePriority === 'High'" [class.text-black]="activePriority === 'High'"
+                [class.text-gray-600]="activePriority !== 'High'" (click)="setPriorityFilter('High')">
                 High
               </button>
               <button class="px-4 py-1.5 text-sm font-medium transition-all"
-                [class.bg-[#00C4C4]]="activePriority === 'Normal'" [class.text-white]="activePriority === 'Normal'"
-                [class.text-[#00383F]]="activePriority !== 'Normal'" (click)="setPriorityFilter('Normal')">
+                [class.bg-gray-800]="activePriority === 'Normal'" [class.text-black]="activePriority === 'Normal'"
+                [class.text-gray-600]="activePriority !== 'Normal'" (click)="setPriorityFilter('Normal')">
                 Normal
               </button>
               <button class="px-4 py-1.5 text-sm font-medium transition-all"
-                [class.bg-[#00C4C4]]="activePriority === 'Low'" [class.text-white]="activePriority === 'Low'"
-                [class.text-[#00383F]]="activePriority !== 'Low'" (click)="setPriorityFilter('Low')">
+                [class.bg-gray-800]="activePriority === 'Low'" [class.text-black]="activePriority === 'Low'"
+                [class.text-gray-600]="activePriority !== 'Low'" (click)="setPriorityFilter('Low')">
                 Low
               </button>
             </div>
@@ -67,8 +67,8 @@
 
           <ng-scrollbar style="max-height: 500px" visibility="hover">
             <table class="w-full table-auto text-left">
-              <thead class="bg-[#00C4C4] text-md">
-                <tr class="text-[white]">
+              <thead class="bg-gray-50 text-md">
+                <tr class="text-gray-700">
                   <th class="w-4"></th>
                   <th class="p-4 font-medium px-4">Task Name</th>
                   <th class="p-4 font-medium px-4">Project</th>
@@ -88,7 +88,7 @@
                     </mat-icon>
                   </td>
                   <td>
-                    <span class="text-[#00383F]" [ngClass]="{ 'line-through text-gray-400': task.done }">{{ task.title
+                    <span class="text-gray-800" [ngClass]="{ 'line-through text-gray-400': task.done }">{{ task.title
                       }}</span>
                   </td>
                   <td>
@@ -134,8 +134,8 @@
         <mat-sidenav-content class="flex-1 !border-r">
           <ng-scrollbar style="height: 500px" visibility="hover">
             <table class="w-full table-auto text-left">
-              <thead class="bg-[#00C4C4] text-md">
-                <tr class="text-[white]">
+              <thead class="bg-gray-50 text-md">
+                <tr class="text-gray-700">
                   <th class="w-4"></th>
                   <th class="p-4 font-medium px-4">Task Name</th>
                   <th class="p-4 font-medium px-4">Project</th>
@@ -153,7 +153,7 @@
                   </td>
 
                   <td>
-                    <span class="text-[#00383F]" [ngClass]="{ 'line-through text-gray-400': task.done }">{{ task.title
+                    <span class="text-gray-800" [ngClass]="{ 'line-through text-gray-400': task.done }">{{ task.title
                       }}</span>
                   </td>
                   <td>

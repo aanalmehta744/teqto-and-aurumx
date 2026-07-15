@@ -8,10 +8,10 @@
     <!-- Card -->
     <div class="bg-white rounded-xl shadow">
       <!-- Header -->
-      <div class="flex flex-col md:flex-row justify-between gap-4 mb-4 p-4 bg-[#00C4C4] rounded-t-xl">
+      <div class="flex flex-col md:flex-row justify-between gap-4 mb-4 p-4 bg-white rounded-t-xl border-b border-gray-100">
         <!-- Left Header -->
         <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
-          <h2 class="text-xl font-medium text-white">My Tasks</h2>
+          <h2 class="text-xl font-medium text-gray-800">My Tasks</h2>
           <div class="flex items-center justify-center">
             <div
               class="border border-[#CCCCCC] rounded-full bg-white flex items-center text-gray-500 shadow w-full max-w-md">
@@ -25,15 +25,15 @@
 
         <!-- Right Header -->
         <div class="flex items-center flex-wrap gap-2">
-          <button mat-mini-fab color="primary" class="!bg-[#D5EAEA] hover:!bg-gray-100 !text-[#00383F]"
+          <button mat-mini-fab color="primary" class="!bg-[#d6d5ea] hover:!bg-gray-100 !text-[#00383F]"
             (click)="refresh()" matTooltip="REFRESH">
             <mat-icon>refresh</mat-icon>
           </button>
           <button *ngIf="selection.hasValue()" mat-mini-fab color="warn"
-            class="!bg-[#D5EAEA] hover:!bg-gray-100 !text-[#00383F]" (click)="removeSelectedRows()" matTooltip="DELETE">
+            class="!bg-[#d6d5ea] hover:!bg-gray-100 !text-[#00383F]" (click)="removeSelectedRows()" matTooltip="DELETE">
             <mat-icon>delete</mat-icon>
           </button>
-          <div class="cursor-pointer p-2 rounded-xl bg-[#D5EAEA] hover:bg-gray-100 shadow-xl" matTooltip="XLSX"
+          <div class="cursor-pointer p-2 rounded-xl bg-[#d6d5ea] hover:bg-gray-100 shadow-xl" matTooltip="XLSX"
             (click)="exportExcel()">
             <img src="assets/images/icons/xlsx.png" alt="Export Excel" class="h-6 w-6" />
           </div>

@@ -31,13 +31,21 @@
                         <dt class="w-40 font-medium text-[#0E264A]">Created by:</dt>
                         <dd class="text-[#7C6D84]">{{ loggedInUserName || 'Unknown' }}</dd>
                       </div>
+                      <!-- OLD: BDE Account ID & BDE Email Account -->
+                      <!-- <div class="flex"><dt class="w-40 font-medium text-[#0E264A]">BDE Account ID:</dt><dd class="text-[#7C6D84]">{{ client?.bde_account_id || 'N/A' }}</dd></div> -->
+                      <!-- <div class="flex"><dt class="w-40 font-medium text-[#0E264A]">BDE Email Account:</dt><dd class="text-[#7C6D84]">{{ client?.bde_account_email || 'N/A' }}</dd></div> -->
+                      <!-- NEW CODE: Show bank details instead -->
                       <div class="flex">
-                        <dt class="w-40 font-medium text-[#0E264A]">BDE Account ID:</dt>
-                        <dd class="text-[#7C6D84]">{{ client?.bde_account_id || 'N/A' }}</dd>
+                        <dt class="w-40 font-medium text-[#0E264A]">Bank Name:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.bank_name || 'N/A' }}</dd>
                       </div>
                       <div class="flex">
-                        <dt class="w-40 font-medium text-[#0E264A]">BDE Account Email:</dt>
-                        <dd class="text-[#7C6D84]">{{ client?.bde_account_email || 'N/A' }}</dd>
+                        <dt class="w-40 font-medium text-[#0E264A]">Account Number:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.bank_account_number || 'N/A' }}</dd>
+                      </div>
+                      <div class="flex">
+                        <dt class="w-40 font-medium text-[#0E264A]">IFSC Code:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.ifsc_code || 'N/A' }}</dd>
                       </div>
                       <div class="flex">
                         <dt class="w-40 font-medium text-[#0E264A]">Mobile:</dt>
@@ -65,7 +73,7 @@
                       </div>
                       <div class="flex">
                         <dt class="w-40 font-medium text-[#0E264A]">Prize Amount:</dt>
-                        <dd class="text-[#7C6D84]">{{ client?.prize_amount || 'N/A' }}</dd>
+                        <dd class="text-[#7C6D84]">{{ client?.prize_amount != null ? client?.prize_amount : 'N/A' }}</dd>
                       </div>
                       <div class="flex">
                         <dt class="w-40 font-medium text-[#0E264A]">Prize Tag:</dt>
@@ -97,10 +105,28 @@
                         <dt class="w-40 font-medium text-[#0E264A]">Client Connect Type:</dt>
                         <dd class="text-[#7C6D84]">{{ client?.client_Connect_Type || 'N/A' }}</dd>
                       </div>
-                      <div class="flex">
-                        <dt class="w-40 font-medium text-[#0E264A]">Platform:</dt>
-                        <dd class="text-[#7C6D84]">{{ client?.platform || 'N/A' }}</dd>
+                      <!-- NEW CODE: Show connect source only when connect type is "Other" -->
+                      <div class="flex" *ngIf="client?.client_Connect_Type === 'Other'">
+                        <dt class="w-40 font-medium text-[#0E264A]">Connect Source:</dt>
+                        <dd class="text-[#7C6D84]">{{ client?.client_connect_source || 'N/A' }}</dd>
                       </div>
+
+                      
+                      <div class="flex items-center">
+                        <dt class="w-40 font-medium text-[#0E264A]">Platform:</dt>
+                        <dd>
+                          <span *ngIf="!client?.platform" class="text-[#7C6D84]">N/A</span>
+                          <!-- Clickable chip — opens platform details popup -->
+                          <button *ngIf="client?.platform" (click)="openPlatformPopup()"
+                            class="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 text-gray-700 text-sm font-semibold rounded-full border border-gray-200 hover:bg-gray-200 transition-colors duration-150 cursor-pointer">
+                            <!-- <mat-icon class="!text-[15px] flex items-center">computer</mat-icon> -->
+                            {{ client?.platform }}
+                            <!-- <mat-icon class="!text-[14px]">open_in_new</mat-icon> -->
+                          </button>
+                        </dd>
+                      </div>
+
+                      
                       <div class="flex">
                         <dt class="w-40 font-medium text-[#0E264A]">Address:</dt>
                         <dd class="text-[#7C6D84]">{{ client?.address || 'N/A' }}</dd>
@@ -123,14 +149,14 @@
                       </ng-template>
 
                       <div class="flex justify-end mb-3 mt-4">
-                        <button mat-raised-button class="!bg-[#D5EAEA] !text-[#00383F]"
+                        <button mat-raised-button class="!bg-[#d6d5ea] !text-[#00383F]"
                           (click)="openAddFollowupDialog()">
                           <mat-icon>add</mat-icon> Add Follow-up
                         </button>
                       </div>
 
                       <table class="min-w-full text-sm text-left border border-gray-200 text-black">
-                        <thead class="bg-[#00C4C4] text-white">
+                        <thead class="bg-gray-50 text-gray-700">
                           <tr>
                             <th class="p-3 font-medium border">Status</th>
                             <th class="p-3 font-medium border">Date</th>
@@ -168,4 +194,87 @@
       </div>
     </div>
   </div>
+
+<!-- Platform Details Popup -->
+<div *ngIf="showPlatformPopup" class="fixed inset-0 z-50 flex items-center justify-center">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="closePlatformPopup()"></div>
+
+  <!-- Modal Card -->
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 z-10 overflow-hidden">
+
+    <!-- Header -->
+    <div class="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center">
+          <mat-icon class="!text-gray-600 !text-xl">computer</mat-icon>
+        </div>
+        <h3 class="text-gray-800 font-semibold text-lg">Platform Details</h3>
+      </div>
+      <button (click)="closePlatformPopup()" class="text-gray-400 hover:text-gray-700 transition-colors">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="p-6 space-y-5">
+
+      <!-- Platform Name -->
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 bg-[#EAF8F8] rounded-xl flex items-center justify-center flex-shrink-0">
+          <mat-icon class="text-[#0b0b88] !text-xl !flex !justify-center">computer</mat-icon>
+        </div>
+        <div>
+          <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Platform Name</p>
+          <p class="text-gray-800 font-semibold text-base mt-0.5">{{ client?.platform || '—' }}</p>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-100"></div>
+
+      <!-- Platform ID -->
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 bg-[#EAF8F8] rounded-xl flex items-center justify-center flex-shrink-0">
+          <mat-icon class="text-[#0b0b88] !text-xl !flex !justify-center">account_circle</mat-icon>
+        </div>
+        <div>
+          <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Platform ID / Username</p>
+          <p class="text-gray-800 font-semibold text-base mt-0.5">{{ client?.platform_id || '—' }}</p>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-100"></div>
+
+      <!-- Password with show/hide -->
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 bg-[#EAF8F8] rounded-xl flex items-center justify-center flex-shrink-0">
+          <mat-icon class="text-[#0b0b88] !text-xl !flex !justify-center">lock</mat-icon>
+        </div>
+        <div class="flex-1">
+          <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Password</p>
+          <div class="flex items-center gap-2 mt-0.5">
+            <p class="text-gray-800 font-semibold text-base font-mono tracking-widest">
+              {{ showPlatformPassword ? (client?.platform_password || '—') : '••••••••' }}
+            </p>
+            <button (click)="showPlatformPassword = !showPlatformPassword"
+              class="text-gray-400 hover:text-[#0b0b88] transition-colors ml-1">
+              <mat-icon class="!text-[20px]">{{ showPlatformPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="px-6 pb-5">
+      <button (click)="closePlatformPopup()"
+        class="w-full py-2.5 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors duration-150">
+        Close
+      </button>
+    </div>
+
+  </div>
+</div>
+
 </section>

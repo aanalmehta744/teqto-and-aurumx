@@ -77,16 +77,21 @@
           <textarea matInput formControlName="reason"></textarea>
         </mat-form-field>
       </div>
-      <!-- Show checkbox only if sandwich leave applies -->
-      <div *ngIf="isSandwichLeave" class="my-4">
-        <mat-checkbox formControlName="sandwich_confirm" required>
-          I acknowledge the Sandwich Rule applies to my leave
+      <!-- Sandwich leave warning + checkbox -->
+      <div *ngIf="isSandwichLeave" class="space-y-3">
+        <div class="flex items-start gap-2 bg-yellow-50 border border-yellow-400 text-yellow-700 rounded-lg px-4 py-3">
+          <mat-icon class="text-yellow-600 mt-0.5 shrink-0">warning</mat-icon>
+          <div>
+            <p class="font-semibold text-yellow-700">⚠️ This is a Sandwich Leave — it is Unpaid.</p>
+          </div>
+        </div>
+        <mat-checkbox formControlName="sandwich_confirm">
+          <span class="text-yellow-700 font-medium">I understand this is a sandwich leave and will be unpaid</span>
         </mat-checkbox>
         <div *ngIf="myLeavesForm.get('sandwich_confirm')?.invalid && myLeavesForm.get('sandwich_confirm')?.touched"
-          class="text-red-500 text-sm mt-1">
-          You must confirm the Sandwich Rule to proceed
+          class="text-yellow-700 text-sm">
+          You must acknowledge the sandwich leave policy to proceed
         </div>
-
       </div>
       <!-- Row 5: Warnings -->
       <div class="text-center space-y-2 mt-4">
@@ -102,9 +107,6 @@
       <div class="space-y-2 text-center mt-2">
         <div *ngIf="holidayWarning" class="text-yellow-700 bg-yellow-100 px-4 py-2 rounded">
           ⚠️ Your leave period overlaps with a holiday.
-        </div>
-        <div *ngIf="sandwichWarning" class="text-yellow-700 bg-yellow-100 px-4 py-2 rounded">
-          ⚠️ The selected dates fall under the sandwich rule.
         </div>
         <div *ngIf="paidLeaveError" class="text-red-700 bg-red-100 px-4 py-2 rounded">
           {{ paidLeaveError }}

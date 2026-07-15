@@ -8,10 +8,10 @@
     <!-- Card -->
     <div class="bg-white rounded-xl shadow">
       <!-- Header -->
-      <div class="flex flex-col md:flex-row justify-between gap-4 mb-4 p-4 bg-[#00C4C4] rounded-t-xl">
+      <div class="flex flex-col md:flex-row justify-between gap-4 mb-4 p-4 bg-white rounded-t-xl border-b border-gray-100">
         <!-- Left Header -->
         <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
-          <h2 class="text-xl font-medium text-white">All Tasks</h2>
+          <h2 class="text-xl font-medium text-gray-800">All Tasks</h2>
           <div class="flex items-center justify-center">
             <div
               class="border border-[#CCCCCC] rounded-full bg-white flex items-center text-gray-500 shadow w-full max-w-md">
@@ -25,19 +25,19 @@
 
         <!-- Right Header -->
         <div class="flex items-center flex-wrap gap-2">
-          <button mat-mini-fab color="primary" class="!bg-[#D5EAEA] hover:!bg-gray-100 !text-[#00383F]"
+          <button mat-mini-fab color="primary" class="!bg-[#d6d5ea] hover:!bg-gray-100 !text-[#00383F]"
             (click)="addNew()" matTooltip="ADD TASK">
             <mat-icon>add</mat-icon>
           </button>
-          <button mat-mini-fab color="primary" class="!bg-[#D5EAEA] hover:!bg-gray-100 !text-[#00383F]"
+          <button mat-mini-fab color="primary" class="!bg-[#d6d5ea] hover:!bg-gray-100 !text-[#00383F]"
             (click)="refresh()" matTooltip="REFRESH">
             <mat-icon>refresh</mat-icon>
           </button>
           <button *ngIf="selection.hasValue()" mat-mini-fab color="warn"
-            class="!bg-[#D5EAEA] hover:!bg-gray-100 !text-[#00383F]" (click)="removeSelectedRows()" matTooltip="DELETE">
+            class="!bg-[#d6d5ea] hover:!bg-gray-100 !text-[#00383F]" (click)="removeSelectedRows()" matTooltip="DELETE">
             <mat-icon>delete</mat-icon>
           </button>
-          <div class="cursor-pointer p-2 rounded-xl bg-[#D5EAEA] hover:bg-gray-100 shadow-xl" matTooltip="XLSX"
+          <div class="cursor-pointer p-2 rounded-xl bg-[#d6d5ea] hover:bg-gray-100 shadow-xl" matTooltip="XLSX"
             (click)="exportExcel()">
             <img src="assets/images/icons/xlsx.png" alt="Export Excel" class="h-6 w-6" />
           </div>
@@ -155,7 +155,12 @@
           <!-- Actions -->
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef class="p-2 border-b font-semibold">Actions</th>
-            <td mat-cell *matCellDef="let row; let i = index" class="p-2 border-b flex gap-2">
+            <td mat-cell *matCellDef="let row; let i = index" class="p-2 border-b flex gap-2 items-center" (click)="$event.stopPropagation()">
+              <button mat-icon-button (click)="toggleStatus(row)"
+                [matTooltip]="row.done === 1 ? 'Mark as Open' : 'Mark as Closed'"
+                [class]="row.done === 1 ? 'text-green-600 hover:text-green-800' : 'text-gray-400 hover:text-green-600'">
+                <mat-icon>{{ row.done === 1 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+              </button>
               <button mat-icon-button color="accent" (click)="editCall(row)" matTooltip="Edit"
                 class="text-blue-600 hover:text-blue-800">
                 <mat-icon>edit</mat-icon>

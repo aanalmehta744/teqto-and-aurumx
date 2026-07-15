@@ -1,162 +1,91 @@
 <section>
-  <div class="mx-auto">
-    <div class="mb-4">
-      <app-breadcrumb [title]="'Today Attendance'" [items]="['Attendance']" [active_item]="'Today'"></app-breadcrumb>
-    </div>
-    <div class="flex flex-wrap">
-      <div class="w-full">
-        <div class="flex flex-col">
-          <div class="flex flex-wrap">
-            <div class="w-full">
-              <div class="rounded-lg shadow-xl overflow-hidden">
+  <div class="mx-auto space-y-5">
+    <app-breadcrumb [title]="'Today Attendance'" [items]="['Attendance']" [active_item]="'Today'"></app-breadcrumb>
 
-                <!-- Table Header -->
-                <div class="flex flex-col md:flex-row justify-between items-center p-4 border-b bg-[#00c4c4]">
-                  <div class="w-full md:w-auto mb-4 md:mb-0">
-                    <ul class="flex flex-col md:flex-row items-start md:items-center gap-4">
-                      <li>
-                        <h2 class="text-lg text-white mr-2">Attendance</h2>
-                      </li>
-                      <div class="flex items-center justify-center">
-                        <div
-                          class="border border-[#CCCCCC] rounded-full bg-white flex items-center text-gray-500 shadow w-full max-w-md">
-                          <mat-icon class="ms-3">search</mat-icon>
-                          <input placeholder="Search" type="text" #filter (keyup)="applyFilter($event)"
-                            class="w-full h-[40px] rounded-full ps-2 focus:outline-none placeholder:text-[16px]"
-                            aria-label="Search box">
-                        </div>
-                      </div>
-                    </ul>
-                  </div>
-                </div>
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
 
-                <!-- Table Body -->
-                <div class="overflow-auto">
-                  <div class="min-w-full">
-                    <table mat-table [dataSource]="dataSource" matSort class="w-full">
-
-                      <!-- ID Column -->
-                      <ng-container matColumnDef="id">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header>Id</mat-header-cell>
-                        <mat-cell *matCellDef="let row">{{row.id}}</mat-cell>
-                      </ng-container>
-
-                      <!-- Image Column -->
-                      <ng-container matColumnDef="img">
-                        <mat-header-cell *matHeaderCellDef class="w-[7%]">Image</mat-header-cell>
-                        <mat-cell *matCellDef="let row" class="w-[7%]">
-
-                          <img [src]="row.img" class="w-10 h-10 rounded-full object-cover" />
-                        </mat-cell>
-                      </ng-container>
-
-                      <!-- Name Column -->
-                      <ng-container matColumnDef="name">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
-                        <mat-cell *matCellDef="let row">
-                          {{row.fullName}}
-                        </mat-cell>
-                      </ng-container>
-
-                      <!-- Check In Column -->
-                      <ng-container matColumnDef="first_in">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header>Punch In</mat-header-cell>
-                        <mat-cell *matCellDef="let row">
-
-                          {{ row.check_in ? (row.check_in | date : 'mediumTime') : '--' }}
-                        </mat-cell>
-                      </ng-container>
-
-                      <!-- Check Out Column -->
-                      <ng-container matColumnDef="last_out">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header>Punch Out</mat-header-cell>
-                        <mat-cell *matCellDef="let row">
-
-                          {{ row.check_out ? (row.check_out | date : 'mediumTime') : '--' }}
-                        </mat-cell>
-                      </ng-container>
-
-                      <!-- Total Hours Column -->
-                      <ng-container matColumnDef="total">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header>Total</mat-header-cell>
-                        <mat-cell *matCellDef="let row" class="whitespace-nowrap">
-                          {{row.hours}}
-                        </mat-cell>
-                      </ng-container>
-
-                      <!-- Status -->
-                      <ng-container matColumnDef="status">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">
-                          Status
-                        </mat-header-cell>
-                        <mat-cell *matCellDef="let row" class="px-4 py-2">
-                          <!-- Present -->
-                          <span *ngIf="row.status === 'Present'"
-                            class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-                            {{ row.status }}
-                          </span>
-
-                          <!-- Absent -->
-                          <span *ngIf="row.status === 'Absent'"
-                            class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
-                            {{ row.status }}
-                          </span>
-                          <!-- Half Day -->
-                          <span *ngIf="row.status === 'Half Day'"
-                            class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
-                            {{ row.status }}
-                          </span>
-                          <!-- Leave -->
-                          <span *ngIf="row.status === 'Leave'"
-                            class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
-                            {{ row.status }}
-                          </span>
-
-                          <span *ngIf="row.final_status === 'Leave'"
-                            class="bg-yellow-100 text-yellow-800 px-3 py-1 ml-2 rounded-full text-xs font-medium">
-                            {{ row.final_status }}
-                          </span>
-                          <!-- Fallback for any other status -->
-                          <span
-                            *ngIf="row.status !== 'Present' && row.status !== 'Absent' && row.status !== 'Leave' && row.status !== 'Half Day'"
-                            class=" bg-blue-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
-                            {{ row.status }}
-                          </span>
-                        </mat-cell>
-                      </ng-container>
-
-                      <!-- Shift Column -->
-                      <ng-container matColumnDef="break">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header>Break</mat-header-cell>
-                        <mat-cell *matCellDef="let row">
-                          {{row.break}}
-                        </mat-cell>
-                      </ng-container>
-
-                      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-                      <mat-row *matRowDef="let row; columns: displayedColumns;" class="cursor-pointer hover:bg-gray-50"
-                        matRipple>
-                      </mat-row>
-                    </table>
-
-                    <!-- Empty State -->
-                    <div *ngIf="(dataSource.connect() | async)?.length === 0" class="text-center p-4 text-gray-500">
-                      No results found.
-                    </div>
-
-
-                  </div>
-                </div>
-
-                <!-- Paginator -->
-                <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0" [pageSize]="10"
-                  [pageSizeOptions]="[5, 10, 25, 100]" class="!border-t !p-2 !bg-[#FAF9FD]">
-                </mat-paginator>
-              </div>
-            </div>
+      <!-- Header -->
+      <div class="flex flex-col md:flex-row justify-between items-center px-5 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-4 mb-3 md:mb-0">
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-[#0b0b88]"></span>
+            <h6 class="text-sm font-semibold text-[#1B1B2F]">Today's Attendance</h6>
+          </div>
+          <div class="relative">
+            <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 !text-[18px]">search</mat-icon>
+            <input placeholder="Search…" type="text" #filter (keyup)="applyFilter($event)"
+              class="pl-9 pr-4 py-2 rounded-full border border-gray-200 bg-gray-50 text-sm focus:outline-none w-[220px] placeholder:text-gray-400"
+              aria-label="Search box">
           </div>
         </div>
       </div>
+
+      <!-- Table -->
+      <div class="overflow-auto">
+        <table mat-table [dataSource]="dataSource" matSort class="w-full">
+
+          <ng-container matColumnDef="id">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Id</mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.id}}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="img">
+            <mat-header-cell *matHeaderCellDef class="w-[7%]">Image</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="w-[7%]">
+              <img [src]="row.img" class="w-9 h-9 rounded-full object-cover ring-2 ring-gray-100" />
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="font-medium text-[#1B1B2F]">{{row.fullName}}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="first_in">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Punch In</mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.check_in ? (row.check_in | date : 'mediumTime') : '--' }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="last_out">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Punch Out</mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.check_out ? (row.check_out | date : 'mediumTime') : '--' }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="total">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Total</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="whitespace-nowrap">{{row.hours}}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Status</mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              <span *ngIf="row.status === 'Present'" class="bg-green-100 text-green-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
+              <span *ngIf="row.status === 'Absent'" class="bg-red-100 text-red-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
+              <span *ngIf="row.status === 'Half Day'" class="bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
+              <span *ngIf="row.status === 'Leave'" class="bg-yellow-100 text-yellow-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
+              <span *ngIf="row.final_status === 'Leave'" class="bg-yellow-100 text-yellow-700 px-2.5 py-0.5 ml-1 rounded-full text-xs font-medium">{{ row.final_status }}</span>
+              <span *ngIf="row.status !== 'Present' && row.status !== 'Absent' && row.status !== 'Leave' && row.status !== 'Half Day'"
+                class="bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="break">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Break</mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.break}}</mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50 transition-colors" matRipple></mat-row>
+        </table>
+
+        <div *ngIf="(dataSource.connect() | async)?.length === 0" class="py-8 text-center text-gray-400 text-sm">
+          No attendance records found.
+        </div>
+      </div>
+
+      <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0" [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25, 100]" class="!border-t border-gray-100 !bg-white"></mat-paginator>
     </div>
+
   </div>
 </section>

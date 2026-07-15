@@ -34,6 +34,7 @@ const bdePerformanceRoutes = require('./bde-performance/bde-performance');
 const bdeClientTargetsRoutes = require('./bde-client-targets/bde-client-targets');
 const notificationsRoutes = require('./notifications/notifications');
 const clientDailyNotesRoutes = require('./client-daily-notes/client-daily-notes');
+const loginSettingsRoutes = require('./login-settings/login-settings');
 const db = require('./connection');
 const app = express();
 
@@ -193,10 +194,23 @@ const app = express();
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`).catch(() => {});
 
+    // Add recipient columns to notifications for per-user notifications
+    await db.query(`ALTER TABLE notifications ADD COLUMN recipient_id INT NULL`).catch(() => {});
+    await db.query(`ALTER TABLE notifications ADD COLUMN recipient_role VARCHAR(20) NULL`).catch(() => {});
+
     // If bde_targets was created with wrong column name 'target_month', rename it
     await db.query(`ALTER TABLE bde_targets CHANGE COLUMN target_month month TINYINT NOT NULL`).catch(() => {});
 
     // New unified targets table (one row per BDE per month/year)
+    // Login page settings (one-row config table)
+    await db.query(`CREATE TABLE IF NOT EXISTS login_page_settings (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        image_path VARCHAR(255),
+        text TEXT,
+        updated_by INT,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )`).catch(() => {});
+
     await db.query(`CREATE TABLE IF NOT EXISTS bde_targets (
         id INT AUTO_INCREMENT PRIMARY KEY,
         bde_id INT NOT NULL,
@@ -228,6 +242,7 @@ const io = new Server(server, {
   }
 });
 console.log("✅ Socket.IO Initialized");
+
 
 initializeSocket(io);
 
@@ -304,6 +319,7 @@ app.use('/api/bde-performance', bdePerformanceRoutes);
 app.use('/api/bde-client-targets', bdeClientTargetsRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/client-daily-notes', clientDailyNotesRoutes);
+app.use('/api/login-settings', loginSettingsRoutes);
 
 
 

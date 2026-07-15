@@ -444,6 +444,25 @@ router.delete('/:targetId/targets', async (req, res) => {
   }
 });
 
+// PATCH /api/employees/:id/upload-photo — upload or replace profile photo
+router.patch('/:id/upload-photo', upload.single('photo'), async (req, res) => {
+  const { id } = req.params;
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+    const [[employee]] = await db.query('SELECT uploadImg FROM employees WHERE id = ?', [id]);
+    if (!employee) return res.status(404).json({ error: 'Employee not found' });
+    // Delete old photo file if it exists
+    if (employee.uploadImg) {
+      fs.unlink(path.join(employeeUploadDir, employee.uploadImg), () => {});
+    }
+    await db.query('UPDATE employees SET uploadImg = ? WHERE id = ?', [req.file.filename, id]);
+    res.json({ message: 'Photo updated successfully', filename: req.file.filename });
+  } catch (err) {
+    console.error('Error uploading photo:', err);
+    res.status(500).json({ error: 'Failed to upload photo' });
+  }
+});
+
 // added code below is — PATCH /api/employees/:id/incentive — admin updates BDE incentive amount
 router.patch('/:id/incentive', async (req, res) => {
   const { id } = req.params;

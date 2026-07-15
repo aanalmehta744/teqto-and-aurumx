@@ -6,7 +6,7 @@
     <!-- Table Card -->
     <div class="!bg-[white] rounded-xl shadow-xl overflow-hidden">
       <!-- Table Header -->
-      <div class="flex flex-col md:flex-row justify-between items-center p-4 border-b bg-[#00c4c4]">
+      <div class="flex flex-col md:flex-row justify-between items-center p-4 border-b bg-[#0b0b88]">
         <div class="w-full md:w-auto mb-4 md:mb-0">
           <ul class="flex flex-col md:flex-row items-start md:items-center gap-4">
             <li>
@@ -27,25 +27,25 @@
         <div class="w-full md:w-auto">
           <ul class="flex items-center md:justify-end gap-2">
             <li>
-              <button mat-mini-fab class="!bg-[#D5EAEA] hover:!bg-gray-100" (click)="addNew()" matTooltip="ADD">
+              <button mat-mini-fab class="!bg-[#d6d5ea] hover:!bg-gray-100" (click)="addNew()" matTooltip="ADD">
                 <mat-icon class="!text-[#00383F]">add</mat-icon>
               </button>
             </li>
             <li>
-              <button mat-mini-fab class="!bg-[#D5EAEA] hover:!bg-gray-100" (click)="refresh()" matTooltip="REFRESH">
+              <button mat-mini-fab class="!bg-[#d6d5ea] hover:!bg-gray-100" (click)="refresh()" matTooltip="REFRESH">
                 <mat-icon class="!text-[#00383F]">refresh</mat-icon>
               </button>
             </li>
             <li>
               <div [hidden]="!selection.hasValue()">
-                <button mat-mini-fab class="!bg-[#D5EAEA] hover:!bg-gray-100" (click)="removeSelectedRows()"
+                <button mat-mini-fab class="!bg-[#d6d5ea] hover:!bg-gray-100" (click)="removeSelectedRows()"
                   matTooltip="DELETE">
                   <mat-icon class="!text-[#00383F]">delete</mat-icon>
                 </button>
               </div>
             </li>
             <li>
-              <div class="cursor-pointer p-2 rounded-xl bg-[#D5EAEA] hover:bg-gray-100 shadow-xl" matTooltip="XLSX">
+              <div class="cursor-pointer p-2 rounded-xl bg-[#d6d5ea] hover:bg-gray-100 shadow-xl" matTooltip="XLSX">
                 <img src="assets/images/icons/xlsx.png" alt="Export to Excel" class="w-6 h-6" (click)="exportExcel()" />
               </div>
             </li>

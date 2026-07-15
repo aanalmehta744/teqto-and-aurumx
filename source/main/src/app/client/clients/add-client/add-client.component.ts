@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   UntypedFormBuilder,
   UntypedFormGroup,
@@ -17,6 +17,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { CommonModule, formatDate } from '@angular/common';
 import { ClientsService } from '../all-clients/clients.service';
+// NEW CODE: MatCheckboxModule added for platform checkbox toggle
+import { MatCheckboxModule } from '@angular/material/checkbox';
+// NEW CODE: MatIconModule added for mat-icon suffix icons in form fields
+import { MatIconModule } from '@angular/material/icon';
 import Swal from 'sweetalert2';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -38,6 +42,8 @@ import { Router } from '@angular/router';
     FileUploadComponent,
     MatButtonModule,
     CommonModule,
+    MatCheckboxModule, // NEW CODE: for platform checkbox
+    MatIconModule, // NEW CODE: for mat-icon suffix icons in form fields
   ],
 })
 export class AddClientComponent {
@@ -55,6 +61,11 @@ export class AddClientComponent {
 
   countries: { name: string, flag: string, dialCode: string }[] = [];
   selectedCountry = this.countries[66]; // Default India
+
+  // NEW CODE: Controls visibility of "Where did you get client from?" box when "Other" is selected
+  showConnectSource = false;
+  // NEW CODE: Controls visibility of platform ID/password fields when checkbox is ticked
+  showPlatformFields = false;
 
   // countries = [
   //   { name: 'India', flag: '🇮🇳', dialCode: '+91' },
@@ -74,8 +85,12 @@ export class AddClientComponent {
     this.bdeEmail = user.email || '-';
 
     this.clientForm = this.fb.group({
-      bdeAccountId: [''],
-      bdeAccountEmail: [''],
+      // OLD: bdeAccountId: [''],
+      // OLD: bdeAccountEmail: [''],
+      // NEW CODE: Bank details replace BDE account fields
+      bankName: [''],
+      bankAccountNumber: [''],
+      ifscCode: [''],
       fullName: ['', [Validators.required]],
       mobile: ['', [
         Validators.required,
@@ -91,11 +106,19 @@ export class AddClientComponent {
       clientType: ['', [Validators.required]],
       clientConnectType: ['', [Validators.required]],
       date: ['', [Validators.required]],
+      // OLD: platform: [''],
+      // NEW CODE: platform is now optional — shown only when platform checkbox is checked
       platform: [''],
       technology: [''],
       address: [''],
+      // NEW CODE: "Where did you get client from?" — shown only when Connect Type = Other
+      clientConnectSource: [''],
+      // NEW CODE: Platform login details — shown only when platform checkbox is ticked
+      platformId: [''],
+      platformPassword: [''],
     });
     this.loadCountries();
+    
   }
   loadCountries(): void {
     this.http.get<{ name: string }[]>('/assets/data/countries.json').subscribe(data => {
@@ -106,12 +129,44 @@ export class AddClientComponent {
       .get<{ name: string, flag: string, dialCode: string }[]>('/assets/data/selectCountries.json')
       .subscribe(data => {
         this.countries = data;
-        this.selectedCountry = this.countries[66]; // Default India
+        // NEW CODE: Find India by name instead of hardcoded index (index can shift)
+        this.selectedCountry = this.countries.find(c => c.name === 'India') || this.countries[66];
+        // NEW CODE: Auto-fill Country field with default dial code country on load
+        if (this.selectedCountry) {
+          const match = this.countryList.find(c => c.name.toLowerCase() === this.selectedCountry.name.toLowerCase());
+          if (match) this.clientForm.get('country')?.setValue(match.name);
+        }
       });
   }
   onCountryDropdown(opened: boolean) {
     if (opened) {
       this.clientForm.get('mobile')?.setValue('');
+    }
+  }
+
+  // NEW CODE: Show/hide "Where did you get this client?" input when "Other" is selected
+  onConnectTypeChange(value: string): void {
+    this.showConnectSource = value === 'Other';
+    if (!this.showConnectSource) {
+      this.clientForm.get('clientConnectSource')?.setValue('');
+    }
+  }
+
+  // NEW CODE: Show/hide platform ID & password fields when checkbox is toggled
+  onPlatformToggle(checked: boolean): void {
+    this.showPlatformFields = checked;
+    if (!checked) {
+      this.clientForm.get('platform')?.setValue('');
+      this.clientForm.get('platformId')?.setValue('');
+      this.clientForm.get('platformPassword')?.setValue('');
+    }
+  }
+
+  // NEW CODE: Auto-fill Country field when a dial code / flag is selected
+  onDialCodeChange(country: { name: string; flag: string; dialCode: string }): void {
+    const match = this.countryList.find(c => c.name.toLowerCase() === country.name.toLowerCase());
+    if (match) {
+      this.clientForm.get('country')?.setValue(match.name);
     }
   }
 

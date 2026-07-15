@@ -21,6 +21,7 @@ export class DailyNotesComponent implements OnInit {
   filterStatus = '';
   filterDate = '';
   filterSearch = '';
+  filterTag = '';
 
   selectedClient: any = null;
   clientNotes: any[] = [];
@@ -30,6 +31,49 @@ export class DailyNotesComponent implements OnInit {
   saving = false;
 
   editingNote: any = null;
+
+  currentPage = 1;
+  readonly pageSize = 10;
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.clients.length / this.pageSize));
+  }
+
+  get paginatedClients(): any[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.clients.slice(start, start + this.pageSize);
+  }
+
+  get pageNumbers(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+
+  goToPage(page: number) {
+    if (page < 1 || page > this.totalPages) return;
+    this.currentPage = page;
+  }
+
+  // Notes panel pagination
+  notesPage = 1;
+  readonly notesPageSize = 10;
+
+  get notesTotalPages(): number {
+    return Math.max(1, Math.ceil(this.clientNotes.length / this.notesPageSize));
+  }
+
+  get paginatedNotes(): any[] {
+    const start = (this.notesPage - 1) * this.notesPageSize;
+    return this.clientNotes.slice(start, start + this.notesPageSize);
+  }
+
+  get notesPageNumbers(): number[] {
+    return Array.from({ length: this.notesTotalPages }, (_, i) => i + 1);
+  }
+
+  goToNotesPage(page: number) {
+    if (page < 1 || page > this.notesTotalPages) return;
+    this.notesPage = page;
+  }
 
   moodOptions = [
     { value: 'positive', label: 'Positive', color: 'text-green-600', bg: 'bg-green-100', icon: '😊' },
@@ -51,9 +95,19 @@ export class DailyNotesComponent implements OnInit {
     if (this.filterStatus) params.status = this.filterStatus;
     if (this.filterSearch) params.search = this.filterSearch;
     if (this.filterDate) params.date = this.filterDate;
+    if (this.filterTag) params.tag = this.filterTag;
 
+    this.currentPage = 1;
     this.http.get<any>(`${environment.apiUrl}/client-daily-notes/dashboard`, { params })
       .subscribe({ next: d => { this.stats = d.stats; this.clients = d.clients; }, error: () => {} });
+  }
+
+  clearFilters() {
+    this.filterStatus = '';
+    this.filterSearch = '';
+    this.filterDate = '';
+    this.filterTag = '';
+    this.loadDashboard();
   }
 
   clearDateFilter() {
@@ -73,6 +127,7 @@ export class DailyNotesComponent implements OnInit {
   }
 
   loadNotes(clientId: number) {
+    this.notesPage = 1;
     this.http.get<any[]>(`${environment.apiUrl}/client-daily-notes/notes/${clientId}`)
       .subscribe({ next: d => this.clientNotes = d, error: () => {} });
   }

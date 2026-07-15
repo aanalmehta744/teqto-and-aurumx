@@ -11,6 +11,8 @@ import { UnsubscribeOnDestroyAdapter } from '@shared';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef } from '@angular/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'environments/environment';
 import Swal from 'sweetalert2';
 
 
@@ -41,13 +43,20 @@ export class LoginComponent extends UnsubscribeOnDestroyAdapter
     error = '';
     hide = true;
     selectedRole = '';
+    loginImage: string | null = null;
+    loginHeading: string | null = null;
+    loginDescription: string | null = null;
+    readonly defaultImage = '../../../assets/images/Professional Businesswoman Portrait _ Corporate Headshot Photography for Personal Branding.jpeg';
+    private apiBase = environment.apiUrl;
+
     constructor(
         private formBuilder: UntypedFormBuilder,
         private route: ActivatedRoute,
         private router: Router,
         private authService: AuthService,
         private changeDetector: ChangeDetectorRef,
-        private snackBar: MatSnackBar
+        private snackBar: MatSnackBar,
+        private http: HttpClient
     ) {
         super();
     }
@@ -56,6 +65,23 @@ export class LoginComponent extends UnsubscribeOnDestroyAdapter
             username: ['', Validators.required],
             password: ['', Validators.required],
             role: ['', Validators.required]
+        });
+        this.loadLoginSettings();
+    }
+
+    private loadLoginSettings() {
+        this.http.get<{ image_path: string | null; heading: string | null; description: string | null }>(
+            `${this.apiBase}/login-settings`
+        ).subscribe({
+            next: (settings) => {
+                if (settings.image_path) {
+                    this.loginImage = `${this.apiBase.replace('/api', '')}/uploads/login-settings/${settings.image_path}`;
+                }
+                this.loginHeading = settings.heading || null;
+                this.loginDescription = settings.description || null;
+                this.changeDetector.detectChanges();
+            },
+            error: () => { /* silently fall back to defaults */ }
         });
     }
     get f() {

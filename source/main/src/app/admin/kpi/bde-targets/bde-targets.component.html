@@ -397,9 +397,9 @@
               <span class="text-xs font-bold text-indigo-600 uppercase tracking-wide">Revenue Amount ($)</span>
               <span [class]="'text-xs font-bold px-2 py-0.5 rounded-full ' + badge(singleAchievement.amtPct)">{{ singleAchievement.amtPct }}%</span>
             </div>
-            <p class="text-gray-500 text-xs">Target: <span class="font-bold text-gray-800">₹{{ singleAchievement.amount | number }}</span></p>
-            <p class="text-gray-500 text-xs">Achieved: <span class="font-bold text-green-600">₹{{ singleAchievement.amount_achieved | number }}</span></p>
-            <p class="text-gray-500 text-xs">Remaining: <span class="font-bold text-red-500">₹{{ (singleAchievement.amount - singleAchievement.amount_achieved < 0 ? 0 : singleAchievement.amount - singleAchievement.amount_achieved) | number }}</span></p>
+            <p class="text-gray-500 text-xs">Target: <span class="font-bold text-gray-800">${{ singleAchievement.amount | number }}</span></p>
+            <p class="text-gray-500 text-xs">Achieved: <span class="font-bold text-green-600">${{ singleAchievement.amount_achieved | number }}</span></p>
+            <p class="text-gray-500 text-xs">Remaining: <span class="font-bold text-red-500">${{ (singleAchievement.amount - singleAchievement.amount_achieved < 0 ? 0 : singleAchievement.amount - singleAchievement.amount_achieved) | number }}</span></p>
             <div class="mt-2 h-2 bg-gray-100 rounded-full">
               <div [class]="'h-full rounded-full ' + bar(singleAchievement.amtPct)" [style.width.%]="singleAchievement.amtPct"></div>
             </div>

@@ -243,10 +243,10 @@
           *ngFor="let user of filteredUsers"
           (click)="selectUser(user)"
           class="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[#F0F9F9] transition-colors"
-          [ngClass]="{ 'bg-[#D5EAEA]': selectedUser?.id === user.id }"
+          [ngClass]="{ 'bg-[#d6d5ea]': selectedUser?.id === user.id }"
         >
           <!-- Avatar circle showing first 2 initials -->
-          <div class="flex-shrink-0 w-9 h-9 rounded-full bg-teal-500 flex items-center justify-center
+          <div class="flex-shrink-0 w-9 h-9 rounded-full bg-#0b0b88 flex items-center justify-center
                       text-white text-xs font-bold">
             {{ getInitials(user.fullName) }}
           </div>
@@ -292,7 +292,7 @@
 
       <!-- Conversation header bar -->
       <div class="flex items-center gap-3 px-5 py-3 border-b border-gray-100 bg-white flex-shrink-0">
-        <div class="w-9 h-9 rounded-full bg-teal-500 flex items-center justify-center
+        <div class="w-9 h-9 rounded-full bg-#0b0b88 flex items-center justify-center
                     text-white text-xs font-bold flex-shrink-0">
           {{ getInitials(selectedUser.fullName) }}
         </div>
@@ -322,7 +322,7 @@
           <!-- MY message — right-aligned, teal bubble -->
           <div *ngIf="msg.sender_id === currentUserId" class="flex justify-end">
             <div class="max-w-xs lg:max-w-md">
-              <div class="bg-teal-500 text-white px-4 py-2 rounded-2xl rounded-tr-sm text-sm shadow-sm">
+              <div class="bg-#0b0b88 text-white px-4 py-2 rounded-2xl rounded-tr-sm text-sm shadow-sm">
                 {{ msg.message }}
               </div>
               <p class="text-xs text-gray-400 mt-1 text-right">
@@ -362,7 +362,7 @@
           <button
             (click)="send()"
             [disabled]="!newMessage.trim()"
-            class="w-10 h-10 rounded-full bg-teal-500 hover:bg-teal-600
+            class="w-10 h-10 rounded-full bg-#0b0b88 hover:bg-teal-600
                    disabled:opacity-40 flex items-center justify-center transition-colors"
           >
             <!-- Send icon -->
