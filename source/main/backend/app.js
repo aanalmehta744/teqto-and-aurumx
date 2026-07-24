@@ -230,6 +230,15 @@ const app = express();
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         UNIQUE KEY unique_bde_target (bde_id, month, year)
     )`).catch(() => {});
+
+    // Add new columns to clients table if not already present
+    await db.query(`ALTER TABLE clients ADD COLUMN tag VARCHAR(100) NULL`).catch(() => {});
+    await db.query(`ALTER TABLE clients ADD COLUMN client_connect_source VARCHAR(255) NULL`).catch(() => {});
+    await db.query(`ALTER TABLE clients ADD COLUMN platform_id VARCHAR(255) NULL`).catch(() => {});
+    await db.query(`ALTER TABLE clients ADD COLUMN platform_password VARCHAR(255) NULL`).catch(() => {});
+    await db.query(`ALTER TABLE clients ADD COLUMN bank_name VARCHAR(255) NULL`).catch(() => {});
+    await db.query(`ALTER TABLE clients ADD COLUMN bank_account_number VARCHAR(100) NULL`).catch(() => {});
+    await db.query(`ALTER TABLE clients ADD COLUMN ifsc_code VARCHAR(50) NULL`).catch(() => {});
 })();
 
 const server = http.createServer(app);
