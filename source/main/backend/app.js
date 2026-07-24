@@ -32,7 +32,7 @@ const chatRoutes = require("./chat/chatRoutes");
 const admindashboardRoutes = require('./dashboard/admindashboard');
 const dailyUpdatesRoutes = require('./daily-updates/daily-updates');
 const announcementRoutes = require('./announcements/announcements');
-// const bdeKpiRoutes = require('./bde-kpi/bde-kpi');
+const bdeKpiRoutes = require('./bde-kpi/bde-kpi');
 // const bdeActivitiesRoutes = require('./bde-activities/bde-activities');
 const bdePerformanceRoutes = require('./bde-performance/bde-performance');
 const bdeClientTargetsRoutes = require('./bde-client-targets/bde-client-targets');
@@ -379,7 +379,7 @@ app.use('/api/interviews', interviewRoutes); // Prefix for job routes
 app.use('/api/admindashboard', admindashboardRoutes);
 app.use('/api/dailyUpdates', dailyUpdatesRoutes);
 app.use('/api/announcements', announcementRoutes);
-// app.use('/api/kpi', bdeKpiRoutes);
+app.use('/api/kpi', bdeKpiRoutes);
 // app.use('/api/bde', bdeActivitiesRoutes);
 app.use('/api/bde-performance', bdePerformanceRoutes);
 app.use('/api/bde-client-targets', bdeClientTargetsRoutes);
