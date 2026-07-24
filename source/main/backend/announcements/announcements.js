@@ -1,21 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../connection');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-
-const uploadDir = path.join(__dirname, '../uploads/announcements');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, unique + path.extname(file.originalname));
-  },
-});
-const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
+const { createUpload } = require('../cloudinary');
+const upload = createUpload('announcements');
 
 // GET all active announcements (all logged-in users)
 router.get('/', async (req, res) => {
@@ -39,7 +26,7 @@ router.post('/', upload.single('image'), async (req, res) => {
   const { title, text, created_by } = req.body;
   if (!text) return res.status(400).json({ error: 'Text is required' });
 
-  const imagePath = req.file ? req.file.filename : null;
+  const imagePath = req.file ? (req.file.path || req.file.filename) : null;
 
   try {
     const [result] = await db.query(
@@ -59,10 +46,7 @@ router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const [rows] = await db.query('SELECT image_path FROM announcements WHERE id = ?', [id]);
-    if (rows.length && rows[0].image_path) {
-      const imgFile = path.join(uploadDir, rows[0].image_path);
-      if (fs.existsSync(imgFile)) fs.unlinkSync(imgFile);
-    }
+    // Cloudinary deletion can be added here if needed
     await db.query('DELETE FROM announcements WHERE id = ?', [id]);
     res.json({ message: 'Announcement deleted' });
   } catch (err) {
