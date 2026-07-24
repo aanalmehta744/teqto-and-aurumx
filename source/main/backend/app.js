@@ -252,8 +252,17 @@ const app = express();
     await db.query(`ALTER TABLE notifications ADD COLUMN recipient_id INT NULL`).catch(() => {});
     await db.query(`ALTER TABLE notifications ADD COLUMN recipient_role VARCHAR(20) NULL`).catch(() => {});
 
-    // If bde_targets was created with wrong column name 'target_month', rename it
-    await db.query(`ALTER TABLE bde_targets CHANGE COLUMN target_month month TINYINT NOT NULL`).catch(() => {});
+    // Migrate bde_targets: add all new columns the code expects (silently skip if already present)
+    await db.query(`ALTER TABLE bde_targets ADD COLUMN month TINYINT NOT NULL DEFAULT 1`).catch(() => {});
+    await db.query(`ALTER TABLE bde_targets ADD COLUMN year SMALLINT NOT NULL DEFAULT 2024`).catch(() => {});
+    await db.query(`ALTER TABLE bde_targets ADD COLUMN full_time INT NOT NULL DEFAULT 0`).catch(() => {});
+    await db.query(`ALTER TABLE bde_targets ADD COLUMN part_time INT NOT NULL DEFAULT 0`).catch(() => {});
+    await db.query(`ALTER TABLE bde_targets ADD COLUMN hourly INT NOT NULL DEFAULT 0`).catch(() => {});
+    await db.query(`ALTER TABLE bde_targets ADD COLUMN project_base INT NOT NULL DEFAULT 0`).catch(() => {});
+    await db.query(`ALTER TABLE bde_targets ADD COLUMN amount DECIMAL(12,2) NOT NULL DEFAULT 0`).catch(() => {});
+    await db.query(`ALTER TABLE bde_targets ADD COLUMN created_by INT NULL`).catch(() => {});
+    await db.query(`ALTER TABLE bde_targets ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`).catch(() => {});
+    await db.query(`ALTER TABLE bde_targets ADD UNIQUE KEY unique_bde_target (bde_id, month, year)`).catch(() => {});
 
     // New unified targets table (one row per BDE per month/year)
     // Login page settings (one-row config table)
