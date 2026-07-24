@@ -141,6 +141,7 @@ router.delete('/:id', async (req, res) => {
         res.status(500).send({ error: err.message });
     }
 });
+
 // PUT: Update project progress by project ID
 router.put('/updateProgress/:id', async (req, res) => {
     const projectId = req.params.id;

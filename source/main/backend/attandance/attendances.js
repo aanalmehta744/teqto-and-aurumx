@@ -12,13 +12,13 @@ router.get('/check/:employeeId', async (req, res) => {
     [employeeId, date]
   );
 
-  
   if (result.length > 0) {
     return res.json({ hasCheckedIn: true });
   } else {
     return res.json({ hasCheckedIn: false });
   }
 });
+
 router.get('/pause-status/:employeeId', async (req, res) => {
   try {
     const { employeeId } = req.params;
@@ -37,6 +37,7 @@ router.get('/pause-status/:employeeId', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 // Schedule cron job at midnight
 cron.schedule('32 11 * * *', async () => {
   try {
@@ -104,63 +105,6 @@ cron.schedule('0 23 * * *', async () => {
     console.error('Auto punch-out cron error:', error);
   }
 });
-
-// router.get('/employee-attendance', async (req, res) => {
-//   try {
-//     const query = `
-//       SELECT 
-//         a.id,
-//         a.employee_id, 
-//         a.date, 
-//         a.check_in, 
-//         a.check_out, 
-//         a.hours, 
-//         a.break,
-//         a.status,
-//         e.role, 
-//         e.fullName AS employee_name,
-//         e.email AS employee_email,
-
-//         CASE 
-//           -- If Holidays → mark Holiday Name -> set to Present
-//           WHEN EXISTS (
-//             SELECT 1 FROM holidays h
-//             WHERE DATE(a.date) = DATE(h.date)
-//           ) THEN (
-//             SELECT h.hName FROM holidays h WHERE DATE(a.date) = DATE(h.date) LIMIT 1
-//           )
-
-//           -- If employee checked in → always mark Present
-//           WHEN a.status = 'Present' THEN 'Present'
-
-//           -- If leave exists for this date → show Leave
-//           WHEN EXISTS (
-//             SELECT 1 FROM leave_requests l
-//             WHERE l.employee_id = a.employee_id
-//             AND a.date BETWEEN l.start_date AND l.end_date
-//             AND l.status = 'Approved'
-//           ) THEN 'Leave'
-
-//           -- If Saturday (7) or Sunday (1) → Paid Holiday
-//           WHEN DAYOFWEEK(a.date) IN (1, 7) THEN 'Paid Holiday'
-
-//           ELSE a.status
-//         END AS final_status
-
-//       FROM attendance a
-//       JOIN employees e ON a.employee_id = e.id
-//       ORDER BY a.date DESC;
-//     `;
-
-//     const [results] = await db.query(query);
-//     res.status(200).json(results);
-
-//   } catch (err) {
-//     console.error('Error fetching attendance data', err);
-//     res.status(500).json({ message: 'Error fetching attendance data', error: err });
-//   }
-// });
-
 
 router.get('/employee-attendance', async (req, res) => {
   try {
@@ -322,53 +266,7 @@ router.put('/updateTimer/:id', async (req, res) => {
     res.status(500).json({ error: "Server error", details: error });
   }
 });
-// // When an employee starts the timer, update the start_time and set the status to present
-// router.post('/start-timer', async (req, res) => {
-//   const { employee_id } = req.body;
-//   const check_in = new Date();
 
-//   try {
-//     // 1. Check if today has a row
-//     const [rows] = await db.query(
-//       `SELECT id FROM attendance WHERE employee_id = ? AND date = CURDATE()`,
-//       [employee_id]
-//     );
-
-//     if (rows.length === 0) {
-//       return res.status(400).json({
-//         success: false,
-//         status: 400,
-//         message: "You can't start the timer because no attendance record exists for today."
-//       });
-//     }
-
-//     // 2. Update row if it exists
-//     await db.execute(
-//       `UPDATE attendance 
-//        SET check_in = ?, status = 'Present'
-//        WHERE employee_id = ? AND date = CURDATE()`,
-//       [check_in, employee_id]
-//     );
-
-//     // 3. Fetch the updated row
-//     const [updated] = await db.query(
-//       `SELECT id, employee_id, date, check_in, check_out, status 
-//        FROM attendance 
-//        WHERE employee_id = ? AND date = CURDATE()`,
-//       [employee_id]
-//     );
-
-//     res.json({
-//       success: true,
-//       message: 'Timer started successfully.',
-//       data: updated[0]  // ✅ send check_in back
-//     });
-//   } catch (error) {
-//     console.error('Error executing query:', error);
-//     res.status(500).json({ error: 'Failed to start timer.' });
-//   }
-// });
-// When an employee starts the timer, update the start_time and set the status to present or half day
 router.post('/start-timer', async (req, res) => {
   const { employee_id } = req.body;
   const check_in = new Date();
@@ -498,7 +396,6 @@ router.post('/stop-timer', async (req, res) => {
   }
 });
 
-
 // Get all attendance records
 router.get('/', async (req, res) => {
   try {
@@ -509,6 +406,7 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: 'Error fetching attendance data', error: err });
   }
 });
+
 // Example pseudo-code for Express route
 router.get('/active/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
@@ -641,7 +539,6 @@ router.get('/:employeeId', async (req, res) => {
   }
 });
 
-
 router.post('/add-break', async (req, res) => {
   const { employeeId, breakDuration, startDate } = req.body;
   const today = new Date(startDate).toISOString().split('T')[0];
@@ -680,6 +577,7 @@ router.post('/add-break', async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
+
 // Helper: Add two time strings like "00:10:00" + "00:05:00"
 function addBreakTimes(time1, time2) {
   // Split safely

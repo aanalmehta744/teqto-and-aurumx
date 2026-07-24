@@ -15,7 +15,11 @@ const clientRoutes = require('./clients/clients'); // Import the client routes
 const leaveRoutes = require('./leaves/leave_requests'); // Import the client routes
 const myleaveRoutes = require('./leaves/my-leave'); // Import the client routes
 const attendancesRoutes = require('./attandance/attendances');
+// const attendancesRoutes = require('./attandance/routes/attendance-routes');
+
 const todayAttendancesRoutes = require('./attandance/today-attendances');
+// const todayAttendancesRoutes = require('./attandance/routes/attendance-routes');
+
 const payrollRoutes = require('./payroll/payroll');
 const taskRoutes = require('./tasks/tasks');
 const calendarRoutes = require('./calender/calender');
@@ -28,8 +32,8 @@ const chatRoutes = require("./chat/chatRoutes");
 const admindashboardRoutes = require('./dashboard/admindashboard');
 const dailyUpdatesRoutes = require('./daily-updates/daily-updates');
 const announcementRoutes = require('./announcements/announcements');
-const bdeKpiRoutes = require('./bde-kpi/bde-kpi');
-const bdeActivitiesRoutes = require('./bde-activities/bde-activities');
+// const bdeKpiRoutes = require('./bde-kpi/bde-kpi');
+// const bdeActivitiesRoutes = require('./bde-activities/bde-activities');
 const bdePerformanceRoutes = require('./bde-performance/bde-performance');
 const bdeClientTargetsRoutes = require('./bde-client-targets/bde-client-targets');
 const notificationsRoutes = require('./notifications/notifications');
@@ -236,8 +240,8 @@ const port = 3000;
 
 const io = new Server(server, {
   cors: {
-    // origin: "http://localhost:34200",
-    origin: "*",
+    origin: "http://localhost:34200",
+    // origin: "*",
     methods: ["GET", "POST"]
   }
 });
@@ -313,8 +317,8 @@ app.use('/api/interviews', interviewRoutes); // Prefix for job routes
 app.use('/api/admindashboard', admindashboardRoutes);
 app.use('/api/dailyUpdates', dailyUpdatesRoutes);
 app.use('/api/announcements', announcementRoutes);
-app.use('/api/kpi', bdeKpiRoutes);
-app.use('/api/bde', bdeActivitiesRoutes);
+// app.use('/api/kpi', bdeKpiRoutes);
+// app.use('/api/bde', bdeActivitiesRoutes);
 app.use('/api/bde-performance', bdePerformanceRoutes);
 app.use('/api/bde-client-targets', bdeClientTargetsRoutes);
 app.use('/api/notifications', notificationsRoutes);

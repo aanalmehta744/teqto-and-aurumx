@@ -88,15 +88,7 @@ router.post('/save', async (req, res) => {
   if (!bde_id || !month || !year) return res.status(400).json({ error: 'bde_id, month and year are required' });
 
   try {
-    // await db.query(`
-    //   INSERT INTO bde_targets (bde_id, month, year, full_time, part_time, hourly, project_base, amount)
-    //   VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    //   ON DUPLICATE KEY UPDATE
-    //     full_time = VALUES(full_time), part_time = VALUES(part_time),
-    //     hourly = VALUES(hourly), project_base = VALUES(project_base),
-    //     amount = VALUES(amount), created_by = VALUES(created_by)
-    // `, [bde_id, month, year, full_time || 0, part_time || 0, hourly || 0, project_base || 0, amount || 0, created_by || null]);
-
+  
 await db.query(`
   INSERT INTO bde_targets
   (bde_id, month, year, full_time, part_time, hourly, project_base, amount)
@@ -136,14 +128,7 @@ router.post('/save-all', async (req, res) => {
   try {
     const [bdes] = await db.query(`SELECT id FROM employees WHERE role='BDE' AND status=1`);
     for (const bde of bdes) {
-      // await db.query(`
-      //   INSERT INTO bde_targets (bde_id, month, year, full_time, part_time, hourly, project_base, amount, created_by)
-      //   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      //   ON DUPLICATE KEY UPDATE
-      //     full_time = VALUES(full_time), part_time = VALUES(part_time),
-      //     hourly = VALUES(hourly), project_base = VALUES(project_base),
-      //     amount = VALUES(amount), created_by = VALUES(created_by)
-      // `, [bde.id, month, year, full_time || 0, part_time || 0, hourly || 0, project_base || 0, amount || 0, created_by || null]);
+    
 
 await db.query(`
   INSERT INTO bde_targets

@@ -84,7 +84,7 @@ db.query(`
   if (rows[0].cnt === 0) {
     return db.query(`ALTER TABLE employees ADD COLUMN incentive DECIMAL(10, 2) DEFAULT 0`);
   }
-}).catch(() => {});
+}).catch(() => { });
 
 // 🟢 GET all employees
 router.get('/', async (req, res) => {
@@ -104,10 +104,7 @@ router.get('/:id', async (req, res) => {
   const employeeId = req.params.id;
 
   try {
-    const sql = `SELECT *
-                     FROM employees 
-                     
-                     WHERE id = ?`;
+    const sql = `SELECT * FROM employees WHERE id = ?`;
 
     const [results] = await db.query(sql, [employeeId]);
     // console.log(results);
@@ -124,12 +121,12 @@ router.get('/:id', async (req, res) => {
 
 // 🟢 POST Add a new employee
 router.post('/', upload.single('uploadImg'), async (req, res) => {
-console.log("Request Body:", req.body);
-console.log(
-  "termination_date:",
-  req.body.termination_date,
-  typeof req.body.termination_date
-);
+  console.log("Request Body:", req.body);
+  console.log(
+    "termination_date:",
+    req.body.termination_date,
+    typeof req.body.termination_date
+  );
 
   const employeeData = req.body;
   const uploadedFile = req.file;
@@ -181,16 +178,16 @@ console.log(
     const status =
       employeeData.status === 'true' || employeeData.status === true ? 1 : 0;
 
-      const terminationDate =
-  employeeData.termination_date === "null" ||
-  employeeData.termination_date === "" ||
-  employeeData.termination_date == null
-    ? null
-    : employeeData.termination_date;
+    const terminationDate =
+      employeeData.termination_date === "null" ||
+        employeeData.termination_date === "" ||
+        employeeData.termination_date == null
+        ? null
+        : employeeData.termination_date;
 
-    
-console.log("terminationDate =", terminationDate);
-console.log("type =", typeof terminationDate);
+
+    console.log("terminationDate =", terminationDate);
+    console.log("type =", typeof terminationDate);
 
     const values = [
       employeeData.fullName,
@@ -207,12 +204,10 @@ console.log("type =", typeof terminationDate);
       employeeData.role,
       employeeData.panCard,
       employeeData.aadharCard,
-      paidLeaves,
-      paidLeaves,
+      paidLeaves,         // total_leave
+      paidLeaves,         // leave_balance (starts equal to total_leave for new employees)
       status,
-      // employeeData.status ?? 1,                 // default active
       terminationDate,    // only set if inactive
-      // employeeData.employment_type,
       employmentType,
     ];
 
@@ -300,7 +295,6 @@ router.put('/:id', async (req, res) => {
       employeeData.panCard,
       employeeData.aadharCard,
       paidLeaves,
-      paidLeaves,
       employeeData.status ?? 1, // if not provided, default active
       employeeData.employment_type,
       employeeData.status == 0 ? (employeeData.termination_date || new Date().toLocaleDateString('en-CA')) : null,
@@ -341,6 +335,11 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while deleting employee' });
   }
 });
+
+
+
+
+
 // POST /api/employees/:id/targets
 router.post('/:id/targets', async (req, res) => {
   const employeeId = req.params.id;
@@ -453,7 +452,7 @@ router.patch('/:id/upload-photo', upload.single('photo'), async (req, res) => {
     if (!employee) return res.status(404).json({ error: 'Employee not found' });
     // Delete old photo file if it exists
     if (employee.uploadImg) {
-      fs.unlink(path.join(employeeUploadDir, employee.uploadImg), () => {});
+      fs.unlink(path.join(employeeUploadDir, employee.uploadImg), () => { });
     }
     await db.query('UPDATE employees SET uploadImg = ? WHERE id = ?', [req.file.filename, id]);
     res.json({ message: 'Photo updated successfully', filename: req.file.filename });

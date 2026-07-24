@@ -40,7 +40,7 @@ import {
   OwlNativeDateTimeModule,
 } from '@danielmoncada/angular-datetime-picker';
 import { HolidayService } from 'app/admin/holidays/all-holidays/all-holidays.service';
-import { InterviewService } from 'app/employee/jobs/interview-schedule/interview.service';
+// import { InterviewService } from 'app/employee/jobs/interview-schedule/interview.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 @Component({
@@ -93,7 +93,7 @@ export class CalendarComponent
     public calendarService: CalendarService,
     private snackBar: MatSnackBar,
     private holidayService: HolidayService,
-    private interviewService: InterviewService,
+    // private interviewService: InterviewService,
   ) {
     super();
     this.dialogTitle = 'Add New Event';
@@ -114,12 +114,12 @@ export class CalendarComponent
 
     const calendarEvents$ = this.calendarService.getAllCalendars().pipe(catchError(() => of([])));
     const holidays$ = this.holidayService.getAllHolidays().pipe(catchError(() => of([])));
-    const interviews$ = role === 'Admin'
-      ? this.interviewService.getInterviews().pipe(catchError(() => of([])))
-      : of([]);
+    // const interviews$ = role === 'Admin'
+      // ? this.interviewService.getInterviews().pipe(catchError(() => of([])))
+      // : of([]);
 
-    this.subs.sink = forkJoin([calendarEvents$, holidays$, interviews$]).subscribe(
-      ([calData, holidays, interviews]: [any[], any[], any[]]) => {
+    this.subs.sink = forkJoin([calendarEvents$, holidays$]).subscribe(
+      ([calData, holidays]: [any[], any[]]) => {
 
         // User's own calendar events
         const userEvents = calData.filter((e: any) => e.employee_id === employeeId);
@@ -145,32 +145,32 @@ export class CalendarComponent
         }));
 
         // Interview events (Admin only)
-        const interviewEvents: EventInput[] = interviews.map((interview: any) => {
-          let start: Date = new Date(interview.interview_date);
-          let end: Date | undefined = undefined;
-          if (interview.interview_time) {
-            const m = interview.interview_time.match(/(\d+):(\d+)\s?(AM|PM)/i);
-            if (m) {
-              let h = parseInt(m[1], 10);
-              const min = parseInt(m[2], 10);
-              if (m[3].toUpperCase() === 'PM' && h < 12) h += 12;
-              if (m[3].toUpperCase() === 'AM' && h === 12) h = 0;
-              start = new Date(interview.interview_date);
-              start.setHours(h, min, 0, 0);
-              end = new Date(start.getTime() + 60 * 60 * 1000);
-            }
-          }
-          return {
-            id: `interview-${interview.id}`,
-            title: `Interview: ${interview.candidate_name} (${interview.job_name})`,
-            start, end,
-            className: 'fc-event-interview',
-            groupId: 'interview',
-            details: `Type: ${interview.interview_type}<br>Mode: ${interview.mode}<br>Status: ${interview.status}`,
-          };
-        });
+        // const interviewEvents: EventInput[] = interviews.map((interview: any) => {
+        //   let start: Date = new Date(interview.interview_date);
+        //   let end: Date | undefined = undefined;
+        //   if (interview.interview_time) {
+        //     const m = interview.interview_time.match(/(\d+):(\d+)\s?(AM|PM)/i);
+        //     if (m) {
+        //       let h = parseInt(m[1], 10);
+        //       const min = parseInt(m[2], 10);
+        //       if (m[3].toUpperCase() === 'PM' && h < 12) h += 12;
+        //       if (m[3].toUpperCase() === 'AM' && h === 12) h = 0;
+        //       start = new Date(interview.interview_date);
+        //       start.setHours(h, min, 0, 0);
+        //       end = new Date(start.getTime() + 60 * 60 * 1000);
+        //     }
+        //   }
+        //   return {
+        //     id: `interview-${interview.id}`,
+        //     title: `Interview: ${interview.candidate_name} (${interview.job_name})`,
+        //     start, end,
+        //     className: 'fc-event-interview',
+        //     groupId: 'interview',
+        //     details: `Type: ${interview.interview_type}<br>Mode: ${interview.mode}<br>Status: ${interview.status}`,
+        //   };
+        // });
 
-        const allEvents = [...mappedUserEvents, ...holidayEvents, ...interviewEvents];
+        const allEvents = [...mappedUserEvents, ...holidayEvents];
         this.calendarEvents = allEvents;
         this.tempEvents = allEvents;
         this.calendarOptions.events = allEvents;

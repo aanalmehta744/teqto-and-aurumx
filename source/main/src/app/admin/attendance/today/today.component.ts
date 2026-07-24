@@ -118,7 +118,8 @@ export class ExampleDataSource extends DataSource<Today> {
     // Subscribe to the observable here and update dataSubject
     this.todayService.getAllTodays().subscribe({
       next: (data) => {
-        console.log("Today attendance", data);
+        // console.log("Today attendance", data);
+          console.log("Today attendance FULL", JSON.stringify(data, null, 2));
 
         // Remove records where role = Admin
         const filtered = data.filter(d => d.role?.toLowerCase() !== 'admin');

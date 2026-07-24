@@ -39,21 +39,28 @@
           <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
             <mat-cell *matCellDef="let row" class="font-medium text-[#1B1B2F]">{{row.fullName}}</mat-cell>
+                        <!-- <mat-cell *matCellDef="let row" class="font-medium text-[#1B1B2F]">{{row.name}}</mat-cell> -->
+
           </ng-container>
 
           <ng-container matColumnDef="first_in">
             <mat-header-cell *matHeaderCellDef mat-sort-header>Punch In</mat-header-cell>
             <mat-cell *matCellDef="let row">{{ row.check_in ? (row.check_in | date : 'mediumTime') : '--' }}</mat-cell>
+            <!-- <mat-cell *matCellDef="let row">{{ row.first_in || '--' }}</mat-cell> -->
+
           </ng-container>
 
           <ng-container matColumnDef="last_out">
             <mat-header-cell *matHeaderCellDef mat-sort-header>Punch Out</mat-header-cell>
             <mat-cell *matCellDef="let row">{{ row.check_out ? (row.check_out | date : 'mediumTime') : '--' }}</mat-cell>
+            <!-- <mat-cell *matCellDef="let row">{{ row.last_out || '--' }}</mat-cell> -->
           </ng-container>
 
           <ng-container matColumnDef="total">
             <mat-header-cell *matHeaderCellDef mat-sort-header>Total</mat-header-cell>
             <mat-cell *matCellDef="let row" class="whitespace-nowrap">{{row.hours}}</mat-cell>
+                      <!-- <mat-cell *matCellDef="let row" class="whitespace-nowrap">{{row.total}}</mat-cell> -->
+
           </ng-container>
 
           <ng-container matColumnDef="status">

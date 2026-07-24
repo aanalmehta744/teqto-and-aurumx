@@ -3,24 +3,6 @@ const router = express.Router();
 const db = require('../connection'); // Import the database connection
 const { sendFollowupNotification } = require('./emailService'); // ✅ import function
 
-// router.get('/grouped-by-bde', async (req, res) => {
-//     try {
-//         const sql = `
-//       SELECT c.*, e.fullName AS bde_name 
-//       FROM clients c
-//       JOIN employees e ON c.employee_id = e.id
-//       ORDER BY e.fullName, c.fullName
-//     `;
-
-//         const [results] = await db.query(sql); // Corrected: use `sql`, not `insertQuery`
-
-//         res.status(200).json(results);
-//     } catch (error) {
-//         console.error('Error fetching clients:', error);
-//         res.status(500).json({ message: 'Database error', error });
-//     }
-// });
-
 router.get('/grouped-by-bde', async (req, res) => {
     try {
         const sql = `
@@ -86,21 +68,7 @@ router.post('/', async (req, res) => {
         res.status(500).json({ message: 'Database error', error });
     }
 });
-// ✅ READ: Get All Clients with BDE Name
-// router.get('/', async (req, res) => {
-//     try {
-//         const [results] = await db.query(`
-//         SELECT c.*, e.fullName AS bde_name 
-//       FROM clients c
-//       JOIN employees e ON c.employee_id = e.id
 
-//     `);
-//         res.status(200).json(results);
-//     } catch (error) {
-//         console.error('Error fetching clients with BDE name:', error);
-//         res.status(500).json({ message: 'Database error', error });
-//     }
-// });
 // ✅ READ: Get All Clients with BDE Name + Latest Follow-up Info
 router.get('/', async (req, res) => {
     try {

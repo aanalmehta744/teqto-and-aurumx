@@ -157,8 +157,6 @@ router.get('/leave-balance', async (req, res) => {
     }
 });
 
-// 4. Get Employee Leave Balance
-//   e.leave_balance AS current_balance, -- Current balance stored in DB
 router.get('/leave-balance/:id', async (req, res) => {
     const { id } = req.params;
     const query = `
