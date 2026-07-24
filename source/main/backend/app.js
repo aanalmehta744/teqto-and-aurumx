@@ -235,13 +235,12 @@ const app = express();
 const server = http.createServer(app);
 
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:34200",
-    // origin: "*",
+    origin: "*",
     methods: ["GET", "POST"]
   }
 });
@@ -285,9 +284,13 @@ io.on("connection", (socket) => {
 
 
 // Middleware
-app.use(cors());
-app.use(express.json()); // For parsing application/json
-app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from the uploads folder
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
