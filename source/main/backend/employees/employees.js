@@ -222,7 +222,7 @@ router.post('/', upload.single('uploadImg'), async (req, res) => {
 
   } catch (err) {
     console.error('Error adding employee:', err);
-    res.status(500).json({ error: 'An error occurred while adding employee data' });
+    res.status(500).json({ message: err.message, error: err.message });
   }
 });
 
