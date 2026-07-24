@@ -68,31 +68,31 @@ const app = express();
     }
     console.log('✅ Core tables verified');
 
-    // Fix missing AUTO_INCREMENT on id columns (Railway import strips it)
+    // Fix missing AUTO_INCREMENT + PRIMARY KEY on id columns (Railway import strips these)
     const autoIncrementFixes = [
-        `ALTER TABLE employees MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
-        `ALTER TABLE attendance MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
-        `ALTER TABLE projects MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
-        `ALTER TABLE clients MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
-        `ALTER TABLE client_followups MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
-        `ALTER TABLE holidays MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
-        `ALTER TABLE leave_requests MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
-        `ALTER TABLE tasks MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
-        `ALTER TABLE daily_updates MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
-        `ALTER TABLE jobs MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
-        `ALTER TABLE candidates MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
-        `ALTER TABLE interviews MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
-        `ALTER TABLE salary_slips MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
-        `ALTER TABLE salary_payslip MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
-        `ALTER TABLE emails MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
-        `ALTER TABLE payments MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
-        `ALTER TABLE announcements MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
-        `ALTER TABLE notifications MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT`,
+        `ALTER TABLE employees MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
+        `ALTER TABLE attendance MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
+        `ALTER TABLE projects MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
+        `ALTER TABLE clients MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
+        `ALTER TABLE client_followups MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
+        `ALTER TABLE holidays MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
+        `ALTER TABLE leave_requests MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
+        `ALTER TABLE tasks MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
+        `ALTER TABLE daily_updates MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
+        `ALTER TABLE jobs MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
+        `ALTER TABLE candidates MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
+        `ALTER TABLE interviews MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
+        `ALTER TABLE salary_slips MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
+        `ALTER TABLE salary_payslip MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
+        `ALTER TABLE emails MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
+        `ALTER TABLE payments MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
+        `ALTER TABLE announcements MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
+        `ALTER TABLE notifications MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`,
     ];
     for (const sql of autoIncrementFixes) {
-        await db.query(sql).catch(() => {}); // silently skip if already correct
+        await db.query(sql).catch(() => {}); // skip if already correct
     }
-    console.log('✅ AUTO_INCREMENT verified on all tables');
+    console.log('✅ AUTO_INCREMENT + PRIMARY KEY verified on all tables');
 
     try {
         await db.query(`ALTER TABLE leave_requests MODIFY COLUMN halfDay VARCHAR(50) DEFAULT ''`);
