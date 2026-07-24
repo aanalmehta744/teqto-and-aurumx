@@ -1,12 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../connection'); // Ensure database connection
-const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
 const bcrypt = require('bcrypt');
 const cron = require('node-cron');
 const { sendWelcomeEmail } = require('./sendEmail');
+const { createUpload } = require('../cloudinary');
 
 // Middleware to parse JSON bodies
 router.use(express.json());
@@ -56,25 +54,7 @@ cron.schedule('0 0 1 1 *', async () => {
   }
 });
 
-// Define upload directories
-const employeeUploadDir = path.join(__dirname, '../uploads/employees');
-
-// Create the uploads directory if it doesn't exist
-if (!fs.existsSync(employeeUploadDir)) {
-  fs.mkdirSync(employeeUploadDir, { recursive: true });
-}
-
-// Set up Multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, employeeUploadDir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  },
-});
-
-const upload = multer({ storage });
+const upload = createUpload('employees');
 
 // added code below is — ensure incentive column exists in employees table (MySQL 5.7 compatible)
 db.query(`
@@ -199,7 +179,7 @@ router.post('/', upload.single('uploadImg'), async (req, res) => {
       employeeData.email,
       formattedDobDate,
       employeeData.salary,
-      uploadedFile ? uploadedFile.filename : null,
+      uploadedFile ? (uploadedFile.path || uploadedFile.filename) : null,
       formattedJoiningDate,
       employeeData.role,
       employeeData.panCard,
@@ -450,12 +430,9 @@ router.patch('/:id/upload-photo', upload.single('photo'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
     const [[employee]] = await db.query('SELECT uploadImg FROM employees WHERE id = ?', [id]);
     if (!employee) return res.status(404).json({ error: 'Employee not found' });
-    // Delete old photo file if it exists
-    if (employee.uploadImg) {
-      fs.unlink(path.join(employeeUploadDir, employee.uploadImg), () => { });
-    }
-    await db.query('UPDATE employees SET uploadImg = ? WHERE id = ?', [req.file.filename, id]);
-    res.json({ message: 'Photo updated successfully', filename: req.file.filename });
+    const photoUrl = req.file.path || req.file.filename;
+    await db.query('UPDATE employees SET uploadImg = ? WHERE id = ?', [photoUrl, id]);
+    res.json({ message: 'Photo updated successfully', filename: photoUrl });
   } catch (err) {
     console.error('Error uploading photo:', err);
     res.status(500).json({ error: 'Failed to upload photo' });
