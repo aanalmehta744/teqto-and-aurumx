@@ -91,8 +91,8 @@ export class AnnouncementBannerComponent implements OnInit {
   }
 
   imageUrl(filename: string): string {
-    const base = environment.apiUrl.replace('/api', '');
-    return `${base}/uploads/announcements/${filename}`;
+    if (filename?.startsWith('http')) return filename;
+    return '';
   }
 
   cancelForm(): void {

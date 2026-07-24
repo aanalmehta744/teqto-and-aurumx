@@ -10,7 +10,27 @@
     <!-- Modal Content (Form) -->
     <div mat-dialog-content>
         <form [formGroup]="dailyUpdateForm" (ngSubmit)="onSubmit()" class="space-y-4">
-            <input type="hidden" formControlName="employee_id" />
+
+            <!-- Employee Dropdown (BDE/BA/Admin only) -->
+            <div *ngIf="isAssignerRole()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Employee Name</mat-label>
+                    <mat-select formControlName="employee_id" required
+                        (selectionChange)="onEmployeeChange($event.value)">
+                        <mat-option *ngFor="let emp of employees" [value]="emp.id">
+                            {{ emp.fullName || (emp.first_name + ' ' + emp.last_name) }}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error>Employee is required</mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Department</mat-label>
+                    <input matInput [value]="selectedDepartment" readonly placeholder="Auto-filled" />
+                </mat-form-field>
+            </div>
+
+            <!-- Hidden employee_id for Employee role -->
+            <input *ngIf="!isAssignerRole()" type="hidden" formControlName="employee_id" />
 
             <!-- Project & Task Fields (Non-HR only) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4" *ngIf="!isHrDepartment()">

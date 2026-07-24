@@ -83,16 +83,21 @@ export class EmployeeDailyUpdateComponent implements OnInit, AfterViewInit {
     });
   }
 
+  isAssignerRole(): boolean {
+    return ['Admin', 'BDE', 'BA'].includes(this.userData?.role || '');
+  }
+
   loadUserDataFromLocalStorage(): void {
     const userJson = localStorage.getItem('currentUser');
     if (userJson) {
       this.userData = JSON.parse(userJson);
-      console.log('Logged User Data:', this.userData);
 
-      // Check if HR role (adjust property according to your actual user object structure)
-      if (this.userData?.department === 'HR') {
+      if (this.isAssignerRole()) {
+        this.ishr = 'false';
+        this.displayedColumns = ['employeeName', 'project', 'taskTitle', 'taskDetails', 'update', 'status', 'actions'];
+      } else if (this.userData?.department === 'HR') {
         this.ishr = 'true';
-        this.displayedColumns = ['update', 'actions']; // Show only update column for HR
+        this.displayedColumns = ['update', 'actions'];
       } else {
         this.ishr = 'false';
         this.displayedColumns = ['project', 'taskTitle', 'taskDetails', 'update', 'status', 'actions'];
@@ -113,7 +118,11 @@ export class EmployeeDailyUpdateComponent implements OnInit, AfterViewInit {
 
     this.isTblLoading = true;
 
-    this.dailyUpdateService.getUpdates(this.userData.id).subscribe((res) => {
+    const fetch$ = this.isAssignerRole()
+      ? this.dailyUpdateService.getAllUpdates()
+      : this.dailyUpdateService.getUpdates(this.userData.id);
+
+    fetch$.subscribe((res) => {
       this.isTblLoading = false;
 
       // Group by date

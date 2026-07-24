@@ -1,4 +1,5 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { environment } from 'environments/environment';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -181,9 +182,8 @@ export class EmployeeProfileComponent implements OnInit, AfterViewInit {
   }
 
   getProfileImage(): string {
-    if (this.employee?.uploadImg) {
-      return `http://localhost:3000/uploads/employees/${this.employee.uploadImg}`;
-    }
+    const img = this.employee?.uploadImg;
+    if (img?.startsWith('http')) return img;
     const gender = this.employee?.gender?.toLowerCase();
     if (gender === 'female') return 'assets/images/female-profile.png';
     if (gender === 'male') return 'assets/images/male-profile.png';

@@ -6,9 +6,13 @@ const db = require('../connection');
 router.get('/all', async (req, res) => {
     try {
         const [rows] = await db.query(`
-        SELECT du.*, e.fullName AS employee_name, e.department, p.projectTitle, t.title AS task_title, t.note AS task_note FROM daily_updates du LEFT JOIN employees e ON du.employee_id = e.id LEFT JOIN projects p ON du.project_id = p.id LEFT JOIN tasks t ON du.task_id = t.id ORDER BY du.update_date DESC;
-    `
-        );
+        SELECT du.*, e.fullName AS employeeName, e.department, p.projectTitle, t.title, t.note
+        FROM daily_updates du
+        LEFT JOIN employees e ON du.employee_id = e.id
+        LEFT JOIN projects p ON du.project_id = p.id
+        LEFT JOIN tasks t ON du.task_id = t.id
+        ORDER BY du.update_date DESC
+        `);
         res.json(rows);
     } catch (err) {
         res.status(500).send({ error: err.message });

@@ -74,8 +74,8 @@ export class LoginComponent extends UnsubscribeOnDestroyAdapter
             `${this.apiBase}/login-settings`
         ).subscribe({
             next: (settings) => {
-                if (settings.image_path) {
-                    this.loginImage = `${this.apiBase.replace('/api', '')}/uploads/login-settings/${settings.image_path}`;
+                if (settings.image_path?.startsWith('http')) {
+                    this.loginImage = settings.image_path;
                 }
                 this.loginHeading = settings.heading || null;
                 this.loginDescription = settings.description || null;

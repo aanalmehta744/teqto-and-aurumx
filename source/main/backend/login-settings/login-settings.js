@@ -1,21 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../connection');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const { createUpload } = require('../cloudinary');
 
-const uploadDir = path.join(__dirname, '../uploads/login-settings');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, unique + path.extname(file.originalname));
-  },
-});
-const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
+const upload = createUpload('login-settings');
 
 // Ensure heading & description columns exist (migration)
 (async () => {
@@ -36,7 +24,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST update login page settings (Admin / HR only – enforced on frontend)
+// POST update login page settings
 router.post('/', upload.single('image'), async (req, res) => {
   const { heading, description, updated_by } = req.body;
 
@@ -48,11 +36,8 @@ router.post('/', upload.single('image'), async (req, res) => {
     let imagePath = existing[0]?.image_path || null;
 
     if (req.file) {
-      if (imagePath) {
-        const oldFile = path.join(uploadDir, imagePath);
-        if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile);
-      }
-      imagePath = req.file.filename;
+      // Cloudinary returns the full URL in req.file.path
+      imagePath = req.file.path;
     }
 
     const [rows] = await db.query(`SELECT id FROM login_page_settings LIMIT 1`);
@@ -69,8 +54,6 @@ router.post('/', upload.single('image'), async (req, res) => {
       );
     }
 
-
-    
     res.json({ message: 'Login page settings updated', image_path: imagePath, heading, description });
   } catch (err) {
     console.error('Error updating login settings:', err);

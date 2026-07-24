@@ -9,9 +9,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { HttpClient } from '@angular/common/http';
 import { MyProjectsService } from 'app/employee/my-projects/my-projects.service';
 import { MyTasksService } from 'app/employee/my-tasks/my-tasks.service';
 import { EmployeeDailyUpdateService } from '../../employee-daily-update.service';
+import { environment } from 'environments/environment';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -37,6 +39,8 @@ export class FormDialogComponent implements OnInit {
   isDetails = false;
   projects: any[] = [];
   tasks: any[] = [];
+  employees: any[] = [];
+  selectedDepartment = '';
   dailyUpdate: any = {};
   dialogTitle = 'New Daily Update';
   action = 'new';
@@ -51,6 +55,7 @@ export class FormDialogComponent implements OnInit {
     public myProjectsService: MyProjectsService,
     public myTasksService: MyTasksService,
     public dailyUpdateService: EmployeeDailyUpdateService,
+    private http: HttpClient,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
 
@@ -67,17 +72,63 @@ export class FormDialogComponent implements OnInit {
 
   }
 
+  isAssignerRole(): boolean {
+    const userString = localStorage.getItem('currentUser');
+    if (userString) {
+      try {
+        const user = JSON.parse(userString);
+        return ['Admin', 'BDE', 'BA'].includes(user.role);
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  onEmployeeChange(employeeId: number): void {
+    const emp = this.employees.find(e => e.id === employeeId);
+    this.selectedDepartment = emp?.department || '';
+    if (emp) {
+      this.loadProjectsForEmployee(employeeId);
+      this.loadTasksForEmployee(employeeId);
+    }
+  }
+
+  loadProjectsForEmployee(employeeId: number): void {
+    this.http.get<any[]>(`${environment.apiUrl}/projects`).subscribe({
+      next: (data) => { this.projects = data; },
+      error: () => {}
+    });
+  }
+
+  loadTasksForEmployee(employeeId: number): void {
+    this.http.get<any[]>(`${environment.apiUrl}/tasks/mytask/${employeeId}`).subscribe({
+      next: (data) => { this.tasks = Array.isArray(data) ? data : []; },
+      error: () => { this.tasks = []; }
+    });
+  }
+
   ngOnInit(): void {
     const isHR = this.isHrDepartment();
+    const isAssigner = this.isAssignerRole();
+
+    if (isAssigner) {
+      this.http.get<any[]>(`${environment.apiUrl}/employees`).subscribe({
+        next: (data) => {
+          this.employees = data.filter((e: any) => e.role !== 'Admin');
+        },
+        error: () => {}
+      });
+    }
 
     this.dailyUpdateForm = isHR
       ? this.fb.group({
-        employee_id: [this.getLoggedInUserId()],
+        employee_id: [isAssigner ? null : this.getLoggedInUserId(), Validators.required],
         update_date: [new Date(), Validators.required],
         update_details: ['', Validators.required],
       })
       : this.fb.group({
-        employee_id: [this.getLoggedInUserId()],
+        employee_id: [isAssigner ? null : this.getLoggedInUserId(), Validators.required],
         project_id: [''],
         update_date: [new Date(), Validators.required],
         task_id: [''],
@@ -86,8 +137,16 @@ export class FormDialogComponent implements OnInit {
       });
 
     if (!isHR) {
-      this.loadProjects();
-      this.loadTasks();
+      if (isAssigner) {
+        // Load all projects immediately; tasks load after employee is selected
+        this.http.get<any[]>(`${environment.apiUrl}/projects`).subscribe({
+          next: (data) => { this.projects = data; },
+          error: () => {}
+        });
+      } else {
+        this.loadProjects();
+        this.loadTasks();
+      }
     }
 
     if (this.action === 'edit' && this.data?.updateData) {
@@ -105,11 +164,13 @@ export class FormDialogComponent implements OnInit {
             status: updateData.status,
           }),
       });
-      // 🔹 Set trainer project if it exists
+
+      if (isAssigner && updateData.employee_id) {
+        this.onEmployeeChange(updateData.employee_id);
+      }
+
       if (updateData.trainer_project_name) {
         this.selectedTrainerProject = updateData.trainer_project_name;
-
-        // remove project_id validation if trainer project
         this.dailyUpdateForm.get('project_id')?.clearValidators();
         this.dailyUpdateForm.get('project_id')?.updateValueAndValidity();
       }

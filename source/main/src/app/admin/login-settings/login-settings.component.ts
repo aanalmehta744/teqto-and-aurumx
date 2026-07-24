@@ -49,8 +49,8 @@ export class LoginSettingsComponent implements OnInit {
         next: (s) => {
           this.heading = s.heading || '';
           this.description = s.description || '';
-          if (s.image_path) {
-            this.currentImage = `${this.apiBase.replace('/api', '')}/uploads/login-settings/${s.image_path}`;
+          if (s.image_path?.startsWith('http')) {
+            this.currentImage = s.image_path;
           }
           this.cd.detectChanges();
         },

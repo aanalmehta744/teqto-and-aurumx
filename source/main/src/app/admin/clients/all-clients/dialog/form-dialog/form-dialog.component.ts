@@ -3,6 +3,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormControl, Validators, UntypedFormGroup, UntypedFormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClientsService } from '../../clients.service';
 import { Clients } from '../../clients.model';
+import { forkJoin } from 'rxjs';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -166,37 +167,26 @@ export class FormDialogComponent implements OnInit {
   // }
 
   loadCountries(): void {
-    this.http.get<{ name: string }[]>('/assets/data/countries.json')
-      .subscribe(countryData => {
-        this.countryList = countryData;
-      });
+    forkJoin({
+      countryList: this.http.get<{ name: string }[]>('/assets/data/countries.json'),
+      selectList: this.http.get<{ name: string; flag: string; dialCode: string }[]>('/assets/data/selectCountries.json')
+    }).subscribe(({ countryList, selectList }) => {
+      this.countryList = countryList;
+      this.countries = selectList;
 
-    this.http
-      .get<{ name: string; flag: string; dialCode: string }[]>('/assets/data/selectCountries.json')
-      .subscribe(selectData => {
-        this.countries = selectData;
+      const selectedCountryName = this.clientForm.get('country')?.value;
 
-        // 👉 EDIT MODE: set country dial code automatically
-        const selectedCountryName = this.clientForm.get('country')?.value;
-
-        if (selectedCountryName) {
-          const match = this.countries.find(
-            c => c.name.toLowerCase() === selectedCountryName.toLowerCase()
-          );
-
-          if (match) {
-            this.selectedCountry = match;
-          }
-        } else {
-          // Default India for ADD
-          this.selectedCountry = this.countries.find(c => c.name === 'India')!;
-          // NEW CODE: Auto-fill Country field with default India on ADD mode load
-          if (this.selectedCountry) {
-            const defaultMatch = this.countryList.find(c => c.name.toLowerCase() === this.selectedCountry.name.toLowerCase());
-            if (defaultMatch) this.clientForm.get('country')?.setValue(defaultMatch.name);
-          }
+      if (selectedCountryName) {
+        const match = this.countries.find(c => c.name.toLowerCase() === selectedCountryName.toLowerCase());
+        if (match) this.selectedCountry = match;
+      } else {
+        this.selectedCountry = this.countries.find(c => c.name === 'India')!;
+        if (this.selectedCountry) {
+          const defaultMatch = this.countryList.find(c => c.name.toLowerCase() === this.selectedCountry.name.toLowerCase());
+          if (defaultMatch) this.clientForm.get('country')?.setValue(defaultMatch.name);
         }
-      });
+      }
+    });
   }
 
   confirmAdd(): void {

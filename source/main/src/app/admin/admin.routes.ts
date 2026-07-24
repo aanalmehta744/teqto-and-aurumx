@@ -1,6 +1,7 @@
 import { Route } from '@angular/router';
 import { EmployeeDailyUpdateComponent } from './employee-daily-update/employee-daily-update.component';
 import { LoginSettingsComponent } from './login-settings/login-settings.component';
+import { AllTasksComponent } from '../employee/all-tasks/all-tasks.component';
 export const ADMIN_ROUTE: Route[] = [
   {
     path: 'dashboard',
@@ -69,6 +70,10 @@ export const ADMIN_ROUTE: Route[] = [
   {
     path: 'login-settings',
     component: LoginSettingsComponent,
+  },
+  {
+    path: 'alltasks',
+    component: AllTasksComponent,
   },
 ];
 

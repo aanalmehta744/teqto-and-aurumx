@@ -88,11 +88,11 @@ export class AllTasksComponent
       console.log('Task List Loaded:', data);  // Log from component side too
     });
 
-    // BDE and BA can edit/delete tasks
+    // BDE, BA, and Admin can edit/delete tasks
     const userJson = localStorage.getItem('currentUser');
     if (userJson) {
       const user = JSON.parse(userJson);
-      if (user.role === 'BDE' || user.role === 'BA') {
+      if (user.role === 'BDE' || user.role === 'BA' || user.role === 'Admin') {
         this.displayedColumns = [...this.displayedColumns, 'actions'];
       }
     }
