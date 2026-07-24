@@ -4,9 +4,9 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel . -d dist",
     "dev": "nodemon src/app.js",
-    "start": "node dist/app.js"
+    "start": "node dist/app.js",
+    "build": "babel . -d dist --ignore node_modules"
   },
   "dependencies": {
     "@babel/cli": "^7.25.9",
