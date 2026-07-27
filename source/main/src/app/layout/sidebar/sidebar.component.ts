@@ -242,6 +242,7 @@ export class SidebarComponent
 
   getProfileImgUrl(): string {
     if (this.userImg && !this.userImg.startsWith('assets/')) {
+      if (this.userImg.startsWith('http')) return this.userImg;
       return `${environment.apiUrl.replace('/api', '')}/uploads/employees/${this.userImg}`;
     }
     return this.userImg || this.getImgUrl(this.userGender || '');

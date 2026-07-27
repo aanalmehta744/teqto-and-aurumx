@@ -18,15 +18,7 @@
             <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6 items-center">
               <!-- Profile Image -->
               <div class="md:col-span-2 flex justify-center">
-                <img class="rounded-full w-[120px] h-[120px] object-cover" [src]="
-                    member.uploadImg
-                      ? 'http://localhost:3000/uploads/employees/' + member.uploadImg
-                      : member.gender === 'Male'
-                      ? 'assets/images/male-profile.png'
-                      : member.gender === 'Female'
-                      ? 'assets/images/female-profile.png'
-                      : 'assets/images/user/usrbig1.jpg'
-                  " alt="Profile" />
+                <img class="rounded-full w-[120px] h-[120px] object-cover" [src]="getMemberImage(member)" alt="Profile" />
               </div>
 
               <!-- Basic Info -->

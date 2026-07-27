@@ -185,6 +185,7 @@ export class HeaderComponent
 
   getProfileImgUrl(): string {
     if (this.userImg) {
+      if (this.userImg.startsWith('http')) return this.userImg;
       return `${environment.apiUrl.replace('/api', '')}/uploads/employees/${this.userImg}`;
     }
     return this.getImgUrl(this.userGender || '');
