@@ -82,9 +82,10 @@ export class FormDialogComponent {
   onGenerate() {
     const row = this.data;
     if (row?.id) {
-      const url = `/employee/payroll/payslip/${row.id}?month=${this.selectedMonth}&year=${this.selectedYear}`;
-      window.open(url, '_blank');
-      this.dialogRef.close({ action: 'generate', month: this.selectedMonth, year: this.selectedYear });
+      this.dialogRef.close();
+      this.router.navigate([`/employee/payroll/payslip/${row.id}`], {
+        queryParams: { month: this.selectedMonth, year: this.selectedYear }
+      });
     }
   }
 

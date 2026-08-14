@@ -1,22 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../connection');
-const multer = require('multer');
-const path = require('path');
-
-// Configure file upload
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = path.join(__dirname, '..', 'uploads', 'resumes');
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + '-' + file.originalname;
-    cb(null, uniqueName);
-  }
-});
-
-const upload = multer({ storage });
+const { createUpload } = require('../cloudinary');
+const upload = createUpload('resumes');
 
 // Create a new candidate
 router.post('/', upload.single('resume'), async (req, res) => {
@@ -26,7 +12,7 @@ router.post('/', upload.single('resume'), async (req, res) => {
       address, gender, experience,
       last_company, last_ctc, job_id, status,remarks } = req.body;
     console.log(req.body);
-    const resume = req.file ? req.file.filename : '';
+    const resume = req.file ? (req.file.path || req.file.filename) : '';
     console.log('File received:', req.file);
 
     const sql = `INSERT INTO candidates
@@ -101,7 +87,7 @@ router.put('/:id', upload.single('resume'), async (req, res) => {
       last_company, last_ctc, job_id, status,remarks
     } = req.body;
     console.log(req.body);
-    const resume = req.file ? req.file.filename : null;
+    const resume = req.file ? (req.file.path || req.file.filename) : null;
 
     // 1. Get current candidate status
     const [rows] = await db.execute('SELECT status FROM candidates WHERE id = ?', [candidateId]);

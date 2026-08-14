@@ -6,9 +6,13 @@ const db = require('../connection');
 router.get('/all', async (req, res) => {
     try {
         const [rows] = await db.query(`
-        SELECT du.*, e.fullName AS employee_name, e.department, p.projectTitle, t.title AS task_title, t.note AS task_note FROM daily_updates du LEFT JOIN employees e ON du.employee_id = e.id LEFT JOIN projects p ON du.project_id = p.id LEFT JOIN tasks t ON du.task_id = t.id ORDER BY du.update_date DESC;
-    `
-        );
+        SELECT du.*, e.fullName AS employeeName, e.department, p.projectTitle, t.title, t.note
+        FROM daily_updates du
+        LEFT JOIN employees e ON du.employee_id = e.id
+        LEFT JOIN projects p ON du.project_id = p.id
+        LEFT JOIN tasks t ON du.task_id = t.id
+        ORDER BY du.update_date DESC
+        `);
         res.json(rows);
     } catch (err) {
         res.status(500).send({ error: err.message });
@@ -83,6 +87,18 @@ router.post('/', async (req, res) => {
 
     try {
         const [result] = await db.query(sql, values);
+
+        // Notify all BDE and BA users about the new daily update
+        const [empRow] = await db.query('SELECT fullName FROM employees WHERE id = ?', [employee_id]).catch(() => [[]]);
+        const empName = empRow[0]?.fullName || 'An employee';
+        const [bdebaUsers] = await db.query("SELECT id, role FROM employees WHERE role IN ('BDE', 'BA')").catch(() => [[]]);
+        for (const user of bdebaUsers) {
+            await db.query(
+                `INSERT INTO notifications (type, message, recipient_id, recipient_role) VALUES (?, ?, ?, ?)`,
+                ['daily_update', `${empName} added a daily update`, user.id, user.role]
+            ).catch(() => {});
+        }
+
         res.status(201).send({ id: result.insertId, message: "Daily update created" });
     } catch (err) {
         console.error('Insert error:', err.message);
@@ -129,6 +145,7 @@ router.delete('/:id', async (req, res) => {
         res.status(500).send({ error: err.message });
     }
 });
+
 // PUT: Update project progress by project ID
 router.put('/updateProgress/:id', async (req, res) => {
     const projectId = req.params.id;

@@ -357,12 +357,19 @@ export class ExampleDataSource extends DataSource<EmployeeSalary> {
     return merge(...displayDataChanges).pipe(
       map(() => {
         // Filter data
+        const loggedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const loggedRole = (loggedUser?.role || '').toLowerCase();
+        const loggedId   = loggedUser?.id;
+
         this.filteredData = this.exampleDatabase.data
           .slice()
           .filter((employeeSalary: EmployeeSalary) => {
-            // skip Admin
-            if (employeeSalary.role?.toLowerCase() === 'admin') {
-              return false;
+            // Always hide admin rows
+            if (employeeSalary.role?.toLowerCase() === 'admin') return false;
+
+            // Non-admin users (BA, BDE, Employee) see only their own record
+            if (loggedRole !== 'admin') {
+              if (employeeSalary.id !== loggedId) return false;
             }
 
             const searchStr = (

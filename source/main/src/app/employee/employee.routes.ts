@@ -1,9 +1,10 @@
 import { Page404Component } from '../authentication/page404/page404.component';
 import { Route } from '@angular/router';
+import { LoginSettingsComponent } from '../admin/login-settings/login-settings.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AttendancesComponent } from './attendance/attendance.component';
 import { MyTeamsComponent } from './myteam/myteam.component';
-import { SettingsComponent } from './settings/settings.component';
+// import { SettingsComponent } from './settings/settings.component';
 import { MyLeavesComponent } from './my-leaves/my-leaves.component';
 import { MyProjectsComponent } from './my-projects/my-projects.component';
 import { MyTasksComponent } from './my-tasks/my-tasks.component';
@@ -23,11 +24,11 @@ export const EMPLOYEE_ROUTE: Route[] = [
     loadChildren: () =>
       import('./attendance/attendance.routes').then((m) => m.EMPLOYEEATTENDANCE_ROUTE),
   },
-  {
-    path: 'jobs',
-    loadChildren: () =>
-      import('./jobs/jobs.routes').then((m) => m.JOBS_ROUTE),
-  },
+  // {
+  //   path: 'jobs',
+  //   loadChildren: () =>
+  //     import('./jobs/jobs.routes').then((m) => m.JOBS_ROUTE),
+  // },
   {
     path: 'employee-list',
     loadChildren: () =>
@@ -67,10 +68,10 @@ export const EMPLOYEE_ROUTE: Route[] = [
     path: 'chat',
     component: ChatComponent,
   },
-  {
-    path: 'settings',
-    component: SettingsComponent,
-  },
+  // {
+  //   path: 'settings',
+  //   component: SettingsComponent,
+  // },
   {
     path: 'myleaves/leave-balance',
     component: LeaveBalanceComponent,
@@ -86,6 +87,10 @@ export const EMPLOYEE_ROUTE: Route[] = [
   {
     path: 'daily-update/all-employees',
     component: AllEmployeeDailyUpdateComponent,
+  },
+  {
+    path: 'login-settings',
+    component: LoginSettingsComponent,
   },
 
   { path: '**', component: Page404Component },

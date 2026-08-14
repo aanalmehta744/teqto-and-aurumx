@@ -1,7 +1,6 @@
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogContent, MatDialogClose } from '@angular/material/dialog';
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormControl, Validators, UntypedFormGroup, UntypedFormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { formatDate } from '@angular/common';
 import { AllTasksService } from '../../all-tasks.service';
 import { MyTasks } from '../../all-tasks.model';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -12,6 +11,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'environments/environment';
+import Swal from 'sweetalert2';
+
 export interface DialogData {
   id: number;
   action: string;
@@ -38,70 +41,106 @@ export interface DialogData {
     CommonModule
   ],
 })
-export class FormDialogComponent {
+export class FormDialogComponent implements OnInit {
   action: string;
   dialogTitle!: string;
   myTasksForm: UntypedFormGroup;
   myTasks: MyTasks;
   isDetails = false;
+  employees: any[] = [];
+  projects: any[] = [];
 
   constructor(
     public dialogRef: MatDialogRef<FormDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     public myTasksService: AllTasksService,
-    private fb: UntypedFormBuilder
+    private fb: UntypedFormBuilder,
+    private http: HttpClient
   ) {
-    // Set the defaults
-
     this.action = data.action;
-    console.log("Action", this.action);
     if (this.action === 'edit') {
-      this.dialogTitle = data.myTasks.taskNo;
+      this.dialogTitle = data.myTasks.title;
       this.myTasks = data.myTasks;
-    } else if (this.action == 'details') {
-      this.myTasks = data.myTasks
+    } else if (this.action === 'details') {
+      this.myTasks = data.myTasks;
       this.isDetails = true;
-    }
-    else {
-      this.dialogTitle = 'New MyTasks';
+    } else {
+      this.dialogTitle = 'Add New Task';
       const blankObject = {} as MyTasks;
       this.myTasks = new MyTasks(blankObject);
     }
-    this.myTasksForm = this.createContactForm();
+    this.myTasksForm = this.createTaskForm();
   }
-  formControl = new UntypedFormControl('', [
-    Validators.required,
-    // Validators.email,
-  ]);
-  getErrorMessage() {
-    return this.formControl.hasError('required')
-      ? 'Required field'
-      : this.formControl.hasError('email')
-        ? 'Not a valid email'
-        : '';
+
+  ngOnInit(): void {
+    if (this.action === 'add' || this.action === 'edit') {
+      this.http.get<any[]>(`${environment.apiUrl}/employees`).subscribe({
+        next: (data) => { this.employees = data; },
+        error: () => {}
+      });
+      this.http.get<any[]>(`${environment.apiUrl}/projects`).subscribe({
+        next: (data) => { this.projects = data; },
+        error: () => {}
+      });
+    }
   }
-  createContactForm(): UntypedFormGroup {
+
+  createTaskForm(): UntypedFormGroup {
+    const raw = this.myTasks as any;
     return this.fb.group({
-      id: [this.myTasks.id],
-      taskNo: [this.myTasks.taskNo],
-      project: [this.myTasks.projectTitle],
-      client: [this.myTasks.client],
-      status: [this.myTasks.status],
-      priority: [this.myTasks.priority],
-      type: [this.myTasks.type],
-      executor: [this.myTasks.executor],
-      details: [this.myTasks.details],
+      id: [raw?.id || null],
+      employee_id: [raw?.employee_id || null, Validators.required],
+      project_id: [raw?.project_id || null],
+      title: [this.myTasks.title || '', Validators.required],
+      priority: [this.myTasks.priority || 'Normal', Validators.required],
+      due_date: [this.myTasks.due_date || null, Validators.required],
+      note: [this.myTasks.note || ''],
+      done: [raw?.done ?? 0],
+      employee_type: [raw?.employee_type || 'Employee'],
+      trainer_project_name: [raw?.trainer_project_name || null],
     });
   }
-  submit() {
-    // emppty stuff
-  }
+
   onNoClick(): void {
     this.dialogRef.close();
   }
+
   public confirmAdd(): void {
-    this.myTasksService.addMyTasks(this.myTasksForm.getRawValue());
+    if (this.myTasksForm.invalid) return;
+    const payload = this.myTasksForm.getRawValue();
+    if (payload.due_date) {
+      const d = new Date(payload.due_date);
+      payload.due_date = d.toISOString().slice(0, 10);
+    }
+    this.myTasksService.addMyTasks(payload).subscribe({
+      next: () => {
+        Swal.fire({ icon: 'success', title: 'Task Added!', text: 'Task assigned successfully.', timer: 1500, showConfirmButton: false });
+        this.dialogRef.close(1);
+      },
+      error: () => {
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to add task.' });
+      }
+    });
   }
+
+  public confirmEdit(): void {
+    if (this.myTasksForm.invalid) return;
+    const payload = this.myTasksForm.getRawValue();
+    if (payload.due_date) {
+      const d = new Date(payload.due_date);
+      payload.due_date = d.toISOString().slice(0, 10);
+    }
+    this.myTasksService.updateMyTasks(payload).subscribe({
+      next: () => {
+        Swal.fire({ icon: 'success', title: 'Updated!', text: 'Task updated successfully.', timer: 1500, showConfirmButton: false });
+        this.dialogRef.close(1);
+      },
+      error: () => {
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to update task.' });
+      }
+    });
+  }
+
   isToday(dateString: string): boolean {
     const today = new Date();
     const date = new Date(dateString);

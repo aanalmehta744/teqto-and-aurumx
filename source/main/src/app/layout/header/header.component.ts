@@ -1,5 +1,5 @@
-import { DOCUMENT, NgClass, NgIf } from '@angular/common';
-import { Component, Inject, ElementRef, OnInit, Renderer2, Output, EventEmitter, Input } from '@angular/core';
+import { DOCUMENT, NgClass, NgIf, CommonModule } from '@angular/common';
+import { Component, Inject, ElementRef, OnInit, OnDestroy, Renderer2, Output, EventEmitter, Input } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ConfigService } from '@config';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
@@ -9,6 +9,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { FeatherIconsComponent } from '@shared/components/feather-icons/feather-icons.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'environments/environment';
 import Swal from 'sweetalert2';
 
 interface Notifications {
@@ -32,12 +34,13 @@ interface Notifications {
     FeatherIconsComponent,
     MatMenuModule,
     NgScrollbar,
-    NgIf
+    NgIf,
+    CommonModule,
   ],
 })
 export class HeaderComponent
   extends UnsubscribeOnDestroyAdapter
-  implements OnInit {
+  implements OnInit, OnDestroy {
   public config!: InConfiguration;
   userImg: string = '';
   userName: string = 'Guest';
@@ -52,6 +55,12 @@ export class HeaderComponent
   @Output() mobileSidebarToggle = new EventEmitter<void>();
   @Input() isHovered: boolean = false;
 
+  // Notifications (admin only)
+  notifCount = 0;
+  notifications: any[] = [];
+  showNotifPanel = false;
+  private notifInterval: any;
+
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private renderer: Renderer2,
@@ -59,7 +68,8 @@ export class HeaderComponent
     private configService: ConfigService,
     private authService: AuthService,
     private router: Router,
-    public languageService: LanguageService
+    public languageService: LanguageService,
+    private http: HttpClient
   ) {
     super();
   }
@@ -70,7 +80,7 @@ export class HeaderComponent
     if (isMobile) {
       return 'assets/images/favicon-150x150.jpg'; // Mobile view
     }
-    return this.collapsed && !this.isHovered ? 'assets/images/favicon-150x150.jpg' : 'assets/images/logo-placeholder-png-2.png';
+    return this.collapsed && !this.isHovered ? 'assets/images/favicon-150x150.jpg' : '../../../../assets/images/Teqto(bg).png';
   }
 
   ngOnInit() {
@@ -82,6 +92,7 @@ export class HeaderComponent
 
     if (user) {
       const userRole = user.role;
+      this.userRole = userRole;
       this.userImg = user.img; // Access img safely
       this.userGender = user.gender; // Access img safely
       this.docElement = document.documentElement;
@@ -90,26 +101,94 @@ export class HeaderComponent
 
       if (userRole === 'Admin') {
         this.homePage = 'admin/dashboard/main';
+        this.loadNotifications();
+        this.notifInterval = setInterval(() => this.loadNotifCount(), 30000);
       } else if (userRole === 'BDE') {
         this.homePage = 'client/dashboard';
+        this.loadUserNotifications(user.id);
+        this.notifInterval = setInterval(() => this.loadUserNotifCount(user.id), 30000);
+      } else if (userRole === 'BA') {
+        this.homePage = 'admin/dashboard/main';
+        this.loadUserNotifications(user.id);
+        this.notifInterval = setInterval(() => this.loadUserNotifCount(user.id), 30000);
       } else if (userRole === 'Employee') {
         this.homePage = 'employee/dashboard';
+        this.loadUserNotifications(user.id);
+        this.notifInterval = setInterval(() => this.loadUserNotifCount(user.id), 30000);
       } else {
         this.homePage = 'admin/dashboard/main';
       }
     }
   }
 
+  private currentUserId: number | null = null;
+
+  loadNotifCount() {
+    this.http.get<{ count: number }>(`${environment.apiUrl}/notifications/count`)
+      .subscribe({ next: r => this.notifCount = r.count, error: () => {} });
+  }
+
+  loadNotifications() {
+    this.http.get<any[]>(`${environment.apiUrl}/notifications`)
+      .subscribe({ next: d => { this.notifications = d; this.notifCount = d.filter(n => !n.is_read).length; }, error: () => {} });
+  }
+
+  loadUserNotifCount(userId: number) {
+    this.http.get<{ count: number }>(`${environment.apiUrl}/notifications/user/${userId}/count`)
+      .subscribe({ next: r => this.notifCount = r.count, error: () => {} });
+  }
+
+  loadUserNotifications(userId: number) {
+    this.currentUserId = userId;
+    this.http.get<any[]>(`${environment.apiUrl}/notifications/user/${userId}`)
+      .subscribe({ next: d => { this.notifications = d; this.notifCount = d.filter(n => !n.is_read).length; }, error: () => {} });
+  }
+
+  toggleNotifPanel() {
+    this.showNotifPanel = !this.showNotifPanel;
+    if (this.showNotifPanel) {
+      if (this.currentUserId) {
+        this.loadUserNotifications(this.currentUserId);
+      } else {
+        this.loadNotifications();
+      }
+    }
+  }
+
+  markAllRead() {
+    if (this.currentUserId) {
+      this.http.put(`${environment.apiUrl}/notifications/user/${this.currentUserId}/read-all`, {})
+        .subscribe({ next: () => { this.notifCount = 0; this.notifications.forEach(n => n.is_read = 1); }, error: () => {} });
+    } else {
+      this.http.put(`${environment.apiUrl}/notifications/read-all`, {})
+        .subscribe({ next: () => { this.notifCount = 0; this.notifications.forEach(n => n.is_read = 1); }, error: () => {} });
+    }
+  }
+
+  markRead(n: any) {
+    if (n.is_read) return;
+    this.http.put(`${environment.apiUrl}/notifications/${n.id}/read`, {})
+      .subscribe({ next: () => { n.is_read = 1; this.notifCount = Math.max(0, this.notifCount - 1); }, error: () => {} });
+  }
+
+  override ngOnDestroy() {
+    super.ngOnDestroy();
+    if (this.notifInterval) clearInterval(this.notifInterval);
+  }
+
 
   getImgUrl(gender: string): string {
+    if (gender.toLowerCase() === 'female') return 'assets/images/female-profile.png';
+    if (gender.toLowerCase() === 'male') return 'assets/images/male-profile.png';
+    return 'assets/images/default-profile.png';
+  }
 
-    if (gender.toLowerCase() === 'female') {
-      return 'assets/images/female-profile.png';
-    } else if (gender.toLowerCase() === 'male') {
-      return 'assets/images/male-profile.png';
+  getProfileImgUrl(): string {
+    if (this.userImg) {
+      if (this.userImg.startsWith('http')) return this.userImg;
+      return `${environment.apiUrl.replace('/api', '')}/uploads/employees/${this.userImg}`;
     }
-
-    return 'assets/images/default-profile.png'; // Fallback
+    return this.getImgUrl(this.userGender || '');
   }
 
 

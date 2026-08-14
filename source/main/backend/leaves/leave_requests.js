@@ -157,8 +157,6 @@ router.get('/leave-balance', async (req, res) => {
     }
 });
 
-// 4. Get Employee Leave Balance
-//   e.leave_balance AS current_balance, -- Current balance stored in DB
 router.get('/leave-balance/:id', async (req, res) => {
     const { id } = req.params;
     const query = `
@@ -279,11 +277,176 @@ router.get('/check-overlap', async (req, res) => {
 // 6. Update Leave Request
 
 
-router.put('/:id', async (req, res) => {
-    console.log("========== MY NEW PUT ROUTE RUNNING ==========");
-    try {
-        console.log("PUT BODY:", req.body);
+// router.put('/:id', async (req, res) => {
+//     console.log("========== MY NEW PUT ROUTE RUNNING ==========");
+//     try {
+//         console.log("PUT BODY:", req.body);
 
+//         const { id } = req.params;
+
+//         const {
+//             approvedBy,
+//             leave_type,
+//             start_date,
+//             end_date,
+//             reason,
+//             status,
+//             employee_id,
+//             halfDay,
+//             sandwich_confirm
+//         } = req.body;
+
+//         // Check approver
+//         if (!approvedBy) {
+//             return res.status(400).json({ error: 'approvedBy is required' });
+//         }
+
+//         const [user] = await db.query(
+//             'SELECT role FROM employees WHERE id = ?',
+//             [approvedBy]
+//         );
+
+//         if (!user.length) {
+//             return res.status(404).json({
+//                 error: 'Approver not found. Please log out and log in again.'
+//             });
+//         }
+
+//         if (!['Admin', 'HR'].includes(user[0].role)) {
+//             return res.status(403).json({
+//                 error: 'Only Admin or HR can approve/reject leave requests'
+//             });
+//         }
+
+//         // Format dates for MySQL
+//         // const formattedStartDate = start_date
+//         //     .replace('T', ' ')
+//         //     .replace('Z', '')
+//         //     .split('.')[0];
+
+//         // const formattedEndDate = end_date
+//         //     .replace('T', ' ')
+//         //     .replace('Z', '')
+//         //     .split('.')[0];
+//         function formatMySQL(date) {
+//   const d = new Date(date);
+//   const pad = (n) => (n < 10 ? '0' + n : n);
+
+//   return (
+//     d.getFullYear() +
+//     '-' +
+//     pad(d.getMonth() + 1) +
+//     '-' +
+//     pad(d.getDate()) +
+//     ' ' +
+//     pad(d.getHours()) +
+//     ':' +
+//     pad(d.getMinutes()) +
+//     ':' +
+//     pad(d.getSeconds())
+//   );
+// }
+
+//         console.log('MYSQL START:', formattedStartDate);
+//         console.log('MYSQL END:', formattedEndDate);
+
+//         const startDateObj = new Date(formattedStartDate);
+//         const endDateObj = new Date(formattedEndDate);
+
+//         let numberOfDays;
+
+//         if (halfDay === 'Half Day' || halfDay === 1) {
+//             numberOfDays = 0.5;
+//         } else {
+//             numberOfDays =
+//                 Math.floor(
+//                     (endDateObj - startDateObj) /
+//                     (1000 * 60 * 60 * 24)
+//                 ) + 1;
+//         }
+
+//         const updateQuery = `
+//             UPDATE leave_requests
+//             SET
+//                 leave_type = ?,
+//                 start_date = ?,
+//                 end_date = ?,
+//                 reason = ?,
+//                 no_of_days = ?,
+//                 status = ?,
+//                 halfDay = ?,
+//                 sandwich_confirm = ?
+//             WHERE id = ?
+//         `;
+
+//         const [result] = await db.query(updateQuery, [
+//             leave_type,
+//             formattedStartDate,
+//             formattedEndDate,
+//             reason,
+//             numberOfDays,
+//             status,
+//             halfDay || 0,
+//             sandwich_confirm || 0,
+//             id
+//         ]);
+
+//         if (result.affectedRows === 0) {
+//             return res.status(404).json({
+//                 error: 'Leave request not found'
+//             });
+//         }
+
+//         // Deduct leave balance only when approved
+//         if (
+//             leave_type &&
+//             leave_type.toLowerCase() === 'paid' &&
+//             status &&
+//             status.toLowerCase() === 'approved'
+//         ) {
+//             await db.query(
+//                 `
+//                 UPDATE employees
+//                 SET leave_balance = leave_balance - ?
+//                 WHERE id = ?
+//                 `,
+//                 [numberOfDays, employee_id]
+//             );
+//         }
+
+//         // Send Email
+//         await sendLeaveNotification(
+//             employee_id,
+//             leave_type,
+//             formattedStartDate,
+//             formattedEndDate,
+//             numberOfDays,
+//             reason,
+//             status,
+//             'update'
+//         );
+
+//         res.status(200).json({
+//             success: true,
+//             message: 'Leave request updated successfully'
+//         });
+
+//     } catch (err) {
+//         console.error('PUT ERROR:', err);
+
+//         res.status(500).json({
+//             success: false,
+//             error: err.message
+//         });
+//     }
+// });
+
+router.put('/:id', async (req, res) => {
+    console.log("========== UPDATE LEAVE REQUEST ==========");
+    console.log("PARAM ID:", req.params.id);
+    console.log("BODY:", req.body);
+
+    try {
         const { id } = req.params;
 
         const {
@@ -298,71 +461,81 @@ router.put('/:id', async (req, res) => {
             sandwich_confirm
         } = req.body;
 
-        // Check approver
+        console.log("approvedBy =", approvedBy);
+
+        // Validate approver
         if (!approvedBy) {
-            return res.status(400).json({ error: 'approvedBy is required' });
+            return res.status(400).json({
+                success: false,
+                error: "approvedBy is required"
+            });
         }
 
+        console.log("Checking approver user...");
+
         const [user] = await db.query(
-            'SELECT role FROM employees WHERE id = ?',
+            "SELECT role FROM employees WHERE id = ?",
             [approvedBy]
         );
 
+        console.log("USER RESULT:", user);
+
         if (!user.length) {
             return res.status(404).json({
-                error: 'Approver not found. Please log out and log in again.'
+                success: false,
+                error: "Approver not found"
             });
         }
 
-        if (!['Admin', 'HR'].includes(user[0].role)) {
+        if (!["Admin", "HR"].includes(user[0].role)) {
             return res.status(403).json({
-                error: 'Only Admin or HR can approve/reject leave requests'
+                success: false,
+                error: "Only Admin or HR can approve/reject leave requests"
             });
         }
 
-        // Format dates for MySQL
-        // const formattedStartDate = start_date
-        //     .replace('T', ' ')
-        //     .replace('Z', '')
-        //     .split('.')[0];
+        // Format date for MySQL
+        const formatMySQL = (date) => {
+            const d = new Date(date);
 
-        // const formattedEndDate = end_date
-        //     .replace('T', ' ')
-        //     .replace('Z', '')
-        //     .split('.')[0];
-        function formatMySQL(date) {
-  const d = new Date(date);
-  const pad = (n) => (n < 10 ? '0' + n : n);
+            const pad = (n) => (n < 10 ? '0' + n : n);
 
-  return (
-    d.getFullYear() +
-    '-' +
-    pad(d.getMonth() + 1) +
-    '-' +
-    pad(d.getDate()) +
-    ' ' +
-    pad(d.getHours()) +
-    ':' +
-    pad(d.getMinutes()) +
-    ':' +
-    pad(d.getSeconds())
-  );
-}
+            return (
+                d.getFullYear() +
+                '-' +
+                pad(d.getMonth() + 1) +
+                '-' +
+                pad(d.getDate()) +
+                ' ' +
+                pad(d.getHours()) +
+                ':' +
+                pad(d.getMinutes()) +
+                ':' +
+                pad(d.getSeconds())
+            );
+        };
 
-        console.log('MYSQL START:', formattedStartDate);
-        console.log('MYSQL END:', formattedEndDate);
+        const formattedStartDate = formatMySQL(start_date);
+        const formattedEndDate = formatMySQL(end_date);
 
-        const startDateObj = new Date(formattedStartDate);
-        const endDateObj = new Date(formattedEndDate);
+        console.log("MYSQL START:", formattedStartDate);
+        console.log("MYSQL END:", formattedEndDate);
 
-        let numberOfDays;
+        const startObj = new Date(formattedStartDate);
+        const endObj = new Date(formattedEndDate);
 
-        if (halfDay === 'Half Day' || halfDay === 1) {
+        let numberOfDays = 1;
+
+        if (
+            halfDay === 'Half Day' ||
+            halfDay === 'First Half' ||
+            halfDay === 'Second Half'
+        ) {
             numberOfDays = 0.5;
         } else {
             numberOfDays =
                 Math.floor(
-                    (endDateObj - startDateObj) /
+                    (endObj.getTime() - startObj.getTime()) /
                     (1000 * 60 * 60 * 24)
                 ) + 1;
         }
@@ -388,24 +561,29 @@ router.put('/:id', async (req, res) => {
             reason,
             numberOfDays,
             status,
-            halfDay || 0,
-            sandwich_confirm || 0,
+            halfDay || '',
+            sandwich_confirm ? 1 : 0,
             id
         ]);
 
+        console.log("UPDATE RESULT:", result);
+
         if (result.affectedRows === 0) {
             return res.status(404).json({
-                error: 'Leave request not found'
+                success: false,
+                error: "Leave request not found"
             });
         }
 
-        // Deduct leave balance only when approved
+        // Deduct paid leave only when approved
         if (
             leave_type &&
-            leave_type.toLowerCase() === 'paid' &&
+            leave_type.toLowerCase() === "paid" &&
             status &&
-            status.toLowerCase() === 'approved'
+            status.toLowerCase() === "approved"
         ) {
+            console.log("Updating employee leave balance...");
+
             await db.query(
                 `
                 UPDATE employees
@@ -414,34 +592,27 @@ router.put('/:id', async (req, res) => {
                 `,
                 [numberOfDays, employee_id]
             );
+
+            console.log("Leave balance updated.");
         }
 
-        // Send Email
-        await sendLeaveNotification(
-            employee_id,
-            leave_type,
-            formattedStartDate,
-            formattedEndDate,
-            numberOfDays,
-            reason,
-            status,
-            'update'
-        );
+        console.log("UPDATE SUCCESS");
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
-            message: 'Leave request updated successfully'
+            message: "Leave request updated successfully"
         });
 
     } catch (err) {
-        console.error('PUT ERROR:', err);
+        console.error("PUT ERROR:", err);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             error: err.message
         });
     }
 });
+
 // 7. Delete Leave Request
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;

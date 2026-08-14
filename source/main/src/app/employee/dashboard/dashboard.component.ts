@@ -13,13 +13,14 @@ import { AttendancesService } from '../attendance/attendance.service';
 import { MyTasksService } from '../my-tasks/my-tasks.service';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
-import { JobsListService } from '../jobs/jobs-list/jobs-list.service';
-import { CandidatesService } from '../jobs/candidates/candidates.service';
+// import { JobsListService } from '../jobs/jobs-list/jobs-list.service';
+// import { CandidatesService } from '../jobs/candidates/candidates.service';
 import { TodayService } from '../attendance/today/today.service';
-import { InterviewService } from '../jobs/interview-schedule/interview.service';
+// import { InterviewService } from '../jobs/interview-schedule/interview.service';
 import { LeavesService } from 'app/admin/leaves/leave-requests/leaves.service';
 import { AllTasksService } from '../all-tasks/all-tasks.service';
 import { Subject, takeUntil } from 'rxjs';
+import { AnnouncementBannerComponent } from '@shared/components/announcement-banner/announcement-banner.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -37,6 +38,7 @@ import { Subject, takeUntil } from 'rxjs';
     MatTooltipModule,
     NgClass,
     CommonModule,
+    AnnouncementBannerComponent,
   ],
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -93,10 +95,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     private myProjectsService: MyProjectsService,
     private attendanceService: AttendancesService,
     private myTasksService: MyTasksService,
-    private jobsService: JobsListService,
-    private candidatesService: CandidatesService,
+    // private jobsService: JobsListService,
+    // private candidatesService: CandidatesService,
     public todayService: TodayService,
-    public interviewService: InterviewService,
+    // public interviewService: InterviewService,
     public leavesService: LeavesService,
     public allTasksService: AllTasksService,
     private ngZone: NgZone,
@@ -540,17 +542,17 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadHrWidgets(): void {
-    this.jobsService.getAllJobsLists()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((jobs) => {
-        this.activeJobs = jobs.filter(job => job.status === 'Open').length;
-      });
+    // this.jobsService.getAllJobsLists()
+    //   .pipe(takeUntil(this.destroy$))
+    //   .subscribe((jobs) => {
+    //     this.activeJobs = jobs.filter(job => job.status === 'Open').length;
+    //   });
 
-    this.candidatesService.getAllCandidates()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((candidates) => {
-        this.totalCandidates = candidates.length;
-      });
+    // this.candidatesService.getAllCandidates()
+    //   .pipe(takeUntil(this.destroy$))
+    //   .subscribe((candidates) => {
+    //     this.totalCandidates = candidates.length;
+    //   });
 
     this.todayService.getTodayAttendacves()
       .pipe(takeUntil(this.destroy$))
@@ -563,15 +565,15 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   loadInterviews(): void {
     if (this.isHR) {
-      this.interviewService.getInterviews()
-        .pipe(takeUntil(this.destroy$))
-        .subscribe((interviews: any[]) => {
-          const now = new Date();
-          const upcoming = interviews.filter(i => new Date(i.interview_date) >= now);
-          console.log(interviews);
-          this.interviewDataSource.data = upcoming;
-          this.updateInterviewPagination();
-        });
+      // this.interviewService.getInterviews()
+      //   .pipe(takeUntil(this.destroy$))
+      //   .subscribe((interviews: any[]) => {
+      //     const now = new Date();
+      //     const upcoming = interviews.filter(i => new Date(i.interview_date) >= now);
+      //     console.log(interviews);
+        //   this.interviewDataSource.data = upcoming;
+        //   this.updateInterviewPagination();
+        // });
     }
   }
 

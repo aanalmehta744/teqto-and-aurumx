@@ -63,7 +63,6 @@ export class AllTasksComponent
     'priority',
     'details',
     'due_date',
-    // 'actions',
   ];
 
   exampleDatabase?: AllTasksService | null;
@@ -88,9 +87,28 @@ export class AllTasksComponent
     this.subs.sink = this.myTasksService.dataChange.subscribe(data => {
       console.log('Task List Loaded:', data);  // Log from component side too
     });
+
+    // BDE, BA, and Admin can edit/delete tasks
+    const userJson = localStorage.getItem('currentUser');
+    if (userJson) {
+      const user = JSON.parse(userJson);
+      if (user.role === 'BDE' || user.role === 'BA' || user.role === 'Admin') {
+        this.displayedColumns = [...this.displayedColumns, 'actions'];
+      }
+    }
   }
   refresh() {
     this.loadData();
+  }
+
+  toggleStatus(row: MyTasks) {
+    const updated = { ...(row as any), done: (row as any).done === 1 ? 0 : 1 };
+    this.myTasksService.updateMyTasks(updated as MyTasks).subscribe({
+      next: () => {
+        (row as any).done = updated.done;
+        this.refreshTable();
+      }
+    });
   }
 
   applyFilter(event: Event) {
@@ -123,18 +141,7 @@ export class AllTasksComponent
     });
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
       if (result === 1) {
-        // After dialog is closed we're doing frontend updates
-        // For add we're just pushing a new row inside DataServicex
-        this.exampleDatabase?.dataChange.value.unshift(
-          this.myTasksService.getDialogData()
-        );
-        this.refreshTable();
-        this.showNotification(
-          'snackbar-success',
-          'Add Record Successfully...!!!',
-          'bottom',
-          'center'
-        );
+        this.loadData();
       }
     });
   }
@@ -193,21 +200,11 @@ export class AllTasksComponent
       direction: tempDirection,
     });
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
-      if (result === 1) {
-        const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-          (x) => x.id === this.id
-        );
-        // for delete we use splice in order to remove single object from DataService
-        if (foundIndex !== undefined && this.exampleDatabase !== undefined) {
-          this.exampleDatabase?.dataChange.value.splice(foundIndex, 1);
-          this.refreshTable();
-          this.showNotification(
-            'snackbar-danger',
-            'Delete Record Successfully...!!!',
-            'bottom',
-            'center'
-          );
-        }
+      if (result === 1 && this.id) {
+        this.myTasksService.deleteMyTasks(this.id).subscribe(() => {
+          this.loadData();
+          this.showNotification('snackbar-danger', 'Delete Record Successfully...!!!', 'bottom', 'center');
+        });
       }
     });
   }

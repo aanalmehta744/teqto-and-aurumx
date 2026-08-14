@@ -19,6 +19,7 @@ import {
 } from '@angular/core';
 import { ROUTES } from './sidebar-items';
 import { AuthService } from '@core';
+import { environment } from 'environments/environment';
 import { RouteInfo } from './sidebar.metadata';
 import { TranslateModule } from '@ngx-translate/core';
 import { FeatherModule } from 'angular-feather';
@@ -234,12 +235,17 @@ export class SidebarComponent
 
 
   getImgUrl(gender: string): string {
-    if (gender?.toLowerCase() === 'female') {
-      return 'assets/images/female-profile.png';
-    } else if (gender?.toLowerCase() === 'male') {
-      return 'assets/images/male-profile.png';
-    }
+    if (gender?.toLowerCase() === 'female') return 'assets/images/female-profile.png';
+    if (gender?.toLowerCase() === 'male') return 'assets/images/male-profile.png';
     return 'assets/images/default-profile.png';
+  }
+
+  getProfileImgUrl(): string {
+    if (this.userImg && !this.userImg.startsWith('assets/')) {
+      if (this.userImg.startsWith('http')) return this.userImg;
+      return `${environment.apiUrl.replace('/api', '')}/uploads/employees/${this.userImg}`;
+    }
+    return this.userImg || this.getImgUrl(this.userGender || '');
   }
 
   @HostListener('window:resize', ['$event'])

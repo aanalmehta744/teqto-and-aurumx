@@ -11,10 +11,10 @@
 
         <!-- Header: Title + Search + Buttons -->
         <div
-          class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4 border-b bg-[#00C4C4] rounded-t-lg">
+          class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4 border-b bg-white rounded-t-lg">
           <!-- Left -->
           <div class="flex flex-wrap items-center gap-4">
-            <h2 class="text-lg text-white font-medium">Daily Updates</h2>
+            <h2 class="text-lg text-gray-800 font-medium">Daily Updates</h2>
             <div class="flex items-center">
               <div
                 class="border border-[#CCCCCC] bg-white rounded-full flex items-center text-gray-500 shadow w-full max-w-md">
@@ -27,11 +27,11 @@
 
           <!-- Right buttons -->
           <div class="flex items-center gap-2">
-            <button mat-mini-fab class="!bg-[#D5EAEA] hover:!bg-gray-100 !text-[#00383F]" matTooltip="ADD"
+            <button mat-mini-fab class="!bg-[#d6d5ea] hover:!bg-gray-100 !text-[#00383F]" matTooltip="ADD"
               (click)="addNew()">
               <mat-icon>add</mat-icon>
             </button>
-            <button mat-mini-fab class="!bg-[#D5EAEA] hover:!bg-gray-100 !text-[#00383F]" matTooltip="REFRESH"
+            <button mat-mini-fab class="!bg-[#d6d5ea] hover:!bg-gray-100 !text-[#00383F]" matTooltip="REFRESH"
               (click)="refresh()">
               <mat-icon>refresh</mat-icon>
             </button>

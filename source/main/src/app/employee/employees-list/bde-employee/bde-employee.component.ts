@@ -323,9 +323,8 @@ export class BdeEmployeeComponent extends UnsubscribeOnDestroyAdapter
   }
 
   getImageURL(filename: string | null | undefined): string {
-    return filename
-      ? `${environment.apiUrl.replace('api', '')}uploads/employees/${filename}`
-      : 'assets/images/default-profile.png'; // Fallback image if filename is null/undefined
+    if (filename?.startsWith('http')) return filename;
+    return 'assets/images/default-profile.png';
   }
 }
 export class ExampleDataSource extends DataSource<Employees> {

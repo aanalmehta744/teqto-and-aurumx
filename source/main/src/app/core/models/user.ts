@@ -3,6 +3,7 @@ import { Role } from './role';
 export class User {
   id!: number;
   img!: string;
+  uploadImg!: string;
   username!: string;
   fullName!: string;
   password!: string;

@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "angular": "^1.8.3"
-  },
-  "devDependencies": {
-    "@angular/cli": "^15.1.5",
-    "@types/google.maps": "^3.55.5"
-  }
-}

@@ -93,6 +93,14 @@ router.post('/', async (req, res) => {
       ]
     );
 
+    // Notify the assigned employee
+    if (employee_id) {
+      await db.query(
+        `INSERT INTO notifications (type, message, recipient_id, recipient_role) VALUES (?, ?, ?, ?)`,
+        ['task_assigned', `A new task has been assigned to you: "${title}"`, employee_id, 'Employee']
+      ).catch(() => {});
+    }
+
     res.json({ message: 'Task created successfully' });
   } catch (err) {
     console.error('Insert error:', err);  // Add logging

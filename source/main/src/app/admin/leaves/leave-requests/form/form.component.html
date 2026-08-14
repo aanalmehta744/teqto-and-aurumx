@@ -86,8 +86,10 @@
             <mat-select formControlName="halfDay">
               <mat-option value="">--</mat-option>
               <mat-option value="Full Day">Full Day</mat-option>
-              <mat-option value="First Half">First Half</mat-option>
-              <mat-option value="Second Half">Second Half</mat-option>
+                <mat-option value="Half Day">Half Day</mat-option>
+
+              <!-- <mat-option value="First Half">First Half</mat-option> -->
+              <!-- <mat-option value="Second Half">Second Half</mat-option> -->
             </mat-select>
             @if (leavesForm.get('halfDay')?.hasError('required')) {
             <mat-error>
@@ -103,16 +105,15 @@
           <textarea matInput formControlName="reason"></textarea>
         </mat-form-field>
 
-        <!-- Show checkbox only if sandwich leave applies -->
-        <div *ngIf="isSandwichLeave" class="my-4">
+        <!-- Show checkbox only if sandwich leave applies for non-BDE/BA -->
+        <div *ngIf="isSandwichLeave && !isBdeOrBa" class="my-4">
           <mat-checkbox formControlName="sandwich_confirm" required>
-            I acknowledge the Sandwich Rule applies to my leave
+            <span class="text-red-600 font-medium">I understand this is a sandwich leave and will be unpaid</span>
           </mat-checkbox>
           <div *ngIf="leavesForm.get('sandwich_confirm')?.invalid && leavesForm.get('sandwich_confirm')?.touched"
             class="text-red-500 text-sm mt-1">
-            You must confirm the Sandwich Rule to proceed
+            You must acknowledge the sandwich leave policy to proceed
           </div>
-
         </div>
 
         <!-- Warnings -->
@@ -121,12 +122,6 @@
             {{ leaveError }}
           </div>
         </div>
-        <!-- <div class="text-center space-y-2 mt-4">
-          <div *ngIf="sandwicherror" class="text-red-600 text-sm mt-2 bg-yellow-100 p-2 rounded"
-            [innerHTML]="sandwicherror">
-            
-          </div>
-        </div> -->
         <div class="text-center space-y-2 mt-4">
           <div *ngIf="halfdayError" class="text-red-600 text-sm mt-2 bg-yellow-100 p-2 rounded">
             {{ halfdayError }}
@@ -140,8 +135,23 @@
           <div *ngIf="holidayWarning" class="text-yellow-700 bg-yellow-100 p-2 rounded">
             ⚠️ Your leave period overlaps with a holiday.
           </div>
-          <div *ngIf="sandwichWarning" class="text-yellow-700 bg-yellow-100 p-2 rounded">
-            ⚠️ The selected dates fall under the sandwich rule.
+          <!-- BDE/BA sandwich leave note: UnPaid and locked -->
+          <div *ngIf="isSandwichLeave && isBdeOrBa"
+            class="flex items-start gap-2 bg-blue-50 border border-blue-400 text-blue-800 rounded-lg px-4 py-3 mt-2">
+            <mat-icon class="text-blue-600 mt-0.5 shrink-0">info</mat-icon>
+            <div>
+              <p class="font-semibold text-blue-800">This is a Sandwich Leave.</p>
+      
+            </div>
+          </div>
+          <!-- Non-BDE/BA sandwich leave warning -->
+          <div *ngIf="isSandwichLeave && !isBdeOrBa"
+            class="flex items-start gap-2 bg-red-50 border border-red-400 text-red-700 rounded-lg px-4 py-3 mt-2">
+            <mat-icon class="text-red-600 mt-0.5 shrink-0">warning</mat-icon>
+            <div>
+              <p class="font-semibold text-red-700">⚠️ This is a Sandwich Leave — it is Unpaid.</p>
+          
+            </div>
           </div>
         </div>
         <!-- Action Buttons -->

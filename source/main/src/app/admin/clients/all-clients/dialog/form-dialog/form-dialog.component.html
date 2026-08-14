@@ -60,30 +60,56 @@
         <div>
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Client Connect Type</mat-label>
-            <mat-select formControlName="clientConnectType" required>
+            <!-- NEW CODE: Added (selectionChange) to trigger "Other" source box -->
+            <!-- OLD: <mat-select formControlName="clientConnectType" required> -->
+            <mat-select formControlName="clientConnectType" (selectionChange)="onConnectTypeChange($event.value)" required>
               <mat-option *ngFor="let type of clientConnectType" [value]="type">{{ type }}</mat-option>
             </mat-select>
             <mat-error *ngIf="clientForm.get('clientConnectType')?.hasError('required')">
               Client Connect Type is required
             </mat-error>
           </mat-form-field>
+
+          <!-- NEW CODE: Show this input only when "Other" is selected as connect type -->
+          <mat-form-field *ngIf="showConnectSource" appearance="outline" class="w-full mt-1">
+            <mat-label>Where did you get this client from?</mat-label>
+            <input matInput formControlName="clientConnectSource" placeholder="e.g. Conference, Referral, Cold Outreach" />
+            <mat-icon matSuffix class="text-gray-500">info</mat-icon>
+          </mat-form-field>
         </div>
       </div>
 
-      <!-- bde_account_id & bde_account_email-->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- OLD: BDE Account ID & BDE Email Account fields -->
+      <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>BDE Account ID</mat-label>
           <input matInput formControlName="bdeAccountId">
-          <mat-icon matSuffix>face</mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>BDE Email Account</mat-label>
+          <input matInput formControlName="bdeAccountEmail">
+        </mat-form-field>
+      </div> -->
+
+      <!-- NEW CODE: Bank details — Bank Name, Account Number, IFSC Code -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Bank Name</mat-label>
+          <input matInput formControlName="bankName" placeholder="e.g. HDFC, SBI, ICICI" />
+          <mat-icon matSuffix class="text-gray-500">account_balance</mat-icon>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="w-full">
-          <mat-label>BDE Account Email</mat-label>
-          <input matInput formControlName="bdeAccountEmail">
-          <mat-icon matSuffix>email</mat-icon>
+          <mat-label>Bank Account Number</mat-label>
+          <input matInput formControlName="bankAccountNumber" placeholder="Enter account number" />
+          <mat-icon matSuffix class="text-gray-500">credit_card</mat-icon>
         </mat-form-field>
 
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>IFSC Code</mat-label>
+          <input matInput formControlName="ifscCode" placeholder="e.g. HDFC0001234" style="text-transform:uppercase" />
+          <mat-icon matSuffix class="text-gray-500">tag</mat-icon>
+        </mat-form-field>
       </div>
 
       <!-- Row: Full Name & Mobile -->
@@ -115,8 +141,10 @@
 
 
           <!-- COUNTRY SELECT (FLOATING, NOT PREFIX) -->
-          <mat-select [(value)]="selectedCountry" class="country-select border-r pr-2" disableOptionCentering
-            panelClass="country-panel">
+          <!-- NEW CODE: Added (selectionChange)="onDialCodeChange()" to auto-fill Country field -->
+          <!-- OLD: <mat-select [(value)]="selectedCountry" class="country-select border-r pr-2" ...> -->
+          <mat-select [(value)]="selectedCountry" (selectionChange)="onDialCodeChange($event.value)"
+            class="country-select border-r pr-2" disableOptionCentering panelClass="country-panel">
             <mat-option *ngFor="let c of countries" [value]="c" class="country_select">
               {{ c.flag }} {{ c.dialCode }}
             </mat-option>
@@ -210,8 +238,10 @@
         </style> -->
       </div>
 
-      <!-- Row: Email & LinkedIn -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Row: Email — LinkedIn removed -->
+      <!-- NEW CODE: LinkedIn field removed — Email now takes full row -->
+      <!-- OLD grid had 2 cols: Email + LinkedIn ID -->
+      <div class="grid grid-cols-1 gap-4">
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Email</mat-label>
           <input matInput formControlName="email" required>
@@ -224,12 +254,12 @@
           </mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="w-full">
+        <!-- OLD: LinkedIn ID field — REMOVED as per requirement -->
+        <!-- <mat-form-field appearance="outline" class="w-full">
           <mat-label>LinkedIn ID</mat-label>
           <input matInput formControlName="linkedinId">
           <mat-icon matSuffix>link</mat-icon>
-
-        </mat-form-field>
+        </mat-form-field> -->
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -291,21 +321,54 @@
           </mat-error>
         </mat-form-field>
       </div>
-      <!-- Row: Technology & Platform -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Row: Technology — Platform moved to checkbox section below -->
+      <!-- OLD: Technology & Platform were side by side, Platform was a plain text input -->
+      <!-- NEW CODE: Platform is now a checkbox; Technology gets its own full row -->
+      <div class="grid grid-cols-1 gap-4">
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Technology</mat-label>
           <input matInput formControlName="technology">
           <mat-icon matSuffix>build</mat-icon>
-
         </mat-form-field>
+      </div>
 
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Platform</mat-label>
-          <input matInput formControlName="platform">
-          <mat-icon matSuffix>computer</mat-icon>
+      <!-- OLD: <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Platform</mat-label>
+        <input matInput formControlName="platform">
+        <mat-icon matSuffix>computer</mat-icon>
+      </mat-form-field> -->
 
-        </mat-form-field>
+      <!-- NEW CODE: Platform as optional checkbox. When checked, show Platform name, ID and Password fields -->
+      <div class="border rounded-lg p-4 bg-gray-50">
+        <mat-checkbox
+          [(ngModel)]="showPlatformFields"
+          [ngModelOptions]="{standalone: true}"
+          (change)="onPlatformToggle($event.checked)"
+          class="text-sm font-medium text-gray-700">
+          Has Platform Account?
+        </mat-checkbox>
+        <p class="text-xs text-gray-400 mt-1 ml-7">Check this if client was found on a freelancing/work platform</p>
+
+        <!-- NEW CODE: These 3 fields appear only when checkbox is checked -->
+        <div *ngIf="showPlatformFields" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Platform Name</mat-label>
+            <input matInput formControlName="platform" placeholder="e.g. Upwork, Fiverr, Toptal" />
+            <mat-icon matSuffix class="text-gray-500">computer</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Platform ID / Username</mat-label>
+            <input matInput formControlName="platformId" placeholder="Your profile username" />
+            <mat-icon matSuffix class="text-gray-500">account_circle</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Platform Password</mat-label>
+            <input matInput formControlName="platformPassword" type="password" placeholder="Account password" />
+            <mat-icon matSuffix class="text-gray-500">lock</mat-icon>
+          </mat-form-field>
+        </div>
       </div>
       <!-- Row: Price Tag & Price Amount -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -329,6 +392,15 @@
           <mat-error *ngIf="clientForm.get('prizeAmount')?.hasError('min')">
             Price Amount must be greater than 0
           </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Tag (optional) -->
+      <div>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Tag <span class="text-gray-400 text-xs">(optional)</span></mat-label>
+          <input matInput formControlName="tag" placeholder="e.g. VIP, Priority, Referral" />
+          <mat-icon matSuffix>label</mat-icon>
         </mat-form-field>
       </div>
 

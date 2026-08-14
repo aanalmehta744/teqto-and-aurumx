@@ -41,6 +41,13 @@ export class PayslipComponent implements OnInit {
     private employeeSalaryService: EmployeeSalaryService,
     private employeeService: EmployeesService,
   ) { }
+  // added code below is — month name for payslip header
+  get monthName(): string {
+    if (!this.employeeSalary?.month) return '';
+    return new Date(2000, Number(this.employeeSalary.month) - 1, 1)
+      .toLocaleString('default', { month: 'long' });
+  }
+
   enableEditDays() {
     if (this.employeeSalary) {
       this.tempWorkingDays = this.employeeSalary.workingDays;

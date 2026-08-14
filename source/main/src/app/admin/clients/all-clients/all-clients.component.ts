@@ -58,11 +58,14 @@ import { MatExpansionModule } from '@angular/material/expansion';
 export class AllclientComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   displayedColumns = [
     'bde_name',
-    'bde_account_id',
-    'bde_account_email',
+    // OLD: 'bde_account_id', 'bde_account_email',
+    // NEW CODE: Bank detail columns replace BDE account columns
+    'bank_name',
+    'bank_account_number',
     'name',
     'email',
     'technology',
+    'tag',
     'client_type',
     'client_Connect_Type',
     'last_followup_date',
@@ -449,8 +452,11 @@ export class AllclientComponent extends UnsubscribeOnDestroyAdapter implements O
     // Prepare export data for that BDE only
     const exportData: Partial<TableElement>[] = bde.clients.map((x: any) => ({
       'BDE': x.bde_name,
-      'BDE Account Id': x.bde_account_id || '-',
-      'BDE Account Email': x.bde_account_email || '-',
+      // OLD: 'BDE Account Id': x.bde_account_id || '-', 'BDE Email Account': x.bde_account_email || '-',
+      // NEW CODE: Export bank details instead
+      'Bank Name': x.bank_name || '-',
+      'Bank Account Number': x.bank_account_number || '-',
+      'IFSC Code': x.ifsc_code || '-',
       'Client Name': x.fullName,
       'Mobile': x.mobile,
       'Email': x.email,
@@ -484,8 +490,11 @@ export class AllclientComponent extends UnsubscribeOnDestroyAdapter implements O
     const exportData: Partial<TableElement>[] =
       this.dataSource.filteredData.map((x) => ({
         BDE: x.bde_name,
-        bde_account_id: x.bde_account_id,
-        bde_account_email: x.bde_account_email,
+        // OLD: bde_account_id: x.bde_account_id, bde_account_email: x.bde_account_email,
+        // NEW CODE: Export bank details instead
+        Bank_Name: x.bank_name,
+        Bank_Account_Number: x.bank_account_number,
+        IFSC_Code: x.ifsc_code,
         Name: x.fullName,
         Mobile: x.mobile,
         Email: x.email,
@@ -555,8 +564,10 @@ export class ExampleDataSource extends DataSource<Clients> {
           .filter((clients: Clients) => {
             const searchStr = (
               clients.name +
-              clients.bde_account_id +
-              clients.bde_account_email +
+              // OLD: clients.bde_account_id + clients.bde_account_email +
+              // NEW CODE: Search bank fields instead
+              (clients.bank_name || '') +
+              (clients.bank_account_number || '') +
               clients.bde_name +
               clients.mobile +
               clients.email +

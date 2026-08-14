@@ -32,11 +32,14 @@ import {
   ApexNonAxisChartSeries,
   NgApexchartsModule,
 } from 'ng-apexcharts';
-import { InterviewService } from 'app/employee/jobs/interview-schedule/interview.service';
+// import { InterviewService } from 'app/employee/jobs/interview-schedule/interview.service';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { LeavesService } from 'app/admin/leaves/leave-requests/leaves.service';
 import { AuthService } from '@core';
+import { AnnouncementBannerComponent } from '@shared/components/announcement-banner/announcement-banner.component';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'environments/environment';
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -55,7 +58,9 @@ import { AuthService } from '@core';
     CommonModule,
     NgScrollbarModule,
     NgApexchartsModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    AnnouncementBannerComponent,
+    MatTableModule,
   ],
 })
 export class MainComponent implements OnInit {
@@ -84,6 +89,7 @@ export class MainComponent implements OnInit {
 
 
   userRole: string = '';
+  baLeaveBalance: any = null;
   private projectStatusMap: { [status: string]: string[] } = {};
   constructor(
     private dashboardService: DashboardService,
@@ -91,9 +97,10 @@ export class MainComponent implements OnInit {
     private dailyUpdateService: EmployeeDailyUpdateService,
     private projectService: ProjectService,
     private clientsService: ClientsService,
-    private interviewService: InterviewService,
+    // private interviewService: InterviewService,
     private ieavesService: LeavesService,
     private authService: AuthService,
+    private http: HttpClient,
   ) {
     this.userRole = this.authService.currentUserValue?.role?.toLowerCase() ?? '';
   }
@@ -178,6 +185,27 @@ export class MainComponent implements OnInit {
     }
   };
 
+  // BDE Activity Chart (calls / meetings / deals)
+  bdePerformanceSummary: any[] = [];
+  public bdeChartSeries: ApexAxisChartSeries = [];
+  public bdeChartOptions: ApexChart = { type: 'bar', height: 320, toolbar: { show: false } };
+  public bdeChartXAxis: ApexXAxis = { categories: [] };
+  public bdeChartDataLabels: ApexDataLabels = { enabled: true };
+  public bdeChartTooltip: ApexTooltip = { shared: true, intersect: false };
+  public bdeChartColors: string[] = ['#0b0b88', '#f59e0b', '#10b981'];
+
+  // BDE KPI Target Achievement Chart (completed / partial / missed)
+  bdeKpiAchievement: any[] = [];
+  public kpiAchievementSeries: ApexAxisChartSeries = [];
+  public kpiAchievementChart: ApexChart = { type: 'bar', height: 320, stacked: true, toolbar: { show: false } };
+  public kpiAchievementXAxis: ApexXAxis = { categories: [] };
+  public kpiAchievementDataLabels: ApexDataLabels = { enabled: true };
+  public kpiAchievementTooltip: ApexTooltip = { shared: true, intersect: false };
+  public kpiAchievementColors: string[] = ['#10b981', '#f59e0b', '#ef4444'];
+  public kpiAchievementLegend: ApexLegend = { position: 'top' };
+
+  // Leaderboard
+  bdeLeaderboard: any[] = [];
 
   ngOnInit() {
     this.loadFollowupsByBDE();
@@ -188,6 +216,61 @@ export class MainComponent implements OnInit {
     this.loadClients();
     this.loadInterviews();
     this.loadPendingLeaves();
+    this.loadBdePerformanceSummary();
+    this.loadBdeKpiAchievement();
+    if (this.userRole === 'ba') {
+      this.loadBaLeaveBalance();
+    }
+  }
+
+  loadBaLeaveBalance(): void {
+    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const userId = user?.id;
+    if (!userId) return;
+    this.http.get<any>(`${environment.apiUrl}/leaveRequests/leave-balance/${userId}`).subscribe({
+      next: (data) => { this.baLeaveBalance = data; },
+      error: (err) => console.error('Error fetching BA leave balance:', err),
+    });
+  }
+
+  loadBdePerformanceSummary(): void {
+    this.dashboardService.getBdePerformanceSummary().subscribe({
+      next: (data) => {
+        this.bdePerformanceSummary = data;
+        const names = data.map((b: any) => b.bde_name);
+        this.bdeChartXAxis = { categories: names };
+        this.bdeChartSeries = [
+          { name: 'Calls', data: data.map((b: any) => b.calls) },
+          { name: 'Meetings', data: data.map((b: any) => b.meetings) },
+          { name: 'Deals Won', data: data.map((b: any) => b.deals_won) },
+        ];
+      },
+      error: (err) => console.error('Error loading BDE performance:', err),
+    });
+  }
+
+  loadBdeKpiAchievement(): void {
+    this.dashboardService.getBdeKpiAchievement().subscribe({
+      next: (data) => {
+        this.bdeKpiAchievement = data;
+        this.bdeLeaderboard = data; // already sorted by avg_achievement desc from backend
+        const names = data.map((b: any) => b.bde_name);
+        this.kpiAchievementXAxis = { categories: names };
+        this.kpiAchievementSeries = [
+          { name: 'Completed (≥100%)', data: data.map((b: any) => b.completed) },
+          { name: 'Partial (70–99%)', data: data.map((b: any) => b.partial) },
+          { name: 'Missed (<70%)', data: data.map((b: any) => b.missed) },
+        ];
+      },
+      error: (err) => console.error('Error loading BDE KPI achievement:', err),
+    });
+  }
+
+  rankMedal(index: number): string {
+    if (index === 0) return '🥇';
+    if (index === 1) return '🥈';
+    if (index === 2) return '🥉';
+    return `#${index + 1}`;
   }
   ngAfterViewInit(): void {
     if (this.followupPaginator) {
@@ -264,14 +347,14 @@ export class MainComponent implements OnInit {
   }
   loadInterviews(): void {
 
-    this.interviewService.getInterviews().subscribe((interviews: any[]) => {
-      // Only show upcoming interviews (today or future)
-      const now = new Date();
-      const upcoming = interviews.filter(i => new Date(i.interview_date) >= now);
-      console.log("Interviews List", interviews);
-      this.interviewDataSource.data = upcoming;
-      this.updateInterviewPagination();
-    });
+    // this.interviewService.getInterviews().subscribe((interviews: any[]) => {
+    //   // Only show upcoming interviews (today or future)
+    //   const now = new Date();
+    //   const upcoming = interviews.filter(i => new Date(i.interview_date) >= now);
+    //   console.log("Interviews List", interviews);
+    //   this.interviewDataSource.data = upcoming;
+    //   this.updateInterviewPagination();
+    // });
 
   }
   updateInterviewPagination(): void {

@@ -1,4 +1,112 @@
 
+// .responsive_table {
+//   width: 100%;
+//   overflow-x: auto;
+// }
+
+// table.mat-table {
+//   min-width: 800px;
+//   width: 100%;
+// }
+
+// .mat-cell, .mat-header-cell {
+//   white-space: nowrap;
+//   text-overflow: ellipsis;
+//   overflow: hidden;
+//   max-width: 200px;
+// }
+
+
+
+
+// ==========================================================================
+// Employee Dashboard — professional, white-based theme
+// ==========================================================================
+
+:host {
+  --color-bg: #f8fafc;        // page background (slate-50)
+  --color-surface: #ffffff;   // card / panel background
+  --color-border: #e2e8f0;    // hairline borders (slate-200)
+  --color-text: #1e293b;      // primary text (slate-800)
+  --color-text-muted: #64748b;// secondary text (slate-500)
+  --color-accent: #0d9488;    // teal-600, brand accent
+  --radius-md: 0.75rem;
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+// ── Stat / widget cards ───────────────────────────────────────────────────
+.stat-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 1.1rem 1.25rem;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+    transform: translateY(-1px);
+  }
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.stat-sublabel {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  margin-top: 0.15rem;
+}
+
+.stat-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.6rem;
+  font-size: 1rem;
+}
+
+// ── Panels (table containers) ─────────────────────────────────────────────
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.panel-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+}
+
+// ── Tables ────────────────────────────────────────────────────────────────
 .responsive_table {
   width: 100%;
   overflow-x: auto;
@@ -9,9 +117,100 @@ table.mat-table {
   width: 100%;
 }
 
-.mat-cell, .mat-header-cell {
+.mat-cell,
+.mat-header-cell {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
   max-width: 200px;
+}
+
+.table-head-row {
+  background: #f8fafc;
+}
+
+.th-cell {
+  text-align: left;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.td-cell {
+  padding: 0.65rem 0.9rem;
+  color: var(--color-text);
+  font-size: 0.85rem;
+}
+
+.table-row {
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 0.1s ease;
+
+  &:hover {
+    background-color: #f8fafc;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.empty-row {
+  text-align: center;
+  padding: 1.5rem 0.9rem;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+// ── Badges (status pills) ─────────────────────────────────────────────────
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.badge-success {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.badge-danger {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.badge-warning {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.badge-caution {
+  background: #fefce8;
+  color: #a16207;
+}
+
+.badge-neutral {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+// ── Misc ──────────────────────────────────────────────────────────────────
+.link-more {
+  color: var(--color-accent);
+  cursor: pointer;
+  font-weight: 500;
+  margin-left: 0.25rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }

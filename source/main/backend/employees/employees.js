@@ -1,12 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../connection'); // Ensure database connection
-const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
 const bcrypt = require('bcrypt');
 const cron = require('node-cron');
 const { sendWelcomeEmail } = require('./sendEmail');
+const { createUpload } = require('../cloudinary');
 
 // Middleware to parse JSON bodies
 router.use(express.json());
@@ -56,25 +54,17 @@ cron.schedule('0 0 1 1 *', async () => {
   }
 });
 
-// Define upload directories
-const employeeUploadDir = path.join(__dirname, '../uploads/employees');
+const upload = createUpload('employees');
 
-// Create the uploads directory if it doesn't exist
-if (!fs.existsSync(employeeUploadDir)) {
-  fs.mkdirSync(employeeUploadDir, { recursive: true });
-}
-
-// Set up Multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, employeeUploadDir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  },
-});
-
-const upload = multer({ storage });
+// added code below is — ensure incentive column exists in employees table (MySQL 5.7 compatible)
+db.query(`
+  SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'employees' AND COLUMN_NAME = 'incentive'
+`).then(([rows]) => {
+  if (rows[0].cnt === 0) {
+    return db.query(`ALTER TABLE employees ADD COLUMN incentive DECIMAL(10, 2) DEFAULT 0`);
+  }
+}).catch(() => { });
 
 // 🟢 GET all employees
 router.get('/', async (req, res) => {
@@ -94,10 +84,7 @@ router.get('/:id', async (req, res) => {
   const employeeId = req.params.id;
 
   try {
-    const sql = `SELECT *
-                     FROM employees 
-                     
-                     WHERE id = ?`;
+    const sql = `SELECT * FROM employees WHERE id = ?`;
 
     const [results] = await db.query(sql, [employeeId]);
     // console.log(results);
@@ -114,12 +101,12 @@ router.get('/:id', async (req, res) => {
 
 // 🟢 POST Add a new employee
 router.post('/', upload.single('uploadImg'), async (req, res) => {
-console.log("Request Body:", req.body);
-console.log(
-  "termination_date:",
-  req.body.termination_date,
-  typeof req.body.termination_date
-);
+  console.log("Request Body:", req.body);
+  console.log(
+    "termination_date:",
+    req.body.termination_date,
+    typeof req.body.termination_date
+  );
 
   const employeeData = req.body;
   const uploadedFile = req.file;
@@ -171,16 +158,16 @@ console.log(
     const status =
       employeeData.status === 'true' || employeeData.status === true ? 1 : 0;
 
-      const terminationDate =
-  employeeData.termination_date === "null" ||
-  employeeData.termination_date === "" ||
-  employeeData.termination_date == null
-    ? null
-    : employeeData.termination_date;
+    const terminationDate =
+      employeeData.termination_date === "null" ||
+        employeeData.termination_date === "" ||
+        employeeData.termination_date == null
+        ? null
+        : employeeData.termination_date;
 
-    
-console.log("terminationDate =", terminationDate);
-console.log("type =", typeof terminationDate);
+
+    console.log("terminationDate =", terminationDate);
+    console.log("type =", typeof terminationDate);
 
     const values = [
       employeeData.fullName,
@@ -192,17 +179,15 @@ console.log("type =", typeof terminationDate);
       employeeData.email,
       formattedDobDate,
       employeeData.salary,
-      uploadedFile ? uploadedFile.filename : null,
+      uploadedFile ? (uploadedFile.path || uploadedFile.filename) : null,
       formattedJoiningDate,
       employeeData.role,
       employeeData.panCard,
       employeeData.aadharCard,
-      paidLeaves,
-      paidLeaves,
+      paidLeaves,         // total_leave
+      paidLeaves,         // leave_balance (starts equal to total_leave for new employees)
       status,
-      // employeeData.status ?? 1,                 // default active
       terminationDate,    // only set if inactive
-      // employeeData.employment_type,
       employmentType,
     ];
 
@@ -217,7 +202,7 @@ console.log("type =", typeof terminationDate);
 
   } catch (err) {
     console.error('Error adding employee:', err);
-    res.status(500).json({ error: 'An error occurred while adding employee data' });
+    res.status(500).json({ message: err.message, error: err.message });
   }
 });
 
@@ -290,7 +275,6 @@ router.put('/:id', async (req, res) => {
       employeeData.panCard,
       employeeData.aadharCard,
       paidLeaves,
-      paidLeaves,
       employeeData.status ?? 1, // if not provided, default active
       employeeData.employment_type,
       employeeData.status == 0 ? (employeeData.termination_date || new Date().toLocaleDateString('en-CA')) : null,
@@ -331,6 +315,11 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while deleting employee' });
   }
 });
+
+
+
+
+
 // POST /api/employees/:id/targets
 router.post('/:id/targets', async (req, res) => {
   const employeeId = req.params.id;
@@ -431,6 +420,38 @@ router.delete('/:targetId/targets', async (req, res) => {
   } catch (error) {
     console.error('Error deleting target:', error);
     res.status(500).json({ message: 'Failed to delete target' });
+  }
+});
+
+// PATCH /api/employees/:id/upload-photo — upload or replace profile photo
+router.patch('/:id/upload-photo', upload.single('photo'), async (req, res) => {
+  const { id } = req.params;
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+    const [[employee]] = await db.query('SELECT uploadImg FROM employees WHERE id = ?', [id]);
+    if (!employee) return res.status(404).json({ error: 'Employee not found' });
+    const photoUrl = req.file.path || req.file.filename;
+    await db.query('UPDATE employees SET uploadImg = ? WHERE id = ?', [photoUrl, id]);
+    res.json({ message: 'Photo updated successfully', filename: photoUrl });
+  } catch (err) {
+    console.error('Error uploading photo:', err);
+    res.status(500).json({ error: 'Failed to upload photo' });
+  }
+});
+
+// added code below is — PATCH /api/employees/:id/incentive — admin updates BDE incentive amount
+router.patch('/:id/incentive', async (req, res) => {
+  const { id } = req.params;
+  const incentive = parseFloat(req.body.incentive ?? 0);
+  if (isNaN(incentive) || incentive < 0) {
+    return res.status(400).json({ error: 'Invalid incentive value' });
+  }
+  try {
+    await db.query('UPDATE employees SET incentive = ? WHERE id = ?', [incentive, id]);
+    res.json({ message: 'Incentive updated successfully', incentive });
+  } catch (err) {
+    console.error('Error updating incentive:', err);
+    res.status(500).json({ error: 'Failed to update incentive' });
   }
 });
 

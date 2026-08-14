@@ -3,6 +3,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormControl, Validators, UntypedFormGroup, UntypedFormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClientsService } from '../../clients.service';
 import { Clients } from '../../clients.model';
+import { forkJoin } from 'rxjs';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,6 +13,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { CommonModule } from '@angular/common';
+// NEW CODE: MatCheckboxModule added for platform checkbox toggle
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import Swal from 'sweetalert2';
 import { formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -41,6 +44,7 @@ export interface DialogData {
     MatDatepickerModule,
     MatNativeDateModule,
     CommonModule,
+    MatCheckboxModule, // NEW CODE: for platform checkbox
   ],
 })
 export class FormDialogComponent implements OnInit {
@@ -53,10 +57,16 @@ export class FormDialogComponent implements OnInit {
   countryList: { name: string }[] = [];
   clientConnectType: string[] = ['Call', 'Whatsapp', 'Email', 'Linkedin', 'Other'];
   clientTypes: string[] = ['Hot', 'Cold', 'Close'];
-  prizeTags: string[] = ['Hourly', 'Monthly'];
+  prizeTags: string[] = ['Full Time', 'Part Time', 'Hourly', 'Project Based'];
 
   countries: { name: string, flag: string, dialCode: string }[] = [];
   selectedCountry = this.countries[66]; // Default India
+
+  // NEW CODE: Controls visibility of "Where did you get client from?" box when "Other" is selected
+  showConnectSource = false;
+
+  // NEW CODE: Controls visibility of platform ID/password fields when checkbox is ticked
+  showPlatformFields = false;
 
 
   constructor(
@@ -88,8 +98,12 @@ export class FormDialogComponent implements OnInit {
       bde_name: [this.clients?.bde_name || currentUser.fullName || ''],
       bde_email: [this.clients?.bde_email || currentUser.email || ''],
 
-      bdeAccountId: [this.clients.bde_account_id || ''],
-      bdeAccountEmail: [this.clients.bde_account_email || ''],
+      // OLD: bdeAccountId: [this.clients.bde_account_id || ''],
+      // OLD: bdeAccountEmail: [this.clients.bde_account_email || ''],
+      // NEW CODE: Bank details replace BDE account fields
+      bankName: [this.clients.bank_name || ''],
+      bankAccountNumber: [this.clients.bank_account_number || ''],
+      ifscCode: [this.clients.ifsc_code || ''],
 
       fullName: [this.clients.fullName || '', [Validators.required]],
       mobile: [this.clients.mobile || ''],
@@ -107,9 +121,17 @@ export class FormDialogComponent implements OnInit {
       clientConnectType: [this.clients.client_Connect_Type || '', [Validators.required]],
       clientType: [this.clients.client_type || '', [Validators.required]],
       date: [this.clients.date || '', [Validators.required]],
+      // NEW CODE: platform is now optional — shown only when platform checkbox is checked
+      // OLD: platform: [this.clients.platform || '', [Validators.required]],
       platform: [this.clients.platform || ''],
       technology: [this.clients.technology || ''],
-      address: [this.clients.address || '']
+      address: [this.clients.address || ''],
+      tag: [this.clients.tag || ''],
+      // NEW CODE: "Where did you get client from?" — shown only when Connect Type = Other
+      clientConnectSource: [this.clients.client_connect_source || ''],
+      // NEW CODE: Platform login details — shown only when platform checkbox is ticked
+      platformId: [this.clients.platform_id || ''],
+      platformPassword: [this.clients.platform_password || '']
     });
   }
 
@@ -119,6 +141,16 @@ export class FormDialogComponent implements OnInit {
     this.clientForm.statusChanges.subscribe(status => {
       console.log('Form Status:', status, 'Valid:', this.clientForm.valid);
     });
+
+    // NEW CODE: Restore "Other" connect source visibility in edit mode
+    if (this.clients.client_Connect_Type === 'Other') {
+      this.showConnectSource = true;
+    }
+
+    // NEW CODE: Restore platform fields visibility in edit mode if platform was already set
+    if (this.clients.platform) {
+      this.showPlatformFields = true;
+    }
   }
 
   // loadCountries(): void {
@@ -135,32 +167,26 @@ export class FormDialogComponent implements OnInit {
   // }
 
   loadCountries(): void {
-    this.http.get<{ name: string }[]>('/assets/data/countries.json')
-      .subscribe(countryData => {
-        this.countryList = countryData;
-      });
+    forkJoin({
+      countryList: this.http.get<{ name: string }[]>('/assets/data/countries.json'),
+      selectList: this.http.get<{ name: string; flag: string; dialCode: string }[]>('/assets/data/selectCountries.json')
+    }).subscribe(({ countryList, selectList }) => {
+      this.countryList = countryList;
+      this.countries = selectList;
 
-    this.http
-      .get<{ name: string; flag: string; dialCode: string }[]>('/assets/data/selectCountries.json')
-      .subscribe(selectData => {
-        this.countries = selectData;
+      const selectedCountryName = this.clientForm.get('country')?.value;
 
-        // 👉 EDIT MODE: set country dial code automatically
-        const selectedCountryName = this.clientForm.get('country')?.value;
-
-        if (selectedCountryName) {
-          const match = this.countries.find(
-            c => c.name.toLowerCase() === selectedCountryName.toLowerCase()
-          );
-
-          if (match) {
-            this.selectedCountry = match;
-          }
-        } else {
-          // Default India for ADD
-          this.selectedCountry = this.countries.find(c => c.name === 'India')!;
+      if (selectedCountryName) {
+        const match = this.countries.find(c => c.name.toLowerCase() === selectedCountryName.toLowerCase());
+        if (match) this.selectedCountry = match;
+      } else {
+        this.selectedCountry = this.countries.find(c => c.name === 'India')!;
+        if (this.selectedCountry) {
+          const defaultMatch = this.countryList.find(c => c.name.toLowerCase() === this.selectedCountry.name.toLowerCase());
+          if (defaultMatch) this.clientForm.get('country')?.setValue(defaultMatch.name);
         }
-      });
+      }
+    });
   }
 
   confirmAdd(): void {
@@ -235,6 +261,32 @@ export class FormDialogComponent implements OnInit {
       prizeAmountControl?.clearValidators();
     }
     prizeAmountControl?.updateValueAndValidity();
+  }
+
+  // NEW CODE: Show/hide "Where did you get this client?" input when "Other" is selected
+  onConnectTypeChange(value: string): void {
+    this.showConnectSource = value === 'Other';
+    if (!this.showConnectSource) {
+      this.clientForm.get('clientConnectSource')?.setValue('');
+    }
+  }
+
+  // NEW CODE: Show/hide platform ID & password fields when checkbox is toggled
+  onPlatformToggle(checked: boolean): void {
+    this.showPlatformFields = checked;
+    if (!checked) {
+      this.clientForm.get('platform')?.setValue('');
+      this.clientForm.get('platformId')?.setValue('');
+      this.clientForm.get('platformPassword')?.setValue('');
+    }
+  }
+
+  // NEW CODE: Auto-fill Country field when a dial code / flag is selected from phone picker
+  onDialCodeChange(country: { name: string; flag: string; dialCode: string }): void {
+    const match = this.countryList.find(c => c.name.toLowerCase() === country.name.toLowerCase());
+    if (match) {
+      this.clientForm.get('country')?.setValue(match.name);
+    }
   }
 
   onNoClick(): void {

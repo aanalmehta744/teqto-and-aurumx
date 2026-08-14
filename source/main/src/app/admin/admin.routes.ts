@@ -1,5 +1,7 @@
 import { Route } from '@angular/router';
 import { EmployeeDailyUpdateComponent } from './employee-daily-update/employee-daily-update.component';
+import { LoginSettingsComponent } from './login-settings/login-settings.component';
+import { AllTasksComponent } from '../employee/all-tasks/all-tasks.component';
 export const ADMIN_ROUTE: Route[] = [
   {
     path: 'dashboard',
@@ -46,23 +48,32 @@ export const ADMIN_ROUTE: Route[] = [
     loadChildren: () =>
       import('./payroll/payroll.routes').then((m) => m.PAYROLL_ROUTE),
   },
-  {
-    path: 'leads',
-    loadChildren: () =>
-      import('./leads/leads.routes').then((m) => m.LEADS_ROUTE),
-  },
-  {
-    path: 'jobs',
-    loadChildren: () => import('./jobs/jobs.routes').then((m) => m.JOBS_ROUTE),
-  },
-  {
-    path: 'reports',
-    loadChildren: () =>
-      import('./reports/reports.routes').then((m) => m.REPORT_ROUTE),
-  },
+  // {
+  //   path: 'leads',
+  //   loadChildren: () =>
+  //     import('./leads/leads.routes').then((m) => m.LEADS_ROUTE),
+  // },
+ 
+  // {
+  //   path: 'reports',
+  //   loadChildren: () =>
+  //     import('./reports/reports.routes').then((m) => m.REPORT_ROUTE),
+  // },
   {
     path: 'daily-update',
     component: EmployeeDailyUpdateComponent,
+  },
+  {
+    path: 'kpi',
+    loadChildren: () => import('./kpi/kpi.routes').then((m) => m.KPI_ROUTE),
+  },
+  {
+    path: 'login-settings',
+    component: LoginSettingsComponent,
+  },
+  {
+    path: 'alltasks',
+    component: AllTasksComponent,
   },
 ];
 

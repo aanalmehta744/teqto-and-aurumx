@@ -7,49 +7,33 @@
 
     <div class="flex flex-wrap">
       <div class="w-full">
-        <div class="rounded-lg shadow-xl overflow-hidden">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
 
           <!-- table-header -->
-          <div class="flex flex-col md:flex-row justify-between items-center p-4 border-b bg-[#00c4c4]">
-            <div class="w-full md:w-auto mb-4 md:mb-0">
-              <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
-                <h2 class="text-lg text-white">Employee Salary</h2>
-                <div class="flex items-center justify-center">
-                  <div
-                    class="border border-[#CCCCCC] rounded-full bg-white flex items-center text-gray-500 shadow w-full max-w-md">
-                    <mat-icon class="ms-3">search</mat-icon>
-                    <input type="text"
-                      class="w-full h-[40px] rounded-full ps-2 focus:outline-none placeholder:text-[16px]"
-                      placeholder="Search" matInput #filter (keyup)="applyFilter($event)" id="inputoutline">
-                  </div>
-                </div>
+          <div class="flex flex-col md:flex-row justify-between items-center px-5 py-4 border-b border-gray-100">
+            <div class="flex items-center gap-4 mb-3 md:mb-0">
+              <div class="flex items-center gap-2">
+                <span class="h-2 w-2 rounded-full bg-[#0b0b88]"></span>
+                <h6 class="text-sm font-semibold text-[#1B1B2F]">Employee Salary</h6>
+              </div>
+              <div class="relative">
+                <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 !text-[18px]">search</mat-icon>
+                <input type="text"
+                  class="pl-9 pr-4 py-2 rounded-full border border-gray-200 bg-gray-50 text-sm focus:outline-none w-[220px] placeholder:text-gray-400"
+                  placeholder="Search" matInput #filter (keyup)="applyFilter($event)" id="inputoutline">
               </div>
             </div>
 
-            <div class="w-full md:w-auto">
-              <ul class="flex items-center md:justify-end gap-2">
-                <li>
-                  <div class="ml-2" matTooltip="REFRESH">
-                    <button mat-mini-fab class="!bg-[#D5EAEA] hover:!bg-gray-100" (click)="refresh()">
-                      <mat-icon class="!text-[#00383F]">refresh</mat-icon>
-                    </button>
-                  </div>
-                </li>
-                <li>
-                  <div class="ml-2" [hidden]="!selection.hasValue()" matTooltip="DELETE">
-                    <button mat-mini-fab color="warn" class="!bg-[#D5EAEA] hover:!bg-gray-100"
-                      (click)="removeSelectedRows()">
-                      <mat-icon class="!text-[#00383F]">delete</mat-icon>
-                    </button>
-                  </div>
-                </li>
-                <li>
-                  <div class="cursor-pointer p-2 rounded-xl bg-[#D5EAEA] hover:bg-gray-100 shadow-xl" matTooltip="XLSX"
-                    (click)="exportExcel()">
-                    <img src="assets/images/icons/xlsx.png" alt="Export to XLSX" class="w-6 h-6" />
-                  </div>
-                </li>
-              </ul>
+            <div class="flex items-center gap-2">
+              <button mat-mini-fab class="!bg-[#d6d5ea] !shadow-none hover:!bg-gray-100" (click)="refresh()" matTooltip="REFRESH">
+                <mat-icon class="!text-[#00383F]">refresh</mat-icon>
+              </button>
+              <button mat-mini-fab class="!bg-[#d6d5ea] !shadow-none hover:!bg-gray-100" [hidden]="!selection.hasValue()" color="warn" (click)="removeSelectedRows()" matTooltip="DELETE">
+                <mat-icon class="!text-[#00383F]">delete</mat-icon>
+              </button>
+              <div class="cursor-pointer p-2 rounded-xl bg-[#d6d5ea] hover:bg-gray-100" matTooltip="XLSX" (click)="exportExcel()">
+                <img src="assets/images/icons/xlsx.png" alt="Export to XLSX" class="w-6 h-6" />
+              </div>
             </div>
           </div>
 
@@ -204,7 +188,7 @@
           </div>
 
           <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0" [pageSize]="10"
-            [pageSizeOptions]="[5, 10, 25, 100]" class="!p-2 !border-t !bg-[#FAF9FD]">
+            [pageSizeOptions]="[5, 10, 25, 100]" class="!border-t border-gray-100 !bg-white">
           </mat-paginator>
         </div>
       </div>

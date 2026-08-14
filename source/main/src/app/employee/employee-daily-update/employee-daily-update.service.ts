@@ -12,7 +12,7 @@ export class EmployeeDailyUpdateService {
   constructor(private http: HttpClient) { }
 
   getAllUpdates(): Observable<any[]> {
-    return this.http.get<any[]>(this.API_URL);
+    return this.http.get<any[]>(`${this.API_URL}/all`);
   }
 
   // Get daily updates by employeeId and optional date

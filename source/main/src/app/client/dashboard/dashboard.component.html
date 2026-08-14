@@ -1,249 +1,269 @@
 <section>
-  <!-- Breadcrumb -->
-  <div class="mb-4">
-    <app-breadcrumb [title]="'Dashboard'" [items]="['Home']" [active_item]="'Dashboard'"></app-breadcrumb>
-  </div>
+  <div class="bg-slate-50 min-h-screen p-5">
+    <!-- Breadcrumb -->
+    <div class="mb-4">
+      <app-breadcrumb [title]="'Dashboard'" [items]="['Home']" [active_item]="'Dashboard'"></app-breadcrumb>
+    </div>
 
-  <!-- Info Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    <div class="bg-gradient-to-r from-purple-500 to-purple-700 text-white p-4 rounded-xl shadow">
-      <h6 class="mb-2 font-medium">Today Attendance</h6>
-      <div class="flex justify-between items-center !text-[1.2rem]">
+    <!-- Announcements -->
+    <app-announcement-banner></app-announcement-banner>
 
-        <!-- Present → running/pause timer -->
-        <span *ngIf="attendanceStatus === 'Present'">
-          Present : {{ liveTimer }}
-        </span>
+    <!-- Info Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-4">
+      <!-- Today Attendance -->
+      <div class="stat-card border-l-4 border-l-indigo-500">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="stat-label">Today Attendance</p>
+            <p class="stat-value" *ngIf="attendanceStatus === 'Present'">{{ liveTimer }}</p>
+            <p class="stat-value" *ngIf="attendanceStatus === 'Checked Out'">{{ liveTimer }}</p>
+            <p class="stat-value text-slate-400" *ngIf="attendanceStatus === 'Absent'">Absent</p>
+            <p class="stat-sublabel" *ngIf="attendanceStatus === 'Present' || attendanceStatus === 'Checked Out'">
+              Present
+            </p>
+          </div>
+          <span class="stat-icon bg-indigo-50 text-indigo-600">
+            <i class="fas fa-user-check"></i>
+          </span>
+        </div>
+      </div>
 
-        <!-- Checked Out → final frozen hours -->
-        <span *ngIf="attendanceStatus === 'Checked Out'">
-          Present : {{ liveTimer }}
-        </span>
+      <!-- Today Followups -->
+      <div class="stat-card border-l-4 border-l-emerald-500">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="stat-label">Today Followups</p>
+            <p class="stat-value">{{ todayFollowupsCount }}</p>
+          </div>
+          <span class="stat-icon bg-emerald-50 text-emerald-600">
+            <i class="far fa-check-circle"></i>
+          </span>
+        </div>
+      </div>
 
-        <!-- Absent -->
-        <span *ngIf="attendanceStatus === 'Absent'">
-          Absent
-        </span>
+      <!-- Monthly Target -->
+      <div class="stat-card border-l-4 border-l-amber-500">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="stat-label">Monthly Target</p>
+            <p class="stat-value">{{ monthlyTarget }}</p>
+          </div>
+          <span class="stat-icon bg-amber-50 text-amber-600">
+            <i class="fas fa-briefcase"></i>
+          </span>
+        </div>
+      </div>
 
-        <i class="fas fa-user-check"></i>
+      <!-- Available Leaves -->
+      <div class="stat-card border-l-4 border-l-#0b0b88">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="stat-label">Available Leaves</p>
+            <p class="stat-value">{{ leaveBalance }}</p>
+          </div>
+          <span class="stat-icon bg-teal-50 text-teal-600">
+            <i class="fas fa-umbrella-beach"></i>
+          </span>
+        </div>
       </div>
     </div>
-    <div class="bg-green-500 text-white p-4 rounded-lg shadow-md">
-      <h6 class="text-sm font-medium">Today Followups</h6>
-      <div class="flex justify-between items-center mt-2 text-[1.5rem]">
-        <span class="font-medium">{{todayFollowupsCount}}</span>
-        <i class="far fa-check-circle"></i>
+
+    <!-- Today Followups Table -->
+    <div class="panel mt-6">
+      <div class="panel-header">
+        <h6 class="panel-title">
+          <i class="far fa-check-circle text-teal-600 mr-2"></i>Today's Followups
+        </h6>
       </div>
-    </div>
-    <div class="bg-orange-500 text-white p-4 rounded-lg shadow-md">
-      <h6 class="text-sm font-medium">Monthly Target</h6>
-      <div class="flex justify-between items-center mt-2 text-[1.5rem]">
-        <span class="font-medium">{{monthlyTarget}}</span>
-        <i class="fas fa-briefcase"></i>
+      <div class="overflow-auto max-h-[60vh] responsive_table">
+        <table mat-table [dataSource]="todayFollowupsDataSource" class="w-full text-sm text-left" matSort>
+
+          <!-- ID -->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">ID</th>
+            <td mat-cell *matCellDef="let followup" class="td-cell">{{ followup.id }}</td>
+          </ng-container>
+
+          <!-- Client -->
+          <ng-container matColumnDef="clientName">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Client</th>
+            <td mat-cell *matCellDef="let followup" class="td-cell">{{ followup.clientName }}</td>
+          </ng-container>
+
+          <!-- Contact -->
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Email</th>
+            <td mat-cell *matCellDef="let followup" class="td-cell">{{ followup.email }}</td>
+          </ng-container>
+
+          <!-- Status -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Type</th>
+            <td mat-cell *matCellDef="let followup" class="td-cell">
+              {{ followup.status }}
+            </td>
+          </ng-container>
+
+          <!-- Next Followup Date -->
+          <ng-container matColumnDef="next_date">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Next Date</th>
+            <td mat-cell *matCellDef="let followup" class="td-cell">
+              {{ followup.followup_date | date:'mediumDate' }}
+            </td>
+          </ng-container>
+
+          <!-- Remarks -->
+          <ng-container matColumnDef="notes">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Notes</th>
+            <td mat-cell *matCellDef="let followup" class="td-cell">{{ followup.notes || '--' }}</td>
+          </ng-container>
+
+          <!-- Header + Row -->
+          <tr mat-header-row *matHeaderRowDef="todayFollowupsDisplayedColumns" class="table-head-row"></tr>
+          <tr mat-row *matRowDef="let row; columns: todayFollowupsDisplayedColumns;" class="table-row"></tr>
+
+          <!-- No Records Row -->
+          <tr *matNoDataRow>
+            <td class="empty-row" [attr.colspan]="todayFollowupsDisplayedColumns.length">
+              No followups found for today
+            </td>
+          </tr>
+        </table>
       </div>
+
+      <mat-paginator #todayFollowupsPaginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
+      </mat-paginator>
     </div>
-    <div class="bg-blue-500 text-white p-4 rounded-lg shadow-md">
-      <h6 class="text-sm font-medium">Available Leaves</h6>
-      <div class="flex justify-between items-center mt-2 text-[1.5rem]">
-        <span class="font-medium">{{leaveBalance}}</span>
-        <i class="fas fa-umbrella-beach"></i>
+
+
+    <!-- Clients Table -->
+    <div class="panel mt-6">
+      <div class="panel-header">
+        <h6 class="panel-title">
+          <i class="fas fa-users text-teal-600 mr-2"></i>Clients List
+        </h6>
       </div>
+      <div class="overflow-auto max-h-[60vh] responsive_table">
+        <table mat-table [dataSource]="clientsDataSource" class="w-full text-sm text-left" matSort>
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">ID</th>
+            <td mat-cell *matCellDef="let client" class="td-cell">{{client.id}}</td>
+          </ng-container>
+          <ng-container matColumnDef="fullName">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Name</th>
+            <td mat-cell *matCellDef="let client" class="td-cell">{{client.fullName}}</td>
+          </ng-container>
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Email</th>
+            <td mat-cell *matCellDef="let client" class="td-cell">{{client.email}}</td>
+          </ng-container>
+          <ng-container matColumnDef="mobile">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Mobile</th>
+            <td mat-cell *matCellDef="let client" class="td-cell">{{client.mobile || '--'}}</td>
+          </ng-container>
+          <ng-container matColumnDef="address">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Address</th>
+            <td mat-cell *matCellDef="let client" class="td-cell">{{client.address}}</td>
+          </ng-container>
+          <ng-container matColumnDef="client_type">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Type</th>
+            <td mat-cell *matCellDef="let client" class="td-cell">{{client.client_type}}</td>
+          </ng-container>
+          <ng-container matColumnDef="client_Connect_Type">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Connect Type</th>
+            <td mat-cell *matCellDef="let client" class="td-cell">{{client.client_Connect_Type}}</td>
+          </ng-container>
+          <ng-container matColumnDef="country">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Country</th>
+            <td mat-cell *matCellDef="let client" class="td-cell">{{client.country}}</td>
+          </ng-container>
+          <ng-container matColumnDef="created_at">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Created At</th>
+            <td mat-cell *matCellDef="let client" class="td-cell">{{client.created_at | date:'mediumDate'}}</td>
+          </ng-container>
+          <ng-container matColumnDef="technology">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Technology</th>
+            <td mat-cell *matCellDef="let client" class="td-cell">{{client.technology || '--'}}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="clientsDisplayedColumns" class="table-head-row"></tr>
+          <tr mat-row *matRowDef="let row; columns: clientsDisplayedColumns;" class="table-row"></tr>
+        </table>
+
+      </div>
+      <mat-paginator #clientsPaginator [pageSizeOptions]="[5, 10, 20]"
+        showFirstLastButtons></mat-paginator>
     </div>
+
+    <!-- Attendance Table -->
+    <div class="panel mt-6">
+      <div class="panel-header">
+        <h6 class="panel-title">
+          <i class="fas fa-calendar-check text-teal-600 mr-2"></i>Attendance Records
+        </h6>
+      </div>
+      <div class="overflow-auto max-h-[60vh] responsive_table">
+        <table mat-table [dataSource]="dataSource" class="w-full text-sm text-left" matSort>
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Date</th>
+            <td mat-cell *matCellDef="let attendance" class="td-cell">{{ attendance.date | date }}</td>
+          </ng-container>
+          <ng-container matColumnDef="check_in">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Check In</th>
+            <td mat-cell *matCellDef="let attendance" class="td-cell">{{ attendance.check_in ? (attendance.check_in |
+              date:'h:mm:ss a') : '--' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="check_out">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Check Out</th>
+            <td mat-cell *matCellDef="let attendance" class="td-cell">{{ attendance.check_out ? (attendance.check_out
+              |
+              date:'h:mm:ss a') : '--' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="th-cell">
+              Status
+            </th>
+            <td mat-cell *matCellDef="let row" class="td-cell">
+              <!-- Present -->
+              <span *ngIf="row.final_status === 'Present'" class="badge badge-success">
+                {{ row.final_status }}
+              </span>
+
+              <!-- Absent -->
+              <span *ngIf="row.final_status === 'Absent'" class="badge badge-danger">
+                {{ row.final_status }}
+              </span>
+              <!-- Half Day -->
+              <span *ngIf="row.status === 'Half Day'" class="badge badge-warning">
+                {{ row.final_status }}
+              </span>
+              <!-- Leave -->
+              <span *ngIf="row.final_status === 'Leave'" class="badge badge-caution">
+                {{ row.final_status }}
+              </span>
+              <!-- Fallback for any other status -->
+              <span
+                *ngIf="row.final_status !== 'Present' && row.final_status !== 'Absent' && row.final_status !== 'Leave' && row.final_status !== 'Half Day'"
+                class="badge badge-neutral">
+                {{ row.final_status }}
+              </span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="hours">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Hours</th>
+            <td mat-cell *matCellDef="let attendance" class="td-cell">{{ attendance.hours || '--' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="break">
+            <th mat-header-cell *matHeaderCellDef class="th-cell">Break</th>
+            <td mat-cell *matCellDef="let attendance" class="td-cell">{{ attendance.break || '--' }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns" class="table-head-row"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+        </table>
+
+      </div>
+      <mat-paginator #attendancePaginator [pageSizeOptions]="[5, 10, 20]"
+        showFirstLastButtons></mat-paginator>
+    </div>
+
   </div>
-  <!-- Today Followups Table -->
-  <div class="mt-8 bg-white rounded-lg shadow-md overflow-hidden">
-    <div class="p-4 border-b bg-[#00C4C4]">
-      <h2 class="text-lg font-medium text-white">Today's Followups</h2>
-    </div>
-    <div class="overflow-auto max-h-[60vh]">
-      <table mat-table [dataSource]="todayFollowupsDataSource" class="w-full text-sm text-left" matSort>
-
-        <!-- ID -->
-        <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">ID</th>
-          <td mat-cell *matCellDef="let followup" class="p-2">{{ followup.id }}</td>
-        </ng-container>
-
-        <!-- Client -->
-        <ng-container matColumnDef="clientName">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Client</th>
-          <td mat-cell *matCellDef="let followup" class="p-2">{{ followup.clientName }}</td>
-        </ng-container>
-
-        <!-- Contact -->
-        <ng-container matColumnDef="email">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Email</th>
-          <td mat-cell *matCellDef="let followup" class="p-2">{{ followup.email }}</td>
-        </ng-container>
-
-        <!-- Status -->
-        <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Type</th>
-          <td mat-cell *matCellDef="let followup" class="p-2">
-            {{ followup.status }}
-          </td>
-        </ng-container>
-
-        <!-- Next Followup Date -->
-        <ng-container matColumnDef="next_date">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Next Date</th>
-          <td mat-cell *matCellDef="let followup" class="p-2">
-            {{ followup.followup_date | date:'mediumDate' }}
-          </td>
-        </ng-container>
-
-        <!-- Remarks -->
-        <ng-container matColumnDef="notes">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Notes</th>
-          <td mat-cell *matCellDef="let followup" class="p-2">{{ followup.notes || '--' }}</td>
-        </ng-container>
-
-        <!-- Header + Row -->
-        <tr mat-header-row *matHeaderRowDef="todayFollowupsDisplayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: todayFollowupsDisplayedColumns;"></tr>
-
-        <!-- No Records Row -->
-        <tr class="text-center" *matNoDataRow>
-          <td class="p-4 text-gray-500" [attr.colspan]="todayFollowupsDisplayedColumns.length">
-            No followups found for today
-          </td>
-        </tr>
-      </table>
-    </div>
-
-    <mat-paginator #todayFollowupsPaginator class="border-t" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
-    </mat-paginator>
-  </div>
-
-
-  <!-- Clients Table -->
-  <div class="mt-8 bg-white rounded-lg shadow-md overflow-hidden">
-    <div class="p-4 border-b bg-[#00C4C4]">
-      <h2 class="text-lg font-medium text-white">Clients List</h2>
-    </div>
-    <div class="overflow-auto max-h-[60vh]">
-      <table mat-table [dataSource]="clientsDataSource" class="w-full text-sm text-left" matSort>
-        <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">ID</th>
-          <td mat-cell *matCellDef="let client" class="p-2">{{client.id}}</td>
-        </ng-container>
-        <ng-container matColumnDef="fullName">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Name</th>
-          <td mat-cell *matCellDef="let client" class="p-2">{{client.fullName}}</td>
-        </ng-container>
-        <ng-container matColumnDef="email">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Email</th>
-          <td mat-cell *matCellDef="let client" class="p-2">{{client.email}}</td>
-        </ng-container>
-        <ng-container matColumnDef="mobile">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Mobile</th>
-          <td mat-cell *matCellDef="let client" class="p-2">{{client.mobile || '--'}}</td>
-        </ng-container>
-        <ng-container matColumnDef="address">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Address</th>
-          <td mat-cell *matCellDef="let client" class="p-2">{{client.address}}</td>
-        </ng-container>
-        <ng-container matColumnDef="client_type">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Type</th>
-          <td mat-cell *matCellDef="let client" class="p-2">{{client.client_type}}</td>
-        </ng-container>
-        <ng-container matColumnDef="client_Connect_Type">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Connect Type</th>
-          <td mat-cell *matCellDef="let client" class="p-2">{{client.client_Connect_Type}}</td>
-        </ng-container>
-        <ng-container matColumnDef="country">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Country</th>
-          <td mat-cell *matCellDef="let client" class="p-2">{{client.country}}</td>
-        </ng-container>
-        <ng-container matColumnDef="created_at">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Created At</th>
-          <td mat-cell *matCellDef="let client" class="p-2">{{client.created_at | date:'mediumDate'}}</td>
-        </ng-container>
-        <ng-container matColumnDef="technology">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Technology</th>
-          <td mat-cell *matCellDef="let client" class="p-2">{{client.technology || '--'}}</td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="clientsDisplayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: clientsDisplayedColumns;"></tr>
-      </table>
-
-    </div>
-    <mat-paginator #clientsPaginator class="border-t" [pageSizeOptions]="[5, 10, 20]"
-      showFirstLastButtons></mat-paginator>
-  </div>
-
-  <!-- Attendance Table -->
-  <div class="mt-8 bg-white rounded-lg shadow-md overflow-hidden">
-    <div class="p-4 border-b bg-[#00C4C4]">
-      <h2 class="text-lg font-medium  text-white">Attendance Records</h2>
-    </div>
-    <div class="overflow-auto max-h-[60vh]">
-      <table mat-table [dataSource]="dataSource" class="w-full text-sm text-left" matSort>
-        <ng-container matColumnDef="date">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Date</th>
-          <td mat-cell *matCellDef="let attendance" class="p-2">{{ attendance.date | date }}</td>
-        </ng-container>
-        <ng-container matColumnDef="check_in">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Check In</th>
-          <td mat-cell *matCellDef="let attendance" class="p-2">{{ attendance.check_in ? (attendance.check_in |
-            date:'h:mm:ss a') : '--' }}</td>
-        </ng-container>
-        <ng-container matColumnDef="check_out">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Check Out</th>
-          <td mat-cell *matCellDef="let attendance" class="p-2">{{ attendance.check_out ? (attendance.check_out |
-            date:'h:mm:ss a') : '--' }}</td>
-        </ng-container>
-        <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">
-            Status
-          </th>
-          <td mat-cell *matCellDef="let row" class="px-4 py-2">
-            <!-- Present -->
-            <span *ngIf="row.final_status === 'Present'"
-              class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-              {{ row.final_status }}
-            </span>
-
-            <!-- Absent -->
-            <span *ngIf="row.final_status === 'Absent'"
-              class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
-              {{ row.final_status }}
-            </span>
-            <!-- Half Day -->
-            <span *ngIf="row.status === 'Half Day'"
-              class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
-              {{ row.final_status }}
-            </span>
-            <!-- Leave -->
-            <span *ngIf="row.final_status === 'Leave'"
-              class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
-              {{ row.final_status }}
-            </span>
-            <!-- Fallback for any other status -->
-            <span
-              *ngIf="row.final_status !== 'Present' && row.final_status !== 'Absent' && row.final_status !== 'Leave' && row.final_status !== 'Half Day'"
-              class=" bg-blue-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
-              {{ row.final_status }}
-            </span>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="hours">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Hours</th>
-          <td mat-cell *matCellDef="let attendance" class="p-2">{{ attendance.hours || '--' }}</td>
-        </ng-container>
-        <ng-container matColumnDef="break">
-          <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-2">Hours</th>
-          <td mat-cell *matCellDef="let attendance" class="p-2">{{ attendance.break || '--' }}</td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
-
-    </div>
-    <mat-paginator #attendancePaginator class="border-t" [pageSizeOptions]="[5, 10, 20]"
-      showFirstLastButtons></mat-paginator>
-  </div>
-
-
-
 </section>

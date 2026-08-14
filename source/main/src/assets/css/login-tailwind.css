@@ -251,8 +251,8 @@
 .bg-\[\#F2F6F9\] {
   background-color: #F2F6F9;
 }
-.bg-\[\#d5eaea\] {
-  background-color: #d5eaea;
+.bg-\[\#d6d5ea\] {
+  background-color: #d6d5ea;
 }
 .bg-\[url\(\'https\:\/\/eliteinfotec\.in\/wp-content\/uploads\/2024\/10\/bg-2-5\.png\'\)\] {
   background-image: url('https://eliteinfotec.in/wp-content/uploads/2024/10/bg-2-5.png');
@@ -337,10 +337,10 @@
   transition-timing-function: var(--tw-ease, ease);
   transition-duration: var(--tw-duration, 0s);
 }
-.hover\:bg-\[\#D5EAEA\] {
+.hover\:bg-\[\#d6d5ea\] {
   &:hover {
     @media (hover: hover) {
-      background-color: #D5EAEA;
+      background-color: #d6d5ea;
     }
   }
 }

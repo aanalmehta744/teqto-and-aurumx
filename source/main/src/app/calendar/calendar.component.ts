@@ -40,7 +40,9 @@ import {
   OwlNativeDateTimeModule,
 } from '@danielmoncada/angular-datetime-picker';
 import { HolidayService } from 'app/admin/holidays/all-holidays/all-holidays.service';
-import { InterviewService } from 'app/employee/jobs/interview-schedule/interview.service';
+// import { InterviewService } from 'app/employee/jobs/interview-schedule/interview.service';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
@@ -91,7 +93,7 @@ export class CalendarComponent
     public calendarService: CalendarService,
     private snackBar: MatSnackBar,
     private holidayService: HolidayService,
-    private interviewService: InterviewService,
+    // private interviewService: InterviewService,
   ) {
     super();
     this.dialogTitle = 'Add New Event';
@@ -108,14 +110,20 @@ export class CalendarComponent
   loadEvents(): void {
     const loggedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     const employeeId = loggedUser.id;
-    const role = loggedUser.role; // ensure you store role in localStorage at login
+    const role = loggedUser.role;
 
-    this.subs.sink = this.calendarService.getAllCalendars().subscribe({
-      next: (data: Calendar[]) => {
-        // Filter only the events for the logged-in user
-        const userEvents = data.filter(event => event.employee_id === employeeId);
+    const calendarEvents$ = this.calendarService.getAllCalendars().pipe(catchError(() => of([])));
+    const holidays$ = this.holidayService.getAllHolidays().pipe(catchError(() => of([])));
+    // const interviews$ = role === 'Admin'
+      // ? this.interviewService.getInterviews().pipe(catchError(() => of([])))
+      // : of([]);
 
-        const mappedUserEvents: EventInput[] = userEvents.map((event) => ({
+    this.subs.sink = forkJoin([calendarEvents$, holidays$]).subscribe(
+      ([calData, holidays]: [any[], any[]]) => {
+
+        // User's own calendar events
+        const userEvents = calData.filter((e: any) => e.employee_id === employeeId);
+        const mappedUserEvents: EventInput[] = userEvents.map((event: any) => ({
           id: event.id,
           title: event.title,
           start: new Date(event.start_date),
@@ -125,110 +133,49 @@ export class CalendarComponent
           details: event.details,
         }));
 
-        // Now fetch holidays
-        this.subs.sink = this.holidayService.getAllHolidays().subscribe({
-          next: (holidays) => {
-            const holidayEvents: EventInput[] = holidays.map((holiday: any) => ({
-              id: `holiday-${holiday.id}`,
-              title: holiday.hName,
-              start: new Date(holiday.date),
-              allDay: true,
-              className: 'fc-event-holiday',
-              groupId: 'holiday',
-              details: holiday.details,
-            }));
+        // Holiday events
+        const holidayEvents: EventInput[] = holidays.map((holiday: any) => ({
+          id: `holiday-${holiday.id}`,
+          title: holiday.hName,
+          start: holiday.date,
+          allDay: true,
+          className: 'fc-event-holiday',
+          groupId: 'holiday',
+          details: holiday.details,
+        }));
 
-            // Initialize merged events
-            let mergedEvents = [...mappedUserEvents, ...holidayEvents];
+        // Interview events (Admin only)
+        // const interviewEvents: EventInput[] = interviews.map((interview: any) => {
+        //   let start: Date = new Date(interview.interview_date);
+        //   let end: Date | undefined = undefined;
+        //   if (interview.interview_time) {
+        //     const m = interview.interview_time.match(/(\d+):(\d+)\s?(AM|PM)/i);
+        //     if (m) {
+        //       let h = parseInt(m[1], 10);
+        //       const min = parseInt(m[2], 10);
+        //       if (m[3].toUpperCase() === 'PM' && h < 12) h += 12;
+        //       if (m[3].toUpperCase() === 'AM' && h === 12) h = 0;
+        //       start = new Date(interview.interview_date);
+        //       start.setHours(h, min, 0, 0);
+        //       end = new Date(start.getTime() + 60 * 60 * 1000);
+        //     }
+        //   }
+        //   return {
+        //     id: `interview-${interview.id}`,
+        //     title: `Interview: ${interview.candidate_name} (${interview.job_name})`,
+        //     start, end,
+        //     className: 'fc-event-interview',
+        //     groupId: 'interview',
+        //     details: `Type: ${interview.interview_type}<br>Mode: ${interview.mode}<br>Status: ${interview.status}`,
+        //   };
+        // });
 
-            // 👉 Only Admins see interview events
-            if (role === 'Admin') {
-              this.subs.sink = this.interviewService.getInterviews().subscribe({
-                next: (interviews) => {
-                  console.log("Interview list", interviews);
-                  const interviewEvents: EventInput[] = interviews.map((interview: any) => {
-                    // calculate end time if interview_time exists
-                    let endDate: Date | undefined = undefined;
-                    if (interview.interview_time) {
-                      // parse 12h format "h:mm AM/PM"
-                      const timeMatch = interview.interview_time.match(/(\d+):(\d+)\s?(AM|PM)/i);
-
-                      if (timeMatch) {
-                        let hours = parseInt(timeMatch[1], 10);
-                        const minutes = parseInt(timeMatch[2], 10);
-                        const ampm = timeMatch[3].toUpperCase();
-
-                        if (ampm === 'PM' && hours < 12) hours += 12;
-                        if (ampm === 'AM' && hours === 12) hours = 0;
-
-                        // base date = interview_date
-                        const startDate = new Date(interview.interview_date);
-                        startDate.setHours(hours, minutes, 0, 0);
-
-                        // add fixed duration (e.g. 1 hour)
-                        const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
-
-                        return {
-                          id: `interview-${interview.id}`,
-                          title: `Interview: ${interview.candidate_name} (${interview.job_name})`,
-                          start: startDate,
-                          end: endDate,
-                          className: 'fc-event-interview',
-                          groupId: 'interview',
-                          details: `
-        Type: ${interview.interview_type} <br>
-        Mode: ${interview.mode} <br>
-        Employee: ${interview.assigned_employee_name || ''} <br>
-        Status: ${interview.status} <br>
-        Remarks: ${interview.remarks || ''}
-      `,
-                        };
-                      }
-                    }
-                    return {
-                      id: `interview-${interview.id}`,
-                      title: `Interview: ${interview.candidate_name} (${interview.job_name})`,
-                      start: new Date(interview.interview_date),
-                      end: endDate,
-                      className: 'fc-event-interview', // custom style for interviews
-                      groupId: 'interview',
-                      details: `
-            Type: ${interview.interview_type} <br>
-            Mode: ${interview.mode} <br>
-            Employee: ${interview.assigned_employee_name || ''} <br>
-            Status: ${interview.status} <br>
-            Remarks: ${interview.remarks || ''}
-          `,
-                    };
-                  });
-
-                  // const mergedEvents = [...this.calendarEvents, ...interviewEvents];
-
-                  // this.calendarEvents = [...mergedEvents];
-                  // this.tempEvents = [...mergedEvents];
-                  // this.calendarOptions = { ...this.calendarOptions, events: [...mergedEvents] };
-
-                  const allEvents = [...mergedEvents, ...interviewEvents];
-
-                  this.calendarEvents = allEvents;
-                  this.tempEvents = allEvents;
-                  this.calendarOptions = { ...this.calendarOptions, events: allEvents };
-                },
-                error: (err) => console.error('Failed to load interviews:', err),
-              });
-            }
-            else {
-              // Non-admin users (no interviews)
-              this.calendarEvents = [...mergedEvents];
-              this.tempEvents = [...mergedEvents];
-              this.calendarOptions = { ...this.calendarOptions, events: [...mergedEvents] };
-            }
-          },
-          error: (err) => console.error('Failed to load holidays:', err),
-        });
-      },
-      error: (err) => console.error('Failed to load events:', err),
-    });
+        const allEvents = [...mappedUserEvents, ...holidayEvents];
+        this.calendarEvents = allEvents;
+        this.tempEvents = allEvents;
+        this.calendarOptions.events = allEvents;
+      }
+    );
   }
 
 
@@ -307,7 +254,9 @@ export class CalendarComponent
 
   filterEvent(element: string[]) {
     const list = this.calendarEvents.filter((x) =>
-      element.includes(x.groupId as string)
+      element.includes(x.groupId as string) ||
+      x.groupId === 'holiday' ||
+      x.groupId === 'interview'
     );
     this.calendarOptions.events = list;
   }

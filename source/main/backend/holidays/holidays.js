@@ -5,7 +5,9 @@ const db = require('../connection'); // Ensure the path is correct
 // 🔹 **Get All Holidays**
 router.get('/', async (req, res) => {
     try {
-        const [results] = await db.query('SELECT * FROM holidays');
+        const [results] = await db.query(
+            `SELECT id, hName, DATE_FORMAT(date, '%Y-%m-%d') AS date, details FROM holidays`
+        );
         res.json(results);
     } catch (err) {
         res.status(500).send(err.message);
@@ -16,7 +18,10 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const [result] = await db.query('SELECT * FROM holidays WHERE id = ?', [id]);
+        const [result] = await db.query(
+            `SELECT id, hName, DATE_FORMAT(date, '%Y-%m-%d') AS date, details FROM holidays WHERE id = ?`,
+            [id]
+        );
         if (result.length === 0) return res.status(404).json({ message: 'Holiday not found' });
         res.json(result[0]);
     } catch (err) {

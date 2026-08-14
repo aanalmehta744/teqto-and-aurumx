@@ -55,15 +55,7 @@
     "LEADERS": {
       "TEXT": "Leaders"
     },
-    "JOBS": {
-      "TEXT": "Jobs",
-      "LIST": {
-        "JOBS_LIST": "Jobs List",
-        "RESUMES": "Resumes",
-        "CANDIDATES":"Candidates",
-        "SHORTLIST_CANDIDATES":"Shortlist Candidates"
-      }
-    },
+   
     "REPORTS": {
       "TEXT": "Reports",
       "LIST": {

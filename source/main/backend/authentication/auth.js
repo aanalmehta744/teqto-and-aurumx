@@ -73,6 +73,7 @@ router.post('/login', async (req, res) => {
         fullName: user.fullName || '',
         role: user.role,
         img: user.uploadImg,
+        uploadImg: user.uploadImg,
         email: user.email,
         gender: user.gender,
         leave_balance: user.leave_balance,
@@ -116,7 +117,7 @@ router.post('/forgot-password', async (req, res) => {
       subject: 'Password Reset Request',
       html: `
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden;">
-          <div style="background: #D5EAEA; padding: 20px; color: white;">
+          <div style="background: #d6d5ea; padding: 20px; color: white;">
             <h2 style="margin: 0;">Password Reset Request</h2>
           </div>
           <div style="padding: 24px;">

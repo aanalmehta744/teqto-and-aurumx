@@ -49,7 +49,7 @@ export const APP_ROUTE: Route[] = [
           role: Role.BA,
         },
         loadChildren: () =>
-          import('./admin/admin.routes').then((m) => m.ADMIN_ROUTE),
+          import('./ba/ba.routes').then((m) => m.BA_ROUTE),
       },
       {
         path: 'calendar',
@@ -61,11 +61,11 @@ export const APP_ROUTE: Route[] = [
         loadChildren: () =>
           import('./task/task.routes').then((m) => m.TASK_ROUTE),
       },
-      {
-        path: 'contacts',
-        loadChildren: () =>
-          import('./contacts/contacts.routes').then((m) => m.CONTACT_ROUTE),
-      },
+      // {
+      //   path: 'contacts',
+      //   loadChildren: () =>
+      //     import('./contacts/contacts.routes').then((m) => m.CONTACT_ROUTE),
+      // },
       {
         path: 'email',
         loadChildren: () =>
@@ -76,59 +76,13 @@ export const APP_ROUTE: Route[] = [
         loadChildren: () =>
           import('./apps/apps.routes').then((m) => m.APPS_ROUTE),
       },
-      {
-        path: 'widget',
-        loadChildren: () =>
-          import('./widget/widget.routes').then((m) => m.WIDGET_ROUTE),
-      },
-      {
-        path: 'ui',
-        loadChildren: () => import('./ui/ui.routes').then((m) => m.UI_ROUTE),
-      },
-      {
-        path: 'forms',
-        loadChildren: () =>
-          import('./forms/forms.routes').then((m) => m.FORMS_ROUTE),
-      },
-      {
-        path: 'tables',
-        loadChildren: () =>
-          import('./tables/tables.routes').then((m) => m.TEBLES_ROUTE),
-      },
-      {
-        path: 'charts',
-        loadChildren: () =>
-          import('./charts/charts.routes').then((m) => m.CHART_ROUTE),
-      },
-      {
-        path: 'timeline',
-        loadChildren: () =>
-          import('./timeline/timeline.routes').then((m) => m.TIMELINE_ROUTE),
-      },
-      {
-        path: 'icons',
-        loadChildren: () =>
-          import('./icons/icons.routes').then((m) => m.ICONS_ROUTE),
-      },
-      {
-        path: 'extra-pages',
-        loadChildren: () =>
-          import('./extra-pages/extra-pages.routes').then(
-            (m) => m.EXTRA_PAGES_ROUTE
-          ),
-      },
-      {
-        path: 'maps',
-        loadChildren: () =>
-          import('./maps/maps.routes').then((m) => m.MAPS_ROUTE),
-      },
-      {
-        path: 'multilevel',
-        loadChildren: () =>
-          import('./multilevel/multilevel.routes').then(
-            (m) => m.MULTILEVEL_ROUTE
-          ),
-      },
+      // {
+      //   path: 'extra-pages',
+      //   loadChildren: () =>
+      //     import('./extra-pages/extra-pages.routes').then(
+      //       (m) => m.EXTRA_PAGES_ROUTE
+      //     ),
+      // },
       {
         path: 'employee-profile',
         component: EmployeeProfileComponent,

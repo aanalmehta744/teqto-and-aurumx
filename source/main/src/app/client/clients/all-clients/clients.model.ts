@@ -5,8 +5,12 @@ export class Clients {
   name: string;
   bde_name?: string;
   bde_email?: string;
-  bde_account_id?: string;
-  bde_account_email?: string;
+  // OLD: bde_account_id?: string;
+  // OLD: bde_account_email?: string;
+  // NEW CODE: Replaced BDE account fields with bank details
+  bank_name?: string;
+  bank_account_number?: string;
+  ifsc_code?: string;
   fullName: string;
   mobile: string;
   email: string;
@@ -25,8 +29,13 @@ export class Clients {
   platform: string;
   technology: string;
   address: string;
+  tag?: string;
   last_followup_date?: string;
   last_followup_note?: string;
+  // NEW CODE: Fields added for "Other" connect type source, and platform login details
+  client_connect_source?: string;
+  platform_id?: string;
+  platform_password?: string;
 
   constructor(client: Clients) {
     {
@@ -37,8 +46,12 @@ export class Clients {
       this.bde_name = client.bde_name || '';
       this.bde_email = client.bde_email || '';
       this.fullName = client.fullName || '';
-      this.bde_account_id = client.bde_account_id || '';
-      this.bde_account_email = client.bde_account_email || '';
+      // OLD: this.bde_account_id = client.bde_account_id || '';
+      // OLD: this.bde_account_email = client.bde_account_email || '';
+      // NEW CODE: Bank detail fields
+      this.bank_name = client.bank_name || '';
+      this.bank_account_number = client.bank_account_number || '';
+      this.ifsc_code = client.ifsc_code || '';
       this.mobile = client.mobile || '';
       this.email = client.email || '';
       this.company_name = client.company_name || '';
@@ -56,6 +69,11 @@ export class Clients {
       this.platform = client.platform || '';
       this.technology = client.technology || '';
       this.address = client.address || '';
+      this.tag = client.tag || '';
+      // NEW CODE: Initialize new fields in constructor
+      this.client_connect_source = client.client_connect_source || '';
+      this.platform_id = client.platform_id || '';
+      this.platform_password = client.platform_password || '';
     }
   }
   public getRandomID(): number {

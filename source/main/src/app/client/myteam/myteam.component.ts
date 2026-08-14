@@ -52,4 +52,11 @@ export class MyTeamsComponent implements OnInit {
     });
 
   }
+
+  getMemberImage(member: any): string {
+    if (member.uploadImg?.startsWith('http')) return member.uploadImg;
+    if (member.gender === 'Male') return 'assets/images/male-profile.png';
+    if (member.gender === 'Female') return 'assets/images/female-profile.png';
+    return 'assets/images/user/usrbig1.jpg';
+  }
 }

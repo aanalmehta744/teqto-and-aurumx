@@ -54,7 +54,9 @@ export class LockedComponent implements OnInit {
     return this.authForm.controls;
   }
   getImageUrl(img:string){
-    return img ? `${environment.apiUrl.replace('/api','')}/uploads/employees/${img} ` : 'assets/images/defult-profile.png';
+    if (!img) return 'assets/images/defult-profile.png';
+    if (img.startsWith('http')) return img;
+    return `${environment.apiUrl.replace('/api','')}/uploads/employees/${img}`;
   }
   onSubmit() {
     this.submitted = true;
