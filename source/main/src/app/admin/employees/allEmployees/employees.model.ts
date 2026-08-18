@@ -9,6 +9,7 @@ export class Employees {
   role: string;
   mobile: string;
   department: string;
+  employee_level: string;
   degree: string;
   gender: string;
   address: string;
@@ -34,6 +35,7 @@ export class Employees {
       this.role = employees.role || '';
       this.mobile = employees.mobile || '';
       this.department = employees.department || '';
+      this.employee_level = employees.employee_level || 'Junior';
       this.degree = employees.degree || '';
       this.gender = employees.gender || '';
       this.address = employees.address || '';

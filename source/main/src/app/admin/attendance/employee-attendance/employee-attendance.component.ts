@@ -79,6 +79,7 @@ export class EmployeeAttendanceComponent extends UnsubscribeOnDestroyAdapter
     'status',
     'actions',
   ];
+  canEditAttendance = false;
 
   dataSource!: AttendanceDataSource;
   selection = new SelectionModel<EmployeeAttendance>(true, []);
@@ -88,6 +89,8 @@ export class EmployeeAttendanceComponent extends UnsubscribeOnDestroyAdapter
   terminatedAttendanceData: EmployeeAttendance[] = [];
   option: number = 0;
   id?: number;
+  currentUser: any = {};
+
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -102,9 +105,22 @@ export class EmployeeAttendanceComponent extends UnsubscribeOnDestroyAdapter
     super()
   }
 
-  ngOnInit() {
-    this.loadData();
-  }
+  // ngOnInit() {
+  //   this.loadData();
+  // }
+ngOnInit() {
+  const currentUser = JSON.parse(
+    localStorage.getItem('currentUser') || '{}'
+  );
+
+  const role = (currentUser.role || '').toLowerCase();
+  const department = (currentUser.department || '').toLowerCase();
+
+  this.canEditAttendance =
+    role === 'admin' || department === 'hr';
+
+  this.loadData();
+}
   ngAfterViewInit() {
     fromEvent(this.filter.nativeElement, 'keyup').subscribe(() => {
       const filterValue = this.filter.nativeElement.value.trim().toLowerCase();
@@ -114,111 +130,7 @@ export class EmployeeAttendanceComponent extends UnsubscribeOnDestroyAdapter
       this.updateGroupedAttendance(filterValue);
     });
   }
-  // updateGroupedAttendance(filter: string) {
-  //   const filtered = this.employeeAttendanceData.filter(att => {
-  //     const formattedDate = formatDate(att.date, 'yyyy-MM-dd', 'en');
-  //     const dateFormatted1 = formatDate(att.date, 'dd-MM-yyyy', 'en');
-  //     const dateFormatted2 = formatDate(att.date, 'MMM d, y', 'en');
-  //     const monthShort = formatDate(att.date, 'MMM', 'en');
-  //     const monthFull = formatDate(att.date, 'MMMM', 'en');
-  //     const checkInFormatted = att.check_in
-  //       ? formatDate(att.check_in, 'hh:mm:ss a', 'en')
-  //       : '';
 
-  //     const checkOutFormatted = att.check_out
-  //       ? formatDate(att.check_out, 'hh:mm:ss a', 'en')
-  //       : '';
-
-
-  //     const searchStr = (
-  //       att.employee_name +
-  //       att.status +
-  //       formattedDate +
-  //       dateFormatted1 +
-  //       dateFormatted2 +
-  //       monthShort +
-  //       monthFull +
-  //       checkInFormatted +
-  //       checkOutFormatted
-  //     ).toLowerCase();
-
-  //     return searchStr.includes(filter.toLowerCase());
-  //   });
-
-  //   this.groupDataByDate(filtered);
-  // }
-
-
-  // loadData() {
-  //   this.exampleDatabase = this.attendanceService;
-
-  //   this.exampleDatabase.getEmployeeAttendance().subscribe(data => {
-  //     this.employeeAttendanceData = data
-  //       // 🔥 filter out Admins
-  //       .filter(item => item.role?.toLowerCase() !== 'admin')
-  //       .map(item => ({
-  //         id: item.id,
-  //         employee_name: item.employee_name || 'Unknown',
-  //         date: item.date,
-  //         check_in: item.check_in,
-  //         check_out: item.check_out,
-  //         hours: item.hours,
-  //         status: item.status,
-  //         final_status: item.final_status,
-  //         break: item.break,
-  //         role: item.role,
-  //       }));
-
-  //     this.groupDataByDate(this.employeeAttendanceData);
-
-  //     this.dataSource = new AttendanceDataSource(
-  //       this.employeeAttendanceData,
-  //       this.paginator,
-  //       this.sort
-  //     );
-
-  //     // Fix ExpressionChangedAfterItHasBeenCheckedError
-  //     this.cdr.detectChanges();
-  //   });
-  // }
-
-  // loadData() {
-  //   this.exampleDatabase = this.attendanceService;
-
-  //   this.exampleDatabase.getEmployeeAttendance().subscribe(data => {
-  //     this.employeeAttendanceData = data
-  //       // 🔥 filter out Admins
-  //       .filter(item =>
-  //         item.role?.toLowerCase() !== 'admin' &&
-  //         (!item.termination_date || item.termination_date === null)
-  //       )
-
-  //       .map(item => ({
-  //         id: item.id,
-  //         employee_name: item.employee_name || 'Unknown',
-  //         date: item.date,
-  //         check_in: item.check_in,
-  //         check_out: item.check_out,
-  //         hours: item.hours,
-  //         status: item.status,
-  //         final_status: item.final_status,
-  //         break: item.break,
-  //         role: item.role,
-  //         termination_date: item.termination_date,
-  //       }));
-
-  //     this.groupDataByDate(this.employeeAttendanceData);
-
-  //     this.dataSource = new AttendanceDataSource(
-  //       this.employeeAttendanceData,
-  //       this.paginator,
-  //       this.sort
-  //     );
-
-  //     // Fix ExpressionChangedAfterItHasBeenCheckedError
-  //     this.cdr.detectChanges();
-  //   });
-  // }
 
   loadData() {
     this.exampleDatabase = this.attendanceService;

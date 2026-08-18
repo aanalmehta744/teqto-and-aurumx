@@ -25,7 +25,7 @@
 
         <!-- Right Header -->
         <div class="flex items-center flex-wrap gap-2">
-          <button mat-mini-fab color="primary" class="!bg-[#d6d5ea] hover:!bg-gray-100 !text-[#00383F]"
+          <button *ngIf="canManageTasks" mat-mini-fab color="primary" class="!bg-[#d6d5ea] hover:!bg-gray-100 !text-[#00383F]"
             (click)="addNew()" matTooltip="ADD TASK">
             <mat-icon>add</mat-icon>
           </button>

@@ -65,6 +65,7 @@ export class TaskComponent implements OnInit {
   dialogTitle?: string;
   tasks: Task[] = [];
   employees: any[] = []; // Store employees from API
+  assignableEmployees: any[] = [];
   projects: any[] = []; // Store employees from API
   editor: Editor = new Editor();
   toolbar: Toolbar = [
@@ -138,6 +139,10 @@ export class TaskComponent implements OnInit {
   loadEmployees() {
     this.employeesService.getAllEmployeess().subscribe((data) => {
       this.employees = data;
+      const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+      this.assignableEmployees = (user?.role?.toLowerCase() === 'employee' && user?.employee_level === 'Senior')
+        ? data.filter((e: any) => e.employee_level === 'Junior' || e.employee_level === 'Intern')
+        : data;
     });
   }
   loadProjects() {
@@ -184,7 +189,7 @@ export class TaskComponent implements OnInit {
       width: '600px',
       data: {
         isNew: true,
-        employees: this.employees,
+        employees: this.assignableEmployees,
         projects: this.projects
       }
     });
@@ -202,7 +207,7 @@ export class TaskComponent implements OnInit {
       data: {
         isNew: false,
         task,
-        employees: this.employees,
+        employees: this.assignableEmployees,
         projects: this.projects
       }
     });

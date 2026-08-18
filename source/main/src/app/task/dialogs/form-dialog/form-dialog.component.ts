@@ -63,6 +63,7 @@ export class FormDialogComponent {
       due_date: [data?.task?.due_date || null],
       note: [data?.task?.note || ''],
       done: [data?.task?.done || false],
+      assigned_by: [JSON.parse(localStorage.getItem('currentUser') || 'null')?.id || null],
     });
   }
   ngOnInit(): void {

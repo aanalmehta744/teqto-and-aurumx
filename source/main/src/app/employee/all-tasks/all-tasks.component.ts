@@ -70,6 +70,7 @@ export class AllTasksComponent
   selection = new SelectionModel<MyTasks>(true, []);
   index?: number;
   id?: number;
+  canManageTasks = false;
   myTasks?: MyTasks | null;
   constructor(
     public httpClient: HttpClient,
@@ -92,7 +93,8 @@ export class AllTasksComponent
     const userJson = localStorage.getItem('currentUser');
     if (userJson) {
       const user = JSON.parse(userJson);
-      if (user.role === 'BDE' || user.role === 'BA' || user.role === 'Admin') {
+      if (user.role === 'BDE' || user.role === 'BA' || user.role === 'Admin' || (user.role === 'Employee' && user.employee_level === 'Senior')) {
+        this.canManageTasks = true;
         this.displayedColumns = [...this.displayedColumns, 'actions'];
       }
     }
@@ -136,6 +138,7 @@ export class AllTasksComponent
       data: {
         myTasks: this.myTasks,
         action: 'add',
+        currentUser: JSON.parse(localStorage.getItem('currentUser') || 'null'),
       },
       direction: tempDirection,
     });
@@ -157,6 +160,7 @@ export class AllTasksComponent
       data: {
         myTasks: row,
         action: 'edit',
+        currentUser: JSON.parse(localStorage.getItem('currentUser') || 'null'),
       },
       direction: tempDirection,
     });

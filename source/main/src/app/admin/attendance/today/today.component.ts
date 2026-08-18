@@ -41,6 +41,7 @@ export class TodayComponent
   displayedColumns = [
 
     'name',
+    'date',
     'first_in',
     'last_out',
     'total',
@@ -71,6 +72,28 @@ export class TodayComponent
   toggleStar(row: Today) {
     console.log(row);
   }
+  isBreakGreaterThanOneHour(breakTime: string): boolean {
+  if (!breakTime) {
+    return false;
+  }
+
+  const parts = breakTime.split(':').map(Number);
+
+  let totalSeconds = 0;
+
+  if (parts.length === 3) {
+    totalSeconds =
+      parts[0] * 3600 +
+      parts[1] * 60 +
+      parts[2];
+  } else if (parts.length === 2) {
+    totalSeconds =
+      parts[0] * 60 +
+      parts[1];
+  }
+
+  return totalSeconds > 3600;
+}
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();

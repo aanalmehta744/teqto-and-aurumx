@@ -94,7 +94,8 @@
               <mat-cell *matCellDef="let row">{{ row.break ?? '-' }}</mat-cell>
             </ng-container>
 
-            <ng-container matColumnDef="actions">
+            <!-- <ng-container matColumnDef="actions"> -->
+              <ng-container matColumnDef="actions" *ngIf="canEditAttendance">
               <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
               <mat-cell *matCellDef="let row">
                 <button mat-icon-button (click)="editCall(row)" matTooltip="Edit">
@@ -162,7 +163,8 @@
                   <mat-cell *matCellDef="let row">{{ row.break ?? '-' }}</mat-cell>
                 </ng-container>
 
-                <ng-container matColumnDef="actions">
+                <!-- <ng-container matColumnDef="actions"> -->
+                  <ng-container matColumnDef="actions" *ngIf="canEditAttendance">
                   <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
                   <mat-cell *matCellDef="let row">
                     <button mat-icon-button (click)="editCall(row)" matTooltip="Edit">

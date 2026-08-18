@@ -41,6 +41,17 @@
             </div>
           </div>
 
+          <div class="w-full md:w-1/2 px-3 mb-6">
+            <mat-form-field class="w-full" appearance="outline">
+              <mat-label>Employee Level</mat-label>
+              <mat-select formControlName="employee_level" required>
+                <mat-option value="Senior">Senior</mat-option>
+                <mat-option value="Junior">Junior</mat-option>
+                <mat-option value="Intern">Intern</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
           <div class="flex flex-wrap -mx-3">
             <!-- Gender -->
             <div class="w-full md:w-1/2 px-3 mb-6">
@@ -158,13 +169,7 @@
               <mat-form-field class="w-full" appearance="outline">
                 <mat-label>Select Department</mat-label>
                 <mat-select formControlName="department" required>
-                  <mat-option [value]="'HR'">HR</mat-option>
-                  <mat-option [value]="'BDE'">BDE</mat-option>
-                  <mat-option [value]="'BA'">BA</mat-option>
-                  <mat-option [value]="'Frontend Developer'">Frontend Developer</mat-option>
-                  <mat-option [value]="'Backend Developer'">Backend Developer</mat-option>
-                  <mat-option [value]="'Fullstack Developer'">Fullstack Developer</mat-option>
-                  <mat-option [value]="'Graphic'">Graphic</mat-option>
+                  <mat-option *ngFor="let dept of departments" [value]="dept.name">{{ dept.name }}</mat-option>
                 </mat-select>
                 @if (docForm.get('department')?.hasError('required')) {
                 <mat-error>Select Any Department</mat-error>

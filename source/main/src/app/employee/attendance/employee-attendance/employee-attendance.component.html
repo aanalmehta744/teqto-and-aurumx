@@ -130,15 +130,23 @@
               <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Break</mat-header-cell>
               <mat-cell *matCellDef="let row">{{ row.break ?? '-' }}</mat-cell>
             </ng-container>
-            <!-- Actions -->
-            <!-- <ng-container matColumnDef="actions">
-              <mat-header-cell *matHeaderCellDef class="font-medium">Actions</mat-header-cell>
-              <mat-cell *matCellDef="let row">
-                <button mat-icon-button (click)="editCall(row)" matTooltip="Edit">
-                  <app-feather-icons icon="edit" class="text-blue-500"></app-feather-icons>
-                </button>
-              </mat-cell>
-            </ng-container> -->
+           <ng-container matColumnDef="actions">
+  <mat-header-cell *matHeaderCellDef class="font-medium">
+    Actions
+  </mat-header-cell>
+
+  <mat-cell *matCellDef="let row">
+    <button
+      mat-icon-button
+      (click)="editCall(row)"
+      matTooltip="Edit">
+      <app-feather-icons
+        icon="edit"
+        class="text-blue-500">
+      </app-feather-icons>
+    </button>
+  </mat-cell>
+</ng-container>
 
             <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
             <mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50 cursor-pointer" matRipple>
@@ -217,21 +225,39 @@
                   <mat-cell *matCellDef="let row">{{ row.break ?? '-' }}</mat-cell>
                 </ng-container>
 
-                <!-- <ng-container matColumnDef="actions">
-                  <mat-header-cell *matHeaderCellDef class="font-medium">Actions</mat-header-cell>
-                  <mat-cell *matCellDef="let row">
-                    <button mat-icon-button (click)="editCall(row)" matTooltip="Edit">
-                      <app-feather-icons icon="edit" class="text-blue-500"></app-feather-icons>
-                    </button>
+             <!-- Actions -->
+<ng-container matColumnDef="actions">
+  <mat-header-cell *matHeaderCellDef class="font-medium">
+    Actions
+  </mat-header-cell>
 
-                  </mat-cell>
-                </ng-container> -->
+  <mat-cell *matCellDef="let row">
+    <button
+      mat-icon-button
+      (click)="editCall(row)"
+      matTooltip="Edit">
+      <app-feather-icons
+        icon="edit"
+        class="text-blue-500">
+      </app-feather-icons>
+    </button>
+  </mat-cell>
+</ng-container>
 
-                <mat-header-row
+                <!-- <mat-header-row
                   *matHeaderRowDef="['name', 'check_in', 'check_out', 'hours', 'status', 'break']"></mat-header-row>
                 <mat-row *matRowDef="let row; columns: ['name', 'check_in', 'check_out', 'hours', 'status', 'break']"
                   class="hover:bg-gray-50 cursor-pointer" matRipple>
-                </mat-row>
+                </mat-row> -->
+                <mat-header-row
+  *matHeaderRowDef="['name', 'check_in', 'check_out', 'hours', 'status', 'break', 'actions']">
+</mat-header-row>
+
+<mat-row
+  *matRowDef="let row; columns: ['name', 'check_in', 'check_out', 'hours', 'status', 'break', 'actions']"
+  class="hover:bg-gray-50 cursor-pointer"
+  matRipple>
+</mat-row>
               </table>
             </ng-container>
           </ng-scrollbar>

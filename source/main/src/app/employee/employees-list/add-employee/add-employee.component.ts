@@ -25,6 +25,8 @@ import {
   MAT_MOMENT_DATE_ADAPTER_OPTIONS,
 } from '@angular/material-moment-adapter';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-add-employee',
@@ -72,9 +74,10 @@ export class AddEmployeeComponent {
   docForm: UntypedFormGroup;
   hidePassword = true;
   hideConfirmPassword = true;
+  departments: any[] = [];
 
 
-  constructor(private fb: UntypedFormBuilder, private employeeService: EmployeesService, private router: Router) {
+  constructor(private fb: UntypedFormBuilder, private employeeService: EmployeesService, private router: Router, private http: HttpClient) {
     this.docForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.pattern('^[a-zA-Z ]+$')]], // ✅ Allow spaces in names
       role: ['', Validators.required],
@@ -83,6 +86,7 @@ export class AddEmployeeComponent {
       password: ['', [Validators.required, Validators.minLength(6)]], // ✅ At least 6 chars
       conformPassword: ['', Validators.required], // ✅ Needs confirmation check
       department: ['', Validators.required],
+      employee_level: ['Junior', Validators.required],
       address: [''],
       joining_date: ['', Validators.required],
       salary: ['', [Validators.required, Validators.min(1)]], // ✅ Salary must be > 0
@@ -101,6 +105,10 @@ export class AddEmployeeComponent {
       employment_type: [true],  // true = Active, false = Inactive
       termination_date: ['']
     }, { validator: this.passwordMatchValidator }); // ✅ Add validator for password matching
+  }
+
+  ngOnInit(): void {
+    this.http.get<any[]>(`${environment.apiUrl}/departments`).subscribe({ next: (data) => this.departments = data, error: () => { this.departments = []; } });
   }
 
   passwordMatchValidator(form: UntypedFormGroup) {

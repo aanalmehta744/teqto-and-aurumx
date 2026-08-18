@@ -19,6 +19,7 @@ export interface DialogData {
   id: number;
   action: string;
   myTasks: MyTasks;
+  currentUser?: any;
 }
 
 @Component({
@@ -49,6 +50,7 @@ export class FormDialogComponent implements OnInit {
   isDetails = false;
   employees: any[] = [];
   projects: any[] = [];
+  assignableEmployees: any[] = [];
 
   constructor(
     public dialogRef: MatDialogRef<FormDialogComponent>,
@@ -75,7 +77,7 @@ export class FormDialogComponent implements OnInit {
   ngOnInit(): void {
     if (this.action === 'add' || this.action === 'edit') {
       this.http.get<any[]>(`${environment.apiUrl}/employees`).subscribe({
-        next: (data) => { this.employees = data; },
+        next: (data) => { this.employees = data; this.assignableEmployees = this.getAssignableEmployees(data); },
         error: () => {}
       });
       this.http.get<any[]>(`${environment.apiUrl}/projects`).subscribe({
@@ -83,6 +85,13 @@ export class FormDialogComponent implements OnInit {
         error: () => {}
       });
     }
+  }
+
+  getAssignableEmployees(data: any[]): any[] {
+    const user = this.data?.currentUser || JSON.parse(localStorage.getItem('currentUser') || 'null');
+    const isSenior = user?.role?.toLowerCase() === 'employee' && user?.employee_level === 'Senior';
+    if (!isSenior) return data.filter(e => (e.role || '').toLowerCase() !== 'admin');
+    return data.filter(e => e.employee_level === 'Junior' || e.employee_level === 'Intern');
   }
 
   createTaskForm(): UntypedFormGroup {
@@ -108,6 +117,7 @@ export class FormDialogComponent implements OnInit {
   public confirmAdd(): void {
     if (this.myTasksForm.invalid) return;
     const payload = this.myTasksForm.getRawValue();
+    payload.assigned_by = this.data?.currentUser?.id || JSON.parse(localStorage.getItem('currentUser') || 'null')?.id || null;
     if (payload.due_date) {
       const d = new Date(payload.due_date);
       payload.due_date = d.toISOString().slice(0, 10);
@@ -126,6 +136,7 @@ export class FormDialogComponent implements OnInit {
   public confirmEdit(): void {
     if (this.myTasksForm.invalid) return;
     const payload = this.myTasksForm.getRawValue();
+    payload.assigned_by = this.data?.currentUser?.id || JSON.parse(localStorage.getItem('currentUser') || 'null')?.id || null;
     if (payload.due_date) {
       const d = new Date(payload.due_date);
       payload.due_date = d.toISOString().slice(0, 10);

@@ -23,16 +23,24 @@
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Department</mat-label>
           <mat-select formControlName="department" required>
-            <mat-option
-              *ngFor="let dept of ['HR','BDE','Front Developer','Backend Developer','Fullstack Developer','Graphic']"
-              [value]="dept">
-              {{ dept }}
-            </mat-option>
+            <mat-option *ngFor="let dept of departments" [value]="dept.name">{{ dept.name }}</mat-option>
           </mat-select>
           <mat-icon matSuffix>business_center</mat-icon>
           <mat-error *ngIf="employeesForm.get('department')?.hasError('required')">
             Department is required
           </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Employee Level -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Employee Level</mat-label>
+          <mat-select formControlName="employee_level" required>
+            <mat-option value="Senior">Senior</mat-option>
+            <mat-option value="Junior">Junior</mat-option>
+            <mat-option value="Intern">Intern</mat-option>
+          </mat-select>
         </mat-form-field>
       </div>
 

@@ -78,6 +78,7 @@ router.post('/login', async (req, res) => {
         gender: user.gender,
         leave_balance: user.leave_balance,
         department: user.department,
+        employee_level: user.employee_level || 'Junior',
       }
     });
 

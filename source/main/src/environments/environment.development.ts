@@ -2,12 +2,28 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+// export const environment = {
+//   production: false,
+//   apiUrl: 
+//   'http://localhost:3000/api' 
+//   // 'https://denver-doe-vacation-sustained.trycloudflare.com/api'
+// };
 export const environment = {
-  production: false,
-  apiUrl: 
-  'http://localhost:3000/api' 
-  // 'https://denver-doe-vacation-sustained.trycloudflare.com/api'
+  production: true,
+
+  localApiUrl: 'http://localhost:3000/api',
+
+  cloudflareApiUrl:
+    'https://washing-spiritual-stomach-damages.trycloudflare.com/api',
+
+  apiUrl:
+    'https://washing-spiritual-stomach-damages.trycloudflare.com/api'
 };
+
+console.log(
+  'Production Environment Loaded. API URL:',
+  environment.apiUrl
+);
 console.log("Development Enviorment Loaded. API URL", environment.apiUrl);
 
 

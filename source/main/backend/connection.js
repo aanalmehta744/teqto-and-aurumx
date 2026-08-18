@@ -9,7 +9,6 @@ const pool = mysql.createPool({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     connectionLimit: Number(process.env.DB_CONNECTION_LIMIT) || 10,
-    ssl: { rejectUnauthorized: false },
 });
 
 // Create a promise-based pool

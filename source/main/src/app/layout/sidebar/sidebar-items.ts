@@ -585,6 +585,16 @@ export const ROUTES: RouteInfo[] = [
     department: ['HR', 'BDE', 'Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
   },
   {
+    path: '/admin/departments',
+    title: 'Departments',
+    iconType: 'feather',
+    icon: 'layers',
+    class: '',
+    groupTitle: false,
+    badge: '', badgeClass: '', role: ['Admin'], submenu: [],
+    department: ['HR', 'BDE', 'Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
+  },
+  {
     path: '/admin/alltasks',
     title: 'Tasks',
     iconType: 'feather',
@@ -715,7 +725,8 @@ export const ROUTES: RouteInfo[] = [
         submenu: [],
       },
       {
-        path: '/employee/attendance/employee-attendance',
+        // path: '/employee/attendance/employee-attendance',
+        path: '/admin/attendance/employee-attendance',
         title: 'Employee Attendance',
         iconType: 'feather',
         icon: 'user-check',
@@ -1095,6 +1106,16 @@ export const ROUTES: RouteInfo[] = [
 
   },
   {
+    path: '/employee/departments',
+    title: 'Departments',
+    iconType: 'feather',
+    icon: 'layers',
+    class: '',
+    groupTitle: false,
+    badge: '', badgeClass: '', role: ['Employee'], submenu: [],
+    department: ['HR'],
+  },
+  {
     path: '/employee/alltasks',
     title: 'All Task',
     iconType: 'feather',
@@ -1105,7 +1126,7 @@ export const ROUTES: RouteInfo[] = [
     badgeClass: '',
     role: ['Employee'],
     submenu: [],
-    department: ['HR'],
+    department: ['HR', 'BDE', 'Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
 
   },
   // {
@@ -1794,7 +1815,7 @@ export const ROUTES: RouteInfo[] = [
     groupTitle: true,
     badge: '',
     badgeClass: '',
-    role: ['Admin', 'Employee'],
+    role: ['Admin'],
     department: ['HR', 'BDE', 'Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
     submenu: [],
   },

@@ -64,7 +64,7 @@
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Assign To Employee</mat-label>
           <mat-select formControlName="employee_id" required>
-            <mat-option *ngFor="let emp of employees" [value]="emp.id">
+            <mat-option *ngFor="let emp of assignableEmployees" [value]="emp.id">
               {{ emp.fullName || (emp.first_name + ' ' + emp.last_name) }}
             </mat-option>
           </mat-select>

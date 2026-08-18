@@ -2,6 +2,7 @@ import { Route } from '@angular/router';
 import { EmployeeDailyUpdateComponent } from './employee-daily-update/employee-daily-update.component';
 import { LoginSettingsComponent } from './login-settings/login-settings.component';
 import { AllTasksComponent } from '../employee/all-tasks/all-tasks.component';
+import { DepartmentsComponent } from '../departments/departments.component';
 export const ADMIN_ROUTE: Route[] = [
   {
     path: 'dashboard',
@@ -75,5 +76,6 @@ export const ADMIN_ROUTE: Route[] = [
     path: 'alltasks',
     component: AllTasksComponent,
   },
+  { path: 'departments', component: DepartmentsComponent },
 ];
 

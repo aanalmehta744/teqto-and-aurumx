@@ -2,6 +2,18 @@ const express = require('express');
 const router = express.Router();
 const db = require('../connection'); // <-- use promise interface
 
+async function validateAssignment(assignedBy, employeeId) {
+  if (!assignedBy || !employeeId) return null;
+  const [[assigner]] = await db.query('SELECT role, department, employee_level FROM employees WHERE id = ?', [assignedBy]);
+  const [[assignee]] = await db.query('SELECT role, employee_level FROM employees WHERE id = ?', [employeeId]);
+  if (!assigner || !assignee) return 'Invalid assigning or assigned employee';
+  const isSenior = String(assigner.employee_level || '').toLowerCase() === 'senior' && String(assigner.role || '').toLowerCase() === 'employee';
+  if (isSenior && !['junior', 'intern'].includes(String(assignee.employee_level || '').toLowerCase())) {
+    return 'Senior employees can assign tasks only to Junior and Intern employees';
+  }
+  return null;
+}
+
 // Fetch all tasks
 router.get('/', async (req, res) => {
   try {
@@ -74,12 +86,15 @@ router.get('/mytask/:userId', async (req, res) => {
 
 // Create a new task
 router.post('/', async (req, res) => {
-  const { employee_id, project_id, trainer_project_name, employee_type, title, done, note, priority, due_date } = req.body;
+  const { employee_id, project_id, trainer_project_name, employee_type, title, done, note, priority, due_date, assigned_by } = req.body;
 
   try {
+    const assignmentError = await validateAssignment(assigned_by, employee_id);
+    if (assignmentError) return res.status(403).json({ error: assignmentError });
+
     await db.query(
-      `INSERT INTO tasks (employee_id, project_id, trainer_project_name, employee_type, title, done, note, priority, due_date)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO tasks (employee_id, project_id, trainer_project_name, employee_type, title, done, note, priority, due_date, assigned_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         employee_id,
         project_id || null,
@@ -89,7 +104,8 @@ router.post('/', async (req, res) => {
         done,
         note,
         priority,
-        due_date
+        due_date,
+        assigned_by || null
       ]
     );
 
@@ -112,13 +128,15 @@ router.post('/', async (req, res) => {
 
 // Update an existing task
 router.put('/:id', async (req, res) => {
-  const { employee_id, project_id, title, done, note, priority, due_date } = req.body;
+  const { employee_id, project_id, title, done, note, priority, due_date, assigned_by } = req.body;
   try {
+    const assignmentError = await validateAssignment(assigned_by, employee_id);
+    if (assignmentError) return res.status(403).json({ error: assignmentError });
     await db.query(
       `UPDATE tasks
-       SET employee_id = ?, project_id = ?, title = ?, done = ?, note = ?, priority = ?, due_date = ?
+       SET employee_id = ?, project_id = ?, title = ?, done = ?, note = ?, priority = ?, due_date = ?, assigned_by = ?
        WHERE id = ?`,
-      [employee_id, project_id, title, done, note, priority, due_date, req.params.id]
+      [employee_id, project_id, title, done, note, priority, due_date, assigned_by || null, req.params.id]
     );
     res.json({ message: 'Task updated successfully' });
   } catch (err) {

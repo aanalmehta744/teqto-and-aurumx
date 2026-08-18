@@ -14,6 +14,7 @@ import { EmployeeDailyUpdateComponent } from './employee-daily-update/employee-d
 import { AllEmployeeDailyUpdateComponent } from './employee-daily-update/allemployee-daily-update/allemployee-daily-update.component';
 import { AllTasksComponent } from './all-tasks/all-tasks.component';
 import { EmployeeLeavesComponent } from './my-leaves/employee-leaves/employee-leaves.component';
+import { DepartmentsComponent } from '../departments/departments.component';
 export const EMPLOYEE_ROUTE: Route[] = [
   {
     path: 'dashboard',
@@ -60,6 +61,7 @@ export const EMPLOYEE_ROUTE: Route[] = [
     path: 'alltasks',
     component: AllTasksComponent,
   },
+  { path: 'departments', component: DepartmentsComponent },
   {
     path: 'myleaves',
     component: MyLeavesComponent,

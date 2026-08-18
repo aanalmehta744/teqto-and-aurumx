@@ -14,4 +14,5 @@ export class User {
   gender!: string;
   leave_balance!: number;
   department!: string;
+  employee_level!: 'Senior' | 'Junior' | 'Intern';
 }
