@@ -72,6 +72,7 @@ export class EmployeeAttendanceComponent extends UnsubscribeOnDestroyAdapter
   displayedColumns = [
     'name',
     'date',
+    'day',
     'check_in',
     'check_out',
     'hours',

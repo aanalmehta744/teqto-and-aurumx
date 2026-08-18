@@ -17,6 +17,7 @@ import { MatTableModule } from '@angular/material/table';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+
 @Component({
   selector: 'app-today',
   templateUrl: './today.component.html',
@@ -27,7 +28,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatIconModule,
     MatTableModule,
     MatSortModule,
-    NgClass,
+  
     MatRippleModule,
     MatProgressSpinnerModule,
     MatPaginatorModule,
@@ -46,7 +47,8 @@ export class TodayComponent
     'last_out',
     'total',
     'break',
-    'status'
+    'status',
+    'pause_start',
   ];
   exampleDatabase?: TodayService;
   dataSource!: ExampleDataSource;

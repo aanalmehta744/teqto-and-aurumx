@@ -86,19 +86,42 @@
             <mat-header-cell *matHeaderCellDef mat-sort-header>Break</mat-header-cell>
             <mat-cell *matCellDef="let row">{{row.break}}</mat-cell>
           </ng-container> -->
-         <ng-container matColumnDef="break">
-  <mat-header-cell *matHeaderCellDef mat-sort-header>
+<ng-container matColumnDef="break">
+
+  <mat-header-cell
+    *matHeaderCellDef
+    mat-sort-header>
     Break
   </mat-header-cell>
 
   <mat-cell *matCellDef="let row">
+
     <span
-      [ngClass]="{
-        'text-red-600 font-semibold': isBreakGreaterThanOneHour(row.break)
-      }">
+      [style.color]="isBreakGreaterThanOneHour(row.break) ? 'red' : 'inherit'"
+      [style.font-weight]="isBreakGreaterThanOneHour(row.break) ? '600' : 'normal'"
+    >
       {{ row.break || '--' }}
     </span>
+
   </mat-cell>
+
+</ng-container>
+<!-- Pause Time -->
+<ng-container matColumnDef="pause_start">
+
+  <mat-header-cell
+    *matHeaderCellDef
+    mat-sort-header>
+    Pause Time
+  </mat-header-cell>
+
+  <mat-cell *matCellDef="let row">
+    {{ row.pause_start
+      ? (row.pause_start | date:'h:mm:ss a')
+      : '--'
+    }}
+  </mat-cell>
+
 </ng-container>
           <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
           <mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50 transition-colors" matRipple></mat-row>

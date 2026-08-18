@@ -14,10 +14,10 @@ export const environment = {
   localApiUrl: 'http://localhost:3000/api',
 
   cloudflareApiUrl:
-    'https://washing-spiritual-stomach-damages.trycloudflare.com/api',
+    'https://temp-acrylic-velvet-lynn.trycloudflare.com/api',
 
   apiUrl:
-    'https://washing-spiritual-stomach-damages.trycloudflare.com/api'
+    'https://temp-acrylic-velvet-lynn.trycloudflare.com/api'
 };
 
 console.log(

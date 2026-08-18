@@ -51,11 +51,14 @@ export class AttendancesComponent
   filterToggle = false;
   displayedColumns = [
     'date',
+    'day',
     'check_in',
     'check_out',
     'hours',
     'status',
-    'break'
+    'break',
+      'pause_start'
+
   ];
   exampleDatabase?: AttendancesService | null;
   dataSource!: ExampleDataSource;
@@ -115,6 +118,24 @@ export class AttendancesComponent
 
     });
   }
+  isBreakGreaterThanOneHour(breakTime: string | null | undefined): boolean {
+  if (!breakTime) {
+    return false;
+  }
+
+  const parts = breakTime.split(':').map(Number);
+
+  if (parts.length !== 3) {
+    return false;
+  }
+
+  const totalSeconds =
+    parts[0] * 3600 +
+    parts[1] * 60 +
+    parts[2];
+
+  return totalSeconds > 3600;
+}
   startPauseStatusPolling() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     const employeeId = currentUser.id;

@@ -12,9 +12,11 @@
       SELECT 
         a.id, a.employee_id, e.fullName, 
         a.date, a.check_in, a.check_out, 
-        a.hours, a.status,
-        a.break, 
-        e.role,
+      a.hours,
+a.status,
+a.break,
+a.pause_start,
+e.role,
         CASE 
           -- If employee checked in → always mark Present
           WHEN a.status = 'Present' THEN 'Present'

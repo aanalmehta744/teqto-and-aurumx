@@ -594,39 +594,93 @@ function addBreakTimes(time1, time2) {
 
   return `${hours}:${minutes}:${seconds}`;
 }
-router.post('/pause-timer', async (req, res) => {
-  const { employeeId, pauseStart, is_paused } = req.body;
-  console.log(req.body);
+// router.post('/pause-timer', async (req, res) => {
+//   const { employeeId, pauseStart, is_paused } = req.body;
+//   console.log(req.body);
 
-  // Convert pauseStart to number and get today's date
+//   // Convert pauseStart to number and get today's date
+//   const today = new Date().toISOString().split('T')[0];
+//   const pauseStartDateTime = new Date(Number(pauseStart)); // For storing exact timestamp
+
+//   try {
+//     const [rows] = await db.query(
+//       `SELECT check_in, elapsed_time FROM attendance 
+//        WHERE employee_id = ? AND date = ?`,
+//       [employeeId, today]
+//     );
+
+//     if (rows.length === 0 || !rows[0].check_in) {
+//       return res.status(404).json({ message: 'No active timer to pause.' });
+//     }
+
+//     await db.query(
+//       `UPDATE attendance 
+//        SET is_paused = ?, pause_start = ? 
+//        WHERE employee_id = ? AND date = ?`,
+//       [is_paused, pauseStartDateTime, employeeId, today]
+//     );
+
+//     res.json({ message: 'Timer paused successfully.' });
+//   } catch (error) {
+//     console.error('Pause error:', error);
+//     res.status(500).json({ error: 'Failed to pause timer.' });
+//   }
+// });
+
+router.post('/pause-timer', async (req, res) => {
+  const { employeeId, is_paused } = req.body;
+
   const today = new Date().toISOString().split('T')[0];
-  const pauseStartDateTime = new Date(Number(pauseStart)); // For storing exact timestamp
+
+  // Exact server timestamp when Pause button is pressed
+  const pauseStart = new Date();
+
+  console.log('====================================');
+  console.log('PAUSE BUTTON PRESSED');
+  console.log('Employee ID:', employeeId);
+  console.log('Pause Time:', pauseStart);
+  console.log('====================================');
 
   try {
     const [rows] = await db.query(
-      `SELECT check_in, elapsed_time FROM attendance 
+      `SELECT check_in, elapsed_time
+       FROM attendance
        WHERE employee_id = ? AND date = ?`,
       [employeeId, today]
     );
 
     if (rows.length === 0 || !rows[0].check_in) {
-      return res.status(404).json({ message: 'No active timer to pause.' });
+      return res.status(404).json({
+        message: 'No active timer to pause.'
+      });
     }
 
     await db.query(
-      `UPDATE attendance 
-       SET is_paused = ?, pause_start = ? 
+      `UPDATE attendance
+       SET is_paused = ?, pause_start = ?
        WHERE employee_id = ? AND date = ?`,
-      [is_paused, pauseStartDateTime, employeeId, today]
+      [
+        is_paused ?? 1,
+        pauseStart,
+        employeeId,
+        today
+      ]
     );
 
-    res.json({ message: 'Timer paused successfully.' });
+    res.json({
+      success: true,
+      message: 'Timer paused successfully.',
+      pause_start: pauseStart
+    });
+
   } catch (error) {
     console.error('Pause error:', error);
-    res.status(500).json({ error: 'Failed to pause timer.' });
+
+    res.status(500).json({
+      error: 'Failed to pause timer.'
+    });
   }
 });
-
 router.post('/resume-timer', async (req, res) => {
   const { employeeId } = req.body;
   const today = new Date().toISOString().split('T')[0];
@@ -655,12 +709,18 @@ router.post('/resume-timer', async (req, res) => {
     const breakFormatted = msToTimeString(totalBreakMs); // HH:mm:ss
 
     // 4. Update DB
-    await db.query(
-      `UPDATE attendance 
-       SET is_paused = 0, pause_start = NULL, break = ?
-       WHERE employee_id = ? AND date = ?`,
-      [breakFormatted, employeeId, today]
-    );
+    // await db.query(
+    //   `UPDATE attendance 
+    //    SET is_paused = 0, pause_start = NULL, break = ?
+    //    WHERE employee_id = ? AND date = ?`,
+    //   [breakFormatted, employeeId, today]
+    // );
+await db.query(
+  `UPDATE attendance 
+   SET is_paused = 0, break = ?
+   WHERE employee_id = ? AND date = ?`,
+  [breakFormatted, employeeId, today]
+);
 
     res.json({ message: 'Timer resumed successfully.', break: breakFormatted });
   } catch (error) {

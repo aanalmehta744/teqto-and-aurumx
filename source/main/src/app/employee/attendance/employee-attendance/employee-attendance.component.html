@@ -60,7 +60,20 @@
               <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Date</mat-header-cell>
               <mat-cell *matCellDef="let row">{{ row.date ? (row.date | date) : '-' }}</mat-cell>
             </ng-container>
+<ng-container matColumnDef="day">
 
+  <mat-header-cell
+    *matHeaderCellDef
+    mat-sort-header
+    class="font-medium">
+    Day
+  </mat-header-cell>
+
+  <mat-cell *matCellDef="let row">
+    {{ row.date ? (row.date | date:'EEEE') : '-' }}
+  </mat-cell>
+
+</ng-container>
             <!-- Check-In -->
             <ng-container matColumnDef="check_in">
               <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Punch-In</mat-header-cell>

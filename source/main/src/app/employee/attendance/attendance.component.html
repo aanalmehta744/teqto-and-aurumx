@@ -71,7 +71,20 @@
               <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">Date</mat-header-cell>
               <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.date | date }}</mat-cell>
             </ng-container>
+<ng-container matColumnDef="day">
 
+  <mat-header-cell
+    *matHeaderCellDef
+    mat-sort-header
+    class="font-medium">
+    Day
+  </mat-header-cell>
+
+  <mat-cell *matCellDef="let row">
+    {{ row.date ? (row.date | date:'EEEE') : '-' }}
+  </mat-cell>
+
+</ng-container>
             <ng-container matColumnDef="check_in">
               <mat-header-cell *matHeaderCellDef mat-sort-header
                 class="px-4 py-2 font-medium">Punch-In</mat-header-cell>
@@ -90,10 +103,57 @@
               <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">Hours</mat-header-cell>
               <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.hours ? row.hours : '--' }}</mat-cell>
             </ng-container>
-            <ng-container matColumnDef="break">
+            <!-- <ng-container matColumnDef="break">
               <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">Break</mat-header-cell>
               <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.break ? row.break : '--' }}</mat-cell>
-            </ng-container>
+            </ng-container> -->
+            <ng-container matColumnDef="break">
+
+  <mat-header-cell
+    *matHeaderCellDef
+    mat-sort-header
+    class="px-4 py-2 font-medium">
+    Break
+  </mat-header-cell>
+
+  <mat-cell *matCellDef="let row" class="px-4 py-2">
+
+    <span
+      [style.color]="
+        isBreakGreaterThanOneHour(row.break)
+          ? 'red'
+          : 'inherit'
+      "
+      [style.font-weight]="
+        isBreakGreaterThanOneHour(row.break)
+          ? '600'
+          : 'normal'
+      "
+    >
+      {{ row.break || '--' }}
+    </span>
+
+  </mat-cell>
+
+</ng-container>
+            <!-- PAUSE TIME -->
+<ng-container matColumnDef="pause_start">
+
+  <mat-header-cell
+    *matHeaderCellDef
+    mat-sort-header
+    class="px-4 py-2 font-medium">
+    Pause Time
+  </mat-header-cell>
+
+  <mat-cell *matCellDef="let row" class="px-4 py-2">
+    {{ row.pause_start
+      ? (row.pause_start | date:'h:mm:ss a')
+      : '--'
+    }}
+  </mat-cell>
+
+</ng-container>
             <ng-container matColumnDef="status">
               <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">
                 Status
