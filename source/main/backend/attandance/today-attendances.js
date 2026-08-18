@@ -8,8 +8,8 @@
     const todayDate = new Date().toISOString().split('T')[0];
     console.log("Today API:", todayDate);
 
-  const query = `
-  SELECT 
+   const query = `
+  SELECT
     a.id,
     a.employee_id,
     e.fullName,
@@ -22,27 +22,15 @@
     a.pause_start,
     e.role,
 
-    (
-      SELECT JSON_ARRAYAGG(
-        JSON_OBJECT(
-          'id', ph.id,
-          'pause_start', ph.pause_start,
-          'pause_end', ph.pause_end,
-          'duration', ph.duration
-        )
-      )
-      FROM attendance_pause_history ph
-      WHERE ph.attendance_id = a.id
-    ) AS pause_history,
-
-    CASE 
+    CASE
       WHEN a.status = 'Present' THEN 'Present'
 
       WHEN EXISTS (
-        SELECT 1 FROM leave_requests l
+        SELECT 1
+        FROM leave_requests l
         WHERE l.employee_id = a.employee_id
-        AND a.date BETWEEN l.start_date AND l.end_date
-        AND l.status = 'Approved'
+          AND a.date BETWEEN l.start_date AND l.end_date
+          AND l.status = 'Approved'
       ) THEN 'Leave'
 
       WHEN DAYOFWEEK(a.date) IN (1, 7) THEN 'Paid Holiday'
@@ -70,6 +58,9 @@
     }
   });
 
+
+
+  
 
   router.put('/addAttendance', (req, res) => {
     const { employee_id, check_in, check_out } = req.body;
@@ -185,6 +176,38 @@
       return res.status(500).json({ message: 'Error fetching attendance records' });
     }
   });
+
+
+  router.get('/pause-history/:attendanceId', async (req, res) => {
+  const { attendanceId } = req.params;
+
+  try {
+    const [rows] = await db.query(
+      `
+      SELECT
+        id,
+        attendance_id,
+        pause_start,
+        pause_end,
+        duration
+      FROM attendance_pause_history
+      WHERE attendance_id = ?
+      ORDER BY pause_start ASC
+      `,
+      [attendanceId]
+    );
+
+    return res.status(200).json(rows);
+
+  } catch (error) {
+    console.error('Error fetching pause history:', error);
+
+    return res.status(500).json({
+      message: 'Error fetching pause history',
+      error: error.message
+    });
+  }
+});
 
 
   module.exports = router;

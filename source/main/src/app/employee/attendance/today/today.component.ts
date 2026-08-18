@@ -73,22 +73,29 @@ export class TodayComponent
     console.log(row);
   }
 
+  // public loadData() {
+  //   this.exampleDatabase = new TodayService(this.httpClient);
   public loadData() {
-    this.exampleDatabase = new TodayService(this.httpClient);
-    this.dataSource = new ExampleDataSource(
-      this.exampleDatabase,
-      this.paginator,
-      this.sort
-    );
-    this.subs.sink = fromEvent(this.filter.nativeElement, 'keyup').subscribe(
-      () => {
-        if (!this.dataSource) {
-          return;
-        }
-        this.dataSource.filter = this.filter.nativeElement.value;
-      }
-    );
-  }
+  this.exampleDatabase = this.todayService;
+
+  this.dataSource = new ExampleDataSource(
+    this.exampleDatabase,
+    this.paginator,
+    this.sort
+  );
+
+  this.subs.sink = fromEvent(
+    this.filter.nativeElement,
+    'keyup'
+  ).subscribe(() => {
+    if (!this.dataSource) {
+      return;
+    }
+
+    this.dataSource.filter =
+      this.filter.nativeElement.value;
+  });
+}
 }
 export class ExampleDataSource extends DataSource<Today> {
   filterChange = new BehaviorSubject('');
@@ -110,55 +117,125 @@ export class ExampleDataSource extends DataSource<Today> {
     this.filterChange.subscribe(() => (this.paginator.pageIndex = 0));
   }
   /** Connect function called by the table to retrieve one stream containing the data to render. */
+  // connect(): Observable<Today[]> {
+  //   // Listen for any changes in the base data, sorting, filtering, or pagination
+  //   const displayDataChanges = [
+  //     this.exampleDatabase.dataChange,
+  //     this._sort.sortChange,
+  //     this.filterChange,
+  //     this.paginator.page,
+  //   ];
+
+  //   this.exampleDatabase.getAllTodays();
+
+  //   return merge(...displayDataChanges).pipe(
+  //     map(() => {
+  //       // Filter data: 🔥 exclude admin roles
+  //       this.filteredData = this.exampleDatabase.data
+  //         .slice()
+  //         .filter((today: Today) => {
+  //           // ❌ skip Admin
+  //           if (today.role?.toLowerCase() === 'admin') {
+  //             return false;
+  //           }
+
+  //           const searchStr = (
+  //             today.name +
+  //             today.first_in +
+  //             today.break +
+  //             today.last_out +
+  //             today.total +
+  //             today.status +
+  //             today.shift
+  //           ).toLowerCase();
+
+  //           return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
+  //         });
+
+  //       // Sort filtered data
+  //       const sortedData = this.sortData(this.filteredData.slice());
+
+  //       // Grab the page's slice of the filtered sorted data.
+  //       const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
+  //       this.renderedData = sortedData.splice(
+  //         startIndex,
+  //         this.paginator.pageSize
+  //       );
+
+  //       return this.renderedData;
+  //     })
+  //   );
+  // }
   connect(): Observable<Today[]> {
-    // Listen for any changes in the base data, sorting, filtering, or pagination
-    const displayDataChanges = [
-      this.exampleDatabase.dataChange,
-      this._sort.sortChange,
-      this.filterChange,
-      this.paginator.page,
-    ];
 
-    this.exampleDatabase.getAllTodays();
+  const displayDataChanges = [
+    this.exampleDatabase.dataChange,
+    this._sort.sortChange,
+    this.filterChange,
+    this.paginator.page,
+  ];
 
-    return merge(...displayDataChanges).pipe(
-      map(() => {
-        // Filter data: 🔥 exclude admin roles
-        this.filteredData = this.exampleDatabase.data
-          .slice()
-          .filter((today: Today) => {
-            // ❌ skip Admin
-            if (today.role?.toLowerCase() === 'admin') {
-              return false;
-            }
+  // Load today's attendance
+  this.exampleDatabase.getAllTodays().subscribe({
+    next: (data) => {
+      console.log('HR TODAY ATTENDANCE:', data);
 
-            const searchStr = (
-              today.name +
-              today.first_in +
-              today.break +
-              today.last_out +
-              today.total +
-              today.status +
-              today.shift
-            ).toLowerCase();
+      this.exampleDatabase.dataChange.next(data);
+    },
 
-            return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
-          });
+    error: (error) => {
+      console.error('HR TODAY ATTENDANCE ERROR:', error);
 
-        // Sort filtered data
-        const sortedData = this.sortData(this.filteredData.slice());
+      this.exampleDatabase.dataChange.next([]);
+    }
+  });
 
-        // Grab the page's slice of the filtered sorted data.
-        const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
-        this.renderedData = sortedData.splice(
-          startIndex,
-          this.paginator.pageSize
-        );
+  return merge(...displayDataChanges).pipe(
+    map(() => {
 
-        return this.renderedData;
-      })
-    );
-  }
+      this.filteredData = this.exampleDatabase.data
+        .slice()
+        .filter((today: Today) => {
+
+          // Hide Admin
+          if (today.role?.toLowerCase() === 'admin') {
+            return false;
+          }
+
+          const searchStr = (
+            (today.name || '') +
+            (today.fullName || '') +
+            (today.first_in || '') +
+            (today.break || '') +
+            (today.last_out || '') +
+            (today.total || '') +
+            (today.status || '') +
+            (today.shift || '') +
+            (today.pause_start || '')
+          ).toLowerCase();
+
+          return searchStr.indexOf(
+            this.filter.toLowerCase()
+          ) !== -1;
+        });
+
+      const sortedData = this.sortData(
+        this.filteredData.slice()
+      );
+
+      const startIndex =
+        this.paginator.pageIndex *
+        this.paginator.pageSize;
+
+      this.renderedData = sortedData.splice(
+        startIndex,
+        this.paginator.pageSize
+      );
+
+      return this.renderedData;
+    })
+  );
+}
 
 
   disconnect() {

@@ -739,7 +739,7 @@ export const ROUTES: RouteInfo[] = [
         submenu: [],
       },
       {
-        path: 'admin/attendance/today',
+        path: '/employee/attendance/today',
         title: 'Today Attendance',
         iconType: 'feather',
         icon: 'user-check',

@@ -142,15 +142,12 @@ export class ExampleDataSource extends DataSource<Today> {
 
     // Subscribe to the observable here and update dataSubject
     this.todayService.getAllTodays().subscribe({
-      next: (data) => {
-        // console.log("Today attendance", data);
-          console.log("Today attendance FULL", JSON.stringify(data, null, 2));
+     next: (data) => {
+  console.log('TODAY ATTENDANCE DATA:', data);
 
-        // Remove records where role = Admin
-        const filtered = data.filter(d => d.role?.toLowerCase() !== 'admin');
-
-        this.dataSubject.next(filtered);
-      },
+  // Show all records
+  this.dataSubject.next(data);
+},
       error: (err) => {
         console.error('Error loading today data:', err);
         this.dataSubject.next([]); // clear data on error
@@ -173,14 +170,15 @@ export class ExampleDataSource extends DataSource<Today> {
           .slice()
           .filter((today: Today) => {
             const searchStr = (
-              today.name +
-              today.first_in +
-              today.break +
-              today.last_out +
-              today.total +
-              today.status +
-              today.shift
-            ).toLowerCase();
+  (today.name || '') +
+  (today.first_in || '') +
+  (today.break || '') +
+  (today.last_out || '') +
+  (today.total || '') +
+  (today.status || '') +
+  (today.shift || '') +
+  (today.pause_start || '')
+).toLowerCase();
             return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
           });
 

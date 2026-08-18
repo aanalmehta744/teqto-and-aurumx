@@ -71,7 +71,55 @@
               <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Total</mat-header-cell>
               <mat-cell *matCellDef="let row">{{ row.hours }}</mat-cell>
             </ng-container>
+<!-- Pause Time -->
+<ng-container matColumnDef="pause_start">
 
+  <mat-header-cell
+    *matHeaderCellDef
+    mat-sort-header
+    class="font-medium">
+    Pause Time
+  </mat-header-cell>
+
+  <mat-cell *matCellDef="let row">
+
+    <div class="flex flex-col gap-1">
+
+      <ng-container *ngIf="row.pause_history?.length > 0; else noPause">
+
+        <div
+          *ngFor="let pause of row.pause_history"
+          class="text-sm whitespace-nowrap">
+
+          {{ pause.pause_start | date:'h:mm:ss a' }}
+
+          <span class="text-gray-400 mx-1">
+            →
+          </span>
+
+          <span *ngIf="pause.pause_end">
+            {{ pause.pause_end | date:'h:mm:ss a' }}
+          </span>
+
+          <span *ngIf="!pause.pause_end" class="text-orange-600">
+            Paused
+          </span>
+
+        </div>
+
+      </ng-container>
+
+      <ng-template #noPause>
+        <span class="text-gray-400">
+          --
+        </span>
+      </ng-template>
+
+    </div>
+
+  </mat-cell>
+
+</ng-container>
             <!-- Status -->
             <ng-container matColumnDef="status">
               <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">
@@ -129,11 +177,11 @@
           </table>
 
           <!-- Spinner -->
-          @if (exampleDatabase?.isTblLoading) {
+          <!-- @if (exampleDatabase?.isTblLoading) {
           <div class="flex justify-center items-center py-6">
             <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate"></mat-progress-spinner>
           </div>
-          }
+          } -->
 
           <!-- No Results -->
           @if (!exampleDatabase?.isTblLoading) {
