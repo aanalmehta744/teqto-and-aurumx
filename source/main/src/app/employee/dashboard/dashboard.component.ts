@@ -134,7 +134,26 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.fetchTodayTasks();
     }
   }
+isBreakGreaterThanOneHour(
+  breakTime: string | null | undefined
+): boolean {
+  if (!breakTime) {
+    return false;
+  }
 
+  const parts = breakTime.split(':').map(Number);
+
+  if (parts.length !== 3) {
+    return false;
+  }
+
+  const totalSeconds =
+    parts[0] * 3600 +
+    parts[1] * 60 +
+    parts[2];
+
+  return totalSeconds > 3600;
+}
   ngAfterViewInit(): void {
     if (this.userAttendancePaginator) {
       this.dataSource.paginator = this.userAttendancePaginator;
@@ -556,11 +575,30 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.todayService.getTodayAttendacves()
       .pipe(takeUntil(this.destroy$))
+      // .subscribe((res: any[]) => {
+      //   this.todayAttendanceRecords = res;
+      //   this.todayAttendanceDataSource.data = res;
+      //   this.updateHrAttendancePagination();
+      // });
       .subscribe((res: any[]) => {
-        this.todayAttendanceRecords = res;
-        this.todayAttendanceDataSource.data = res;
-        this.updateHrAttendancePagination();
-      });
+
+  console.log('HR TODAY ATTENDANCE FULL RESPONSE:', res);
+
+  res.forEach(row => {
+    console.log(
+      'Employee:',
+      row.fullName,
+      'Break:',
+      row.break,
+      'Pause Start:',
+      row.pause_start
+    );
+  });
+
+  this.todayAttendanceRecords = res;
+  this.todayAttendanceDataSource.data = res;
+  this.updateHrAttendancePagination();
+});
   }
 
   loadInterviews(): void {

@@ -655,17 +655,44 @@ router.post('/pause-timer', async (req, res) => {
       });
     }
 
-    await db.query(
-      `UPDATE attendance
-       SET is_paused = ?, pause_start = ?
-       WHERE employee_id = ? AND date = ?`,
-      [
-        is_paused ?? 1,
-        pauseStart,
-        employeeId,
-        today
-      ]
-    );
+   // Get attendance ID
+const [attendanceRows] = await db.query(
+  `SELECT id
+   FROM attendance
+   WHERE employee_id = ? AND date = ?`,
+  [employeeId, today]
+);
+
+if (attendanceRows.length === 0) {
+  return res.status(404).json({
+    message: 'Attendance record not found.'
+  });
+}
+
+const attendanceId = attendanceRows[0].id;
+
+
+// Save this pause into history
+await db.query(
+  `INSERT INTO attendance_pause_history
+   (attendance_id, employee_id, pause_start)
+   VALUES (?, ?, ?)`,
+  [attendanceId, employeeId, pauseStart]
+);
+
+
+// Also keep current pause in attendance table
+await db.query(
+  `UPDATE attendance
+   SET is_paused = ?, pause_start = ?
+   WHERE employee_id = ? AND date = ?`,
+  [
+    is_paused ?? 1,
+    pauseStart,
+    employeeId,
+    today
+  ]
+);
 
     res.json({
       success: true,
@@ -681,54 +708,165 @@ router.post('/pause-timer', async (req, res) => {
     });
   }
 });
+// router.post('/resume-timer', async (req, res) => {
+//   const { employeeId } = req.body;
+//   const today = new Date().toISOString().split('T')[0];
+
+//   try {
+//     // 1. Get current pause_start
+//     const [rows] = await db.query(
+//       `SELECT pause_start, break
+//        FROM attendance 
+//        WHERE employee_id = ? AND date = ?`,
+//       [employeeId, today]
+//     );
+
+//     if (rows.length === 0 || !rows[0].pause_start) {
+//       return res.status(404).json({ message: 'No paused timer found.' });
+//     }
+
+//     // 2. Calculate break duration in milliseconds
+//     const pauseStartTime = new Date(rows[0].pause_start).getTime();
+//     const resumeTime = Date.now();
+//     const breakMs = resumeTime - pauseStartTime;
+
+//     // 3. Add to existing break_time
+//     const existingBreak = rows[0].break ? timeStringToMs(rows[0].break) : 0;
+//     const totalBreakMs = existingBreak + breakMs;
+//     const breakFormatted = msToTimeString(totalBreakMs); // HH:mm:ss
+
+//     // 4. Update DB
+//     // await db.query(
+//     //   `UPDATE attendance 
+//     //    SET is_paused = 0, pause_start = NULL, break = ?
+//     //    WHERE employee_id = ? AND date = ?`,
+//     //   [breakFormatted, employeeId, today]
+//     // );
+// await db.query(
+//   `UPDATE attendance 
+//    SET is_paused = 0, break = ?
+//    WHERE employee_id = ? AND date = ?`,
+//   [breakFormatted, employeeId, today]
+// );
+
+//     res.json({ message: 'Timer resumed successfully.', break: breakFormatted });
+//   } catch (error) {
+//     console.error('Resume error:', error);
+//     res.status(500).json({ error: 'Failed to resume timer.' });
+//   }
+// });
+
+
+
+
+
+// Helper: Convert HH:mm:ss → ms
+
+
+
 router.post('/resume-timer', async (req, res) => {
   const { employeeId } = req.body;
+
   const today = new Date().toISOString().split('T')[0];
 
   try {
-    // 1. Get current pause_start
+    // 1. Get today's attendance
     const [rows] = await db.query(
-      `SELECT pause_start, break
-       FROM attendance 
+      `SELECT id, pause_start, break
+       FROM attendance
        WHERE employee_id = ? AND date = ?`,
       [employeeId, today]
     );
 
     if (rows.length === 0 || !rows[0].pause_start) {
-      return res.status(404).json({ message: 'No paused timer found.' });
+      return res.status(404).json({
+        message: 'No paused timer found.'
+      });
     }
 
-    // 2. Calculate break duration in milliseconds
-    const pauseStartTime = new Date(rows[0].pause_start).getTime();
-    const resumeTime = Date.now();
-    const breakMs = resumeTime - pauseStartTime;
+    const attendanceId = rows[0].id;
+    const pauseStart = rows[0].pause_start;
 
-    // 3. Add to existing break_time
-    const existingBreak = rows[0].break ? timeStringToMs(rows[0].break) : 0;
+    // 2. Resume timestamp
+    const resumeTime = new Date();
+
+    // 3. Calculate THIS pause duration
+    const pauseStartTime = new Date(pauseStart).getTime();
+    const breakMs = resumeTime.getTime() - pauseStartTime;
+
+    const pauseDuration = msToTimeString(breakMs);
+
+    // 4. Get existing total break
+    const existingBreak = rows[0].break
+      ? timeStringToMs(rows[0].break)
+      : 0;
+
     const totalBreakMs = existingBreak + breakMs;
-    const breakFormatted = msToTimeString(totalBreakMs); // HH:mm:ss
 
-    // 4. Update DB
-    // await db.query(
-    //   `UPDATE attendance 
-    //    SET is_paused = 0, pause_start = NULL, break = ?
-    //    WHERE employee_id = ? AND date = ?`,
-    //   [breakFormatted, employeeId, today]
-    // );
-await db.query(
-  `UPDATE attendance 
-   SET is_paused = 0, break = ?
-   WHERE employee_id = ? AND date = ?`,
-  [breakFormatted, employeeId, today]
-);
+    const totalBreakFormatted = msToTimeString(totalBreakMs);
 
-    res.json({ message: 'Timer resumed successfully.', break: breakFormatted });
+    // 5. Close the latest open pause-history record
+    await db.query(
+      `UPDATE attendance_pause_history
+       SET pause_end = ?,
+           duration = ?
+       WHERE attendance_id = ?
+         AND pause_end IS NULL
+       ORDER BY id DESC
+       LIMIT 1`,
+      [
+        resumeTime,
+        pauseDuration,
+        attendanceId
+      ]
+    );
+
+    // 6. Update attendance
+    // IMPORTANT:
+    // We intentionally DO NOT set pause_start = NULL
+    // so the last pause time remains available.
+    await db.query(
+      `UPDATE attendance
+       SET is_paused = 0,
+           break = ?
+       WHERE employee_id = ?
+       AND date = ?`,
+      [
+        totalBreakFormatted,
+        employeeId,
+        today
+      ]
+    );
+
+    console.log(
+      `Resume recorded for employee ${employeeId}`
+    );
+
+    console.log(
+      `Pause duration: ${pauseDuration}`
+    );
+
+    console.log(
+      `Total break: ${totalBreakFormatted}`
+    );
+
+    res.json({
+      success: true,
+      message: 'Timer resumed successfully.',
+      pause_start: pauseStart,
+      pause_end: resumeTime,
+      pause_duration: pauseDuration,
+      break: totalBreakFormatted
+    });
+
   } catch (error) {
     console.error('Resume error:', error);
-    res.status(500).json({ error: 'Failed to resume timer.' });
+
+    res.status(500).json({
+      error: 'Failed to resume timer.'
+    });
   }
 });
-// Helper: Convert HH:mm:ss → ms
 function timeStringToMs(time) {
   const [h, m, s] = time.split(':').map(Number);
   return (h * 3600 + m * 60 + s) * 1000;

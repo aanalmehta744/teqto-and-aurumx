@@ -8,36 +8,52 @@
     const todayDate = new Date().toISOString().split('T')[0];
     console.log("Today API:", todayDate);
 
-    const query = `
-      SELECT 
-        a.id, a.employee_id, e.fullName, 
-        a.date, a.check_in, a.check_out, 
-      a.hours,
-a.status,
-a.break,
-a.pause_start,
-e.role,
-        CASE 
-          -- If employee checked in → always mark Present
-          WHEN a.status = 'Present' THEN 'Present'
+  const query = `
+  SELECT 
+    a.id,
+    a.employee_id,
+    e.fullName,
+    a.date,
+    a.check_in,
+    a.check_out,
+    a.hours,
+    a.status,
+    a.break,
+    a.pause_start,
+    e.role,
 
-          -- If leave exists for this date → show Leave
-          WHEN EXISTS (
-            SELECT 1 FROM leave_requests l
-            WHERE l.employee_id = a.employee_id
-            AND a.date BETWEEN l.start_date AND l.end_date
-            AND l.status = 'Approved'
-          ) THEN 'Leave'
+    (
+      SELECT JSON_ARRAYAGG(
+        JSON_OBJECT(
+          'id', ph.id,
+          'pause_start', ph.pause_start,
+          'pause_end', ph.pause_end,
+          'duration', ph.duration
+        )
+      )
+      FROM attendance_pause_history ph
+      WHERE ph.attendance_id = a.id
+    ) AS pause_history,
 
-          -- If Saturday (7) or Sunday (1) → Paid Holiday
-          WHEN DAYOFWEEK(a.date) IN (1, 7) THEN 'Paid Holiday'
+    CASE 
+      WHEN a.status = 'Present' THEN 'Present'
 
-          ELSE a.status
-        END AS final_status
-      FROM attendance a
-      JOIN employees e ON a.employee_id = e.id
-      WHERE a.date = ?;
-    `;
+      WHEN EXISTS (
+        SELECT 1 FROM leave_requests l
+        WHERE l.employee_id = a.employee_id
+        AND a.date BETWEEN l.start_date AND l.end_date
+        AND l.status = 'Approved'
+      ) THEN 'Leave'
+
+      WHEN DAYOFWEEK(a.date) IN (1, 7) THEN 'Paid Holiday'
+
+      ELSE a.status
+    END AS final_status
+
+  FROM attendance a
+  JOIN employees e ON a.employee_id = e.id
+  WHERE a.date = ?;
+`;
 
     try {
       const [rows] = await db.execute(query, [todayDate]);
