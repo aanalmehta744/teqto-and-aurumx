@@ -152,27 +152,71 @@ export class SidebarComponent
       this.userGender = user.gender;
       this.userImg = user.img || this.getImgUrl(user.gender);
 
-      this.sidebarItems = ROUTES.filter(item => {
-        const roles = (item.role ?? []).map(r => r.toLowerCase());
-        const depts = (item.department ?? []).map(d => d.toLowerCase());
+      // this.sidebarItems = ROUTES.filter(item => {
+      //   const roles = (item.role ?? []).map(r => r.toLowerCase());
+      //   const depts = (item.department ?? []).map(d => d.toLowerCase());
 
-        const roleMatch = roles.includes(userRole) || roles.includes('all');
-        const deptMatch = depts.includes(userDepartment) || depts.includes('all') || userRole === 'admin' || userRole === 'ba';
+      //   const roleMatch = roles.includes(userRole) || roles.includes('all');
+      //   const deptMatch = depts.includes(userDepartment) || depts.includes('all') || userRole === 'admin' || userRole === 'ba';
 
-        if (!(roleMatch && deptMatch)) return false;
+      //   if (!(roleMatch && deptMatch)) return false;
 
-        if (item.submenu && item.submenu.length > 0) {
-          item.submenu = item.submenu.filter(sub => {
-            if (sub.path === '/employee/attendance') return true;
-            if (userRole === 'admin' || userRole === 'ba') return true;
-            return sub.department?.map(d => d.toLowerCase()).includes(userDepartment);
-          });
-        }
+      //   if (item.submenu && item.submenu.length > 0) {
+      //     item.submenu = item.submenu.filter(sub => {
+      //       if (sub.path === '/employee/attendance') return true;
+      //       if (userRole === 'admin' || userRole === 'ba') return true;
+      //       return sub.department?.map(d => d.toLowerCase()).includes(userDepartment);
+      //     });
+      //   }
 
-        return true;
-      });
+      //   return true;
+      // });
 
       // Initialize open state
+      this.sidebarItems = ROUTES.filter(item => {
+  const roles = (item.role ?? []).map(r => r.toLowerCase().trim());
+  const depts = (item.department ?? []).map(d => d.toLowerCase().trim());
+
+  // Admin can only see Admin menus
+  if (userRole === 'admin') {
+    return roles.includes('admin');
+  }
+
+  // All non-admin users must have Employee role
+  if (userRole === 'employee') {
+    // HR employee
+    if (userDepartment === 'hr') {
+      return (
+        roles.includes('employee') &&
+        depts.includes('hr')
+      );
+    }
+
+    // BDE employee
+    if (userDepartment === 'bde') {
+      return (
+        roles.includes('employee') &&
+        depts.includes('bde')
+      );
+    }
+
+    // BA employee
+    if (userDepartment === 'ba') {
+      return (
+        roles.includes('employee') &&
+        depts.includes('ba')
+      );
+    }
+
+    // Other employee departments
+    return (
+      roles.includes('employee') &&
+      depts.includes(userDepartment)
+    );
+  }
+
+  return false;
+});
       this.sidebarItems.forEach(item => {
         item.isOpen = false;
         if (item.submenu) {
@@ -185,11 +229,24 @@ export class SidebarComponent
         }
       });
 
-      if (userRole === 'admin') this.userType = 'Admin';
-      else if (userRole === 'bde') this.userType = 'BDE';
-      else if (userRole === 'employee') this.userType = 'Employee';
-      else if (userRole === 'ba') this.userType = 'BA';
-      else this.userType = 'Admin';
+      // if (userRole === 'admin') this.userType = 'Admin';
+      // else if (userRole === 'bde') this.userType = 'BDE';
+      // else if (userRole === 'employee') this.userType = 'Employee';
+      // else if (userRole === 'ba') this.userType = 'BA';
+      // else this.userType = 'Admin';
+      if (userRole === 'admin') {
+  this.userType = 'Admin';
+} else if (userRole === 'employee' && userDepartment === 'bde') {
+  this.userType = 'BDE';
+} else if (userRole === 'employee' && userDepartment === 'ba') {
+  this.userType = 'BA';
+} else if (userRole === 'employee' && userDepartment === 'hr') {
+  this.userType = 'HR';
+} else if (userRole === 'employee') {
+  this.userType = 'Employee';
+} else {
+  this.userType = 'Employee';
+}
     }
 
     this.initLeftSidebar();

@@ -12,6 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { PayrollService } from 'app/admin/payroll/payslip/payroll.service';
 import { Router } from '@angular/router';
+import { AuthService } from 'app/core/service/auth.service';
 export interface DialogData {
   id: number;
   action: string;
@@ -58,6 +59,7 @@ export class FormDialogComponent {
     public employeeSalaryService: EmployeeSalaryService,
     public payrollService: PayrollService,
     private router: Router,
+      private authService: AuthService,
   ) {
     this.updateMonthOptions(); // initialize with current filter
   }
@@ -79,15 +81,56 @@ export class FormDialogComponent {
     this.updateMonthOptions();
   }
 
+  // onGenerate() {
+  //   const row = this.data;
+  //   if (row?.id) {
+  //     this.dialogRef.close();
+  //     this.router.navigate([`/admin/payroll/payslip/${row.id}`], {
+  //       queryParams: { month: this.selectedMonth, year: this.selectedYear }
+  //     });
+  //   }
+  // }
   onGenerate() {
-    const row = this.data;
-    if (row?.id) {
-      this.dialogRef.close();
-      this.router.navigate([`/admin/payroll/payslip/${row.id}`], {
-        queryParams: { month: this.selectedMonth, year: this.selectedYear }
-      });
-    }
+  const row = this.data;
+
+  if (!row?.id) {
+    return;
   }
+
+  const currentUser = this.authService.currentUserValue;
+
+  if (!currentUser) {
+    this.router.navigate(['/authentication/login']);
+    return;
+  }
+
+  const role = String(currentUser.role || '').toLowerCase().trim();
+  const department = String(currentUser.department || '').toLowerCase().trim();
+
+  let payrollPath = '';
+
+  if (role === 'admin') {
+    payrollPath = `/admin/payroll/payslip/${row.id}`;
+  } else if (role === 'employee' && department === 'ba') {
+    payrollPath = `/ba/payroll/payslip/${row.id}`;
+  } else if (role === 'employee' && department === 'bde') {
+    payrollPath = `/client/payroll/payslip/${row.id}`;
+  } else if (role === 'employee') {
+    payrollPath = `/employee/payroll/payslip/${row.id}`;
+  } else {
+    this.router.navigate(['/authentication/login']);
+    return;
+  }
+
+  this.dialogRef.close();
+
+  this.router.navigate([payrollPath], {
+    queryParams: {
+      month: this.selectedMonth,
+      year: this.selectedYear
+    }
+  });
+}
 
   onConfirm() {
     this.dialogRef.close({ month: this.selectedMonth, year: this.selectedYear });

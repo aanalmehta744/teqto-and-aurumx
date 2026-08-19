@@ -58,28 +58,98 @@ export class LockedComponent implements OnInit {
     if (img.startsWith('http')) return img;
     return `${environment.apiUrl.replace('/api','')}/uploads/employees/${img}`;
   }
-  onSubmit() {
-    this.submitted = true;
+//   onSubmit() {
+//     this.submitted = true;
 
-    // Stop here if form is invalid
-    if (this.authForm.invalid) {
-      return;
-    } else {
-      const currentUser = this.authService.currentUserValue;
+//     // Stop here if form is invalid
+//     if (this.authForm.invalid) {
+//       return;
+//     } else {
+//       const currentUser = this.authService.currentUserValue;
 
-      if (currentUser) {
-        const role = currentUser.role;
+//       // if (currentUser) {
+//       //   const role = currentUser.role;
 
-        if (role === Role.All || role === Role.Admin) {
-          this.router.navigate(['/admin/dashboard/main']);
-        } else if (role === Role.Employee) {
-          this.router.navigate(['/employee/dashboard']);
-        } else if (role === Role.BDE) {
-          this.router.navigate(['/client/dashboard']);
-        } else {
-          this.router.navigate(['/authentication/signin']);
-        }
-      }
-    }
+//       //   if (role === Role.All || role === Role.Admin) {
+//       //     this.router.navigate(['/admin/dashboard/main']);
+//       //   } else if (role === Role.Employee) {
+//       //     this.router.navigate(['/employee/dashboard']);
+//       //   } else if (role === Role.BDE) {
+//       //     this.router.navigate(['/client/dashboard']);
+//       //   } else {
+//       //     this.router.navigate(['/authentication/signin']);
+//       //   }
+//       // }
+//       if (role === Role.All || role === Role.Admin) {
+
+//   this.router.navigate(['/admin/dashboard/main']);
+
+// } else if (role === Role.Employee) {
+
+//   const department = currentUser.department?.toLowerCase().trim();
+
+//   if (department === 'bde') {
+
+//     this.router.navigate(['/client/dashboard']);
+
+//   } else if (department === 'ba') {
+
+//     this.router.navigate(['/ba/dashboard/main']);
+
+//   } else {
+
+//     this.router.navigate(['/employee/dashboard']);
+
+//   }
+
+// } else {
+
+//   this.router.navigate(['/authentication/signin']);
+
+// }
+//     }
+//   }
+onSubmit() {
+  this.submitted = true;
+
+  if (this.authForm.invalid) {
+    return;
   }
+
+  const currentUser = this.authService.currentUserValue;
+
+  if (!currentUser) {
+    this.router.navigate(['/authentication/signin']);
+    return;
+  }
+
+  const role = String(currentUser.role || '').toLowerCase().trim();
+  const department = String(currentUser.department || '').toLowerCase().trim();
+
+  if (role === 'admin') {
+
+    this.router.navigate(['/admin/dashboard/main']);
+
+  } else if (role === 'employee') {
+
+    if (department === 'bde') {
+
+      this.router.navigate(['/client/dashboard']);
+
+    } else if (department === 'ba') {
+
+      this.router.navigate(['/ba/dashboard/main']);
+
+    } else {
+
+      this.router.navigate(['/employee/dashboard']);
+
+    }
+
+  } else {
+
+    this.router.navigate(['/authentication/signin']);
+
+  }
+}
 }

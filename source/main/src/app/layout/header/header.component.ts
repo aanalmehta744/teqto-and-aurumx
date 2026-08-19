@@ -99,25 +99,35 @@ export class HeaderComponent
       // Display user's first and last name
       this.userName = `${user.fullName}`;
 
-      if (userRole === 'Admin') {
-        this.homePage = 'admin/dashboard/main';
-        this.loadNotifications();
-        this.notifInterval = setInterval(() => this.loadNotifCount(), 30000);
-      } else if (userRole === 'BDE') {
-        this.homePage = 'client/dashboard';
-        this.loadUserNotifications(user.id);
-        this.notifInterval = setInterval(() => this.loadUserNotifCount(user.id), 30000);
-      } else if (userRole === 'BA') {
-        this.homePage = 'admin/dashboard/main';
-        this.loadUserNotifications(user.id);
-        this.notifInterval = setInterval(() => this.loadUserNotifCount(user.id), 30000);
-      } else if (userRole === 'Employee') {
-        this.homePage = 'employee/dashboard';
-        this.loadUserNotifications(user.id);
-        this.notifInterval = setInterval(() => this.loadUserNotifCount(user.id), 30000);
-      } else {
-        this.homePage = 'admin/dashboard/main';
-      }
+   
+
+if (userRole === 'Admin') {
+
+  this.homePage = 'admin/dashboard/main';
+
+} else if (userRole === 'Employee') {
+
+  const department = user.department?.toLowerCase().trim();
+
+  if (department === 'bde') {
+
+    this.homePage = 'client/dashboard';
+
+  } else if (department === 'ba') {
+
+    this.homePage = 'ba/dashboard/main';
+
+  } else {
+
+    this.homePage = 'employee/dashboard';
+
+  }
+
+} else {
+
+  this.homePage = 'employee/dashboard';
+
+}
     }
   }
 

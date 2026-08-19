@@ -131,71 +131,231 @@ export class LoginComponent extends UnsubscribeOnDestroyAdapter
     }
 
     /** Handle form submission and navigation */
-    onSubmit() {
-        this.submitted = true;
-        this.loading = true;
-        this.error = '';
+//     onSubmit() {
+//         this.submitted = true;
+//         this.loading = true;
+//         this.error = '';
 
-        if (this.authForm.invalid) {
-            this.snackBar.open('Username and Password are required!', 'Close', {
-                duration: 3000,
-                panelClass: ['bg-red-600', 'text-white']
-            });
-            this.loading = false;
-            return;
-        }
+//         if (this.authForm.invalid) {
+//             this.snackBar.open('Username and Password are required!', 'Close', {
+//                 duration: 3000,
+//                 panelClass: ['bg-red-600', 'text-white']
+//             });
+//             this.loading = false;
+//             return;
+//         }
 
-        const { username, password, role } = this.authForm.value;
+//         const { username, password, role } = this.authForm.value;
 
-        this.authService.login(username, password).subscribe(
-            (res) => {
-                if (res) {
-                    const currentUser = this.authService.currentUserValue;
-                    const userRole = currentUser?.role;
+//         this.authService.login(username, password, role).subscribe(
+//             (res) => {
+//                 if (res) {
+//                     const currentUser = this.authService.currentUserValue;
+//                     const userRole = currentUser?.role;
 
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Login Successful',
-                        text: `Welcome back, ${username}!`,
-                        confirmButtonText: 'Okay',
-                        confirmButtonColor: '#3085d6',
-                        allowOutsideClick: false
-                    }).then(() => {
-                        if (userRole === Role.Admin) {
-                            this.router.navigate(['/admin/dashboard/main']);
-                        } else if (userRole === Role.Employee) {
-                            this.router.navigate(['/employee/dashboard']);
-                        } else if (userRole === Role.BDE) {
-                            this.router.navigate(['/client/dashboard']);
-                        } else if (userRole === Role.BA) {
-                            this.router.navigate(['/ba/dashboard']);
-                        } else {
-                            this.router.navigate(['/authentication/login']);
+//                     Swal.fire({
+//                         icon: 'success',
+//                         title: 'Login Successful',
+//                         text: `Welcome back, ${username}!`,
+//                         confirmButtonText: 'Okay',
+//                         confirmButtonColor: '#3085d6',
+//                         allowOutsideClick: false
+//                     }).then(() => {
+//                         const userRole = currentUser?.role;
+// const userDepartment = currentUser?.department?.toLowerCase().trim();
+
+// if (userRole === Role.Admin) {
+
+//     this.router.navigate(['/admin/dashboard/main']);
+
+// } else if (userRole === Role.Employee) {
+
+//     if (userDepartment === 'bde') {
+
+//         this.router.navigate(['/client/dashboard']);
+
+//     } else if (userDepartment === 'ba') {
+
+//         this.router.navigate(['/ba/dashboard/main']);
+
+//     } else {
+
+//         this.router.navigate(['/employee/dashboard']);
+
+//     }
+
+// } else {
+
+//     this.router.navigate(['/authentication/login']);
+
+// }
+//                         // if (userRole === Role.Admin) {
+//                         //     this.router.navigate(['/admin/dashboard/main']);
+//                         // } else if (userRole === Role.Employee) {
+//                         //     this.router.navigate(['/employee/dashboard']);
+//                         // } else if (userRole === Role.BDE) {
+//                         //     this.router.navigate(['/client/dashboard']);
+//                         // } else if (userRole === Role.BA) {
+//                         //     this.router.navigate(['/ba/dashboard']);
+//                         // } else {
+//                         //     this.router.navigate(['/authentication/login']);
+//                         // }
+//                     });
+//                 } else {
+//                     this.snackBar.open('Invalid login', 'Close', {
+//                         duration: 3000,
+//                         panelClass: ['custom-snackbar-error']
+//                     });
+//                 }
+
+//                 this.loading = false;
+//                 this.changeDetector.detectChanges();
+//             },
+//             (err) => {
+//                 console.log(err);
+//                 this.snackBar.open(err, 'Close', {
+//                     duration: 4000,
+//                     panelClass: ['bg-red-600', 'text-white']
+//                 });
+
+//                 this.submitted = false;
+//                 this.loading = false;
+//                 this.changeDetector.detectChanges();
+//             }
+//         );
+//     }
+onSubmit() {
+    this.submitted = true;
+    this.loading = true;
+    this.error = '';
+
+    if (this.authForm.invalid) {
+        this.snackBar.open('Username, Password and Role are required!', 'Close', {
+            duration: 3000,
+            panelClass: ['bg-red-600', 'text-white']
+        });
+
+        this.loading = false;
+        return;
+    }
+
+    const { username, password, role } = this.authForm.value;
+
+    this.authService.login(username, password,).subscribe(
+        (res) => {
+
+            if (res) {
+
+                const currentUser = this.authService.currentUserValue;
+
+                const userRole = currentUser?.role;
+                const userDepartment =
+                    currentUser?.department?.toLowerCase().trim();
+
+                console.log('Logged in user:', currentUser);
+                console.log('Role:', userRole);
+                console.log('Department:', userDepartment);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login Successful',
+                    text: `Welcome back, ${username}!`,
+                    confirmButtonText: 'Okay',
+                    confirmButtonColor: '#3085d6',
+                    allowOutsideClick: false
+                }).then(() => {
+
+                    // ADMIN
+                    if (userRole === Role.Admin) {
+
+                        this.router.navigate([
+                            '/admin/dashboard/main'
+                        ]);
+
+                    }
+
+                    // ALL NORMAL USERS
+                    else if (userRole === Role.Employee) {
+
+                        // BDE employee
+                        if (userDepartment === 'bde') {
+
+                            this.router.navigate([
+                                '/client/dashboard'
+                            ]);
+
                         }
-                    });
-                } else {
-                    this.snackBar.open('Invalid login', 'Close', {
-                        duration: 3000,
-                        panelClass: ['custom-snackbar-error']
-                    });
-                }
 
-                this.loading = false;
-                this.changeDetector.detectChanges();
-            },
-            (err) => {
-                console.log(err);
-                this.snackBar.open(err, 'Close', {
-                    duration: 4000,
-                    panelClass: ['bg-red-600', 'text-white']
+                        // BA employee
+                        else if (userDepartment === 'ba') {
+
+                            this.router.navigate([
+                                '/ba/dashboard/main'
+                            ]);
+
+                        }
+
+                        // HR / Other employees
+                        else {
+
+                            this.router.navigate([
+                                '/employee/dashboard'
+                            ]);
+
+                        }
+
+                    }
+
+                    // INVALID ROLE
+                    else {
+
+                        this.router.navigate([
+                            '/authentication/login'
+                        ]);
+
+                    }
+
                 });
 
-                this.submitted = false;
-                this.loading = false;
-                this.changeDetector.detectChanges();
+            } else {
+
+                this.snackBar.open(
+                    'Invalid login',
+                    'Close',
+                    {
+                        duration: 3000,
+                        panelClass: ['custom-snackbar-error']
+                    }
+                );
+
             }
-        );
-    }
+
+            this.loading = false;
+            this.changeDetector.detectChanges();
+
+        },
+
+        (err) => {
+
+            console.log(err);
+
+            this.snackBar.open(
+                err?.error?.message || err?.message || 'Login failed',
+                'Close',
+                {
+                    duration: 4000,
+                    panelClass: ['bg-red-600', 'text-white']
+                }
+            );
+
+            this.submitted = false;
+            this.loading = false;
+
+            this.changeDetector.detectChanges();
+
+        }
+    );
+}
 
     goToForgot() {
         this.router.navigate(['/authentication/forgot-password']);
