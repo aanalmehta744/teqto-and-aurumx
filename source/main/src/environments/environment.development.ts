@@ -3,11 +3,11 @@ export const environment = {
   
   localApiUrl: 'http://localhost:5001/api',
 
-  cloudflareApiUrl:
-    'https://hudson-evaluate-courage-measure.trycloudflare.com/api',
+  // cloudflareApiUrl:
+  //   'https://hudson-evaluate-courage-measure.trycloudflare.com/api',
 
   apiUrl:
-    'https://hudson-evaluate-courage-measure.trycloudflare.com/api'
+    'http://localhost:5001/api'
 };
 
 console.log(

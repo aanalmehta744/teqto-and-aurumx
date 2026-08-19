@@ -37,25 +37,46 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
   // To login and get the token and user details from the backend
-  login(username: string, password: string, role: string): Observable<any> {
-    const loginData = { username, password, role };
-    console.log("Login Data", loginData);
+  // login(username: string, password: string, role: string): Observable<any> {
+  //   const loginData = { username, password, role };
+  //   console.log("Login Data", loginData);
 
-    return this.http.post<any>(`${this.apiUrl}/login`, loginData).pipe(
-      catchError((error) => {
-        return throwError(error); // Return error if login fails
-      }),
-      tap((res) => {
-        if (res && res.token && res.user) {  // Ensure response contains user data
-          this.setUserData(res.user, res.token);
-          console.log("User data stored:", res.user);
-        } else {
-          console.error("Invalid response from server:", res);
-        }
-      })
-    );
-  }
+  //   return this.http.post<any>(`${this.apiUrl}/login`, loginData).pipe(
+  //     catchError((error) => {
+  //       return throwError(error); // Return error if login fails
+  //     }),
+  //     tap((res) => {
+  //       if (res && res.token && res.user) {  // Ensure response contains user data
+  //         this.setUserData(res.user, res.token);
+  //         console.log("User data stored:", res.user);
+  //       } else {
+  //         console.error("Invalid response from server:", res);
+  //       }
+  //     })
+  //   );
+  // }
+login(username: string, password: string): Observable<any> {
+  const loginData = { username, password };
 
+  console.log('Login Data', loginData);
+
+  return this.http.post<any>(
+    `${this.apiUrl}/login`,
+    loginData
+  ).pipe(
+    catchError((error) => {
+      return throwError(() => error);
+    }),
+    tap((res) => {
+      if (res && res.token && res.user) {
+        this.setUserData(res.user, res.token);
+        console.log('User data stored:', res.user);
+      } else {
+        console.error('Invalid response from server:', res);
+      }
+    })
+  );
+}
 
   // Store user data and JWT in localStorage or sessionStorage
   setUserData(user: User, token: string): void {

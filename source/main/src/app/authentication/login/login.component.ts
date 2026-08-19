@@ -147,7 +147,7 @@ export class LoginComponent extends UnsubscribeOnDestroyAdapter
 
         const { username, password, role } = this.authForm.value;
 
-        this.authService.login(username, password, role).subscribe(
+        this.authService.login(username, password).subscribe(
             (res) => {
                 if (res) {
                     const currentUser = this.authService.currentUserValue;

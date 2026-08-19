@@ -6,9 +6,9 @@
 //   // apiUrl: 'https://teqto-and-aurumx.onrender.com/api'
 // };
 export const environment = {
-  production: true,
-  cloudflareApiUrl:
-    'https://hudson-evaluate-courage-measure.trycloudflare.com/api',
+  production: false,
+  // cloudflareApiUrl:
+  //   'https://hudson-evaluate-courage-measure.trycloudflare.com/api',
 
   // Change this to whichever backend you want to use
   apiUrl: 'http://localhost:5001/api'

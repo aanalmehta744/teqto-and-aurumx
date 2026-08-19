@@ -15,80 +15,184 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-router.post('/login', async (req, res) => {
-  const { username, password, role } = req.body;
-  console.log("Received login request:", req.body);
+// router.post('/login', async (req, res) => {
+//   const { username, password, role } = req.body;
+//   console.log("Received login request:", req.body);
 
-  if (!username || !password || !role) {
-    return res.status(400).json({ message: 'Email, password, and role are required' });
+//   if (!username || !password || !role) {
+//     return res.status(400).json({ message: 'Email, password, and role are required' });
+//   }
+
+//   try {
+//     // ✅ Always query the `employees` table
+//     const [results] = await db.query(`SELECT * FROM employees WHERE email = ?`, [username]);
+
+//     if (results.length === 0) {
+//       console.log('Invalid username or password.');
+//       return res.status(401).json({ message: 'Invalid username or password.' });
+//     }
+
+//     const user = results[0];
+//     // ✅ Check if the employee is active
+//     if (user.status !== 1) {
+//       console.log('Account inactive. Please contact admin.');
+//       return res.status(403).json({ message: 'Account inactive. Please contact admin.' });
+//     }
+
+//     // ✅ Ensure role matches case-insensitively
+//     if (user.role.toLowerCase() !== role.toLowerCase()) {
+//       console.log('Role mismatch.');
+//       return res.status(403).json({ message: 'Access denied: Incorrect role.' });
+//     }
+
+//     // ✅ Compare hashed password safely
+//     try {
+//       const isMatch = await bcrypt.compare(password.trim(), user.password.trim());
+
+//       if (!isMatch) {
+//         console.log('Invalid username or password.');
+//         return res.status(401).json({ message: 'Invalid username or password.' });
+//       }
+//     } catch (error) {
+//       console.error('Error comparing passwords:', error);
+//       return res.status(500).json({ message: 'Server error' });
+//     }
+
+//     // ✅ Generate JWT Token
+//     const token = jwt.sign(
+//       { userId: user.id, role: user.role },
+//       process.env.JWT_SECRET || 'defaultSecret', // Ensure this is set in your .env file!
+
+//     );
+
+//     console.log('Login successful:', username);
+//     res.json({
+//       token,
+//       user: {
+//         id: user.id,
+//         fullName: user.fullName || '',
+//         role: user.role,
+//         img: user.uploadImg,
+//         uploadImg: user.uploadImg,
+//         email: user.email,
+//         gender: user.gender,
+//         leave_balance: user.leave_balance,
+//         department: user.department,
+//         employee_level: user.employee_level || 'Junior',
+//       }
+//     });
+
+//   } catch (err) {
+//     console.error('Error during authentication:', err);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// });
+
+// --- FORGOT PASSWORD ROUTE ---
+
+
+
+router.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  console.log('Received login request:', req.body);
+
+  if (!username || !password) {
+    return res.status(400).json({
+      message: 'Email and password are required'
+    });
   }
 
   try {
-    // ✅ Always query the `employees` table
-    const [results] = await db.query(`SELECT * FROM employees WHERE email = ?`, [username]);
+    // Find user by email only.
+    // Role is no longer required during login.
+    const [results] = await db.query(
+      `SELECT * FROM employees WHERE email = ?`,
+      [username]
+    );
 
     if (results.length === 0) {
       console.log('Invalid username or password.');
-      return res.status(401).json({ message: 'Invalid username or password.' });
+      return res.status(401).json({
+        message: 'Invalid username or password.'
+      });
     }
 
     const user = results[0];
-    // ✅ Check if the employee is active
+
+    // Check if employee is active
     if (user.status !== 1) {
       console.log('Account inactive. Please contact admin.');
-      return res.status(403).json({ message: 'Account inactive. Please contact admin.' });
+
+      return res.status(403).json({
+        message: 'Account inactive. Please contact admin.'
+      });
     }
 
-    // ✅ Ensure role matches case-insensitively
-    if (user.role.toLowerCase() !== role.toLowerCase()) {
-      console.log('Role mismatch.');
-      return res.status(403).json({ message: 'Access denied: Incorrect role.' });
-    }
-
-    // ✅ Compare hashed password safely
+    // Compare password
     try {
-      const isMatch = await bcrypt.compare(password.trim(), user.password.trim());
+      const isMatch = await bcrypt.compare(
+        password.trim(),
+        user.password.trim()
+      );
 
       if (!isMatch) {
         console.log('Invalid username or password.');
-        return res.status(401).json({ message: 'Invalid username or password.' });
+
+        return res.status(401).json({
+          message: 'Invalid username or password.'
+        });
       }
     } catch (error) {
       console.error('Error comparing passwords:', error);
-      return res.status(500).json({ message: 'Server error' });
+
+      return res.status(500).json({
+        message: 'Server error'
+      });
     }
 
-    // ✅ Generate JWT Token
+    // Generate JWT
     const token = jwt.sign(
-      { userId: user.id, role: user.role },
-      process.env.JWT_SECRET || 'defaultSecret', // Ensure this is set in your .env file!
-
+      {
+        userId: user.id,
+        role: user.role,
+        department: user.department
+      },
+      process.env.JWT_SECRET || 'defaultSecret'
     );
 
     console.log('Login successful:', username);
-    res.json({
+    console.log('Role:', user.role);
+    console.log('Department:', user.department);
+
+    return res.json({
       token,
+
       user: {
         id: user.id,
         fullName: user.fullName || '',
+
+        // New structure
         role: user.role,
+        department: user.department,
+
         img: user.uploadImg,
         uploadImg: user.uploadImg,
         email: user.email,
         gender: user.gender,
         leave_balance: user.leave_balance,
-        department: user.department,
-        employee_level: user.employee_level || 'Junior',
+        employee_level: user.employee_level || 'Junior'
       }
     });
 
   } catch (err) {
     console.error('Error during authentication:', err);
-    res.status(500).json({ message: 'Server error' });
+
+    return res.status(500).json({
+      message: 'Server error'
+    });
   }
 });
-
-// --- FORGOT PASSWORD ROUTE ---
 router.post('/forgot-password', async (req, res) => {
   const { email } = req.body;
 

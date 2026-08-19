@@ -74,7 +74,7 @@ export class SigninComponent
     }
 
     this.authService
-      .login(this.f['username'].value, this.f['password'].value, this.f['role'].value)
+      .login(this.f['username'].value, this.f['password'].value)
 
       .subscribe(
         (res) => {
