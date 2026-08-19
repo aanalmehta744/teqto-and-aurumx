@@ -1,23 +1,13 @@
-// This file can be replaced during build by using the `fileReplacements` array.
-// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
-// The list of file replacements can be found in `angular.json`.
-
-// export const environment = {
-//   production: false,
-//   apiUrl: 
-//   'http://localhost:5001/api' 
-//   // 'https://denver-doe-vacation-sustained.trycloudflare.com/api'
-// };
 export const environment = {
   production: true,
+  
+  localApiUrl: 'http://localhost:3000/api',
 
-  localApiUrl: 'http://localhost:5001/api',
-
-  cloudflareApiUrl:
-    'https://hudson-evaluate-courage-measure.trycloudflare.com/api',
+  // cloudflareApiUrl:
+  //   'https://temp-acrylic-velvet-lynn.trycloudflare.com/api',
 
   apiUrl:
-    'https://hudson-evaluate-courage-measure.trycloudflare.com/api'
+    'http://localhost:3000/api'
 };
 
 console.log(
@@ -27,11 +17,3 @@ console.log(
 console.log("Development Environment Loaded. API URL", environment.apiUrl);
 
 
-/*
- * For easier debugging in development mode, you can import the following file
- * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
- *
- * This import should be commented out in production mode because it will have a negative impact
- * on performance if an error is thrown.
- */
-// import 'zone.js/plugins/zone-error';  // Included with Angular CLI.
