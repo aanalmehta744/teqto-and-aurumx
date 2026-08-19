@@ -51,7 +51,7 @@ services:
     restart: unless-stopped
 
     ports:
-      - "3001:80"
+      - "5001:80"
 
     depends_on:
       - backend

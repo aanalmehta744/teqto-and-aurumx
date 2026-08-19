@@ -106,7 +106,27 @@
               <mat-header-cell *matHeaderCellDef mat-sort-header>Break</mat-header-cell>
               <mat-cell *matCellDef="let row">{{ row.break ?? '-' }}</mat-cell>
             </ng-container>
+<!-- Pause History -->
+<ng-container matColumnDef="pause_history">
 
+  <mat-header-cell *matHeaderCellDef>
+    Pause History
+  </mat-header-cell>
+
+  <mat-cell *matCellDef="let row">
+
+    <button
+      type="button"
+      (click)="openPauseHistory(row); $event.stopPropagation()"
+      class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 text-sm font-medium hover:bg-blue-100 transition">
+
+      View
+
+    </button>
+
+  </mat-cell>
+
+</ng-container>
             <!-- <ng-container matColumnDef="actions"> -->
               <ng-container matColumnDef="actions" *ngIf="canEditAttendance">
               <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
@@ -186,9 +206,36 @@
                   </mat-cell>
                 </ng-container>
 
-                <mat-header-row *matHeaderRowDef="['name', 'check_in', 'check_out', 'hours', 'status', 'break','actions']"></mat-header-row>
+                <!-- <mat-header-row *matHeaderRowDef="['name', 'check_in', 'check_out', 'hours', 'status', 'break','actions']"></mat-header-row>
                 <mat-row *matRowDef="let row; columns: ['name', 'check_in', 'check_out', 'hours', 'status', 'break','actions']"
-                  class="hover:bg-gray-50 cursor-pointer transition-colors" matRipple></mat-row>
+                  class="hover:bg-gray-50 cursor-pointer transition-colors" matRipple></mat-row> -->
+                  <mat-header-row
+  *matHeaderRowDef="[
+    'name',
+    'check_in',
+    'check_out',
+    'hours',
+    'status',
+    'break',
+    'pause_history',
+    'actions'
+  ]">
+</mat-header-row>
+
+<mat-row
+  *matRowDef="let row; columns: [
+    'name',
+    'check_in',
+    'check_out',
+    'hours',
+    'status',
+    'break',
+    'pause_history',
+    'actions'
+  ]"
+  class="hover:bg-gray-50 cursor-pointer transition-colors"
+  matRipple>
+</mat-row>
               </table>
             </ng-container>
           </ng-scrollbar>

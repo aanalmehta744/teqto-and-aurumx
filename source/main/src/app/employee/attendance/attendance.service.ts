@@ -150,8 +150,8 @@ export class AttendancesService extends UnsubscribeOnDestroyAdapter {
   }
 
   // Pause timer
-  pauseTimer(employeeId: number, pauseStart: string, is_paused: boolean) {
-    return this.httpClient.post(`${this.API_URL}/pause-timer`, { employeeId, pauseStart, is_paused });
+  pauseTimer(employeeId: number, pauseStart: string, is_paused: boolean, reason?: string) {
+    return this.httpClient.post(`${this.API_URL}/pause-timer`, { employeeId, pauseStart, is_paused, reason:reason || '' });
   }
 
   // Resume timer
@@ -184,4 +184,5 @@ getPauseHistory(attendanceId: number): Observable<any[]> {
     `${environment.apiUrl}/todayattendances/pause-history/${attendanceId}`
   );
 }
+
 }

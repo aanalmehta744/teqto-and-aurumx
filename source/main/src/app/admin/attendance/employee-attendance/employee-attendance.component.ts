@@ -27,6 +27,7 @@ import { CommonModule } from '@angular/common';
 import { NgScrollbar } from 'ngx-scrollbar';
 import { FormDialogComponent } from './dialog/form-dialog/form-dialog.component';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
+import { PauseHistoryDialogComponent } from '@shared/pause-history-dialog/pause-history-dialog.component';
 import {
   MatSnackBarHorizontalPosition,
   MatSnackBarVerticalPosition,
@@ -41,6 +42,7 @@ export interface EmployeeAttendance {
   hours: number;
   status: string; // Present, Absent, On Leave
   role?: string;
+  pause_history?: any[];
 }
 
 @Component({
@@ -79,6 +81,8 @@ export class EmployeeAttendanceComponent extends UnsubscribeOnDestroyAdapter
     'break',
     'status',
     'actions',
+      'pause_history',
+
   ];
   canEditAttendance = false;
 
@@ -131,7 +135,30 @@ ngOnInit() {
       this.updateGroupedAttendance(filterValue);
     });
   }
+openPauseHistory(row: EmployeeAttendance) {
 
+  this.attendanceService.getPauseHistory(row.id).subscribe({
+
+    next: (history: any[]) => {
+
+      this.dialog.open(PauseHistoryDialogComponent, {
+        width: '700px',
+        maxWidth: '95vw',
+        data: {
+          employeeName: row.employee_name,
+          history: history
+        }
+      });
+
+    },
+
+    error: (error: any) => {
+      console.error('Error loading pause history:', error);
+    }
+
+  });
+
+}
 
   loadData() {
     this.exampleDatabase = this.attendanceService;

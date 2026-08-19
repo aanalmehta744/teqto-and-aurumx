@@ -627,87 +627,532 @@ function addBreakTimes(time1, time2) {
 //   }
 // });
 
+// router.post('/pause-timer', async (req, res) => {
+//   const { employeeId, is_paused } = req.body;
+
+//   const today = new Date().toISOString().split('T')[0];
+
+//   // Exact server timestamp when Pause button is pressed
+//   const pauseStart = new Date();
+
+//   console.log('====================================');
+//   console.log('PAUSE BUTTON PRESSED');
+//   console.log('Employee ID:', employeeId);
+//   console.log('Pause Time:', pauseStart);
+//   console.log('====================================');
+
+//   try {
+//     const [rows] = await db.query(
+//       `SELECT check_in, elapsed_time
+//        FROM attendance
+//        WHERE employee_id = ? AND date = ?`,
+//       [employeeId, today]
+//     );
+
+//     if (rows.length === 0 || !rows[0].check_in) {
+//       return res.status(404).json({
+//         message: 'No active timer to pause.'
+//       });
+//     }
+
+//    // Get attendance ID
+// const [attendanceRows] = await db.query(
+//   `SELECT id
+//    FROM attendance
+//    WHERE employee_id = ? AND date = ?`,
+//   [employeeId, today]
+// );
+
+// if (attendanceRows.length === 0) {
+//   return res.status(404).json({
+//     message: 'Attendance record not found.'
+//   });
+// }
+
+// const attendanceId = attendanceRows[0].id;
+
+
+// // Save this pause into history
+// await db.query(
+//   `INSERT INTO attendance_pause_history
+//    (attendance_id, employee_id, pause_start)
+//    VALUES (?, ?, ?)`,
+//   [attendanceId, employeeId, pauseStart]
+// );
+
+
+// // Also keep current pause in attendance table
+// await db.query(
+//   `UPDATE attendance
+//    SET is_paused = ?, pause_start = ?
+//    WHERE employee_id = ? AND date = ?`,
+//   [
+//     is_paused ?? 1,
+//     pauseStart,
+//     employeeId,
+//     today
+//   ]
+// );
+
+//     res.json({
+//       success: true,
+//       message: 'Timer paused successfully.',
+//       pause_start: pauseStart
+//     });
+
+//   } catch (error) {
+//     console.error('Pause error:', error);
+
+//     res.status(500).json({
+//       error: 'Failed to pause timer.'
+//     });
+//   }
+// });
+
+
+
+// router.post('/pause-timer', async (req, res) => {
+//   const {
+//     employeeId,
+//     is_paused,
+//     reason
+//   } = req.body;
+
+//   const today = new Date().toISOString().split('T')[0];
+
+//   // Exact server timestamp when Pause button is pressed
+//   const pauseStart = new Date();
+
+//   console.log('====================================');
+//   console.log('PAUSE BUTTON PRESSED');
+//   console.log('Employee ID:', employeeId);
+//   console.log('Pause Time:', pauseStart);
+//   console.log('Reason:', reason);
+//   console.log('====================================');
+
+//   try {
+//     // --------------------------------------------------
+//     // 1. Check today's attendance
+//     // --------------------------------------------------
+//     const [rows] = await db.query(
+//       `SELECT check_in, elapsed_time
+//        FROM attendance
+//        WHERE employee_id = ? AND date = ?`,
+//       [employeeId, today]
+//     );
+
+//     if (rows.length === 0 || !rows[0].check_in) {
+//       return res.status(404).json({
+//         message: 'No active timer to pause.'
+//       });
+//     }
+
+//     // --------------------------------------------------
+//     // 2. Get attendance ID
+//     // --------------------------------------------------
+//     const [attendanceRows] = await db.query(
+//       `SELECT id
+//        FROM attendance
+//        WHERE employee_id = ? AND date = ?`,
+//       [employeeId, today]
+//     );
+
+//     if (attendanceRows.length === 0) {
+//       return res.status(404).json({
+//         message: 'Attendance record not found.'
+//       });
+//     }
+
+//     const attendanceId = attendanceRows[0].id;
+
+//     // --------------------------------------------------
+//     // 3. Determine pause reason
+//     // --------------------------------------------------
+
+//     // Current time in server local time
+//     const currentHour = pauseStart.getHours();
+//     const currentMinute = pauseStart.getMinutes();
+
+//     const currentMinutes =
+//       currentHour * 60 + currentMinute;
+
+//     // 1:30 PM = 13:30 = 810 minutes
+//     // 1:40 PM = 13:40 = 820 minutes
+//     const lunchStart = 13 * 60 + 30;
+//     const lunchEnd = 13 * 60 + 40;
+
+//     let pauseReason = reason?.trim() || '';
+
+//     // Automatically set Lunch Break between 1:30 PM and 1:40 PM
+//     if (
+//       currentMinutes >= lunchStart &&
+//       currentMinutes <= lunchEnd
+//     ) {
+//       pauseReason = 'Lunch Break';
+//     }
+
+//     // --------------------------------------------------
+//     // 4. Reason is required outside lunch-break window
+//     // --------------------------------------------------
+//     if (!pauseReason) {
+//       return res.status(400).json({
+//         success: false,
+//         requiresReason: true,
+//         message: 'Please provide a reason for the break.'
+//       });
+//     }
+
+//     // --------------------------------------------------
+//     // 5. Save pause history
+//     // --------------------------------------------------
+//     await db.query(
+//       `INSERT INTO attendance_pause_history
+//        (
+//          attendance_id,
+//          employee_id,
+//          pause_start,
+//          reason
+//        )
+//        VALUES (?, ?, ?, ?)`,
+//       [
+//         attendanceId,
+//         employeeId,
+//         pauseStart,
+//         pauseReason
+//       ]
+//     );
+
+//     // --------------------------------------------------
+//     // 6. Update current attendance pause
+//     // --------------------------------------------------
+//     await db.query(
+//       `UPDATE attendance
+//        SET is_paused = ?,
+//            pause_start = ?
+//        WHERE employee_id = ?
+//          AND date = ?`,
+//       [
+//         is_paused ?? 1,
+//         pauseStart,
+//         employeeId,
+//         today
+//       ]
+//     );
+
+//     // --------------------------------------------------
+//     // 7. Response
+//     // --------------------------------------------------
+//     res.json({
+//       success: true,
+//       message: 'Timer paused successfully.',
+//       pause_start: pauseStart,
+//       reason: pauseReason
+//     });
+
+//   } catch (error) {
+
+//     console.error('Pause error:', error);
+
+//     res.status(500).json({
+//       success: false,
+//       error: 'Failed to pause timer.'
+//     });
+//   }
+// });
+
+
+
+
 router.post('/pause-timer', async (req, res) => {
-  const { employeeId, is_paused } = req.body;
-
-  const today = new Date().toISOString().split('T')[0];
-
-  // Exact server timestamp when Pause button is pressed
-  const pauseStart = new Date();
+  const {
+    employeeId,
+    is_paused,
+    reason
+  } = req.body;
 
   console.log('====================================');
   console.log('PAUSE BUTTON PRESSED');
+  console.log('Request Body:', req.body);
   console.log('Employee ID:', employeeId);
-  console.log('Pause Time:', pauseStart);
+  console.log('Reason Received:', reason);
   console.log('====================================');
 
+  const today = new Date().toISOString().split('T')[0];
+
+  // Exact server timestamp
+  const pauseStart = new Date();
+
   try {
-    const [rows] = await db.query(
-      `SELECT check_in, elapsed_time
-       FROM attendance
-       WHERE employee_id = ? AND date = ?`,
-      [employeeId, today]
+
+    // ==================================================
+    // 1. Validate Employee ID
+    // ==================================================
+
+    if (!employeeId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Employee ID is required.'
+      });
+    }
+
+
+    // ==================================================
+    // 2. Check Today's Attendance
+    // ==================================================
+
+    const [attendanceRows] = await db.query(
+      `
+      SELECT
+        id,
+        employee_id,
+        check_in,
+        elapsed_time,
+        is_paused,
+        pause_start,
+        break
+      FROM attendance
+      WHERE employee_id = ?
+        AND date = ?
+      LIMIT 1
+      `,
+      [
+        employeeId,
+        today
+      ]
     );
 
-    if (rows.length === 0 || !rows[0].check_in) {
+
+    if (
+      attendanceRows.length === 0 ||
+      !attendanceRows[0].check_in
+    ) {
       return res.status(404).json({
+        success: false,
         message: 'No active timer to pause.'
       });
     }
 
-   // Get attendance ID
-const [attendanceRows] = await db.query(
-  `SELECT id
-   FROM attendance
-   WHERE employee_id = ? AND date = ?`,
-  [employeeId, today]
-);
 
-if (attendanceRows.length === 0) {
-  return res.status(404).json({
-    message: 'Attendance record not found.'
-  });
-}
+    // ==================================================
+    // 3. Get Attendance ID
+    // ==================================================
 
-const attendanceId = attendanceRows[0].id;
+    const attendanceId = attendanceRows[0].id;
 
 
-// Save this pause into history
-await db.query(
-  `INSERT INTO attendance_pause_history
-   (attendance_id, employee_id, pause_start)
-   VALUES (?, ?, ?)`,
-  [attendanceId, employeeId, pauseStart]
-);
+    console.log('Attendance ID:', attendanceId);
 
 
-// Also keep current pause in attendance table
-await db.query(
-  `UPDATE attendance
-   SET is_paused = ?, pause_start = ?
-   WHERE employee_id = ? AND date = ?`,
-  [
-    is_paused ?? 1,
-    pauseStart,
-    employeeId,
-    today
-  ]
-);
+    // ==================================================
+    // 4. Check if Already Paused
+    // ==================================================
 
-    res.json({
+    if (Number(attendanceRows[0].is_paused) === 1) {
+      return res.status(400).json({
+        success: false,
+        message: 'Timer is already paused.'
+      });
+    }
+
+
+    // ==================================================
+    // 5. Determine Pause Reason
+    // ==================================================
+
+    const currentHour = pauseStart.getHours();
+    const currentMinute = pauseStart.getMinutes();
+
+    const currentMinutes =
+      currentHour * 60 + currentMinute;
+
+
+    // 1:30 PM
+    const lunchStart =
+      13 * 60 + 30;
+
+
+    // 1:40 PM
+    const lunchEnd =
+      13 * 60 + 40;
+
+
+    let pauseReason =
+      typeof reason === 'string'
+        ? reason.trim()
+        : '';
+
+
+    console.log(
+      'Current Time:',
+      `${currentHour}:${String(currentMinute).padStart(2, '0')}`
+    );
+
+    console.log(
+      'Initial Reason:',
+      pauseReason
+    );
+
+
+    // ==================================================
+    // 6. Automatic Lunch Break
+    // ==================================================
+
+    if (
+      currentMinutes >= lunchStart &&
+      currentMinutes <= lunchEnd
+    ) {
+
+      pauseReason = 'Lunch Break';
+
+      console.log(
+        'Automatic Lunch Break Applied'
+      );
+    }
+
+
+    // ==================================================
+    // 7. Reason Required Outside Lunch Time
+    // ==================================================
+
+    if (!pauseReason) {
+
+      return res.status(400).json({
+        success: false,
+        requiresReason: true,
+        message: 'Please provide a reason for the break.'
+      });
+    }
+
+
+    // ==================================================
+    // 8. Debug Before Database Insert
+    // ==================================================
+
+    console.log('====================================');
+    console.log('BEFORE PAUSE HISTORY INSERT');
+    console.log('Attendance ID:', attendanceId);
+    console.log('Employee ID:', employeeId);
+    console.log('Pause Start:', pauseStart);
+    console.log('Pause Reason:', pauseReason);
+    console.log('====================================');
+
+
+    // ==================================================
+    // 9. Insert Pause History
+    // ==================================================
+
+    const [insertResult] = await db.query(
+      `
+      INSERT INTO attendance_pause_history
+      (
+        attendance_id,
+        employee_id,
+        pause_start,
+        reason
+      )
+      VALUES (?, ?, ?, ?)
+      `,
+      [
+        attendanceId,
+        employeeId,
+        pauseStart,
+        pauseReason
+      ]
+    );
+
+
+    console.log('====================================');
+    console.log('PAUSE HISTORY INSERTED');
+    console.log('Inserted ID:', insertResult.insertId);
+    console.log('====================================');
+
+
+    // ==================================================
+    // 10. Update Attendance Table
+    // ==================================================
+
+    await db.query(
+      `
+      UPDATE attendance
+      SET
+        is_paused = ?,
+        pause_start = ?
+      WHERE employee_id = ?
+        AND date = ?
+      `,
+      [
+        is_paused ?? 1,
+        pauseStart,
+        employeeId,
+        today
+      ]
+    );
+
+
+    // ==================================================
+    // 11. Verify Inserted Record
+    // ==================================================
+
+    const [verifyRows] = await db.query(
+      `
+      SELECT
+        id,
+        attendance_id,
+        employee_id,
+        pause_start,
+        pause_end,
+        reason,
+        duration
+      FROM attendance_pause_history
+      WHERE id = ?
+      LIMIT 1
+      `,
+      [
+        insertResult.insertId
+      ]
+    );
+
+
+    console.log('====================================');
+    console.log('DATABASE VERIFICATION');
+    console.log(verifyRows[0]);
+    console.log('====================================');
+
+
+    // ==================================================
+    // 12. Success Response
+    // ==================================================
+
+    return res.json({
       success: true,
       message: 'Timer paused successfully.',
-      pause_start: pauseStart
+      attendance_id: attendanceId,
+      employee_id: employeeId,
+      pause_start: pauseStart,
+      reason: pauseReason,
+      history_id: insertResult.insertId
     });
 
-  } catch (error) {
-    console.error('Pause error:', error);
 
-    res.status(500).json({
-      error: 'Failed to pause timer.'
+  } catch (error) {
+
+    console.error('====================================');
+    console.error('PAUSE TIMER ERROR');
+    console.error(error);
+    console.error('====================================');
+
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to pause timer.',
+      error: error.message
     });
   }
 });
+
+
+
+
 // router.post('/resume-timer', async (req, res) => {
 //   const { employeeId } = req.body;
 //   const today = new Date().toISOString().split('T')[0];

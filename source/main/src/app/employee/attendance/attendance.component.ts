@@ -28,6 +28,8 @@ import { TableExportUtil, TableElement } from '@shared';
 import Swal from 'sweetalert2';
 import { interval, Subscription } from 'rxjs';
 import { PauseHistoryDialogComponent } from '@shared/pause-history-dialog/pause-history-dialog.component';
+// import { PauseReasonDialogComponent } from 'source/main/src/app/employee/attendance/pause-reason-dialog.component.ts';
+import { PauseReasonDialogComponent } from './pause-reason-dialog.component';
 @Component({
   selector: 'app-attendances',
   templateUrl: './attendance.component.html',
@@ -42,7 +44,8 @@ import { PauseHistoryDialogComponent } from '@shared/pause-history-dialog/pause-
     MatPaginatorModule,
     DatePipe,
     CommonModule,
-    MatIcon
+    MatIcon,
+    PauseReasonDialogComponent,
   ],
 })
 export class AttendancesComponent
@@ -165,7 +168,7 @@ export class AttendancesComponent
     const userId = currentUser.id;
     if (!userId) return;
 
-    const pollInterval = 5000; // 5 seconds
+    const pollInterval = 5001; // 5 seconds
 
     const checkStatus = () => {
       const today = new Date().toISOString().split('T')[0];
@@ -425,56 +428,265 @@ export class AttendancesComponent
     }, 1000);
   }
 
-  togglePauseResume() {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    const employeeId = currentUser.id;
+  // togglePauseResume() {
+  //   const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  //   const employeeId = currentUser.id;
 
-    if (!employeeId) {
-      this.snackBar.open('Invalid user ID.', 'Close', { duration: 2000 });
-      return;
-    }
+  //   if (!employeeId) {
+  //     this.snackBar.open('Invalid user ID.', 'Close', { duration: 2000 });
+  //     return;
+  //   }
 
-    if (this.isPaused) {
-      // RESUME
-      const pauseEnd = Date.now();
-      this.breakDuration += pauseEnd - this.pauseStart;
-      this.pauseStart = 0;
-      this.isPaused = false;
+  //   if (this.isPaused) {
+  //     // RESUME
+  //     const pauseEnd = Date.now();
+  //     this.breakDuration += pauseEnd - this.pauseStart;
+  //     this.pauseStart = 0;
+  //     this.isPaused = false;
 
-      this.attendancesService.resumeTimer(employeeId, pauseEnd).subscribe({
-        next: (res) => {
-          // update data from backend
-          this.getActiveAttendance();
-          this.startTimerLoop();
-          this.loadData();
-          this.snackBar.open('Timer resumed.', 'Close', { duration: 2000 });
-        },
-        error: () => {
-          this.snackBar.open('Failed to resume timer.', 'Close', { duration: 2000 });
-          this.isPaused = true; // revert in case of failure
-        }
-      });
-    } else {
-      // PAUSE
-      this.isPaused = true;
-      this.pauseStart = Date.now();
+  //     this.attendancesService.resumeTimer(employeeId, pauseEnd).subscribe({
+  //       next: (res) => {
+  //         // update data from backend
+  //         this.getActiveAttendance();
+  //         this.startTimerLoop();
+  //         this.loadData();
+  //         this.snackBar.open('Timer resumed.', 'Close', { duration: 2000 });
+  //       },
+  //       error: () => {
+  //         this.snackBar.open('Failed to resume timer.', 'Close', { duration: 2000 });
+  //         this.isPaused = true; // revert in case of failure
+  //       }
+  //     });
+  //   } else {
+  //     // PAUSE
+  //     this.isPaused = true;
+  //     this.pauseStart = Date.now();
 
-      this.attendancesService.pauseTimer(employeeId, this.pauseStart.toString(), true).subscribe({
-        next: (res) => {
-          // update data from backend
-          this.getActiveAttendance();
-          clearInterval(this.timer); // stop UI timer
-          this.loadData();
-          this.snackBar.open('Timer paused.', 'Close', { duration: 2000 });
+  //     this.attendancesService.pauseTimer(employeeId, this.pauseStart.toString(), true).subscribe({
+  //       next: (res) => {
+  //         // update data from backend
+  //         this.getActiveAttendance();
+  //         clearInterval(this.timer); // stop UI timer
+  //         this.loadData();
+  //         this.snackBar.open('Timer paused.', 'Close', { duration: 2000 });
 
-        },
-        error: () => {
-          this.snackBar.open('Failed to pause timer.', 'Close', { duration: 2000 });
-          this.isPaused = false;
-        }
-      });
-    }
+  //       },
+  //       error: () => {
+  //         this.snackBar.open('Failed to pause timer.', 'Close', { duration: 2000 });
+  //         this.isPaused = false;
+  //       }
+  //     });
+  //   }
+  // }
+togglePauseResume() {
+
+  const currentUser = JSON.parse(
+    localStorage.getItem('currentUser') || '{}'
+  );
+
+  const employeeId = currentUser.id;
+
+  if (!employeeId) {
+    this.snackBar.open(
+      'Invalid user ID.',
+      'Close',
+      { duration: 2000 }
+    );
+    return;
   }
+
+  // =====================================================
+  // RESUME
+  // =====================================================
+
+  if (this.isPaused) {
+
+    const pauseEnd = Date.now();
+
+    this.breakDuration +=
+      pauseEnd - this.pauseStart;
+
+    this.pauseStart = 0;
+    this.isPaused = false;
+
+    this.attendancesService
+      .resumeTimer(employeeId, pauseEnd)
+      .subscribe({
+
+        next: (res) => {
+
+          this.getActiveAttendance();
+
+          this.startTimerLoop();
+
+          this.loadData();
+
+          this.snackBar.open(
+            'Timer resumed.',
+            'Close',
+            { duration: 2000 }
+          );
+        },
+
+        error: () => {
+
+          this.snackBar.open(
+            'Failed to resume timer.',
+            'Close',
+            { duration: 2000 }
+          );
+
+          this.isPaused = true;
+        }
+
+      });
+
+    return;
+  }
+
+  // =====================================================
+  // PAUSE
+  // =====================================================
+
+  const pauseStart = Date.now();
+
+  /*
+   * Check local time.
+   *
+   * 13:30 = 1:30 PM
+   * 13:40 = 1:40 PM
+   */
+
+  const now = new Date();
+
+  const currentMinutes =
+    now.getHours() * 60 +
+    now.getMinutes();
+
+  const lunchStart =
+    13 * 60 + 30; // 1:30 PM
+
+  const lunchEnd =
+    13 * 60 + 40; // 1:40 PM
+
+  const isLunchBreak =
+    currentMinutes >= lunchStart &&
+    currentMinutes <= lunchEnd;
+
+
+  // =====================================================
+  // LUNCH BREAK
+  // No reason dialog required
+  // =====================================================
+
+  if (isLunchBreak) {
+
+    this.pauseWithReason(
+      employeeId,
+      pauseStart,
+      'Lunch Break'
+    );
+
+    return;
+  }
+
+
+  // =====================================================
+  // NORMAL BREAK
+  // Ask employee for reason
+  // =====================================================
+
+  const dialogRef = this.dialog.open(
+    PauseReasonDialogComponent,
+    {
+      width: '450px',
+      maxWidth: '95vw',
+      disableClose: true
+    }
+  );
+
+  dialogRef.afterClosed().subscribe(
+    (reason: string | undefined) => {
+
+      // User clicked Cancel
+      if (!reason) {
+        return;
+      }
+
+      this.pauseWithReason(
+        employeeId,
+        pauseStart,
+        reason
+      );
+
+    }
+  );
+}
+
+
+private pauseWithReason(
+  employeeId: number,
+  pauseStart: number,
+  reason: string
+): void {
+
+  // Set UI state
+  this.isPaused = true;
+  this.pauseStart = pauseStart;
+
+  this.attendancesService
+    .pauseTimer(
+      employeeId,
+      pauseStart.toString(),
+      true,
+      reason
+    )
+    .subscribe({
+
+      next: (res) => {
+
+        console.log(
+          'Pause successful:',
+          res
+        );
+
+        this.getActiveAttendance();
+
+        clearInterval(this.timer);
+
+        this.loadData();
+
+        this.snackBar.open(
+          `Timer paused: ${reason}`,
+          'Close',
+          { duration: 2500 }
+        );
+
+      },
+
+      error: (error) => {
+
+        console.error(
+          'Pause error:',
+          error
+        );
+
+        this.snackBar.open(
+          error?.error?.message ||
+          'Failed to pause timer.',
+          'Close',
+          { duration: 2500 }
+        );
+
+        // Roll back UI state
+        this.isPaused = false;
+        this.pauseStart = 0;
+      }
+
+    });
+}
+
+
   formatMilliseconds(ms: number) {
     const totalSeconds = Math.floor(ms / 1000);
     const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');

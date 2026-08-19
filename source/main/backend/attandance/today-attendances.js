@@ -173,18 +173,93 @@
     }
   });
 
-  router.get('/pause-history/:attendanceId', async (req, res) => {
+//   router.get('/pause-history/:attendanceId', async (req, res) => {
+//   const { attendanceId } = req.params;
+
+//   try {
+//     const [rows] = await db.query(
+//       `
+//       SELECT
+//         id,
+//         attendance_id,
+//         pause_start,
+//         pause_end,
+//         duration
+//       FROM attendance_pause_history
+//       WHERE attendance_id = ?
+//       ORDER BY pause_start ASC
+//       `,
+//       [attendanceId]
+//     );
+
+//     return res.status(200).json(rows);
+
+//   } catch (error) {
+//     console.error('Error fetching pause history:', error);
+
+//     return res.status(500).json({
+//       message: 'Error fetching pause history',
+//       error: error.message
+//     });
+//   }
+// });
+
+
+
+
+// router.get('/pause-history-all', async (req, res) => {
+//   try {
+//     const todayDate = new Date().toISOString().split('T')[0];
+
+//     const query = `
+//       SELECT
+//         ph.id,
+//         ph.attendance_id,
+//         ph.employee_id,
+//         e.fullName AS employee_name,
+//         a.date,
+//         ph.pause_start,
+//         ph.pause_end,
+//         ph.duration
+//       FROM attendance_pause_history ph
+//       JOIN attendance a
+//         ON ph.attendance_id = a.id
+//       JOIN employees e
+//         ON ph.employee_id = e.id
+//       WHERE a.date = ?
+//       ORDER BY e.fullName ASC, ph.pause_start ASC
+//     `;
+
+//     const [rows] = await db.query(query, [todayDate]);
+
+//     console.log('All pause history:', rows);
+
+//     return res.status(200).json(rows);
+
+//   } catch (error) {
+//     console.error('Error fetching all pause history:', error);
+
+//     return res.status(500).json({
+//       message: 'Error fetching all pause history',
+//       error: error.message
+//     });
+//   }
+// });
+router.get('/pause-history/:attendanceId', async (req, res) => {
   const { attendanceId } = req.params;
 
   try {
+
     const [rows] = await db.query(
       `
       SELECT
         id,
         attendance_id,
+        employee_id,
         pause_start,
         pause_end,
-        duration
+        duration,
+        reason
       FROM attendance_pause_history
       WHERE attendance_id = ?
       ORDER BY pause_start ASC
@@ -192,22 +267,35 @@
       [attendanceId]
     );
 
+    console.log('====================================');
+    console.log('PAUSE HISTORY');
+    console.log('Attendance ID:', attendanceId);
+    console.log('Rows:', rows);
+    console.log('====================================');
+
     return res.status(200).json(rows);
 
   } catch (error) {
-    console.error('Error fetching pause history:', error);
+
+    console.error(
+      'Error fetching pause history:',
+      error
+    );
 
     return res.status(500).json({
+      success: false,
       message: 'Error fetching pause history',
       error: error.message
     });
   }
 });
 
-
 router.get('/pause-history-all', async (req, res) => {
   try {
-    const todayDate = new Date().toISOString().split('T')[0];
+
+    const todayDate = new Date()
+      .toISOString()
+      .split('T')[0];
 
     const query = `
       SELECT
@@ -218,24 +306,41 @@ router.get('/pause-history-all', async (req, res) => {
         a.date,
         ph.pause_start,
         ph.pause_end,
-        ph.duration
+        ph.duration,
+        ph.reason
       FROM attendance_pause_history ph
+
       JOIN attendance a
         ON ph.attendance_id = a.id
+
       JOIN employees e
         ON ph.employee_id = e.id
+
       WHERE a.date = ?
-      ORDER BY e.fullName ASC, ph.pause_start ASC
+
+      ORDER BY
+        e.fullName ASC,
+        ph.pause_start ASC
     `;
 
-    const [rows] = await db.query(query, [todayDate]);
+    const [rows] = await db.query(
+      query,
+      [todayDate]
+    );
 
-    console.log('All pause history:', rows);
+    console.log(
+      'All pause history:',
+      rows
+    );
 
     return res.status(200).json(rows);
 
   } catch (error) {
-    console.error('Error fetching all pause history:', error);
+
+    console.error(
+      'Error fetching all pause history:',
+      error
+    );
 
     return res.status(500).json({
       message: 'Error fetching all pause history',

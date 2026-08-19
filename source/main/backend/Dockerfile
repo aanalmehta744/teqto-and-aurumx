@@ -10,6 +10,6 @@ COPY . .
 
 RUN chmod +x docker-entrypoint.sh
 
-EXPOSE 3000
+EXPOSE 5001
 
 CMD ["./docker-entrypoint.sh"]

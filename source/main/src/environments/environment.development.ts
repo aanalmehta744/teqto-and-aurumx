@@ -5,19 +5,19 @@
 // export const environment = {
 //   production: false,
 //   apiUrl: 
-//   'http://localhost:3000/api' 
+//   'http://localhost:5001/api' 
 //   // 'https://denver-doe-vacation-sustained.trycloudflare.com/api'
 // };
 export const environment = {
   production: true,
 
-  localApiUrl: 'http://localhost:3000/api',
+  localApiUrl: 'http://localhost:5001/api',
 
   cloudflareApiUrl:
-    'https://ease-gained-punch-background.trycloudflare.com/api',
+    'https://hudson-evaluate-courage-measure.trycloudflare.com/api',
 
   apiUrl:
-    'https://ease-gained-punch-background.trycloudflare.com/api'
+    'https://hudson-evaluate-courage-measure.trycloudflare.com/api'
 };
 
 console.log(

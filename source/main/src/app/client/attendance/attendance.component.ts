@@ -149,7 +149,7 @@ export class AttendancesComponent
     const userId = currentUser.id;
     if (!userId) return;
 
-    const pollInterval = 5000; // 5 seconds
+    const pollInterval = 5001; // 5 seconds
 
     const checkStatus = () => {
       const today = new Date().toISOString().split('T')[0];

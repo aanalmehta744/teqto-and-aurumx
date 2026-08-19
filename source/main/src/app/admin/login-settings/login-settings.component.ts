@@ -246,7 +246,7 @@ export class LoginSettingsComponent implements OnInit {
             message,
             'Close',
             {
-              duration: 5000,
+              duration: 5001,
             }
           );
 
