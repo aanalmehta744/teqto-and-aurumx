@@ -82,23 +82,43 @@ export class SigninComponent
             setTimeout(() => {
               const currentUser = this.authService.currentUserValue;
               console.log("current user value", currentUser);
+              // if (currentUser) {
+              //   const role = currentUser.role;
+              //   console.log("Redirecting, Role:", role); // Debugging
+              //   const department = currentUser.department?.toLowerCase();
+              //   if (role === Role.Admin) {
+              //     this.router.navigate(['/admin/dashboard/main']);
+              //   } else if (role === Role.Employee) {
+              //     this.router.navigate(['/employee/dashboard']);
+              //   } else if (role === Role.BDE) {
+              //     this.router.navigate(['/client/dashboard']);
+              //   } else if (role === Role.BA) {
+              //     this.router.navigate(['/ba/dashboard']);
+              //   } else {
+              //     this.router.navigate(['/authentication/signin']);
+              //   }
+              //   this.changeDetector.detectChanges();
+              // }
               if (currentUser) {
-                const role = currentUser.role;
-                console.log("Redirecting, Role:", role); // Debugging
-                const department = currentUser.department?.toLowerCase();
-                if (role === Role.Admin) {
-                  this.router.navigate(['/admin/dashboard/main']);
-                } else if (role === Role.Employee) {
-                  this.router.navigate(['/employee/dashboard']);
-                } else if (role === Role.BDE) {
-                  this.router.navigate(['/client/dashboard']);
-                } else if (role === Role.BA) {
-                  this.router.navigate(['/ba/dashboard']);
-                } else {
-                  this.router.navigate(['/authentication/signin']);
-                }
-                this.changeDetector.detectChanges();
-              }
+  const role = currentUser.role;
+  const department = currentUser.department?.toLowerCase();
+
+  if (role === Role.All || role === Role.Admin) {
+    this.router.navigate(['/admin/dashboard/main']);
+
+  } else if (role === Role.Employee && department === 'bde') {
+    this.router.navigate(['/client/dashboard']);
+
+  } else if (role === Role.Employee && department === 'ba') {
+    this.router.navigate(['/ba/dashboard']);
+
+  } else if (role === Role.Employee) {
+    this.router.navigate(['/employee/dashboard']);
+
+  } else {
+    this.router.navigate(['/authentication/signin']);
+  }
+}
               this.loading = false;
             }, 1000);
           } else {

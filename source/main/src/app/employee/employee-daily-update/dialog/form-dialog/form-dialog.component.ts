@@ -175,29 +175,96 @@ export class FormDialogComponent implements OnInit {
         this.dailyUpdateForm.get('project_id')?.updateValueAndValidity();
       }
     }
+    // this.dailyUpdateForm.get('task_id')?.valueChanges.subscribe((taskId) => {
+    //   const selectedTask = this.tasks.find(t => t.id === taskId);
+
+    //   if (selectedTask) {
+    //     if (selectedTask.trainer_project_name) {
+    //       // Trainer task → Show trainer project
+    //       this.selectedTrainerProject = selectedTask.trainer_project_name;
+    //       this.dailyUpdateForm.get('project_id')?.clearValidators(); // not required
+    //       this.dailyUpdateForm.get('project_id')?.updateValueAndValidity();
+    //     } else {
+    //       // Regular task → use project dropdown
+    //       this.selectedTrainerProject = null;
+    //       this.dailyUpdateForm.get('project_id')?.setValidators([Validators.required]);
+    //       this.dailyUpdateForm.get('project_id')?.updateValueAndValidity();
+
+    //       // Preselect project_id if task has a project_id
+    //       if (selectedTask.project_id) {
+    //         this.dailyUpdateForm.patchValue({ project_id: selectedTask.project_id });
+    //       }
+    //     }
+    //   }
+    // });
+
+
     this.dailyUpdateForm.get('task_id')?.valueChanges.subscribe((taskId) => {
-      const selectedTask = this.tasks.find(t => t.id === taskId);
+  const selectedTask = this.tasks.find(
+    t => t.id === Number(taskId)
+  );
 
-      if (selectedTask) {
-        if (selectedTask.trainer_project_name) {
-          // Trainer task → Show trainer project
-          this.selectedTrainerProject = selectedTask.trainer_project_name;
-          this.dailyUpdateForm.get('project_id')?.clearValidators(); // not required
-          this.dailyUpdateForm.get('project_id')?.updateValueAndValidity();
-        } else {
-          // Regular task → use project dropdown
-          this.selectedTrainerProject = null;
-          this.dailyUpdateForm.get('project_id')?.setValidators([Validators.required]);
-          this.dailyUpdateForm.get('project_id')?.updateValueAndValidity();
+  const projectControl = this.dailyUpdateForm.get('project_id');
 
-          // Preselect project_id if task has a project_id
-          if (selectedTask.project_id) {
-            this.dailyUpdateForm.patchValue({ project_id: selectedTask.project_id });
-          }
-        }
-      }
-    });
+  if (!selectedTask) {
+    this.selectedTrainerProject = null;
 
+    projectControl?.clearValidators();
+    projectControl?.setValue(null);
+    projectControl?.updateValueAndValidity();
+
+    return;
+  }
+
+  // --------------------------------------------------
+  // 1. Trainer task
+  // --------------------------------------------------
+  if (selectedTask.trainer_project_name) {
+
+    this.selectedTrainerProject =
+      selectedTask.trainer_project_name;
+
+    projectControl?.clearValidators();
+    projectControl?.setValue(null);
+    projectControl?.updateValueAndValidity();
+
+    return;
+  }
+
+  // No trainer project
+  this.selectedTrainerProject = null;
+
+  // --------------------------------------------------
+  // 2. Task has a project
+  // --------------------------------------------------
+  if (
+    selectedTask.project_id !== null &&
+    selectedTask.project_id !== undefined
+  ) {
+
+    projectControl?.setValidators([
+      Validators.required
+    ]);
+
+    // Automatically select the task's project
+    projectControl?.setValue(
+      selectedTask.project_id
+    );
+
+  } else {
+
+    // --------------------------------------------------
+    // 3. Test / direct task
+    //    No project assigned
+    // --------------------------------------------------
+
+    projectControl?.clearValidators();
+
+    projectControl?.setValue(null);
+  }
+
+  projectControl?.updateValueAndValidity();
+});
   }
 
   isHrDepartment(): boolean {

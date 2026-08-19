@@ -155,11 +155,21 @@ export class TaskComponent implements OnInit {
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.tasks, event.previousIndex, event.currentIndex);
   }
-  getProjectTitle(projectId: number): string {
-    const project = this.projects.find(p => p.id == projectId);
-    return project ? project.projectTitle : 'Unknown Project';
-
+  // getProjectTitle(projectId: number): string {
+  //   const project = this.projects.find(p => p.id == projectId);
+  //   return project ? project.projectTitle : 'Unknown Project';
+  // }
+  getProjectTitle(projectId: number | null): string {
+  if (projectId === null || projectId === undefined) {
+    return 'No Project';
   }
+
+  const project = this.projects.find(
+    (p: any) => p.id === projectId
+  );
+
+  return project?.projectTitle || 'Unknown Project';
+}
   getemployeeName(employeeId: number): string {
     const employee = this.employees.find(p => p.id == employeeId);
     return employee ? employee.fullName : 'Unknown employee';

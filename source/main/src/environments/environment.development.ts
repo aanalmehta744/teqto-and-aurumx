@@ -1,13 +1,13 @@
 export const environment = {
   production: true,
   
-  localApiUrl: 'http://localhost:3000/api',
+  localApiUrl: 'http://localhost:5001/api',
 
-  // cloudflareApiUrl:
-  //   'https://temp-acrylic-velvet-lynn.trycloudflare.com/api',
+  cloudflareApiUrl:
+    'https://hudson-evaluate-courage-measure.trycloudflare.com/api',
 
   apiUrl:
-    'http://localhost:3000/api'
+    'https://hudson-evaluate-courage-measure.trycloudflare.com/api'
 };
 
 console.log(

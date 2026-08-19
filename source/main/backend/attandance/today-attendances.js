@@ -245,42 +245,114 @@
 //     });
 //   }
 // });
+// router.get('/pause-history/:attendanceId', async (req, res) => {
+//   const { attendanceId } = req.params;
+
+//   try {
+
+//     const [rows] = await db.query(
+//       `
+//       SELECT
+//         id,
+//         attendance_id,
+//         employee_id,
+//         pause_start,
+//         pause_end,
+//         duration,
+//         reason
+//       FROM attendance_pause_history
+//       WHERE attendance_id = ?
+//       ORDER BY pause_start ASC
+//       `,
+//       [attendanceId]
+//     );
+
+//     console.log('====================================');
+//     console.log('PAUSE HISTORY');
+//     console.log('Attendance ID:', attendanceId);
+//     console.log('Rows:', rows);
+//     console.log('====================================');
+
+//     return res.status(200).json(rows);
+
+//   } catch (error) {
+
+//     console.error(
+//       'Error fetching pause history:',
+//       error
+//     );
+
+//     return res.status(500).json({
+//       success: false,
+//       message: 'Error fetching pause history',
+//       error: error.message
+//     });
+//   }
+// });
+
 router.get('/pause-history/:attendanceId', async (req, res) => {
   const { attendanceId } = req.params;
 
   try {
-
-    const [rows] = await db.query(
+    // --------------------------------------------------
+    // 1. Verify attendance record exists
+    // --------------------------------------------------
+    const [attendanceRows] = await db.query(
       `
       SELECT
         id,
-        attendance_id,
         employee_id,
-        pause_start,
-        pause_end,
-        duration,
-        reason
-      FROM attendance_pause_history
-      WHERE attendance_id = ?
-      ORDER BY pause_start ASC
+        date
+      FROM attendance
+      WHERE id = ?
       `,
       [attendanceId]
     );
 
-    console.log('====================================');
-    console.log('PAUSE HISTORY');
-    console.log('Attendance ID:', attendanceId);
-    console.log('Rows:', rows);
-    console.log('====================================');
+    if (attendanceRows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Attendance record not found.'
+      });
+    }
+
+    const attendance = attendanceRows[0];
+
+    // --------------------------------------------------
+    // 2. Fetch pause history ONLY for this attendance
+    //    AND the same employee
+    // --------------------------------------------------
+    const [rows] = await db.query(
+      `
+      SELECT
+        ph.id,
+        ph.attendance_id,
+        ph.employee_id,
+        ph.pause_start,
+        ph.pause_end,
+        ph.duration,
+        ph.reason
+      FROM attendance_pause_history ph
+      WHERE ph.attendance_id = ?
+        AND ph.employee_id = ?
+      ORDER BY ph.pause_start ASC
+      `,
+      [
+        attendance.id,
+        attendance.employee_id
+      ]
+    );
+
+    console.log('Pause history:', {
+      attendanceId: attendance.id,
+      employeeId: attendance.employee_id,
+      records: rows.length
+    });
 
     return res.status(200).json(rows);
 
   } catch (error) {
-
-    console.error(
-      'Error fetching pause history:',
-      error
-    );
+    console.error('Error fetching pause history:', error);
 
     return res.status(500).json({
       success: false,
@@ -289,7 +361,6 @@ router.get('/pause-history/:attendanceId', async (req, res) => {
     });
   }
 });
-
 router.get('/pause-history-all', async (req, res) => {
   try {
 
