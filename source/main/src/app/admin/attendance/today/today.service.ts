@@ -41,4 +41,10 @@ export class TodayService extends UnsubscribeOnDestroyAdapter {
     return this.httpClient.put<any>(`${this.API_URL_A}/updateTimer/${id}`, data);
   }
 
+  getPauseHistory(attendanceId: number): Observable<any[]> {
+  return this.httpClient.get<any[]>(
+    `${this.API_URL}/pause-history/${attendanceId}`
+  );
+}
+
 }

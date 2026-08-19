@@ -58,10 +58,6 @@
     }
   });
 
-
-
-  
-
   router.put('/addAttendance', (req, res) => {
     const { employee_id, check_in, check_out } = req.body;
 
@@ -177,7 +173,6 @@
     }
   });
 
-
   router.get('/pause-history/:attendanceId', async (req, res) => {
   const { attendanceId } = req.params;
 
@@ -210,4 +205,42 @@
 });
 
 
+router.get('/pause-history-all', async (req, res) => {
+  try {
+    const todayDate = new Date().toISOString().split('T')[0];
+
+    const query = `
+      SELECT
+        ph.id,
+        ph.attendance_id,
+        ph.employee_id,
+        e.fullName AS employee_name,
+        a.date,
+        ph.pause_start,
+        ph.pause_end,
+        ph.duration
+      FROM attendance_pause_history ph
+      JOIN attendance a
+        ON ph.attendance_id = a.id
+      JOIN employees e
+        ON ph.employee_id = e.id
+      WHERE a.date = ?
+      ORDER BY e.fullName ASC, ph.pause_start ASC
+    `;
+
+    const [rows] = await db.query(query, [todayDate]);
+
+    console.log('All pause history:', rows);
+
+    return res.status(200).json(rows);
+
+  } catch (error) {
+    console.error('Error fetching all pause history:', error);
+
+    return res.status(500).json({
+      message: 'Error fetching all pause history',
+      error: error.message
+    });
+  }
+});
   module.exports = router;

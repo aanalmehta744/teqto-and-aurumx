@@ -71,6 +71,10 @@
               <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Total</mat-header-cell>
               <mat-cell *matCellDef="let row">{{ row.hours }}</mat-cell>
             </ng-container>
+
+
+
+            
 <!-- Pause Time -->
 <ng-container matColumnDef="pause_start">
 
@@ -168,7 +172,27 @@
               <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Break</mat-header-cell>
               <mat-cell *matCellDef="let row">{{ row.break }}</mat-cell>
             </ng-container>
+<!-- Pause History -->
+<ng-container matColumnDef="pause_history">
 
+  <mat-header-cell
+    *matHeaderCellDef
+    class="font-medium">
+    Pause History
+  </mat-header-cell>
+
+  <mat-cell *matCellDef="let row">
+
+    <button
+      type="button"
+      (click)="openPauseHistory(row); $event.stopPropagation()"
+      class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 text-sm font-medium hover:bg-blue-100 transition">
+      View
+    </button>
+
+  </mat-cell>
+
+</ng-container>
             <!-- Row Definitions -->
             <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
             <mat-row *matRowDef="let row; columns: displayedColumns" [style.cursor]="'pointer'" class="hover:bg-gray-50"

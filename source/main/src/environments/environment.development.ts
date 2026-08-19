@@ -14,17 +14,17 @@ export const environment = {
   localApiUrl: 'http://localhost:3000/api',
 
   cloudflareApiUrl:
-    'https://temp-acrylic-velvet-lynn.trycloudflare.com/api',
+    'https://ease-gained-punch-background.trycloudflare.com/api',
 
   apiUrl:
-    'https://temp-acrylic-velvet-lynn.trycloudflare.com/api'
+    'https://ease-gained-punch-background.trycloudflare.com/api'
 };
 
 console.log(
   'Production Environment Loaded. API URL:',
   environment.apiUrl
 );
-console.log("Development Enviorment Loaded. API URL", environment.apiUrl);
+console.log("Development Environment Loaded. API URL", environment.apiUrl);
 
 
 /*

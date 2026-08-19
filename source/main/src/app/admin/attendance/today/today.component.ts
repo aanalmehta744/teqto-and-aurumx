@@ -17,6 +17,8 @@ import { MatTableModule } from '@angular/material/table';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
+import { PauseHistoryDialogComponent } from '@shared/pause-history-dialog/pause-history-dialog.component';
 
 @Component({
   selector: 'app-today',
@@ -49,6 +51,8 @@ export class TodayComponent
     'break',
     'status',
     'pause_start',
+      'pause_history'
+
   ];
   exampleDatabase?: TodayService;
   dataSource!: ExampleDataSource;
@@ -57,10 +61,13 @@ export class TodayComponent
   today?: Today;
   constructor(
     public httpClient: HttpClient,
-    public todayService: TodayService
+    public todayService: TodayService,
+      private dialog: MatDialog
+
   ) {
     super();
   }
+  
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
   @ViewChild('filter', { static: true }) filter!: ElementRef;
@@ -74,6 +81,28 @@ export class TodayComponent
   toggleStar(row: Today) {
     console.log(row);
   }
+  openPauseHistory(row: Today) {
+
+  this.todayService.getPauseHistory(row.id).subscribe({
+    next: (history) => {
+
+      this.dialog.open(PauseHistoryDialogComponent, {
+        width: '600px',
+        maxWidth: '95vw',
+        data: {
+          employeeName: row.fullName || row.name,
+          history: history
+        }
+      });
+
+    },
+
+    error: (error) => {
+      console.error('Error loading pause history:', error);
+    }
+  });
+
+}
   isBreakGreaterThanOneHour(breakTime: string): boolean {
   if (!breakTime) {
     return false;
@@ -120,6 +149,7 @@ export class TodayComponent
     );
   }
 }
+
 export class ExampleDataSource extends DataSource<Today> {
   private dataSubject = new BehaviorSubject<Today[]>([]);
   filterChange = new BehaviorSubject('');

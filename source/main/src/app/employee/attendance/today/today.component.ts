@@ -17,6 +17,8 @@ import { MatTableModule } from '@angular/material/table';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { CommonModule } from '@angular/common';
 import { MatIcon, MatIconModule } from '@angular/material/icon';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { PauseHistoryDialogComponent } from '@shared/pause-history-dialog/pause-history-dialog.component';
 @Component({
   selector: 'app-today',
   templateUrl: './today.component.html',
@@ -31,7 +33,8 @@ import { MatIcon, MatIconModule } from '@angular/material/icon';
     MatProgressSpinnerModule,
     MatPaginatorModule,
     CommonModule,
-    MatIcon
+    MatIcon,
+    MatDialogModule
   ],
 })
 export class TodayComponent
@@ -45,8 +48,8 @@ export class TodayComponent
     'last_out',
     'total',
     'break',
-    'status'
-    
+    'status',
+      'pause_history'
   ];
   exampleDatabase?: TodayService;
   dataSource!: ExampleDataSource;
@@ -55,7 +58,9 @@ export class TodayComponent
   today?: Today;
   constructor(
     public httpClient: HttpClient,
-    public todayService: TodayService
+    public todayService: TodayService,
+      private dialog: MatDialog
+
   ) {
     super();
   }
@@ -72,7 +77,72 @@ export class TodayComponent
   toggleStar(row: Today) {
     console.log(row);
   }
+openPauseHistory(row: Today) {
 
+  const currentUser = JSON.parse(
+    localStorage.getItem('currentUser') || '{}'
+  );
+
+  const department = (
+    currentUser.department || ''
+  ).toLowerCase();
+
+  const isHR = department === 'hr';
+
+  // HR can see all employees.
+  if (isHR) {
+
+    this.todayService.getAllPauseHistory().subscribe({
+      next: (history: any[]) => {
+
+        this.dialog.open(PauseHistoryDialogComponent, {
+          width: '700px',
+          maxWidth: '95vw',
+          data: {
+            employeeName: 'All Employees',
+            history: history
+          }
+        });
+
+      },
+
+      error: (error: any) => {
+        console.error(
+          'Error loading all pause history:',
+          error
+        );
+      }
+    });
+
+    return;
+  }
+
+  // Normal Employee / BDE / BA
+  // Only their own pause history.
+  this.todayService.getPauseHistory(row.id).subscribe({
+
+    next: (history: any[]) => {
+
+      this.dialog.open(PauseHistoryDialogComponent, {
+        width: '600px',
+        maxWidth: '95vw',
+        data: {
+          employeeName: row.fullName || row.name,
+          history: history
+        }
+      });
+
+    },
+
+    error: (error: any) => {
+      console.error(
+        'Error loading pause history:',
+        error
+      );
+    }
+
+  });
+}
   // public loadData() {
   //   this.exampleDatabase = new TodayService(this.httpClient);
   public loadData() {
@@ -116,56 +186,7 @@ export class ExampleDataSource extends DataSource<Today> {
     // Reset to the first page when the user changes the filter.
     this.filterChange.subscribe(() => (this.paginator.pageIndex = 0));
   }
-  /** Connect function called by the table to retrieve one stream containing the data to render. */
-  // connect(): Observable<Today[]> {
-  //   // Listen for any changes in the base data, sorting, filtering, or pagination
-  //   const displayDataChanges = [
-  //     this.exampleDatabase.dataChange,
-  //     this._sort.sortChange,
-  //     this.filterChange,
-  //     this.paginator.page,
-  //   ];
-
-  //   this.exampleDatabase.getAllTodays();
-
-  //   return merge(...displayDataChanges).pipe(
-  //     map(() => {
-  //       // Filter data: 🔥 exclude admin roles
-  //       this.filteredData = this.exampleDatabase.data
-  //         .slice()
-  //         .filter((today: Today) => {
-  //           // ❌ skip Admin
-  //           if (today.role?.toLowerCase() === 'admin') {
-  //             return false;
-  //           }
-
-  //           const searchStr = (
-  //             today.name +
-  //             today.first_in +
-  //             today.break +
-  //             today.last_out +
-  //             today.total +
-  //             today.status +
-  //             today.shift
-  //           ).toLowerCase();
-
-  //           return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
-  //         });
-
-  //       // Sort filtered data
-  //       const sortedData = this.sortData(this.filteredData.slice());
-
-  //       // Grab the page's slice of the filtered sorted data.
-  //       const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
-  //       this.renderedData = sortedData.splice(
-  //         startIndex,
-  //         this.paginator.pageSize
-  //       );
-
-  //       return this.renderedData;
-  //     })
-  //   );
-  // }
+  
   connect(): Observable<Today[]> {
 
   const displayDataChanges = [
@@ -176,19 +197,43 @@ export class ExampleDataSource extends DataSource<Today> {
   ];
 
   // Load today's attendance
+  // this.exampleDatabase.getAllTodays().subscribe({
+  //   next: (data) => {
+  //     console.log('HR TODAY ATTENDANCE:', data);
+
+  //     this.exampleDatabase.dataChange.next(data);
+  //   },
+
+  //   error: (error) => {
+  //     console.error('HR TODAY ATTENDANCE ERROR:', error);
+
+  //     this.exampleDatabase.dataChange.next([]);
+  //   }
+  // });
   this.exampleDatabase.getAllTodays().subscribe({
-    next: (data) => {
-      console.log('HR TODAY ATTENDANCE:', data);
+  next: (data) => {
+    console.log('EMPLOYEE TODAY ATTENDANCE:', data);
 
-      this.exampleDatabase.dataChange.next(data);
-    },
+    const currentUser = JSON.parse(
+      localStorage.getItem('currentUser') || '{}'
+    );
 
-    error: (error) => {
-      console.error('HR TODAY ATTENDANCE ERROR:', error);
+    console.log('CURRENT USER:', currentUser);
 
-      this.exampleDatabase.dataChange.next([]);
-    }
-  });
+    console.log(
+      'CURRENT EMPLOYEE ID:',
+      currentUser.employee_id || currentUser.id
+    );
+
+    this.exampleDatabase.dataChange.next(data);
+  },
+
+  error: (error) => {
+    console.error('EMPLOYEE TODAY ATTENDANCE ERROR:', error);
+
+    this.exampleDatabase.dataChange.next([]);
+  }
+});
 
   return merge(...displayDataChanges).pipe(
     map(() => {
@@ -198,10 +243,20 @@ export class ExampleDataSource extends DataSource<Today> {
         .filter((today: Today) => {
 
           // Hide Admin
-          if (today.role?.toLowerCase() === 'admin') {
-            return false;
-          }
+          // if (today.role?.toLowerCase() === 'admin') {
+          //   return false;
+          // }
+const currentUser = JSON.parse(
+  localStorage.getItem('currentUser') || '{}'
+);
 
+const currentEmployeeId = Number(
+  currentUser.employee_id || currentUser.id
+);
+
+if (Number(today.employee_id) !== currentEmployeeId) {
+  return false;
+}
           const searchStr = (
             (today.name || '') +
             (today.fullName || '') +
@@ -211,7 +266,8 @@ export class ExampleDataSource extends DataSource<Today> {
             (today.total || '') +
             (today.status || '') +
             (today.shift || '') +
-            (today.pause_start || '')
+            (today.pause_start || '')+
+            (today.pause_history || '')
           ).toLowerCase();
 
           return searchStr.indexOf(

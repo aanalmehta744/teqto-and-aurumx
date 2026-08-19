@@ -178,5 +178,10 @@ export class AttendancesService extends UnsubscribeOnDestroyAdapter {
   updateTimer(value: string) {
     this.timerSubject.next(value);
   }
-
+// Get pause history for a particular attendance record
+getPauseHistory(attendanceId: number): Observable<any[]> {
+  return this.httpClient.get<any[]>(
+    `${environment.apiUrl}/todayattendances/pause-history/${attendanceId}`
+  );
+}
 }

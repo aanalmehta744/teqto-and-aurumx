@@ -106,6 +106,31 @@
   </mat-cell>
 
 </ng-container>
+
+<ng-container matColumnDef="pause_history">
+
+  <mat-header-cell
+    *matHeaderCellDef>
+    Pause History
+  </mat-header-cell>
+
+  <mat-cell *matCellDef="let row">
+
+    <button
+      type="button"
+      (click)="openPauseHistory(row)"
+      class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 text-sm font-medium hover:bg-blue-100"
+    >
+      View
+    </button>
+
+  </mat-cell>
+
+</ng-container>
+
+
+
+
 <!-- Pause Time -->
 <ng-container matColumnDef="pause_start">
 

@@ -129,6 +129,13 @@ export class TodayService extends UnsubscribeOnDestroyAdapter {
     );
   }
 
+
+getAllPauseHistory(): Observable<any[]> {
+  return this.httpClient.get<any[]>(
+    `${this.API_URL}/pause-history-all`
+  );
+}
+  
   // Get complete pause history
   getPauseHistory(attendanceId: number): Observable<any[]> {
     return this.httpClient.get<any[]>(

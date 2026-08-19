@@ -42,6 +42,7 @@ export interface PauseHistory {
 export class Today {
   id: number;
   img: string;
+  employee_id: number;
   name: string;
   fullName?: string;
   first_in: string;
@@ -56,6 +57,7 @@ export class Today {
 
   constructor(today: Today) {
     this.id = today.id || this.getRandomID();
+    this.employee_id = today.employee_id || 0;
     this.img = today.img || 'assets/images/user/usrbig1.jpg';
     this.name = today.name || '';
     this.fullName = today.fullName || '';

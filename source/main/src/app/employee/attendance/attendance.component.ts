@@ -27,7 +27,7 @@ import { MatIcon, MatIconModule } from '@angular/material/icon';
 import { TableExportUtil, TableElement } from '@shared';
 import Swal from 'sweetalert2';
 import { interval, Subscription } from 'rxjs';
-
+import { PauseHistoryDialogComponent } from '@shared/pause-history-dialog/pause-history-dialog.component';
 @Component({
   selector: 'app-attendances',
   templateUrl: './attendance.component.html',
@@ -57,7 +57,9 @@ export class AttendancesComponent
     'hours',
     'status',
     'break',
-      'pause_start'
+      'pause_start',
+        'pause_history'
+
 
   ];
   exampleDatabase?: AttendancesService | null;
@@ -229,6 +231,34 @@ export class AttendancesComponent
     console.log('Full row data:', row);
   }
 
+  openPauseHistory(row: Attendances) {
+
+  console.log('Opening pause history for attendance:', row.id);
+
+  this.attendancesService.getPauseHistory(row.id).subscribe({
+
+    next: (history: any[]) => {
+
+      console.log('Pause history:', history);
+
+      this.dialog.open(PauseHistoryDialogComponent, {
+        width: '600px',
+        maxWidth: '95vw',
+        data: {
+          employeeName: 'My Pause History',
+          history: history
+        }
+      });
+
+    },
+
+    error: (error: any) => {
+      console.error('Error loading pause history:', error);
+    }
+
+  });
+
+}
   public loadData() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     const employeeId = currentUser.id;
