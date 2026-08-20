@@ -42,11 +42,9 @@
 
 *,*::before,*::after{box-sizing:border-box;}
 
-
 .login_body{
   position:relative;
   z-index:0;
-
   min-height:100vh;
   min-height:100dvh;
   background:var(--login_bg);
@@ -175,7 +173,6 @@
   background:#4C1D95;color:#fff;font:inherit;font-size:15px;font-weight:600;
   cursor:pointer;transition:background .18s ease,transform .12s ease;
   box-shadow:0 12px 24px -10px rgba(76,29,149,.5);
-
 }
 .login_submit:hover{background:#3B0764;}
 .login_submit:active{transform:scale(.99);}
@@ -218,6 +215,7 @@
 }
 .login_media-chip svg{width:14px;height:14px;flex:none;}
 .login_note{margin:16px 0 0 32px;font-size:11.5px;color:var(--login_faint);}
+
 
 @media (max-width:880px), (orientation:portrait) and (max-width:1100px){
   .login_body{--login_pad:26px;--login_gap:14px;--login_shell-pad:14px;--login_fieldH:50px;}
@@ -427,4 +425,5 @@
 ::ng-deep .mat-mdc-form-field-has-icon-suffix .mat-mdc-text-field-wrapper {
     padding-right: 0px !important;
     padding-left: 2px !important;
+
 }
