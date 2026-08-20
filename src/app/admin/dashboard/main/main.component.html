@@ -1,0 +1,526 @@
+<section>
+  <div class="min-h-screen bg-gray-50 p-4 md:p-6 space-y-6">
+
+    <!-- breadcrumb -->
+    <app-breadcrumb [title]="'Dashboard'" [items]="['Home']" [active_item]="'Dashboard'"></app-breadcrumb>
+
+    <!-- ── Announcements ── -->
+    <app-announcement-banner></app-announcement-banner>
+
+    <!-- ── Welcome / Header Banner ── -->
+    <div class="relative overflow-hidden rounded-2xl bg-indigo-900 px-6 py-7 md:px-8 md:py-8">
+      <div class="pointer-events-none absolute -right-8 -top-12 h-44 w-44 rounded-full bg-white/5"></div>
+      <div class="pointer-events-none absolute right-28 -bottom-10 h-28 w-28 rounded-full bg-white/5"></div>
+      <div class="relative">
+        <h1 class="text-xl md:text-2xl font-semibold text-white">Dashboard Overview</h1>
+        <p class="mt-1 text-sm text-indigo-200">A quick snapshot of today's activity across your organization.</p>
+      </div>
+    </div>
+
+    <!-- ── KPI Summary Row ── -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-5">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500">BDEs with Follow-ups</p>
+            <p class="mt-2 text-3xl font-bold text-indigo-900">{{ todayFollowupsByBDE.length }}</p>
+            <p class="mt-1 text-xs text-gray-400">as of today</p>
+          </div>
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-900 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-5" *ngIf="userRole !== 'ba'">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500">Attendance Logged</p>
+            <p class="mt-2 text-3xl font-bold text-indigo-900">{{ todayAttendance.length }}</p>
+            <p class="mt-1 text-xs text-gray-400">records today</p>
+          </div>
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-900 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-5">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500">Upcoming Interviews</p>
+            <p class="mt-2 text-3xl font-bold text-indigo-900">{{ interviewDataSource.data.length }}</p>
+            <p class="mt-1 text-xs text-gray-400">scheduled</p>
+          </div>
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-900 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-5" *ngIf="userRole !== 'ba'">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500">Pending Leaves</p>
+            <p class="mt-2 text-3xl font-bold text-indigo-900">{{ pendingLeaves.length }}</p>
+            <p class="mt-1 text-xs text-gray-400">awaiting approval</p>
+          </div>
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-900 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+              <line x1="9" y1="11" x2="13" y2="11"></line>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── BA Leave Balance Card ── -->
+    <div *ngIf="userRole === 'ba' && baLeaveBalance" class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+      <div class="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
+        <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-900/10 text-indigo-900">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </span>
+        <h6 class="text-sm font-semibold text-gray-900">My Leave Balance</h6>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5">
+        <div class="text-center p-4 rounded-xl bg-indigo-900/5 border border-indigo-900/10">
+          <p class="text-2xl font-bold text-indigo-900">{{ baLeaveBalance.remaining_paid_leave ?? 0 }}</p>
+          <p class="text-xs text-gray-500 mt-1">Paid Leaves Left</p>
+        </div>
+        <div class="text-center p-4 rounded-xl bg-indigo-900/5 border border-indigo-900/10">
+          <p class="text-2xl font-bold text-indigo-900">{{ baLeaveBalance.total_paid_leave ?? 0 }}</p>
+          <p class="text-xs text-gray-500 mt-1">Total Paid</p>
+        </div>
+        <div class="text-center p-4 rounded-xl bg-indigo-900/5 border border-indigo-900/10">
+          <p class="text-2xl font-bold text-indigo-900">{{ baLeaveBalance.used_paid_leave ?? 0 }}</p>
+          <p class="text-xs text-gray-500 mt-1">Paid Used</p>
+        </div>
+        <div class="text-center p-4 rounded-xl bg-indigo-900/5 border border-indigo-900/10">
+          <p class="text-2xl font-bold text-indigo-900">{{ baLeaveBalance.used_sick_leave ?? 0 }}</p>
+          <p class="text-xs text-gray-500 mt-1">Sick Used</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Today's Follow-ups by BDE ── -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-3">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-900/10 text-indigo-900">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </span>
+          <h6 class="text-sm font-semibold text-gray-900">Today's Follow-ups by BDE</h6>
+        </div>
+      </div>
+
+      <div class="p-4">
+        <ng-scrollbar track="all" visibility="hover">
+          <div *ngFor="let bde of todayFollowupsByBDE" class="mb-5 last:mb-0">
+            <div class="flex justify-between items-center px-1 mb-2">
+              <h6 class="font-medium text-sm text-gray-900">{{ bde.bde_name }}</h6>
+              <span class="bg-indigo-900/10 text-indigo-900 text-xs font-medium px-2.5 py-1 rounded-full">
+                {{ bde.followup_count }} Follow-ups
+              </span>
+            </div>
+            <div class="overflow-x-auto rounded-xl border border-gray-100">
+              <table class="min-w-full text-sm">
+                <thead>
+                  <tr class="bg-gray-50">
+                    <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Client Name</th>
+                    <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Email</th>
+                    <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Mobile</th>
+                    <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+                    <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Follow-up Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let client of bde.clients"
+                    class="border-t border-gray-50 hover:bg-indigo-900/5 transition-colors">
+                    <td class="py-2.5 px-4 text-gray-700">{{ client.fullName }}</td>
+                    <td class="py-2.5 px-4 text-gray-500">{{ client.email }}</td>
+                    <td class="py-2.5 px-4 text-gray-500">{{ client.mobile || '-' }}</td>
+                    <td class="py-2.5 px-4 text-gray-700">{{ client.status }}</td>
+                    <td class="py-2.5 px-4 text-gray-500">{{ client.notes }}</td>
+                  </tr>
+                  <tr *ngIf="!bde.clients || bde.clients.length === 0" class="border-t border-gray-50">
+                    <td colspan="5" class="py-4 px-4 text-center text-gray-400">No client follow-ups available</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="border-t border-gray-100">
+                <mat-paginator #followupPaginator [length]="todayFollowupsByBDE.length" [pageSize]="5"
+                  [pageSizeOptions]="[2, 5, 10]" showFirstLastButtons (page)="updateFollowupPagination()">
+                </mat-paginator>
+              </div>
+            </div>
+          </div>
+        </ng-scrollbar>
+        <div *ngIf="todayFollowupsByBDE.length === 0" class="text-center text-gray-400 py-6 text-sm">
+          No follow-ups for today
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Today's Attendance Records ── -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm" *ngIf="userRole !== 'ba'">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-3">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-900/10 text-indigo-900">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </span>
+          <h6 class="text-sm font-semibold text-gray-900">Today's Attendance Records</h6>
+        </div>
+      </div>
+
+      <div class="p-4">
+        <ng-scrollbar track="all" visibility="hover">
+          <div class="overflow-x-auto rounded-xl border border-gray-100">
+            <table class="min-w-full text-sm">
+              <thead>
+                <tr class="bg-gray-50">
+                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Employee Name</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Date</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Punch In</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Punch Out</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Hours</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Break</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let record of paginatedAttendance"
+                  class="border-t border-gray-50 hover:bg-indigo-900/5 transition-colors">
+                  <td class="py-2.5 px-4 text-gray-700 whitespace-nowrap">{{ record.fullName }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ record.date | date:'mediumDate' }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ record.check_in ? (record.check_in | date:'h:mm:ss a') : '-' }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ record.check_out ? (record.check_out | date:'h:mm:ss a') : '-' }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ record.hours ? (record.hours) : '-' }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ record.break ? (record.break) : '-' }}</td>
+                  <!-- Status -->
+                  <td class="py-2.5 px-4">
+                    <span *ngIf="record.status === 'Present'"
+                      class="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-medium">
+                      {{ record.status }}
+                    </span>
+                    <span *ngIf="record.status === 'Absent'"
+                      class="bg-red-50 text-red-700 px-2.5 py-1 rounded-full text-xs font-medium">
+                      {{ record.status }}
+                    </span>
+                    <!-- Half Day -->
+                    <span *ngIf="record.status === 'Half Day'"
+                      class="bg-orange-50 text-orange-700 px-2.5 py-1 rounded-full text-xs font-medium">
+                      {{ record.status }}
+                    </span>
+                    <span
+                      *ngIf="record.status !== 'Present' && record.status !== 'Absent' && record.status !== 'Leave' && record.status !== 'Half Day'"
+                      class="bg-indigo-900/10 text-indigo-900 px-2.5 py-1 rounded-full text-xs font-medium">
+                      {{ record.status }}
+                    </span>
+
+                    <span *ngIf="record.final_status === 'Leave'"
+                      class="bg-amber-50 text-amber-700 px-2.5 py-1 ml-2 rounded-full text-xs font-medium">
+                      {{ record.final_status }}
+                    </span>
+                  </td>
+                </tr>
+                <tr *ngIf="!todayAttendance || todayAttendance.length === 0" class="border-t border-gray-50">
+                  <td colspan="7" class="py-4 px-4 text-center text-gray-400">No attendance records for today</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="border-t border-gray-100">
+              <mat-paginator #attendancePaginator [length]="todayAttendance.length" [pageSize]="5"
+                [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons (page)="updateAttendancePagination()">
+              </mat-paginator>
+            </div>
+          </div>
+        </ng-scrollbar>
+      </div>
+    </div>
+
+    <!-- ── Upcoming Interviews ── -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-3">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-900/10 text-indigo-900">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </span>
+          <h6 class="text-sm font-semibold text-gray-900">Upcoming Interviews</h6>
+        </div>
+      </div>
+
+      <div class="p-4">
+        <div class="overflow-x-auto rounded-xl border border-gray-100">
+          <table class="min-w-full text-sm">
+            <thead>
+              <tr class="bg-gray-50">
+                <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Candidate Name</th>
+                <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Job Title</th>
+                <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Interviewed By</th>
+                <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Date</th>
+                <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Time</th>
+                <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Type</th>
+                <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Mode</th>
+                <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let interview of paginatedInterviews" class="border-t border-gray-50 hover:bg-indigo-900/5 transition-colors">
+                <td class="py-2.5 px-4 text-gray-700 whitespace-nowrap">{{ interview.candidate_name }}</td>
+                <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ interview.job_name }}</td>
+                <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ interview.assigned_employee_name }}</td>
+                <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ interview.interview_date | date:'mediumDate' }}</td>
+                <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ interview.interview_time }}</td>
+                <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ interview.interview_type }}</td>
+                <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ interview.mode }}</td>
+                <td class="py-2.5 px-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" [ngClass]="{
+                      'bg-emerald-50 text-emerald-700': interview.status === 'Scheduled',
+                      'bg-red-50 text-red-700': interview.status === 'Cancelled',
+                      'bg-gray-100 text-gray-600': interview.status !== 'Scheduled' && interview.status !== 'Cancelled'
+                    }">
+                    {{ interview.status }}
+                  </span>
+                </td>
+              </tr>
+              <tr *ngIf="!paginatedInterviews || paginatedInterviews.length === 0" class="border-t border-gray-50">
+                <td colspan="8" class="py-4 px-4 text-center text-gray-400">No interviews scheduled</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="border-t border-gray-100">
+            <mat-paginator #interviewPaginator [length]="interviewDataSource.data.length" [pageSize]="5"
+              [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons (page)="updateInterviewPagination()">
+            </mat-paginator>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Pending Leave Requests ── -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm" *ngIf="userRole !== 'ba'">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-3">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-900/10 text-indigo-900">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+              <line x1="9" y1="11" x2="13" y2="11"></line>
+            </svg>
+          </span>
+          <h6 class="text-sm font-semibold text-gray-900">Pending Leave Requests</h6>
+        </div>
+      </div>
+
+      <div class="p-4">
+        <ng-scrollbar track="all" visibility="hover">
+          <div class="overflow-x-auto rounded-xl border border-gray-100">
+            <table class="min-w-full text-sm">
+              <thead>
+                <tr class="bg-gray-50">
+                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Employee Name</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Leave Type</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Start Date</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">End Date</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Days</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Reason</th>
+                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let leave of pendingLeaves"
+                  class="border-t border-gray-50 hover:bg-indigo-900/5 transition-colors">
+                  <td class="py-2.5 px-4 text-gray-700 whitespace-nowrap">{{ leave.employee_name }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ leave.leave_type }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ leave.start_date | date:'mediumDate' }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ leave.end_date | date:'mediumDate' }}</td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ leave.total_days }}</td>
+                  <td class="py-2.5 px-4 min-w-[400px] max-w-[500px] break-words whitespace-normal text-gray-500">
+                    {{ leave.reason }}
+                  </td>
+                  <td class="py-2.5 px-4">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" [ngClass]="{
+                      'bg-amber-50 text-amber-700': leave.status === 'Pending',
+                      'bg-emerald-50 text-emerald-700': leave.status === 'Approved',
+                      'bg-red-50 text-red-700': leave.status === 'Rejected'
+                    }">
+                      {{ leave.status }}
+                    </span>
+                  </td>
+                </tr>
+
+                <tr *ngIf="!pendingLeaves || pendingLeaves.length === 0" class="border-t border-gray-50">
+                  <td colspan="7" class="py-4 px-4 text-center text-gray-400">No pending leave requests</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="border-t border-gray-100">
+              <mat-paginator #leavePaginator [length]="pendingLeaves.length" [pageSize]="5"
+                [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons (page)="updateLeavePagination()">
+              </mat-paginator>
+            </div>
+          </div>
+        </ng-scrollbar>
+      </div>
+    </div>
+
+    <!-- ── Projects and Their Teams ── -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-3">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-900/10 text-indigo-900">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 7h-9"></path>
+              <path d="M14 17H5"></path>
+              <circle cx="17" cy="17" r="3"></circle>
+              <circle cx="7" cy="7" r="3"></circle>
+            </svg>
+          </span>
+          <h6 class="text-sm font-semibold text-gray-900">Projects and Their Teams</h6>
+        </div>
+      </div>
+
+      <div class="p-4">
+        <ng-scrollbar class="h-[280px]" track="all" visibility="hover">
+          <div class="space-y-5 px-1">
+            <div *ngFor="let project of allProjectsWithTeams">
+              <div class="flex justify-between items-center mb-2">
+                <h6 class="font-medium text-sm text-gray-900">{{ project.projectTitle }}</h6>
+                <span class="bg-indigo-900/10 text-indigo-900 text-xs font-medium px-2.5 py-1 rounded-full">
+                  {{ project.team.length }} Team Members
+                </span>
+              </div>
+              <div class="overflow-x-auto rounded-xl border border-gray-100">
+                <table class="min-w-full text-sm">
+                  <thead>
+                    <tr class="bg-gray-50">
+                      <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Full Name</th>
+                      <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Email</th>
+                      <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Mobile</th>
+                      <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Department</th>
+                      <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Gender</th>
+                      <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Address</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let member of project.team"
+                      class="border-t border-gray-50 hover:bg-indigo-900/5 transition-colors">
+                      <td class="py-2.5 px-4 text-gray-700 whitespace-nowrap">{{ member.fullName }}</td>
+                      <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ member.email }}</td>
+                      <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ member.mobile }}</td>
+                      <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ member.department }}</td>
+                      <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ member.gender }}</td>
+                      <td class="py-2.5 px-4 min-w-[400px] max-w-[500px] break-words whitespace-normal text-gray-500">
+                        {{ member.address }}
+                      </td>
+                    </tr>
+                    <tr *ngIf="!project.team || project.team.length === 0" class="border-t border-gray-50">
+                      <td colspan="6" class="py-4 px-4 text-center text-gray-400">No team members</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </ng-scrollbar>
+      </div>
+    </div>
+
+    <!-- ── Employee Daily Update ── -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-3">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-900/10 text-indigo-900">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+          </span>
+          <h6 class="text-sm font-semibold text-gray-900">Employee Daily Update</h6>
+        </div>
+      </div>
+      <div class="p-4 flex justify-center items-center">
+        <apx-chart [series]="chartSeries" [chart]="chartOptions" [xaxis]="xaxis" [yaxis]="yaxis"
+          [dataLabels]="dataLabels" [stroke]="stroke" [tooltip]="tooltip" [legend]="legend"
+          class="min-h-[350px] w-full text-[black]"></apx-chart>
+      </div>
+    </div>
+
+    <!-- ── Charts Row ── -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <!-- Project Status Summary Card -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div class="flex items-center gap-3">
+            <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-900/10 text-indigo-900">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+              </svg>
+            </span>
+            <h6 class="text-sm font-semibold text-gray-900">Project Status Summary</h6>
+          </div>
+        </div>
+        <div class="p-4 flex justify-center items-center">
+          <apx-chart [series]="projectStatusSeries" [chart]="projectStatusChart" [labels]="projectStatusLabels"
+            [colors]="projectStatusColors" [legend]="projectStatusLegend" [dataLabels]="projectStatusDataLabels"
+            [tooltip]="projectStatusTooltip" class="w-full min-h-[300px] text-[black]"></apx-chart>
+        </div>
+      </div>
+
+      <!-- Clients by Country Card -->
+      <!-- <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-gray-400"></span>
+            <h6 class="text-sm font-semibold text-[#1B1B2F]">Clients by Country</h6>
+          </div>
+        </div>
+        <div class="p-4 flex justify-center items-center">
+          <apx-chart [series]="clientCountrySeries" [chart]="clientCountryChart" [xaxis]="clientCountryXAxis"
+            [dataLabels]="clientCountryDataLabels" [tooltip]="clientCountryTooltip"
+            class="w-full min-h-[300px] text-[black]"></apx-chart>
+        </div>
+      </div> -->
+    </div>
+
+  </div>
+</section>

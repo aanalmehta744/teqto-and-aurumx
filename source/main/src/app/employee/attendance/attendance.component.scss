@@ -1,0 +1,71 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+
+  .left {
+    display: flex;
+    align-items: center;
+
+    .tbl-title h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+    }
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+
+    .tbl-export-btn {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      .tbl-header-btn {
+        display: flex;
+        gap: 10px;
+      }
+    }
+  }
+}
+
+.timer-btn button {
+  font-weight: 500;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+
+  &.check-in {
+    background-color: #4caf50 !important; // Green
+  }
+
+  &.check-out {
+    background-color: #e52e20 !important; // Red
+  }
+}
+
+.timer-text {
+  padding: 6px 10px;
+  border: 1px solid gray;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+  width: 80px;
+  background-color: #fff;
+}
+
+::ng-deep .snackbar-error,
+.mat-mdc-snack-bar-container .mat-mdc-snackbar-surface {
+  background-color: #f44336;
+  /* Red */
+  color: #fff;
+}
+
+:ng-deep .snackbar-success {
+  background-color: #4caf50;
+  /* Green */
+  color: #fff;
+}

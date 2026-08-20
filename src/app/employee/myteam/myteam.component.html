@@ -1,0 +1,56 @@
+<section>
+  <div>
+    <!-- Breadcrumb -->
+    <div class="mb-6">
+      <app-breadcrumb [title]="'My Team'" [items]="['Home']" [active_item]="'My Team'"></app-breadcrumb>
+    </div>
+
+    <!-- Project Cards -->
+    <div *ngFor="let project of projects" class="mb-8">
+      <div class="bg-white rounded-lg shadow-xl">
+        <!-- Project Title -->
+        <div class="bg-gray-100 text-gray-800 text-center py-3 rounded-t-lg border-b border-gray-200">
+          <h5 class="text-lg font-semibold tracking-wide">{{ project.projectTitle | uppercase }}</h5>
+        </div>
+
+        <div class="p-4 h-[350px] overflow-auto">
+          <ng-container *ngFor="let member of project.team">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6 items-center">
+              <!-- Profile Image -->
+              <div class="md:col-span-2 flex justify-center">
+                <img class="rounded-full w-[120px] h-[120px] object-cover" [src]="getMemberImage(member)" alt="Profile" />
+              </div>
+
+              <!-- Basic Info -->
+              <div class="md:col-span-6 border-r pr-4">
+                <h5 class="text-xl font-medium text-[#00383F] mb-1">
+                  {{ member.fullName | titlecase }}
+                </h5>
+                <p class="text-gray-700 mb-2">
+                  <i class="fas fa-briefcase mr-2 text-gray-500"></i> {{ member.department || 'N/A' }}
+                </p>
+                <p class="text-gray-700">
+                  <i class="fas fa-birthday-cake mr-2 text-gray-500"></i> {{ member.dob | date }}
+                </p>
+              </div>
+
+              <!-- Contact Info -->
+              <div class="md:col-span-4 space-y-1">
+                <p class="text-gray-700">
+                  <i class="fas fa-map-marker-alt mr-2 text-gray-500"></i> {{ member.address || 'N/A' }}
+                </p>
+                <p class="text-gray-700">
+                  <i class="fas fa-mobile-alt mr-2 text-gray-500"></i> {{ member.mobile }}
+                </p>
+                <p class="text-gray-700">
+                  <i class="far fa-envelope mr-2 text-gray-500"></i> {{ member.email }}
+                </p>
+              </div>
+            </div>
+            <hr class="border-t border-gray-300 mb-4" />
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

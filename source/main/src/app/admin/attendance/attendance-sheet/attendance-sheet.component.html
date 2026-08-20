@@ -1,0 +1,94 @@
+<section>
+  <div class="mx-auto space-y-5">
+    <app-breadcrumb [title]="'Attendance Sheet'" [items]="['Attendance']" [active_item]="'Sheet'"></app-breadcrumb>
+
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+      <!-- Header -->
+      <div class="flex flex-col md:flex-row justify-between items-center px-5 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-[#0b0b88]"></span>
+          <h6 class="text-sm font-semibold text-[#1B1B2F]">Attendance Sheet</h6>
+        </div>
+        <div class="cursor-pointer p-2 rounded-xl bg-[#d6d5ea] hover:bg-gray-100" matTooltip="XLSX">
+          <img src="assets/images/icons/xlsx.png" alt="Export" class="w-6 h-6" (click)="exportExcel()">
+        </div>
+      </div>
+
+      <!-- Date Filter -->
+      <div class="px-5 py-4 border-b border-gray-100 bg-gray-50/50">
+        <form [formGroup]="attendanceForm" (ngSubmit)="searchAttendance()">
+          <div class="flex flex-col md:flex-row items-center gap-3">
+            <mat-form-field class="w-full md:w-52" appearance="outline">
+              <mat-label>Start date</mat-label>
+              <input matInput [matDatepicker]="picker" formControlName="fromDate">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field class="w-full md:w-52" appearance="outline">
+              <mat-label>End date</mat-label>
+              <input matInput [matDatepicker]="picker2" formControlName="toDate">
+              <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+              <mat-datepicker #picker2></mat-datepicker>
+            </mat-form-field>
+
+            <button mat-raised-button class="!bg-[#d6d5ea] !text-[#00383F] !shadow-none !h-[50px] !px-8 !rounded-lg"
+              type="submit">Search</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Attendance Table -->
+      <div class="overflow-auto p-4">
+        <table class="min-w-full border border-gray-100 text-sm text-[#1B1B2F] rounded-xl overflow-hidden">
+          <thead>
+            <tr class="bg-gray-50">
+              <th class="py-3 px-4 text-left border-b border-gray-100 font-medium text-xs text-gray-500 uppercase tracking-wide">Employee Name</th>
+              <th *ngFor="let day of daysInMonth"
+                class="py-3 px-2 border-b border-gray-100 text-center font-medium text-xs text-gray-500 w-12">
+                <div class="flex flex-col items-center">
+                  <span>{{ day.dayNumber }}</span>
+                  <small class="text-[10px] text-gray-400">{{ day.dayName }}</small>
+                </div>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let employee of attendanceList" class="hover:bg-gray-50 transition-colors">
+              <td class="py-3 px-4 border-b border-gray-100 font-medium">{{ employee.employee_name }}</td>
+              <td *ngFor="let day of daysInMonth"
+                class="py-2 px-1 border-b border-gray-100 text-center w-12"
+                [class.bg-blue-50]="isWeekend(day.dayNumber)"
+                [class.bg-amber-50]="getHolidayTitle(day.dayNumber)"
+                [matTooltip]="getAttendanceTooltip(employee, day.dayNumber)" matTooltipPosition="above">
+
+                <ng-container *ngIf="isWeekend(day.dayNumber); else checkHoliday">
+                  <span class="text-blue-400 font-medium text-xs">WE</span>
+                </ng-container>
+
+                <ng-template #checkHoliday>
+                  <ng-container *ngIf="getHolidayTitle(day.dayNumber); else checkAttendance">
+                    <span class="text-amber-600 font-medium text-xs">H</span>
+                  </ng-container>
+
+                  <ng-template #checkAttendance>
+                    <ng-container [ngSwitch]="employee.attendance?.[day.dayNumber]?.status">
+                      <span *ngSwitchCase="'P'" class="text-green-600 font-semibold text-xs">P</span>
+                      <span *ngSwitchCase="'HD'" class="text-yellow-600 font-semibold text-xs">HD</span>
+                      <span *ngSwitchCase="'HOL'" class="text-blue-700 font-semibold text-xs">H</span>
+                      <span *ngSwitchCase="'A'" class="text-red-500 font-semibold text-xs">A</span>
+                      <span *ngSwitchDefault class="text-gray-300 text-xs">--</span>
+                    </ng-container>
+                  </ng-template>
+                </ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</section>

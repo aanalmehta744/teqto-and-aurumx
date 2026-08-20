@@ -1,0 +1,87 @@
+<div class="p-2">
+  @if (isDetails) {
+  <div class="rounded-lg w-full max-w-3xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center px-4 py-3 border-b">
+      <h2 class="text-xl font-medium text-[#00383f]">{{ myProjects.projectTitle }}</h2>
+      <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div mat-dialog-content class="p-4">
+      <mat-card-content>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-4">
+          <!-- Start Date -->
+          <div class="font-medium text-gray-600">Project Start Date:</div>
+          <div class="flex items-center gap-2 text-gray-800">
+            <span class="material-icons-outlined text-base text-blue-500">date_range</span>
+            {{ myProjects.startDate ? (myProjects.startDate | date: 'MM/dd/yyyy') : '--' }}
+          </div>
+
+          <!-- End Date -->
+          <div class="font-medium text-gray-600">Project DeadLine:</div>
+          <div class="flex items-center gap-2 text-gray-800">
+            <span class="material-icons-outlined text-base text-blue-500">date_range</span>
+            {{ myProjects.endDate | date }}
+          </div>
+          <!-- Team -->
+          <div class="font-medium text-gray-600">Team:</div>
+          <div class="flex flex-wrap gap-2">
+            <div *ngIf="myProjects.teamName; else noTeam" class="grid grid-cols-1 gap-2">
+              <span *ngFor="let member of myProjects.teamName.split(',')"
+                class="bg-[#d6d5ea] text-[#00383f] text-sm px-2 py-1 rounded">
+                {{ member.trim() }}
+              </span>
+            </div>
+            <ng-template #noTeam>
+              <span>--</span>
+            </ng-template>
+          </div>
+
+          <!-- Priority -->
+          <div class="font-medium text-gray-600">Priority:</div>
+          <div>
+            @if (myProjects.priority === 'High') {
+            <span class="bg-red-500 text-white text-sm px-2 py-1 rounded">High</span>
+            }
+            @if (myProjects.priority === 'Medium') {
+            <span class="bg-blue-500 text-white text-sm px-2 py-1 rounded">Medium</span>
+            }
+            @if (myProjects.priority === 'Low') {
+            <span class="bg-green-500 text-white text-sm px-2 py-1 rounded">Low</span>
+            }
+          </div>
+
+          <!-- Progress -->
+          <div class="font-medium text-gray-600">Progress:</div>
+          <div class="w-full md:w-1/2">
+            <mat-progress-bar mode="determinate" [value]="myProjects.progress" class="rounded-full"></mat-progress-bar>
+          </div>
+
+          <!-- Status -->
+          <div class="font-medium text-gray-600">Status:</div>
+          <div>
+            <span [ngSwitch]="myProjects.status" [ngClass]="{
+                  'bg-green-500': myProjects.status === 'Active',
+                  'bg-blue-600': myProjects.status === 'Completed',
+                  'bg-purple-500': myProjects.status === 'Running',
+                  'bg-orange-500': myProjects.status === 'Pending',
+                  'bg-gray-600': myProjects.status === 'Not Started',
+                  'bg-red-600': myProjects.status === 'Cancled',
+                  'bg-gray-400': true
+                }" class="inline-block text-white text-sm px-2 py-1 rounded">
+              {{ myProjects.status }}
+            </span>
+          </div>
+
+          <!-- Description -->
+          <div class="font-medium text-gray-600">Project Details:</div>
+          <div class="text-gray-700" [innerHTML]="myProjects.description || '--'"></div>
+        </div>
+      </mat-card-content>
+    </div>
+  </div>
+  }
+</div>

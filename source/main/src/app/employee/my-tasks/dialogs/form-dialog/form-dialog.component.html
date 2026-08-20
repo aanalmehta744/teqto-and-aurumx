@@ -1,0 +1,68 @@
+<div class="p-2">
+  @if (isDetails) {
+  <div class="rounded-lg w-full max-w-3xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center px-4 py-3 border-b">
+      <h2 class="text-xl font-medium text-[#00383f]">{{ myTasks.projectTitle }}</h2>
+      <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div mat-dialog-content class="p-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-4">
+
+        <!-- Task Title -->
+        <div class="font-medium text-gray-600">Task Title:</div>
+        <div class="text-gray-700">{{ myTasks.title }}</div>
+
+        <!-- Project Title -->
+        <div class="font-medium text-gray-600">Project Title:</div>
+        <div class="text-gray-700">{{ myTasks.projectTitle || myTasks.trainer_project_name || '-'}}</div>
+
+        <!-- Employee Name -->
+        <div class="font-medium text-gray-600">Employee Name:</div>
+        <div class="flex items-center gap-2 text-gray-800">
+          {{ myTasks.employee_name ? myTasks.employee_name : '--' }}
+        </div>
+
+        <!-- Due Date -->
+        <div class="font-medium text-gray-600">Due Date:</div>
+        <div class="flex items-center gap-2 text-gray-800">
+          {{ myTasks.due_date | date }}
+        </div>
+
+        <!-- Status -->
+        <div class="font-medium text-gray-600">Status:</div>
+        <div class="status-pill" [ngClass]="{
+              'pill-open-today': myTasks.done === 0 && isToday(myTasks.create_date),
+              'pill-due-today': myTasks.done === 0 && isToday(myTasks.due_date) && !isToday(myTasks.create_date),
+              'pill-overdue': myTasks.done === 0 && isOverdue(myTasks.due_date),
+              'pill-closed': myTasks.done === 1
+            }">
+          <div>{{ myTasks.done === 0 ? 'Open' : 'Closed' }}</div>
+          <div *ngIf="myTasks.done === 0">
+            <span *ngIf="isToday(myTasks.create_date)">(Today)</span>
+            <span *ngIf="isToday(myTasks.due_date) && !isToday(myTasks.create_date)">(Due Today)</span>
+            <span *ngIf="isOverdue(myTasks.due_date) && !isToday(myTasks.due_date)">(Overdue)</span>
+          </div>
+        </div>
+
+        <!-- Priority -->
+        <div class="font-medium text-gray-600">Priority:</div>
+        <div>
+          <span *ngIf="myTasks.priority === 'High'" class="bg-red-500 text-white text-sm px-2 py-1 rounded">High</span>
+          <span *ngIf="myTasks.priority === 'Normal'"
+            class="bg-blue-500 text-white text-sm px-2 py-1 rounded">Normal</span>
+          <span *ngIf="myTasks.priority === 'Low'" class="bg-green-500 text-white text-sm px-2 py-1 rounded">Low</span>
+        </div>
+
+        <!-- Description -->
+        <div class="font-medium text-gray-600">Task Details:</div>
+        <div class="text-gray-700" [innerHTML]="myTasks.note || '--'"></div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

@@ -1,0 +1,27 @@
+<h3 mat-dialog-title class="text-xl font-semibold text-gray-800 mb-2">Are you sure?</h3>
+
+<div mat-dialog-content class="mb-4">
+  <ul class="space-y-2">
+    <li>
+      <p>
+        <span class="font-medium text-[#00383F]">Name:</span>
+        <span class="text-gray-800">{{ data.fullName }}</span>
+      </p>
+    </li>
+    <li>
+      <p>
+        <span class="font-medium text-[#00383F]">Email:</span>
+        <span class="text-gray-800">{{ data.email }}</span>
+      </p>
+    </li>
+  </ul>
+</div>
+
+<div mat-dialog-actions class="flex justify-end gap-3 mt-4">
+  <button mat-raised-button color="warn" [mat-dialog-close]="1" (click)="confirmDelete()">
+    Delete
+  </button>
+  <button mat-raised-button (click)="onNoClick()" tabindex="-1">
+    Cancel
+  </button>
+</div>

@@ -1,0 +1,335 @@
+<div class="p-4 md:p-6 bg-gray-50 min-h-screen">
+
+  <!-- Page Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-[#00383F]">Daily Client Notes</h1>
+    <p class="text-sm text-gray-500 mt-1">Track day-by-day notes and live status for all your clients</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+    <div class="bg-white rounded-xl shadow-sm border p-4 text-center">
+      <p class="text-2xl font-bold text-[#00383F]">{{ stats.total }}</p>
+      <p class="text-xs text-gray-500 mt-1">Total Clients</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-4 text-center">
+      <p class="text-2xl font-bold text-red-500">{{ stats.hot }}</p>
+      <p class="text-xs text-gray-500 mt-1">Hot Leads</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-4 text-center">
+      <p class="text-2xl font-bold text-blue-500">{{ stats.cold }}</p>
+      <p class="text-xs text-gray-500 mt-1">Cold Leads</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-4 text-center">
+      <p class="text-2xl font-bold text-green-600">{{ stats.closed }}</p>
+      <p class="text-xs text-gray-500 mt-1">Closed</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border p-4 text-center">
+      <p class="text-2xl font-bold text-purple-600">{{ stats.close_rate || 0 }}%</p>
+      <p class="text-xs text-gray-500 mt-1">Close Rate</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white rounded-xl shadow-sm border p-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+      <!-- Search -->
+      <div>
+        <label class="text-xs font-medium text-gray-500 block mb-1">Search Client</label>
+        <div class="relative">
+          <mat-icon class="absolute left-2.5 top-2 text-gray-400 !text-[18px]">search</mat-icon>
+          <input [(ngModel)]="filterSearch" (ngModelChange)="loadDashboard()"
+            type="text" placeholder="Client name..."
+            class="w-full pl-8 pr-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00383F]/30 text-red-500" />
+        </div>
+      </div>
+
+      <!-- Status Filter -->
+      <div>
+        <label class="text-xs font-medium text-gray-500 block mb-1">Status</label>
+        <select [(ngModel)]="filterStatus" (ngModelChange)="loadDashboard()"
+          class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00383F]/30 text-red-500">
+          <option value="">All Status</option>
+          <option value="Hot">Hot</option>
+          <option value="Cold">Cold</option>
+          <option value="Close">Close</option>
+        </select>
+      </div>
+
+      <!-- Tag Filter -->
+      <div>
+        <label class="text-xs font-medium text-gray-500 block mb-1">Filter by Tag</label>
+        <div class="relative">
+          <mat-icon class="absolute left-2.5 top-2 text-gray-400 !text-[18px]">label</mat-icon>
+          <input [(ngModel)]="filterTag" (ngModelChange)="loadDashboard()"
+            type="text" placeholder="Tag..."
+            class="w-full pl-8 pr-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00383F]/30 text-red-500" />
+        </div>
+      </div>
+
+      <!-- Date Filter -->
+      <div>
+        <label class="text-xs font-medium text-gray-500 block mb-1">Filter by Date</label>
+        <input [(ngModel)]="filterDate" (ngModelChange)="loadDashboard()"
+          type="date"
+          class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00383F]/30 text-red-500" />
+      </div>
+
+      <!-- Clear -->
+      <div>
+        <button (click)="clearFilters()"
+          class="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium py-2 px-4 rounded-lg transition-colors">
+          Clear Filters
+        </button>
+      </div>
+    </div>
+
+    <p *ngIf="filterDate" class="text-xs text-[#00383F] mt-2 flex items-center gap-1">
+      <mat-icon class="!text-[14px]">filter_alt</mat-icon>
+      Showing clients with notes on {{ filterDate | date:'MMM d, y' }}
+      <button (click)="clearDateFilter()" class="ml-1 underline text-red-500">clear</button>
+    </p>
+  </div>
+
+  <!-- Main Layout: Client List + Notes Panel -->
+  <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+
+    <!-- Client List -->
+    <div class="lg:col-span-3 space-y-3">
+      <h2 class="text-sm font-semibold text-gray-600 mb-2">
+        {{ clients.length }} client{{ clients.length !== 1 ? 's' : '' }}
+        <span *ngIf="clients.length > pageSize" class="font-normal text-gray-400">
+          — page {{ currentPage }} of {{ totalPages }}
+        </span>
+      </h2>
+
+      <div *ngIf="clients.length === 0" class="bg-white rounded-xl border p-8 text-center text-gray-400">
+        <mat-icon class="!text-4xl mb-2">person_off</mat-icon>
+        <p>No clients found</p>
+      </div>
+
+      <div *ngFor="let client of paginatedClients"
+        class="bg-white rounded-xl border transition-all duration-200 hover:shadow-md"
+        [class.ring-2]="selectedClient?.id === client.id"
+        [class.ring-[#00383F]]="selectedClient?.id === client.id">
+
+        <!-- Client Header -->
+        <div class="p-4 cursor-pointer" (click)="selectClient(client)">
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h3 class="font-semibold text-gray-800 text-sm">{{ client.fullName }}</h3>
+                <span class="text-[11px] font-medium px-2 py-0.5 rounded-full"
+                  [class]="statusColor(client.client_type)">
+                  {{ client.client_type }}
+                </span>
+                <span *ngIf="client.prize_tag" class="text-[11px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                  {{ client.prize_tag }}
+                </span>
+                <span *ngIf="client.tag"
+                  class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-teal-100 text-teal-700">
+                  {{ client.tag }}
+                </span>
+              </div>
+              <p class="text-xs text-gray-500 mt-0.5">{{ client.email }}</p>
+              <p *ngIf="client.platform || client.technology" class="text-xs text-gray-400 mt-0.5">
+                {{ client.platform }}{{ client.platform && client.technology ? ' · ' : '' }}{{ client.technology }}
+              </p>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button (click)="$event.stopPropagation(); openAddNote(client.id)"
+                class="flex items-center gap-1 bg-gray-800 hover:bg-gray-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-colors">
+                <mat-icon class="!text-[14px]">add</mat-icon>
+                Add Note
+              </button>
+              <mat-icon class="text-gray-400 !text-[18px] transition-transform duration-200"
+                [class.rotate-180]="selectedClient?.id === client.id">
+                expand_more
+              </mat-icon>
+            </div>
+          </div>
+
+          <!-- Latest Note Preview -->
+          <div *ngIf="client.latest_note" class="mt-2.5 pt-2.5 border-t border-dashed border-gray-200">
+            <div class="flex items-start gap-2">
+              <span class="text-base leading-none mt-0.5">{{ moodFor(client.latest_mood).icon }}</span>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs text-gray-600 line-clamp-2">{{ client.latest_note }}</p>
+                <p *ngIf="client.next_action" class="text-[11px] text-[#00383F] mt-0.5 font-medium">
+                  Next: {{ client.next_action }}
+                </p>
+              </div>
+              <span class="text-[10px] text-gray-400 flex-shrink-0">{{ client.latest_note_date | date:'MMM d' }}</span>
+            </div>
+          </div>
+          <div *ngIf="!client.latest_note" class="mt-2 pt-2 border-t border-dashed border-gray-200">
+            <p class="text-xs text-gray-400 italic">No notes yet — click Add Note to get started</p>
+          </div>
+        </div>
+
+        <!-- Inline Add Note Form -->
+        <div *ngIf="addingFor === client.id" class="border-t bg-gray-50 p-4 rounded-b-xl">
+          <p class="text-sm font-semibold text-gray-700 mb-3">Add Note for {{ client.fullName }}</p>
+          <textarea [(ngModel)]="newNote.note_text" rows="3"
+            placeholder="Write today's update, conversation summary or status..."
+            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00383F]/30 resize-none mb-3 text-red-500">
+          </textarea>
+
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <!-- Mood -->
+            <div>
+              <label class="text-xs font-medium text-gray-500 block mb-1">Mood / Sentiment</label>
+              <div class="flex gap-2">
+                <button *ngFor="let m of moodOptions"
+                  (click)="newNote.mood = m.value"
+                  class="flex-1 py-1.5 rounded-lg text-xs font-medium border-2 transition-all"
+                  [class]="newNote.mood === m.value ? m.bg + ' ' + m.color + ' border-current' : 'bg-white text-gray-500 border-gray-200'">
+                  {{ m.icon }} {{ m.label }}
+                </button>
+              </div>
+            </div>
+            <!-- Next Action -->
+            <div>
+              <label class="text-xs font-medium text-gray-500 block mb-1">Next Action</label>
+              <input [(ngModel)]="newNote.next_action" type="text"
+                placeholder="e.g. Follow up on Tuesday"
+                class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00383F]/30 text-red-500" />
+            </div>
+          </div>
+
+          <div class="flex gap-2 justify-end">
+            <button (click)="addingFor = null" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2">Cancel</button>
+            <button (click)="saveNote()" [disabled]="saving || !newNote.note_text.trim()"
+              class="bg-[#00383F] hover:bg-[#004f57] disabled:opacity-50 text-white text-sm font-medium px-5 py-2 rounded-lg transition-colors">
+              {{ saving ? 'Saving...' : 'Save Note' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="totalPages > 1" class="flex items-center justify-center gap-1 pt-2">
+        <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1"
+          class="p-1.5 rounded-lg text-gray-500 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+          <mat-icon class="!text-[18px]">chevron_left</mat-icon>
+        </button>
+
+        <ng-container *ngFor="let p of pageNumbers">
+          <button (click)="goToPage(p)"
+            class="min-w-[32px] h-8 rounded-lg text-sm font-medium transition-colors"
+            [class]="p === currentPage
+              ? 'bg-[#00383F] text-white'
+              : 'text-gray-600 hover:bg-gray-100'">
+            {{ p }}
+          </button>
+        </ng-container>
+
+        <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages"
+          class="p-1.5 rounded-lg text-gray-500 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+          <mat-icon class="!text-[18px]">chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Notes Timeline Panel -->
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-xl border sticky top-20">
+        <div class="px-4 py-3 border-b bg-white rounded-t-xl">
+          <h3 class="text-sm font-semibold text-gray-800">
+            {{ selectedClient ? selectedClient.fullName + ' — Notes' : 'Select a client to view notes' }}
+          </h3>
+        </div>
+
+        <!-- No client selected -->
+        <div *ngIf="!selectedClient" class="p-8 text-center text-gray-400">
+          <mat-icon class="!text-4xl mb-2">notes</mat-icon>
+          <p class="text-sm">Click on any client to view their full notes timeline</p>
+        </div>
+
+        <!-- Notes Timeline -->
+        <div *ngIf="selectedClient" class="max-h-[75vh] overflow-y-auto flex flex-col">
+          <div *ngIf="clientNotes.length === 0" class="p-6 text-center text-gray-400 text-sm">
+            No notes yet for this client
+          </div>
+
+          <div *ngFor="let note of paginatedNotes; let i = index"
+            class="relative px-4 py-3 border-b last:border-0">
+
+            <!-- Not editing -->
+            <div *ngIf="editingNote?.id !== note.id">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="text-base">{{ moodFor(note.mood).icon }}</span>
+                  <div>
+                    <span class="text-xs font-semibold text-gray-700">{{ note.note_date | date:'EEE, MMM d, y' }}</span>
+                    <span class="ml-2 text-[10px] px-1.5 py-0.5 rounded-full font-medium"
+                      [class]="moodFor(note.mood).bg + ' ' + moodFor(note.mood).color">
+                      {{ moodFor(note.mood).label }}
+                    </span>
+                  </div>
+                </div>
+                <div class="flex gap-1 flex-shrink-0">
+                  <button (click)="startEdit(note)" class="p-1 text-gray-400 hover:text-blue-500 transition-colors">
+                    <mat-icon class="!text-[16px]">edit</mat-icon>
+                  </button>
+                  <button (click)="deleteNote(note.id)" class="p-1 text-gray-400 hover:text-red-500 transition-colors">
+                    <mat-icon class="!text-[16px]">delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <p class="text-sm text-gray-700 mt-1.5 leading-relaxed">{{ note.note_text }}</p>
+              <p *ngIf="note.next_action" class="text-xs text-[#00383F] font-medium mt-1.5 flex items-center gap-1">
+                <mat-icon class="!text-[13px]">arrow_forward</mat-icon>
+                {{ note.next_action }}
+              </p>
+            </div>
+
+            <!-- Edit mode -->
+            <div *ngIf="editingNote?.id === note.id">
+              <textarea [(ngModel)]="editingNote.note_text" rows="3"
+                class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00383F]/30 resize-none mb-2 text-red-500">
+              </textarea>
+              <div class="flex gap-1.5 mb-2">
+                <button *ngFor="let m of moodOptions"
+                  (click)="editingNote.mood = m.value"
+                  class="flex-1 py-1 rounded text-xs font-medium border transition-all"
+                  [class]="editingNote.mood === m.value ? m.bg + ' ' + m.color + ' border-current' : 'bg-white text-gray-500 border-gray-200'">
+                  {{ m.icon }}
+                </button>
+              </div>
+              <input [(ngModel)]="editingNote.next_action" type="text" placeholder="Next action..."
+                class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none mb-2 text-red-500" />
+              <div class="flex gap-2 justify-end">
+                <button (click)="editingNote = null" class="text-xs text-gray-500 hover:text-gray-700 px-3 py-1">Cancel</button>
+                <button (click)="saveEdit()" class="bg-gray-800 text-white text-xs font-medium px-4 py-1.5 rounded-lg">Save</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes Pagination -->
+          <div *ngIf="notesTotalPages > 1"
+            class="flex items-center justify-center gap-1 px-4 py-3 border-t bg-gray-50 sticky bottom-0">
+            <button (click)="goToNotesPage(notesPage - 1)" [disabled]="notesPage === 1"
+              class="p-1 rounded-lg text-gray-500 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+              <mat-icon class="!text-[18px]">chevron_left</mat-icon>
+            </button>
+
+            <ng-container *ngFor="let p of notesPageNumbers">
+              <button (click)="goToNotesPage(p)"
+                class="min-w-[28px] h-7 rounded-lg text-xs font-medium transition-colors"
+                [class]="p === notesPage ? 'bg-[#00383F] text-white' : 'text-gray-600 hover:bg-gray-100'">
+                {{ p }}
+              </button>
+            </ng-container>
+
+            <button (click)="goToNotesPage(notesPage + 1)" [disabled]="notesPage === notesTotalPages"
+              class="p-1 rounded-lg text-gray-500 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+              <mat-icon class="!text-[18px]">chevron_right</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

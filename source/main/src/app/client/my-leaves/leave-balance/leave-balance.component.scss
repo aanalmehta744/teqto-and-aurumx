@@ -1,0 +1,108 @@
+.leave-rules-card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-header {
+    background-color: #f1f1f1;
+    padding: 15px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .card-body {
+    padding: 20px;
+  }
+
+  .rules-list {
+    list-style-type: none;
+    padding: 0;
+
+    .rule-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-left: 10px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .rule-icon {
+        font-size: 24px;
+        color: #4caf50;
+        margin-right: 15px;
+      }
+
+      .rule-text {
+        font-size: 1rem;
+        color: #555;
+
+        strong {
+          color: #333;
+        }
+
+        em {
+          color: #888;
+        }
+
+        .leave-types {
+          font-style: italic;
+          color: #888;
+        }
+      }
+    }
+  }
+}
+
+mat-card {
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Card title */
+mat-card-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+/* Leave info text */
+.mb-2 {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #444;
+}
+
+/* Margin tweaks for spacing between progress bars */
+mat-progress-bar {
+  height: 8px;
+  border-radius: 4px;
+}
+
+/* Additional margin for sections */
+.mt-3 {
+  margin-top: 1rem !important;
+}
+
+.mb-4 {
+  margin-bottom: 1.5rem !important;
+}

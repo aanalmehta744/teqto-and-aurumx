@@ -1,0 +1,77 @@
+<div class="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-auto">
+  <!-- Header -->
+  <div class="flex justify-between items-center px-4 py-3 border-b">
+    <h2 class="text-lg font-medium text-[#00383F]">
+      {{ dialogTitle }}
+    </h2>
+    <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Form -->
+  <div mat-dialog-content class="p-6">
+    <form [formGroup]="calendarForm" class="space-y-4">
+      <!-- Title -->
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label class="!text-[#00383F]">Title</mat-label>
+        <input matInput formControlName="title" required />
+        <mat-icon matSuffix class="material-icons-outlined text-gray-500">turned_in_not</mat-icon>
+      </mat-form-field>
+
+      <!-- Category -->
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label class="!text-[#00383F]">Category</mat-label>
+        <mat-select formControlName="category" required>
+          <mat-option value="work">Work</mat-option>
+          <mat-option value="personal">Personal</mat-option>
+          <mat-option value="important">Important</mat-option>
+          <mat-option value="travel">Travel</mat-option>
+          <mat-option value="friends">Friends</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Dates -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Start Date -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label class="!text-[#00383F]">Start Date</mat-label>
+          <input matInput formControlName="startDate" [owlDateTimeTrigger]="startDate" [owlDateTime]="startDate"
+            placeholder="Choose a date" required />
+          <mat-icon matSuffix [owlDateTimeTrigger]="startDate">today</mat-icon>
+          <owl-date-time #startDate></owl-date-time>
+        </mat-form-field>
+
+        <!-- End Date -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label class="!text-[#00383F]">End Date</mat-label>
+          <input matInput formControlName="endDate" [owlDateTimeTrigger]="endDate" [owlDateTime]="endDate"
+            placeholder="Choose a date" required />
+          <mat-icon matSuffix [owlDateTimeTrigger]="endDate">today</mat-icon>
+          <owl-date-time #endDate></owl-date-time>
+        </mat-form-field>
+      </div>
+
+      <!-- Event Details -->
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label class="!text-[#00383F]">Event Details</mat-label>
+        <textarea matInput formControlName="details" rows="3"></textarea>
+      </mat-form-field>
+
+      <!-- Actions -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pt-2">
+        <div class="flex gap-3">
+          <button mat-raised-button color="primary" type="submit" [disabled]="!calendarForm.valid"
+            (click)="confirmAdd()">Save</button>
+          <button mat-raised-button color="warn" type="button" (click)="dialogRef.close()">Cancel</button>
+        </div>
+
+        @if (showDeleteBtn) {
+        <button mat-mini-fab color="warn" aria-label="Delete" (click)="deleteEvent()">
+          <mat-icon>delete_outline</mat-icon>
+        </button>
+        }
+      </div>
+    </form>
+  </div>
+</div>

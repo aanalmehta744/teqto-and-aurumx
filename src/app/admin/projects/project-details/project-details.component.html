@@ -1,0 +1,148 @@
+<section>
+  <div class="mx-auto">
+    <!-- Breadcrumb Header -->
+    <div>
+      <app-breadcrumb [title]="'Project Details'" [items]="['Projects']"
+        [active_item]="'Project Details'"></app-breadcrumb>
+    </div>
+
+    <div class="flex flex-wrap -mx-3">
+      <!-- Left Column (9/12 width) -->
+      <div class="w-full md:w-9/12 px-3 mb-6">
+
+        <div class="bg-white rounded-lg shadow-xl p-4">
+          <div>
+            <h2 class="text-[17px] font-medium text-[#009F9F]">Project Details :</h2>
+          </div>
+
+          <div class="mt-3">
+            <!-- Project Header -->
+            <div class="flex flex-wrap mb-6">
+              <div class="w-full">
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="text-2xl font-medium text-[#00383F]">{{ projectDetails?.projectTitle }}</h3>
+                </div>
+                <!-- <dl class="flex items-center">
+                  <dt class="font-medium text-[#0E264A] mr-2">Status:</dt>
+                  <dd>
+                    <span
+                      class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                      {{ projectDetails?.status }}
+                    </span>
+                  </dd>
+                </dl> -->
+              </div>
+            </div>
+
+            <!-- Project Info Rows -->
+            <div class="w-full md:grid md:grid-cols-2 gap-5">
+              <!-- Left Info Column -->
+              <div class="w-full">
+                <dl class="space-y-3">
+                  <div class="flex">
+                    <dt class="font-medium text-[#0E264A] mb-1">Project priority :</dt>
+                    <dd class="text-gray-800">{{ projectDetails?.priority }}</dd>
+                  </div>
+                  <div>
+                    <dt class="font-medium text-[#0E264A] mb-1">Project Status :</dt>
+                    <dd>
+                      <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                        <div class="bg-blue-600 h-2 rounded-full" [style.width.%]="projectDetails?.progress || 0"></div>
+                      </div>
+                      <small class="text-[#7C6D84] text-[14px]"><strong class="text-[#0E264A]">{{
+                          projectDetails?.progress }}%</strong> Project
+                        completed.</small>
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+
+              <!-- Right Info Column -->
+              <div class="w-full  mt-4 md:mt-0">
+                <dl class="space-y-3">
+                  <div class="flex">
+                    <dt class="w-32 font-medium text-[#0E264A]">Start Date :</dt>
+                    <dd class="text-[#7C6D84]">{{ projectDetails?.startDate | date }}</dd>
+                  </div>
+                  <div class="flex">
+                    <dt class="w-32 font-medium text-[#0E264A]">End Date :</dt>
+                    <dd class="text-[#7C6D84]">{{ projectDetails?.endDate | date}}</dd>
+                  </div>
+                  <!-- <div class="flex">
+                    <dt class="w-32 font-medium text-[#0E264A]">Deadline :</dt>
+                    <dd class="text-[#7C6D84]">{{ projectDetails?.endDate ? (projectDetails?.endDate | date:
+                      'dd-MM-yyyy') : 'No deadline' }}</dd>
+                  </div> -->
+                  <div class="flex">
+                    <dt class="w-32 font-medium text-[#0E264A]">Team :</dt>
+                    <dd class="text-[#7C6D84] font-medium">{{ projectDetails?.teamName }}</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project-Description -->
+      <div class="w-full md:w-3/12 px-3 mb-6">
+        <div class="bg-white rounded-lg shadow-xl">
+          <div class="p-4">
+            <div class="wrapper">
+              <h3 class="text-lg font-medium text-[#009F9F] mb-3">Project description :</h3>
+              <div id="Projectdes" class="prose max-w-none text-[#7C6D84] overflow-auto h-[7rem] md:h-[10rem]"
+                [innerHTML]="projectDetails?.description"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Row -->
+    <div class="flex flex-wrap -mx-3">
+      <!-- Client Details -->
+      <div class="w-full md:w-6/12 px-3 mb-6">
+        <div class="bg-white rounded-lg shadow-xl">
+          <div class="p-4">
+            <h3 class="text-lg font-medium text-[#009F9F] mb-3">Client Details :</h3>
+            <div class="space-y-2 ">
+              <p class="flex gap-2 text-[#7C6D84] "><b class="font-medium text-[#0E264A]">Client :</b> {{
+                projectDetails?.client_fullName }}</p>
+              <p class="flex gap-2 text-[#7C6D84] "><b class="font-medium text-[#0E264A]">Date :</b> {{
+                projectDetails?.client_date | date:'dd.MM.yyyy' }}</p>
+
+              <p class="flex gap-2 text-[#7C6D84] "><b class="font-medium text-[#0E264A]">Country :</b> {{
+                projectDetails?.client_country }}</p>
+              <p class="flex gap-2 text-[#7C6D84] "><b class="font-medium text-[#0E264A]">Address :</b> {{
+                projectDetails?.client_address || 'N/A' }}</p>
+              <p class="mb-0"><b class="font-medium">Budget:</b>
+                {{ projectDetails?.client_prize_tag === 'Hourly' ?
+                ( projectDetails?.client_prize_amount + '/hr') :
+                (projectDetails?.client_prize_amount + ' Monthly') }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project Tags -->
+      <div class="w-full md:w-6/12 px-3 mb-6">
+        <div class="bg-white rounded-lg shadow-xl">
+          <div class="p-4">
+            <h3 class="text-lg font-medium text-[#009F9F] mb-3">Project Tags :</h3>
+            <div class="flex flex-wrap gap-2">
+              <ng-container *ngIf="tags.length; else noTags">
+                <span *ngFor="let tag of tags" class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                  {{ tag }}
+                </span>
+              </ng-container>
+              <ng-template #noTags>
+                <p class="text-[#7C6D84]">No tags assigned.</p>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

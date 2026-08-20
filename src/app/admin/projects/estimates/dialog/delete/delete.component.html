@@ -1,0 +1,22 @@
+<h3 mat-dialog-title>Are you sure?</h3>
+<div mat-dialog-content>
+  <ul class="clearfix">
+    <li>
+      <p><span class="font-weight-bold"> Estimate ID: </span>{{data.eNo}}</p>
+    </li>
+    <li>
+      <p><span class="font-weight-bold"> Client Name: </span>{{ data.cName }}</p>
+    </li>
+    <li>
+      <p>
+        <span class="font-weight-bold">Status: </span>{{data.status}}
+      </p>
+    </li>
+  </ul>
+</div>
+<div mat-dialog-actions>
+  <button mat-raised-button color="warn" [mat-dialog-close]="1" (click)="confirmDelete()">
+    Delete
+  </button>
+  <button mat-raised-button (click)="onNoClick()" tabindex="-1">Cancel</button>
+</div>

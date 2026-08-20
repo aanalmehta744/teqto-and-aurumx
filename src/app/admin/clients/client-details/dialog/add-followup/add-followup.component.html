@@ -1,0 +1,70 @@
+<div class="bg-white rounded-lg shadow-md w-full max-w-4xl">
+  <!-- Header -->
+  <div class="flex justify-between items-center px-4 py-3 border-b">
+    <div class="text-lg font-semibold text-[#00383F]">Add Follow-up</div>
+    <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Form Content -->
+  <div mat-dialog-content class="p-6">
+    <form [formGroup]="followupForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <!-- Follow-up Date & Status -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Follow-up Date</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="followup_date" required />
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="followupForm.get('followup_date')?.hasError('required')">
+            Follow-up Date is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status" required>
+            <mat-option value="Hot">Hot</mat-option>
+            <mat-option value="Cold">Cold</mat-option>
+            <mat-option value="Closed">Closed</mat-option>
+          </mat-select>
+          <mat-error *ngIf="followupForm.get('status')?.hasError('required')">
+            Status is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Notes -->
+      <div>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Notes</mat-label>
+          <textarea matInput formControlName="notes" rows="4"></textarea>
+        </mat-form-field>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end gap-4">
+        <!-- <button mat-raised-button color="primary" type="submit" [disabled]="followupForm.invalid">
+          Add
+        </button>
+        <button mat-raised-button color="warn" (click)="onCancel()" type="button" tabindex="-1">
+          Cancel
+        </button> -->
+
+        <button mat-raised-button color="primary" type="submit" [disabled]="followupForm.invalid || isSubmitting">
+
+          <span *ngIf="!isSubmitting">Add</span>
+          <span *ngIf="isSubmitting">Saving...</span>
+        </button>
+
+
+        <button mat-raised-button color="warn" type="button" (click)="onCancel()" [disabled]="isSubmitting"
+          tabindex="-1">
+          Cancel
+        </button>
+
+      </div>
+    </form>
+  </div>
+</div>

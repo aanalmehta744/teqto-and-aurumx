@@ -1,0 +1,12 @@
+
+.angular/
+node_modules/
+dist/
+.env
+node_modules/
+dist/
+.angular/
+.env
+.DS_Store
+*.log
+

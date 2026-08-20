@@ -1,0 +1,93 @@
+<div class="addContainer bg-white rounded-lg shadow-lg p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div class="text-lg font-semibold text-gray-800">{{ dialogTitle }}</div>
+        <button (click)="dialogRef.close()" aria-label="Close dialog" class="text-gray-500 hover:text-gray-800">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="attendanceForm" (ngSubmit)="submit()" class="space-y-6">
+
+        <!-- Row 1: Employee Name + Date -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <mat-form-field appearance="outline" class="w-full ">
+                    <mat-label>Employee Name</mat-label>
+                    <input matInput formControlName="employeeName" class="p-2 border rounded-md w-full" readonly>
+                    <mat-icon matSuffix>perm_identity</mat-icon>
+                    <mat-error *ngIf="attendanceForm.get('employeeName')?.hasError('required')">
+                        Employee name is required
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field appearance="outline" class="w-full ">
+                    <mat-label>Date</mat-label>
+                    <input matInput [matDatepicker]="picker" formControlName="date" required
+                        class="p-2 border rounded-md w-full " readonly>
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                    <mat-error *ngIf="attendanceForm.get('date')?.hasError('required')">
+                        Date is required
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+
+        <!-- Row 2: Check-In + Check-Out -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Check-In</mat-label>
+                    <input matInput type="time" formControlName="checkIn" required class="p-2 border rounded-md w-full">
+                    <mat-icon matSuffix>login</mat-icon>
+                    <mat-error *ngIf="attendanceForm.get('checkIn')?.hasError('required')">
+                        Check-in time is required
+                    </mat-error>
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Check-Out</mat-label>
+                    <input matInput type="time" formControlName="checkOut" class="p-2 border rounded-md w-full">
+                    <mat-icon matSuffix>logout</mat-icon>
+                </mat-form-field>
+            </div>
+        </div>
+
+        <!-- Row 3: Break + Status -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Break (HH:MM:SS)</mat-label>
+                    <input matInput formControlName="break" class="p-2 border rounded-md w-full">
+                    <mat-icon matSuffix>free_breakfast</mat-icon>
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Status</mat-label>
+                    <mat-select formControlName="status" required>
+                        <mat-option value="Present">Present</mat-option>
+                        <mat-option value="Absent">Absent</mat-option>
+                        <mat-option value="Half Day">Half Day</mat-option>
+                    </mat-select>
+                    <mat-icon matSuffix>event_available</mat-icon>
+                    <mat-error *ngIf="attendanceForm.get('status')?.hasError('required')">
+                        Status is required
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-end gap-4">
+            <button mat-raised-button color="primary" [disabled]="!attendanceForm.valid" [mat-dialog-close]="1"
+                (click)="confirmEdit()">Save</button>
+            <button mat-raised-button color="warn" (click)="onNoClick()" tabindex="-1">Cancel</button>
+        </div>
+
+    </form>
+</div>
