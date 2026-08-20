@@ -1,0 +1,148 @@
+<section>
+  <div class="space-y-4">
+    <!-- Breadcrumb -->
+    <div>
+      <app-breadcrumb [title]="'My Tasks'" [items]="['Home']" [active_item]="'My Tasks'"></app-breadcrumb>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-white rounded-xl shadow">
+      <!-- Header -->
+      <div class="flex flex-col md:flex-row justify-between gap-4 mb-4 p-4 bg-white rounded-t-xl border-b border-gray-100">
+        <!-- Left Header -->
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+          <h2 class="text-xl font-medium text-gray-800">My Tasks</h2>
+          <div class="flex items-center justify-center">
+            <div
+              class="border border-[#CCCCCC] rounded-full bg-white flex items-center text-gray-500 shadow w-full max-w-md">
+              <mat-icon class="ms-3">search</mat-icon>
+              <input type="text" #filter
+                class="w-full h-[40px] rounded-full ps-2 focus:outline-none placeholder:text-[16px]"
+                placeholder="Search" matInput (keyup)="applyFilter($event)" id="inputoutline" aria-label="Search box">
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Header -->
+        <div class="flex items-center flex-wrap gap-2">
+          <button mat-mini-fab color="primary" class="!bg-[#d6d5ea] hover:!bg-gray-100 !text-[#00383F]"
+            (click)="refresh()" matTooltip="REFRESH">
+            <mat-icon>refresh</mat-icon>
+          </button>
+          <button *ngIf="selection.hasValue()" mat-mini-fab color="warn"
+            class="!bg-[#d6d5ea] hover:!bg-gray-100 !text-[#00383F]" (click)="removeSelectedRows()" matTooltip="DELETE">
+            <mat-icon>delete</mat-icon>
+          </button>
+          <div class="cursor-pointer p-2 rounded-xl bg-[#d6d5ea] hover:bg-gray-100 shadow-xl" matTooltip="XLSX"
+            (click)="exportExcel()">
+            <img src="assets/images/icons/xlsx.png" alt="Export Excel" class="h-6 w-6" />
+          </div>
+        </div>
+      </div>
+      <!-- Grouped Table -->
+      <div class="overflow-x-auto">
+        <div *ngFor="let group of groupedTasks" class="p-4">
+          <h6 class="text-lg font-medium text-[#009F9F] mb-2">
+            {{ group.date | date: "MMM d, y '('EEE')'" }}
+          </h6>
+
+          <table mat-table [dataSource]="group.tasks" class="mat-elevation-z1 w-full mb-6">
+
+            <!-- Title Column -->
+            <ng-container matColumnDef="title">
+              <th mat-header-cell *matHeaderCellDef>Title</th>
+              <td mat-cell *matCellDef="let row">{{ row.title }}</td>
+            </ng-container>
+
+            <!-- Project Column -->
+            <ng-container matColumnDef="project">
+              <th mat-header-cell *matHeaderCellDef>Project</th>
+              <td mat-cell *matCellDef="let row">{{ row.projectTitle }}</td>
+            </ng-container>
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let row">
+                <div class="status-pill" [ngClass]="{
+        'pill-open-today': row.done === 0 && isToday(row.create_date),
+        'pill-due-today': row.done === 0 && isToday(row.due_date) && !isToday(row.create_date),
+        'pill-overdue': row.done === 0 && isOverdue(row.due_date),
+        'pill-closed': row.done === 1
+      }">
+                  <div>{{ row.done === 0 ? 'Open' : 'Closed' }}</div>
+                  <div *ngIf="row.done === 0">
+                    <ng-container *ngIf="isToday(row.create_date)">
+                      (Today)
+                    </ng-container>
+                    <ng-container *ngIf="isToday(row.due_date) && !isToday(row.create_date)">
+                      (Due Today)
+                    </ng-container>
+                    <ng-container *ngIf="isOverdue(row.due_date) && !isToday(row.due_date)">
+                      (Overdue)
+                    </ng-container>
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Priority Column -->
+            <ng-container matColumnDef="priority">
+              <th mat-header-cell *matHeaderCellDef>Priority</th>
+              <td mat-cell *matCellDef="let row">{{ row.priority }}</td>
+            </ng-container>
+
+            <!-- Details Column -->
+            <!-- Details Column -->
+            <ng-container matColumnDef="details">
+              <th mat-header-cell *matHeaderCellDef>Details</th>
+              <td mat-cell *matCellDef="let row">
+                <div>
+                  <div [innerHTML]="
+          row.showMore
+            ? row.note
+            : (row.note | slice:0:100) + (row.note?.length > 100 ? '...' : '')
+        "></div>
+
+                  <!-- Toggle Button -->
+                  <button *ngIf="row.note?.length > 100" mat-button color="primary" class="p-0 min-h-0 leading-tight"
+                    (click)="toggleShowMore(row)">
+                    {{ row.showMore ? 'Show less' : 'Show more' }}
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+
+            <!-- Due Date Column -->
+            <ng-container matColumnDef="due_date">
+              <th mat-header-cell *matHeaderCellDef>Due Date</th>
+              <td mat-cell *matCellDef="let row">{{ row.due_date | date:'MMM d, y' }}</td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let row">
+                <button mat-icon-button color="accent" (click)="editCall(row)" matTooltip="Edit">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <!-- <button mat-icon-button color="warn" (click)="deleteItem(row)" matTooltip="Delete">
+                  <mat-icon>delete</mat-icon>
+                </button> -->
+              </td>
+            </ng-container>
+
+            <!-- Header and Row Definitions -->
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="cursor-pointer hover:bg-gray-100"
+              (click)="detailsCall(row)"></tr>
+          </table>
+        </div>
+      </div>
+      <!-- No Results -->
+      <div class="text-center py-4 text-gray-500 text-sm" *ngIf="groupedTasks.length === 0">
+        No results
+      </div>
+
+    </div>
+  </div>
+</section>

@@ -1,0 +1,23 @@
+<h3 mat-dialog-title class="text-xl font-semibold text-gray-800 mb-4">Are you sure?</h3>
+<div mat-dialog-content class="space-y-2">
+  <ul class="space-y-1">
+    <li>
+      <p><span class="font-semibold text-gray-700"> Name: </span>{{data.fullName}}</p>
+    </li>
+    <li>
+      <p><span class="font-semibold text-gray-700"> Department: </span>{{ data.department }}</p>
+    </li>
+    <li>
+      <p>
+        <span class="font-semibold text-gray-700">Mobile: </span>{{data.mobile}}
+      </p>
+    </li>
+  </ul>
+</div>
+
+<div mat-dialog-actions class="mt-4 flex justify-end gap-3">
+  <button mat-raised-button color="warn" [mat-dialog-close]="1" (click)="confirmDelete()">
+    Delete
+  </button>
+  <button mat-raised-button (click)="onNoClick()" tabindex="-1">Cancel</button>
+</div>

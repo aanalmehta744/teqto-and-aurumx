@@ -1,0 +1,111 @@
+<section>
+  <div class="mx-auto space-y-5">
+    <app-breadcrumb [title]="'Employee Salary'" [items]="['Payroll']" [active_item]="'Employee Salary'"></app-breadcrumb>
+
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+      <!-- Header -->
+      <div class="flex flex-col md:flex-row justify-between items-center px-5 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-4 mb-3 md:mb-0">
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-[#0b0b88]"></span>
+            <h6 class="text-sm font-semibold text-[#1B1B2F]">Employee Salary</h6>
+          </div>
+          <div class="relative">
+            <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 !text-[18px]">search</mat-icon>
+            <input type="text"
+              class="pl-9 pr-4 py-2 rounded-full border border-gray-200 bg-gray-50 text-sm focus:outline-none w-[220px] placeholder:text-gray-400"
+              placeholder="Search…" matInput #filter (keyup)="applyFilter($event)" id="inputoutline">
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button mat-mini-fab class="!bg-[#d6d5ea] !shadow-none hover:!bg-gray-100" (click)="refresh()" matTooltip="REFRESH">
+            <mat-icon class="!text-[#00383F]">refresh</mat-icon>
+          </button>
+          <button mat-mini-fab class="!bg-[#d6d5ea] !shadow-none hover:!bg-gray-100" [hidden]="!selection.hasValue()" color="warn" (click)="removeSelectedRows()" matTooltip="DELETE">
+            <mat-icon class="!text-[#00383F]">delete</mat-icon>
+          </button>
+          <div class="cursor-pointer p-2 rounded-xl bg-[#d6d5ea] hover:bg-gray-100" matTooltip="XLSX" (click)="exportExcel()">
+            <img src="assets/images/icons/xlsx.png" alt="Export to XLSX" class="w-6 h-6" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="overflow-auto">
+        <table mat-table [dataSource]="dataSource" matSort class="w-full">
+
+          <ng-container matColumnDef="id">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Id</mat-header-cell>
+            <mat-cell *matCellDef="let row">{{row.id}}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
+            <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)" class="font-medium text-[#1B1B2F]">{{row.fullName}}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="email">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Email</mat-header-cell>
+            <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)" class="text-gray-600">{{row.email}}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="department">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Department</mat-header-cell>
+            <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">{{row.department}}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="role">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Role</mat-header-cell>
+            <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">{{row.role}}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="salary">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Salary</mat-header-cell>
+            <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)" class="font-semibold text-[#1B1B2F]">{{row.salary}}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="payslip">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Payslip</mat-header-cell>
+            <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
+              <button mat-icon-button color="accent" class="tbl-action-btn"
+                (click)="$event.stopPropagation(); downloadCall(row)">
+                <app-feather-icons [icon]="'download'" [class]="'col-green'" matTooltip="Download"></app-feather-icons>
+              </button>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef class="pr-0">Actions</mat-header-cell>
+            <mat-cell *matCellDef="let row; let i=index;" class="pr-0 flex items-center gap-1">
+              <button mat-icon-button color="accent" (click)="$event.stopPropagation(); editCall(row)" class="tbl-action-btn" matTooltip="Edit">
+                <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'"></app-feather-icons>
+              </button>
+              <button mat-icon-button color="warn" (click)="$event.stopPropagation(); deleteItem(i, row)" class="tbl-action-btn" matTooltip="Delete">
+                <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'"></app-feather-icons>
+              </button>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns;" class="cursor-pointer hover:bg-gray-50 transition-colors" matRipple></mat-row>
+        </table>
+
+        @if (exampleDatabase?.isTblLoading) {
+          <div class="flex justify-center items-center py-8">
+            <mat-progress-spinner color="primary" [diameter]="36" mode="indeterminate"></mat-progress-spinner>
+          </div>
+        }
+        @if (!exampleDatabase?.isTblLoading) {
+          <div class="py-8 text-center text-gray-400 text-sm" [class.hidden]="dataSource.renderedData.length !== 0">
+            No salary records found
+          </div>
+        }
+      </div>
+
+      <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0" [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25, 100]" class="!border-t border-gray-100 !bg-white"></mat-paginator>
+    </div>
+  </div>
+</section>

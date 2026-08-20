@@ -1,0 +1,15 @@
+button.mat-flat-button {
+    font-weight: 600;
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 6px;
+  }
+  .disabled-row {
+    background-color: #f0f0f0; /* You can adjust this color as needed */
+    color: #ccc; /* Change text color to indicate disabled state */
+    pointer-events: none; /* Disable clicking or interactions */
+  }
+  
+  .disabled-row td {
+    opacity: 0.6; /* Lower opacity to visually indicate that it's disabled */
+  }
