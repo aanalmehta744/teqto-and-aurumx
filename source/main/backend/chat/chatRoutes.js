@@ -1,16 +1,9 @@
 const express = require("express");
 const router = express.Router();
-
 const db = require("../connection");
 const { getIO } = require("../socket");
 const { createUpload } = require("../cloudinary");
 const upload = createUpload("chat_attachments");
-
-/*                                                                         |
-| -------------------------------------------------------------------------- |
-| Get All Users                                                              |
-| -------------------------------------------------------------------------- |
-| */                                                                         
 
 router.get("/users", async (req, res) => {
 try {
@@ -32,12 +25,6 @@ res.status(500).json({
 
 }
 });
-
- /*                                                                         |
-| -------------------------------------------------------------------------- |
-| Create / Get Direct Conversation                                           |
-| -------------------------------------------------------------------------- |
-| */                                                                         
 
 router.post("/conversation/direct", async (req, res) => {
 try {
@@ -97,13 +84,7 @@ res.status(500).json({
 
 
 }
-});
-
- /*                                                                         |
-| -------------------------------------------------------------------------- |
-| Create Group Conversation                                                  |
-| -------------------------------------------------------------------------- |
-| */                                                                         
+});                                                                       
 
 router.post("/conversation/group", async (req, res) => {
 const connection = await db.getConnection();
@@ -130,8 +111,6 @@ const conversationId = groupResult.insertId;
 const uniqueMembers = Array.from(
   new Set([...members, created_by])
 );
-// combines the members array with the creator's ID, removes duplicates, 
-// and ensures the creator is part of the group.
 
 const memberRows = uniqueMembers.map(memberId => [
   conversationId, memberId
@@ -165,19 +144,19 @@ connection.release();
 }
 });
 
-/*                                                                         |
-| -------------------------------------------------------------------------- |
-| Send Message                                                               |
-| -------------------------------------------------------------------------- |
-| */                                                                         
-
-router.post("/message", upload.single("attachment"), async (req, res) => {
+router.post("/message", (req, res, next) => {
+  upload.single("attachment")(req, res, (err) => {
+    if (err) {
+      console.error("Upload Error:", err);
+      return res.status(400).json({ error: err.message || "File upload failed" });
+    }
+    next();
+  });
+}, async (req, res) => {
 try {
-const {
-conversation_id,
-sender_id,
-message
-} = req.body;
+const conversation_id = Number(req.body.conversation_id);
+const sender_id = Number(req.body.sender_id);
+const message = req.body.message;
 
 const trimmedMessage = (message || "").trim();
 const attachmentUrl = req.file ? (req.file.path || req.file.filename) : null;
@@ -249,7 +228,6 @@ res.status(500).json({
 
 }
 });
-                                                                       
 
 router.get("/message/:conversationId", async (req, res) => {
 try {
@@ -286,12 +264,6 @@ res.status(500).json({
 
 }
 });
-
- /*                                                                         |
-| -------------------------------------------------------------------------- |
-| Get User Conversations                                                     |
-| -------------------------------------------------------------------------- |
-| */                                                                         
 
 router.get("/conversations/:employeeId", async (req, res) => {
 try {

@@ -417,7 +417,7 @@ app.use("/api/chat", chatRoutes);
 
 // Default error handling middleware
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    console.error("Unhandled Error:", err);
     res.status(500).send({ message: 'Internal Server Error' });
 });
 
