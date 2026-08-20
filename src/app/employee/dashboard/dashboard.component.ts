@@ -303,91 +303,224 @@ isBreakGreaterThanOneHour(
   }
 
   // FIXED: Process attendance record with proper timer logic
+  // private processAttendanceRecord(record: any): void {
+  //   const {
+  //     status,
+  //     check_in,
+  //     break: breakTime,
+  //     is_paused,
+  //     pause_start,
+  //     elapsed_time,
+  //     check_out,
+  //     hours
+  //   } = record;
+  //   this.activeAttendance = record;
+  //   // Stop any existing timer first
+  //   this.stopTimer();
+
+  //   // Set basic attendance info
+  //   this.attendanceStatus = status || 'Absent';
+  //   this.checkInTime = check_in ? new Date(check_in).toLocaleTimeString() : '--';
+  //   this.isCheckedOut = !!check_out;
+
+  //   console.log('Processing attendance record:', {
+  //     status,
+  //     check_out,
+  //     hours,
+  //     isCheckedOut: this.isCheckedOut,
+  //     is_paused
+  //   });
+
+  //   // If not present, show absent state
+  //   if (status !== 'Present') {
+  //     this.liveTimer = '00:00:00';
+  //     this.isPaused = false;
+  //     this.isTiming = false;
+  //     this.cdr.detectChanges();
+  //     return;
+  //   }
+  //   if (!this.isCheckedOut && status === 'Present') {
+  //     this.stopCheckoutPolling();
+  //     this.startCheckoutPolling();
+  //   }
+  //   // If already checked out, show final hours and stop timer
+  //   if (check_out) {
+  //     this.stopTimer();
+  //     this.stopCheckoutPolling();
+  //     this.isCheckedOut = true;
+  //     this.attendanceStatus = 'Checked Out';
+  //     this.liveTimer = hours || '00:00:00';
+  //     this.isPaused = false;
+  //     this.isTiming = false;
+  //     this.activeAttendance = record; // ✅ keep for later
+  //     console.log('CHECKED OUT (final lock) - Timer frozen at:', this.liveTimer);
+  //     this.cdr.detectChanges();
+  //     return; // ✅ don’t continue
+  //   }
+
+
+  //   // Still working - initialize timer properties
+  //   this.startTime = new Date(check_in).getTime();
+  //   this.breakDuration = this.parseTimeToMs(breakTime || '00:00:00');
+  //   this.totalElapsedTime = elapsed_time || 0;
+  //   this.isPaused = !!is_paused; // Ensure boolean conversion
+  //   this.isTiming = true;
+
+  //   console.log('Timer State:', {
+  //     startTime: new Date(this.startTime),
+  //     breakDuration: this.breakDuration,
+  //     totalElapsedTime: this.totalElapsedTime,
+  //     isPaused: this.isPaused,
+  //     isCheckedOut: this.isCheckedOut
+  //   });
+
+  //   if (this.isPaused && pause_start) {
+  //     // Timer is paused - calculate elapsed time up to pause point
+  //     this.pauseStart = new Date(pause_start).getTime();
+  //     const elapsedUntilPause = this.pauseStart - this.startTime - this.breakDuration + this.totalElapsedTime;
+  //     this.liveTimer = this.formatMilliseconds(Math.max(0, elapsedUntilPause));
+
+  //     console.log('Timer PAUSED at:', this.liveTimer);
+  //     // Don't start interval when paused - THIS IS KEY
+  //   } else {
+  //     // Timer is running - start the live timer
+  //     console.log('Timer RUNNING - starting interval');
+  //     this.startTimerInterval();
+  //   }
+  // }
   private processAttendanceRecord(record: any): void {
-    const {
-      status,
-      check_in,
-      break: breakTime,
-      is_paused,
-      pause_start,
-      elapsed_time,
-      check_out,
-      hours
-    } = record;
-    this.activeAttendance = record;
-    // Stop any existing timer first
-    this.stopTimer();
+  const {
+    status,
+    check_in,
+    break: breakTime,
+    is_paused,
+    pause_start,
+    elapsed_time,
+    check_out,
+    hours
+  } = record;
 
-    // Set basic attendance info
-    this.attendanceStatus = status || 'Absent';
-    this.checkInTime = check_in ? new Date(check_in).toLocaleTimeString() : '--';
-    this.isCheckedOut = !!check_out;
+  this.activeAttendance = record;
 
-    console.log('Processing attendance record:', {
-      status,
-      check_out,
-      hours,
-      isCheckedOut: this.isCheckedOut,
-      is_paused
-    });
+  // Stop previous timer before processing the new record
+  this.stopTimer();
 
-    // If not present, show absent state
-    if (status !== 'Present') {
-      this.liveTimer = '00:00:00';
-      this.isPaused = false;
-      this.isTiming = false;
-      this.cdr.detectChanges();
-      return;
-    }
-    if (!this.isCheckedOut && status === 'Present') {
-      this.stopCheckoutPolling();
-      this.startCheckoutPolling();
-    }
-    // If already checked out, show final hours and stop timer
-    if (check_out) {
-      this.stopTimer();
-      this.stopCheckoutPolling();
-      this.isCheckedOut = true;
-      this.attendanceStatus = 'Checked Out';
-      this.liveTimer = hours || '00:00:00';
-      this.isPaused = false;
-      this.isTiming = false;
-      this.activeAttendance = record; // ✅ keep for later
-      console.log('CHECKED OUT (final lock) - Timer frozen at:', this.liveTimer);
-      this.cdr.detectChanges();
-      return; // ✅ don’t continue
-    }
+  this.attendanceStatus = status || 'Absent';
+  this.checkInTime = check_in
+    ? new Date(check_in).toLocaleTimeString()
+    : '--';
 
+  this.isCheckedOut = !!check_out;
 
-    // Still working - initialize timer properties
-    this.startTime = new Date(check_in).getTime();
-    this.breakDuration = this.parseTimeToMs(breakTime || '00:00:00');
-    this.totalElapsedTime = elapsed_time || 0;
-    this.isPaused = !!is_paused; // Ensure boolean conversion
-    this.isTiming = true;
+  console.log('Processing attendance record:', {
+    status,
+    check_in,
+    check_out,
+    hours,
+    breakTime,
+    elapsed_time,
+    is_paused
+  });
 
-    console.log('Timer State:', {
-      startTime: new Date(this.startTime),
-      breakDuration: this.breakDuration,
-      totalElapsedTime: this.totalElapsedTime,
-      isPaused: this.isPaused,
-      isCheckedOut: this.isCheckedOut
-    });
-
-    if (this.isPaused && pause_start) {
-      // Timer is paused - calculate elapsed time up to pause point
-      this.pauseStart = new Date(pause_start).getTime();
-      const elapsedUntilPause = this.pauseStart - this.startTime - this.breakDuration + this.totalElapsedTime;
-      this.liveTimer = this.formatMilliseconds(Math.max(0, elapsedUntilPause));
-
-      console.log('Timer PAUSED at:', this.liveTimer);
-      // Don't start interval when paused - THIS IS KEY
-    } else {
-      // Timer is running - start the live timer
-      console.log('Timer RUNNING - starting interval');
-      this.startTimerInterval();
-    }
+  // =========================================================
+  // NO CHECK-IN = NO WORKED TIME
+  // =========================================================
+  if (!check_in) {
+    this.liveTimer = '00:00:00';
+    this.isPaused = false;
+    this.isTiming = false;
+    this.isCheckedOut = false;
+    this.cdr.detectChanges();
+    return;
   }
+
+  // =========================================================
+  // ALREADY CHECKED OUT
+  // Show final worked hours from database
+  // =========================================================
+  if (check_out) {
+    this.stopTimer();
+    this.stopCheckoutPolling();
+
+    this.isCheckedOut = true;
+    this.attendanceStatus = 'Checked Out';
+    this.liveTimer = hours || '00:00:00';
+    this.isPaused = false;
+    this.isTiming = false;
+
+    console.log(
+      'CHECKED OUT - Final worked time:',
+      this.liveTimer
+    );
+
+    this.cdr.detectChanges();
+    return;
+  }
+
+  // =========================================================
+  // USER HAS CHECKED IN
+  // This works for BOTH Present and Half Day
+  // =========================================================
+  this.startTime = new Date(check_in).getTime();
+
+  this.breakDuration = this.parseTimeToMs(
+    breakTime || '00:00:00'
+  );
+
+  // this.totalElapsedTime =
+  //   typeof elapsed_time === 'number'
+  //     ? elapsed_time
+  //     : this.parseTimeToMs(elapsed_time || '00:00:00');
+
+  this.totalElapsedTime = 0;
+  
+  this.isPaused = !!is_paused;
+  this.isTiming = true;
+  this.isCheckedOut = false;
+
+  console.log('Timer State:', {
+    startTime: new Date(this.startTime),
+    breakDuration: this.breakDuration,
+    totalElapsedTime: this.totalElapsedTime,
+    isPaused: this.isPaused,
+    status: this.attendanceStatus
+  });
+
+  // =========================================================
+  // CURRENTLY ON BREAK
+  // =========================================================
+  if (this.isPaused && pause_start) {
+    this.pauseStart = new Date(pause_start).getTime();
+
+    const elapsedUntilPause =
+      this.pauseStart -
+      this.startTime -
+      this.breakDuration +
+      this.totalElapsedTime;
+
+    this.liveTimer = this.formatMilliseconds(
+      Math.max(0, elapsedUntilPause)
+    );
+
+    console.log(
+      'Timer PAUSED at:',
+      this.liveTimer
+    );
+
+    this.cdr.detectChanges();
+    return;
+  }
+
+  // =========================================================
+  // CURRENTLY WORKING
+  // Works for Present AND Half Day
+  // =========================================================
+  this.startTimerInterval();
+
+  this.startCheckoutPolling();
+
+  this.cdr.detectChanges();
+}
 
   public handlePauseStateChange(isPaused: boolean): void {
     console.log('Pause state changed to:', isPaused);
@@ -405,34 +538,82 @@ isBreakGreaterThanOneHour(
     }
   }
   // FIXED: Start timer interval with proper pause handling
-  private startTimerInterval(): void {
-    this.stopTimer(); // Clear any existing interval
+  // private startTimerInterval(): void {
+  //   this.stopTimer(); // Clear any existing interval
 
-    this.timerInterval = setInterval(() => {
-      this.ngZone.run(() => {
-        // IMPORTANT: Stop timer if checked out
-        if (this.isCheckedOut) {
-          console.log('Detected checkout during timer - stopping');
-          this.stopTimer();
-          return;
-        }
+  //   this.timerInterval = setInterval(() => {
+  //     this.ngZone.run(() => {
+  //       // IMPORTANT: Stop timer if checked out
+  //       if (this.isCheckedOut) {
+  //         console.log('Detected checkout during timer - stopping');
+  //         this.stopTimer();
+  //         return;
+  //       }
 
-        // CRITICAL FIX: Check if paused and stop interval immediately
-        if (this.isPaused) {
-          console.log('Timer paused - stopping interval');
-          this.stopTimer(); // Stop the interval when paused
-          return;
-        }
+  //       // CRITICAL FIX: Check if paused and stop interval immediately
+  //       if (this.isPaused) {
+  //         console.log('Timer paused - stopping interval');
+  //         this.stopTimer(); // Stop the interval when paused
+  //         return;
+  //       }
 
-        const now = Date.now();
-        const currentSessionTime = now - this.startTime - this.breakDuration;
-        const totalTime = this.totalElapsedTime + currentSessionTime;
+  //       const now = Date.now();
+  //       const currentSessionTime = now - this.startTime - this.breakDuration;
+  //       const totalTime = this.totalElapsedTime + currentSessionTime;
 
-        this.liveTimer = this.formatMilliseconds(Math.max(0, totalTime));
-      });
-    }, 1000);
+  //       this.liveTimer = this.formatMilliseconds(Math.max(0, totalTime));
+  //     });
+  //   }, 1000);
+  // }
+private startTimerInterval(): void {
+  this.stopTimer();
+
+  if (!this.startTime || this.isCheckedOut || this.isPaused) {
+    console.log('Timer NOT started:', {
+      startTime: this.startTime,
+      isCheckedOut: this.isCheckedOut,
+      isPaused: this.isPaused
+    });
+    return;
   }
 
+  const updateTimer = () => {
+    this.ngZone.run(() => {
+      if (this.isCheckedOut) {
+        this.stopTimer();
+        return;
+      }
+
+      if (this.isPaused) {
+        this.stopTimer();
+        return;
+      }
+
+      const now = Date.now();
+
+      const workedMs =
+        now -
+        this.startTime -
+        this.breakDuration;
+
+      this.liveTimer = this.formatMilliseconds(
+        Math.max(0, workedMs)
+      );
+
+      console.log('LIVE TIMER:', this.liveTimer);
+
+      this.cdr.detectChanges();
+    });
+  };
+
+  // Calculate immediately
+  updateTimer();
+
+  // Then update every second
+  this.timerInterval = setInterval(updateTimer, 1000);
+
+  console.log('TIMER INTERVAL STARTED');
+}
   // FIXED: Reset timer state
   private resetTimerState(): void {
     this.stopTimer();
@@ -456,20 +637,40 @@ isBreakGreaterThanOneHour(
     }
   }
 
-  private startCheckoutPolling(): void {
-    // Only start polling if user is present and timer is running
-    if (this.attendanceStatus !== 'Present' || !this.isTiming) {
-      return;
-    }
+  // private startCheckoutPolling(): void {
+  //   // Only start polling if user is present and timer is running
+  //   if (this.attendanceStatus !== 'Present' || !this.isTiming) {
+  //     return;
+  //   }
 
-    this.checkoutPollingInterval = setInterval(() => {
-      // Only check if currently timing and not checked out
-      if (this.isTiming && !this.isCheckedOut && this.userData?.id) {
-        this.checkForCheckout();
-      }
-    }, 30000); // Check every 30 seconds
-  }
+  //   this.checkoutPollingInterval = setInterval(() => {
+  //     // Only check if currently timing and not checked out
+  //     if (this.isTiming && !this.isCheckedOut && this.userData?.id) {
+  //       this.checkForCheckout();
+  //     }
+  //   }, 30000); // Check every 30 seconds
+  // }
   // Check if user has been checked out
+  
+  
+  
+  private startCheckoutPolling(): void {
+  if (!this.isTiming || this.isCheckedOut) {
+    return;
+  }
+
+  this.stopCheckoutPolling();
+
+  this.checkoutPollingInterval = setInterval(() => {
+    if (
+      this.isTiming &&
+      !this.isCheckedOut &&
+      this.userData?.id
+    ) {
+      this.checkForCheckout();
+    }
+  }, 30000);
+}
   private checkForCheckout(): void {
     this.attendanceService.getAllAttendancess(this.userData.id)
       .pipe(takeUntil(this.destroy$))

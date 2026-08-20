@@ -176,13 +176,20 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     // If not present, show absent state
-    if (status !== 'Present') {
-      this.liveTimer = '00:00:00';
-      this.isPaused = false;
-      this.isTiming = false;
-      this.cdr.detectChanges();
-      return;
-    }
+    // if (status !== 'Present') {
+    //   this.liveTimer = '00:00:00';
+    //   this.isPaused = false;
+    //   this.isTiming = false;
+    //   this.cdr.detectChanges();
+    //   return;
+    // }
+    if (!check_in) {
+  this.liveTimer = '00:00:00';
+  this.isPaused = false;
+  this.isTiming = false;
+  this.cdr.detectChanges();
+  return;
+}
     if (!this.isCheckedOut && status === 'Present') {
       this.stopCheckoutPolling();
       this.startCheckoutPolling();
@@ -204,11 +211,23 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
     // Still working - initialize timer properties
+    // this.startTime = new Date(check_in).getTime();
+    // this.breakDuration = this.parseTimeToMs(breakTime || '00:00:00');
+    // this.totalElapsedTime = elapsed_time || 0;
+    // this.isPaused = !!is_paused; // Ensure boolean conversion
+    // this.isTiming = true;
     this.startTime = new Date(check_in).getTime();
-    this.breakDuration = this.parseTimeToMs(breakTime || '00:00:00');
-    this.totalElapsedTime = elapsed_time || 0;
-    this.isPaused = !!is_paused; // Ensure boolean conversion
-    this.isTiming = true;
+
+this.breakDuration = this.parseTimeToMs(
+  breakTime || '00:00:00'
+);
+
+// For live dashboard timer, calculate directly
+// from punch-in time. Do not add elapsed_time again.
+this.totalElapsedTime = 0;
+
+this.isPaused = !!is_paused;
+this.isTiming = true;
 
     console.log('Timer State:', {
       startTime: new Date(this.startTime),
@@ -249,34 +268,76 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
   // FIXED: Start timer interval with proper pause handling
+  // private startTimerInterval(): void {
+  //   this.stopTimer(); // Clear any existing interval
+
+  //   this.timerInterval = setInterval(() => {
+  //     this.ngZone.run(() => {
+  //       // IMPORTANT: Stop timer if checked out
+  //       if (this.isCheckedOut) {
+  //         console.log('Detected checkout during timer - stopping');
+  //         this.stopTimer();
+  //         return;
+  //       }
+
+  //       // CRITICAL FIX: Check if paused and stop interval immediately
+  //       if (this.isPaused) {
+  //         console.log('Timer paused - stopping interval');
+  //         this.stopTimer(); // Stop the interval when paused
+  //         return;
+  //       }
+
+  //       const now = Date.now();
+  //       const currentSessionTime = now - this.startTime - this.breakDuration;
+  //       const totalTime = this.totalElapsedTime + currentSessionTime;
+
+  //       this.liveTimer = this.formatMilliseconds(Math.max(0, totalTime));
+  //     });
+  //   }, 1000);
+  // }
+
   private startTimerInterval(): void {
-    this.stopTimer(); // Clear any existing interval
+  this.stopTimer();
 
-    this.timerInterval = setInterval(() => {
-      this.ngZone.run(() => {
-        // IMPORTANT: Stop timer if checked out
-        if (this.isCheckedOut) {
-          console.log('Detected checkout during timer - stopping');
-          this.stopTimer();
-          return;
-        }
-
-        // CRITICAL FIX: Check if paused and stop interval immediately
-        if (this.isPaused) {
-          console.log('Timer paused - stopping interval');
-          this.stopTimer(); // Stop the interval when paused
-          return;
-        }
-
-        const now = Date.now();
-        const currentSessionTime = now - this.startTime - this.breakDuration;
-        const totalTime = this.totalElapsedTime + currentSessionTime;
-
-        this.liveTimer = this.formatMilliseconds(Math.max(0, totalTime));
-      });
-    }, 1000);
+  // Don't start a timer if we don't have a valid punch-in time
+  if (!this.startTime || this.isCheckedOut || this.isPaused) {
+    return;
   }
 
+  const updateTimer = () => {
+    this.ngZone.run(() => {
+      if (this.isCheckedOut) {
+        this.stopTimer();
+        return;
+      }
+
+      // If employee is on break, freeze the displayed worked time.
+      if (this.isPaused) {
+        this.stopTimer();
+        return;
+      }
+
+      const now = Date.now();
+
+      // Actual time worked since punch-in
+      const workedMs =
+        now -
+        this.startTime -
+        this.breakDuration;
+
+      this.liveTimer = this.formatMilliseconds(
+        Math.max(0, workedMs)
+      );
+
+      this.cdr.detectChanges();
+    });
+  };
+
+  // Show immediately instead of waiting 1 second
+  updateTimer();
+
+  this.timerInterval = setInterval(updateTimer, 1000);
+}
   // FIXED: Reset timer state
   private resetTimerState(): void {
     this.stopTimer();
@@ -382,11 +443,46 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Parse time string to milliseconds
-  parseTimeToMs(timeStr: string): number {
-    if (!timeStr || timeStr === '00:00:00') return 0;
-    const [h, m, s] = timeStr.split(':').map(Number);
-    return ((h * 3600) + (m * 60) + s) * 1000;
+  // parseTimeToMs(timeStr: string): number {
+  //   if (!timeStr || timeStr === '00:00:00') return 0;
+  //   const [h, m, s] = timeStr.split(':').map(Number);
+  //   return ((h * 3600) + (m * 60) + s) * 1000;
+  // }
+  parseTimeToMs(timeValue: any): number {
+  if (
+    timeValue === null ||
+    timeValue === undefined ||
+    timeValue === ''
+  ) {
+    return 0;
   }
+
+  // Backend may return seconds as a number
+  if (typeof timeValue === 'number') {
+    return timeValue * 1000;
+  }
+
+  const value = String(timeValue).trim();
+
+  if (!value || value === '00:00:00') {
+    return 0;
+  }
+
+  const parts = value.split(':').map(Number);
+
+  if (parts.length === 3) {
+    const [hours, minutes, seconds] = parts;
+
+    return (
+      (hours * 3600 +
+        minutes * 60 +
+        seconds) *
+      1000
+    );
+  }
+
+  return 0;
+}
 
 
   // ✅ Load clients

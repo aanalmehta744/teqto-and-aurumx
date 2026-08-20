@@ -176,32 +176,85 @@ export class SidebarComponent
       // Admin sees only Admin items. All other users use role=Employee and
       // their department (HR, BDE, BA, Backend Developer, Frontend Developer,
       // Fullstack Developer or Graphic).
+      // this.sidebarItems = ROUTES.filter(item => {
+      //   const roles = (item.role ?? []).map(r => r.toLowerCase().trim());
+      //   const depts = (item.department ?? []).map(d => d.toLowerCase().trim());
+
+      //   if (userRole === 'admin') {
+      //     return roles.includes('admin') || roles.includes('all');
+      //   }
+
+      //   if (userRole !== 'employee') {
+      //     return false;
+      //   }
+
+      //   const roleMatch = roles.includes('employee') || roles.includes('all');
+      //   if (!roleMatch) {
+      //     return false;
+      //   }
+
+      //   // Empty department = not department-restricted.
+      //   // 'all' = available to every Employee department.
+      //   const departmentMatch =
+      //     depts.length === 0 ||
+      //     depts.includes('all') ||
+      //     depts.includes(userDepartment);
+
+      //   return departmentMatch;
+      // });
       this.sidebarItems = ROUTES.filter(item => {
-        const roles = (item.role ?? []).map(r => r.toLowerCase().trim());
-        const depts = (item.department ?? []).map(d => d.toLowerCase().trim());
+  const roles = (item.role ?? []).map(r => r.toLowerCase().trim());
+  const depts = (item.department ?? []).map(d => d.toLowerCase().trim());
 
-        if (userRole === 'admin') {
-          return roles.includes('admin') || roles.includes('all');
-        }
+  // Task → only Admin, HR, or Senior
+  if (item.path === 'task') {
+    return (
+      userRole === 'admin' ||
+      userDepartment === 'hr' ||
+      user.employee_level?.toLowerCase().trim() === 'senior'
+    );
+  }
 
-        if (userRole !== 'employee') {
-          return false;
-        }
+  // Admin can only see Admin menus
+  if (userRole === 'admin') {
+    return roles.includes('admin');
+  }
 
-        const roleMatch = roles.includes('employee') || roles.includes('all');
-        if (!roleMatch) {
-          return false;
-        }
+  // All non-admin users must have Employee role
+  if (userRole === 'employee') {
+    // HR employee
+    if (userDepartment === 'hr') {
+      return (
+        roles.includes('employee') &&
+        depts.includes('hr')
+      );
+    }
 
-        // Empty department = not department-restricted.
-        // 'all' = available to every Employee department.
-        const departmentMatch =
-          depts.length === 0 ||
-          depts.includes('all') ||
-          depts.includes(userDepartment);
+    // BDE employee
+    if (userDepartment === 'bde') {
+      return (
+        roles.includes('employee') &&
+        depts.includes('bde')
+      );
+    }
 
-        return departmentMatch;
-      });
+    // BA employee
+    if (userDepartment === 'ba') {
+      return (
+        roles.includes('employee') &&
+        depts.includes('ba')
+      );
+    }
+
+    // Other employee departments
+    return (
+      roles.includes('employee') &&
+      depts.includes(userDepartment)
+    );
+  }
+
+  return false;
+});
       this.sidebarItems.forEach(item => {
         item.isOpen = false;
         if (item.submenu) {
