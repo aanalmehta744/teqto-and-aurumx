@@ -42,14 +42,11 @@
 
 *,*::before,*::after{box-sizing:border-box;}
 
-/* Note: this component renders inside a <div class="login_body">, not a
-   real <body> tag (Angular components can't emit <body> directly), so the
-   original "body.login_body" compound selector is changed to ".login_body"
-   here. If you also want the page-level html/body reset (margin:0 etc.),
-   that belongs in your global src/styles.scss, not this component file. */
+
 .login_body{
   position:relative;
   z-index:0;
+
   min-height:100vh;
   min-height:100dvh;
   background:var(--login_bg);
@@ -158,6 +155,7 @@
   transition: background-color 9999s ease-in-out 0s;
 }
 
+
 .login_eye{flex:none;display:grid;place-items:center;width:26px;height:26px;padding:0;border:0;border-radius:8px;background:transparent;color:var(--login_faint);cursor:pointer;}
 .login_eye:hover{color:var(--login_ink);}
 .login_eye:focus-visible{outline:2px solid var(--login_accent);outline-offset:2px;}
@@ -177,6 +175,7 @@
   background:#4C1D95;color:#fff;font:inherit;font-size:15px;font-weight:600;
   cursor:pointer;transition:background .18s ease,transform .12s ease;
   box-shadow:0 12px 24px -10px rgba(76,29,149,.5);
+
 }
 .login_submit:hover{background:#3B0764;}
 .login_submit:active{transform:scale(.99);}
@@ -218,7 +217,6 @@
   font-size:12.5px;font-weight:600;white-space:nowrap;
 }
 .login_media-chip svg{width:14px;height:14px;flex:none;}
-
 .login_note{margin:16px 0 0 32px;font-size:11.5px;color:var(--login_faint);}
 
 @media (max-width:880px), (orientation:portrait) and (max-width:1100px){
@@ -429,5 +427,4 @@
 ::ng-deep .mat-mdc-form-field-has-icon-suffix .mat-mdc-text-field-wrapper {
     padding-right: 0px !important;
     padding-left: 2px !important;
-
 }
