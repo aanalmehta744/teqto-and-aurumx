@@ -1,226 +1,5 @@
-<!-- <section class="content">
-  <div class="content-block">
-    <div class="block-header">
-   
-      <app-breadcrumb [title]="'Chat'" [items]="['Home']" [active_item]="'Chat'"></app-breadcrumb>
-    </div>
-    <div class="row">
-      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
-        <div class="card">
-          <div class="body">
-            <div id="plist" class="people-list">
-              <div class="form-line m-b-15">
-                <input type="text" class="form-control" placeholder="Search..." />
-              </div>
-              <div class="tab-content">
-                <ng-scrollbar style="height: 590px" visibility="hover">
-                  <div id="chat_user">
-                    <ul class="chat-list list-unstyled m-b-0">
-                      <li class="clearfix active">
-                        <img src="assets/images/user/user1.jpg" alt="avatar">
-                        <div class="about">
-                          <div class="name">William Smith</div>
-                          <div class="status">
-                            <i class="material-icons offline">fiber_manual_record</i>
-                            left 7 mins ago </div>
-                        </div>
-                      </li>
-                      <li class="clearfix ">
-                        <img src="assets/images/user/user2.jpg" alt="avatar">
-                        <div class="about">
-                          <div class="name">Martha Williams</div>
-                          <div class="status">
-                            <i class="material-icons offline">fiber_manual_record</i>
-                            online </div>
-                        </div>
-                      </li>
-                      <li class="clearfix">
-                        <img src="assets/images/user/user3.jpg" alt="avatar">
-                        <div class="about">
-                          <div class="name">Joseph Clark</div>
-                          <div class="status">
-                            <i class="material-icons online">fiber_manual_record</i>
-                            online </div>
-                        </div>
-                      </li>
-                      <li class="clearfix">
-                        <img src="assets/images/user/user4.jpg" alt="avatar">
-                        <div class="about">
-                          <div class="name">Nancy Taylor</div>
-                          <div class="status">
-                            <i class="material-icons online">fiber_manual_record</i>
-                            online </div>
-                        </div>
-                      </li>
-                      <li class="clearfix">
-                        <img src="assets/images/user/user5.jpg" alt="avatar">
-                        <div class="about">
-                          <div class="name">Margaret Wilson</div>
-                          <div class="status">
-                            <i class="material-icons online">fiber_manual_record</i>
-                            online </div>
-                        </div>
-                      </li>
-                      <li class="clearfix">
-                        <img src="assets/images/user/user6.jpg" alt="avatar">
-                        <div class="about">
-                          <div class="name">Joseph Jones</div>
-                          <div class="status">
-                            <i class="material-icons offline">fiber_manual_record</i>
-                            left 30 mins ago </div>
-                        </div>
-                      </li>
-                      <li class="clearfix">
-                        <img src="assets/images/user/user7.jpg" alt="avatar">
-                        <div class="about">
-                          <div class="name">Jane Brown</div>
-                          <div class="status">
-                            <i class="material-icons offline">fiber_manual_record</i>
-                            left 10 hours ago </div>
-                        </div>
-                      </li>
-                      <li class="clearfix">
-                        <img src="assets/images/user/user8.jpg" alt="avatar">
-                        <div class="about">
-                          <div class="name">Eliza Johnson</div>
-                          <div class="status">
-                            <i class="material-icons online">fiber_manual_record</i>
-                            online </div>
-                        </div>
-                      </li>
-                      <li class="clearfix">
-                        <img src="assets/images/user/user3.jpg" alt="avatar">
-                        <div class="about">
-                          <div class="name">Mike Clark</div>
-                          <div class="status">
-                            <i class="material-icons online">fiber_manual_record</i>
-                            online </div>
-                        </div>
-                      </li>
-                      <li class="clearfix">
-                        <img src="assets/images/user/user4.jpg" alt="avatar">
-                        <div class="about">
-                          <div class="name">Ann Henry</div>
-                          <div class="status">
-                            <i class="material-icons online">fiber_manual_record</i>
-                            online </div>
-                        </div>
-                      </li>
-                      <li class="clearfix">
-                        <img src="assets/images/user/user5.jpg" alt="avatar">
-                        <div class="about">
-                          <div class="name">Nancy Smith</div>
-                          <div class="status">
-                            <i class="material-icons online">fiber_manual_record</i>
-                            online </div>
-                        </div>
-                      </li>
-                      <li class="clearfix">
-                        <img src="assets/images/user/user9.jpg" alt="avatar">
-                        <div class="about">
-                          <div class="name">David Wilson</div>
-                          <div class="status">
-                            <i class="material-icons offline">fiber_manual_record</i>
-                            offline since Oct 28 </div>
-                        </div>
-                      </li>
-                    </ul>
-                  </div>
-                </ng-scrollbar>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
-        <div class="card">
-          <div class="chat">
-            <div class="chat-header clearfix">
-              <img src="assets/images/user/user2.jpg" alt="avatar">
-              <div class="chat-about">
-                <div class="chat-with">Maria Smith</div>
-                <div class="chat-num-messages">2 new messages</div>
-              </div>
-            </div>
-            <ng-scrollbar style="height: 450px" visibility="hover">
-              <div class="chat-history" id="chat-conversation">
-                <ul>
-                  <li class="clearfix">
-                    <div class="message-data text-end">
-                      <span class="message-data-time">10:10 AM, Today
-                      </span>
-                      &nbsp; &nbsp;
-                      <span class="message-data-name">Maria</span>
-                    </div>
-                    <div class="message other-message float-end"> Hi Robert , how are you? How is
-                      your work going on? </div>
-                  </li>
-                  <li>
-                    <div class="message-data">
-                      <span class="message-data-name">Robert </span>
-                      <span class="message-data-time">10:12 AM, Today</span>
-                    </div>
-                    <div class="message my-message">
-                      <p>Its good. We completed almost all task assign by our manager.</p>
-                      <div class="row">
-                      </div>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="message-data">
-                      <span class="message-data-name">Robert </span>
-                      <span class="message-data-time">10:12 AM, Today</span>
-                    </div>
-                    <div class="message my-message">
-                      <p>How are you feel today? What's about vacation?.</p>
-                      <div class="row">
-                      </div>
-                    </div>
-                  </li>
-                  <li class="clearfix">
-                    <div class="message-data text-end">
-                      <span class="message-data-time">10:10 AM, Today
-                      </span>
-                      &nbsp; &nbsp;
-                      <span class="message-data-name">Maria</span>
-                    </div>
-                    <div class="message other-message float-end"> I am good, We think for next
-                      weekend.
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            </ng-scrollbar>
-            <div class="chat-message clearfix">
-              <div class="form-group">
-                <div class="form-line">
-                  <mat-form-field class="example-full-width" appearance="outline"
-                    [hideRequiredMarker]="hideRequiredControl.value">
-                    <input matInput placeholder="Enter text here.." required>
-                  </mat-form-field>
-                </div>
-              </div>
-              <div class="chat-upload">
-                <button mat-mini-fab class="bg-deep-orange msr-2"> <i class="material-icons">attach_file</i></button>
-                <button mat-mini-fab class="bg-deep-orange"> <i class="material-icons">insert_emoticon</i></button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section> -->
-
-
-
-<div class="flex h-screen bg-white overflow-hidden">
-
-  <!-- ───────────────────────────────────────────────
-       LEFT PANEL — Employee list + search
-  ─────────────────────────────────────────────── -->
-  <div class="w-72 flex-shrink-0 border-r border-gray-200 flex flex-col">
-
+<div class="flex h-[calc(100vh-100px)] bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+  <div class="w-72 border-r border-gray-100 flex flex-col flex-shrink-0">
     <!-- Header -->
     <div class="p-4 border-b border-gray-100">
       <h2 class="text-base font-semibold text-gray-700 mb-3">Team Chat</h2>
@@ -230,14 +9,14 @@
         (input)="filterUsers()"
         placeholder="Search employees..."
         class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg
-               focus:outline-none focus:ring-2 focus:ring-teal-300"
+               focus:outline-none focus:ring-2 focus:ring-indigo-900"
       />
     </div>
-
+ 
     <!-- Scrollable user list -->
     <ng-scrollbar class="flex-1" visibility="hover">
       <ul class="py-2">
-
+ 
         <!-- One row per employee -->
         <li
           *ngFor="let user of filteredUsers"
@@ -246,33 +25,33 @@
           [ngClass]="{ 'bg-[#d6d5ea]': selectedUser?.id === user.id }"
         >
           <!-- Avatar circle showing first 2 initials -->
-          <div class="flex-shrink-0 w-9 h-9 rounded-full bg-#0b0b88 flex items-center justify-center
+          <div class="flex-shrink-0 w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center
                       text-white text-xs font-bold">
             {{ getInitials(user.fullName) }}
           </div>
-
+ 
           <!-- Name and role text -->
           <div class="min-w-0">
             <p class="text-sm font-medium text-gray-800 truncate">{{ user.fullName }}</p>
             <p class="text-xs text-gray-400 truncate">{{ user.role }}</p>
           </div>
         </li>
-
+ 
         <!-- Empty state -->
         <li *ngIf="filteredUsers.length === 0"
             class="px-4 py-6 text-center text-sm text-gray-400">
           No employees found
         </li>
-
+ 
       </ul>
     </ng-scrollbar>
   </div>
-
+ 
   <!-- ───────────────────────────────────────────────
        RIGHT PANEL — Active conversation
   ─────────────────────────────────────────────── -->
   <div class="flex-1 flex flex-col">
-
+ 
     <!-- Placeholder when no user is selected -->
     <div *ngIf="!selectedUser"
          class="flex-1 flex flex-col items-center justify-center text-gray-400">
@@ -286,13 +65,13 @@
       </svg>
       <p class="text-base font-medium">Select a person to start chatting</p>
     </div>
-
+ 
     <!-- Conversation view -->
     <ng-container *ngIf="selectedUser">
-
+ 
       <!-- Conversation header bar -->
       <div class="flex items-center gap-3 px-5 py-3 border-b border-gray-100 bg-white flex-shrink-0">
-        <div class="w-9 h-9 rounded-full bg-#0b0b88 flex items-center justify-center
+        <div class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center
                     text-white text-xs font-bold flex-shrink-0">
           {{ getInitials(selectedUser.fullName) }}
         </div>
@@ -301,28 +80,46 @@
           <p class="text-xs text-gray-400">{{ selectedUser.role }}</p>
         </div>
       </div>
-
+ 
       <!-- Message list -->
       <ng-scrollbar #messageScroll class="flex-1 px-5 py-4" visibility="hover">
-
+ 
         <!-- Loading spinner -->
         <div *ngIf="loading" class="flex justify-center py-8">
-          <div class="w-6 h-6 border-2 border-teal-400 border-t-transparent rounded-full animate-spin"></div>
+          <div class="w-6 h-6 border-2 border-indigo-900 border-t-transparent rounded-full animate-spin"></div>
         </div>
-
+ 
         <!-- Empty conversation -->
         <div *ngIf="!loading && messages.length === 0"
              class="text-center text-sm text-gray-400 py-8">
           No messages yet. Say hello!
         </div>
-
+ 
         <!-- Each message -->
         <div *ngFor="let msg of messages" class="mb-4">
-
+ 
           <!-- MY message — right-aligned, teal bubble -->
           <div *ngIf="msg.sender_id === currentUserId" class="flex justify-end">
             <div class="max-w-xs lg:max-w-md">
-              <div class="bg-#0b0b88 text-white px-4 py-2 rounded-2xl rounded-tr-sm text-sm shadow-sm">
+ 
+              <!-- Image attachment -->
+              <a *ngIf="msg.attachment_url && msg.attachment_type?.startsWith('image/')"
+                 [href]="msg.attachment_url" target="_blank" class="block mb-1">
+                <img [src]="msg.attachment_url" alt="attachment"
+                     class="max-w-[220px] rounded-xl border border-gray-200" />
+              </a>
+ 
+              <!-- Non-image file attachment -->
+              <a *ngIf="msg.attachment_url && !msg.attachment_type?.startsWith('image/')"
+                 [href]="msg.attachment_url" target="_blank"
+                 class="flex items-center gap-2 mb-1 px-3 py-2 rounded-xl bg-indigo-50 text-indigo-900 text-xs font-medium hover:bg-indigo-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                </svg>
+                <span class="truncate">View attachment</span>
+              </a>
+ 
+              <div *ngIf="msg.message" class="bg-indigo-900 text-white px-4 py-2 rounded-2xl rounded-tr-sm text-sm shadow-sm">
                 {{ msg.message }}
               </div>
               <p class="text-xs text-gray-400 mt-1 text-right">
@@ -330,7 +127,7 @@
               </p>
             </div>
           </div>
-
+ 
           <!-- THEIR message — left-aligned, gray bubble -->
           <div *ngIf="msg.sender_id !== currentUserId" class="flex items-end gap-2">
             <div class="w-7 h-7 rounded-full bg-gray-300 flex items-center justify-center
@@ -338,32 +135,83 @@
               {{ getInitials(msg.sender_name) }}
             </div>
             <div class="max-w-xs lg:max-w-md">
-              <div class="bg-gray-100 text-gray-800 px-4 py-2 rounded-2xl rounded-tl-sm text-sm shadow-sm">
+ 
+              <!-- Image attachment -->
+              <a *ngIf="msg.attachment_url && msg.attachment_type?.startsWith('image/')"
+                 [href]="msg.attachment_url" target="_blank" class="block mb-1">
+                <img [src]="msg.attachment_url" alt="attachment"
+                     class="max-w-[220px] rounded-xl border border-gray-200" />
+              </a>
+ 
+              <!-- Non-image file attachment -->
+              <a *ngIf="msg.attachment_url && !msg.attachment_type?.startsWith('image/')"
+                 [href]="msg.attachment_url" target="_blank"
+                 class="flex items-center gap-2 mb-1 px-3 py-2 rounded-xl bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                </svg>
+                <span class="truncate">View attachment</span>
+              </a>
+ 
+              <div *ngIf="msg.message" class="bg-gray-100 text-gray-800 px-4 py-2 rounded-2xl rounded-tl-sm text-sm shadow-sm">
                 {{ msg.message }}
               </div>
               <p class="text-xs text-gray-400 mt-1">{{ formatTime(msg.created_at) }}</p>
             </div>
           </div>
-
+ 
         </div>
       </ng-scrollbar>
-
+ 
       <!-- Message input bar -->
       <div class="px-4 py-3 border-t border-gray-100 bg-white flex-shrink-0">
+ 
+        <!-- Selected attachment preview, shown above the input row -->
+        <div *ngIf="selectedFile"
+             class="flex items-center gap-2 mb-2 px-3 py-2 rounded-lg bg-indigo-50 text-indigo-900 text-xs w-fit max-w-full">
+          <img *ngIf="filePreviewUrl" [src]="filePreviewUrl" alt="preview"
+               class="h-8 w-8 rounded object-cover flex-shrink-0" />
+          <svg *ngIf="!filePreviewUrl" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+          </svg>
+          <span class="truncate max-w-[180px] font-medium">{{ selectedFile.name }}</span>
+          <button (click)="removeSelectedFile()" class="ml-1 text-indigo-400 hover:text-indigo-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+ 
         <div class="flex items-center gap-2">
+ 
+          <!-- Attach button -->
+          <input #fileInput type="file" class="hidden" (change)="onFileSelected($event)" />
+          <button
+            type="button"
+            (click)="fileInput.click()"
+            class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0
+                   text-gray-500 hover:bg-gray-100 transition-colors"
+            aria-label="Attach a file"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+            </svg>
+          </button>
+ 
           <input
             type="text"
             [(ngModel)]="newMessage"
             (keydown)="onEnter($event)"
             placeholder="Type a message..."
             class="flex-1 px-4 py-2 text-sm text-gray-900 bg-white border border-gray-200
-                   rounded-full focus:outline-none focus:ring-2 focus:ring-teal-300"
+                   rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-900"
           />
           <button
             (click)="send()"
-            [disabled]="!newMessage.trim()"
-            class="w-10 h-10 rounded-full bg-#0b0b88 hover:bg-teal-600
-                   disabled:opacity-40 flex items-center justify-center transition-colors"
+            [disabled]="!newMessage.trim() && !selectedFile"
+            class="w-10 h-10 rounded-full bg-indigo-900 hover:bg-indigo-800
+                   disabled:opacity-40 flex items-center justify-center transition-colors flex-shrink-0"
           >
             <!-- Send icon -->
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white"
@@ -373,30 +221,11 @@
           </button>
         </div>
       </div>
-
+ 
     </ng-container>
   </div>
-
+ 
 </div>
-<!-- Left Sidebar
-Shows all employees.
-Search filters users.
-Clicking a user calls selectUser(user).
-Right Panel
-If no user selected → placeholder screen.
-If user selected → open conversation.
-Messages
-*ngFor="let msg of messages" loops all messages.
-If sender is current user → right teal bubble.
-Else → left gray bubble.
-Input Section
-[(ngModel)]="newMessage" binds input.
-onEnter() sends on Enter key.
-send() sends message when button clicked.
-Helper Methods Used
-filterUsers() → search employee list.
-selectUser(user) → load conversation.
-getInitials(name) → generate avatar initials.
-formatTime(date) → show message time.
-send() → send chat message.
-onEnter(event) → send on Enter key press. -->
+ 
+
+ 
