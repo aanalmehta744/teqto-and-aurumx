@@ -252,6 +252,14 @@ export class ChatComponent
    */
   newMessage = '';
 
+    selectedFile: File | null = null;
+
+  /*
+   * Local preview URL for the selected file
+   * (only set when the file is an image)
+   */
+  filePreviewUrl: string | null = null;
+
   /*
    * Current conversation id
    *

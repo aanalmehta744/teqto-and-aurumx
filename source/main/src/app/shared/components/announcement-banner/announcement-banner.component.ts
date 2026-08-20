@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -18,6 +18,7 @@ export class AnnouncementBannerComponent implements OnInit {
   canManage = false;
   currentUser: any = null;
   apiBase = environment.apiUrl;
+  @Input() hideOwnAddButton = false;
 
   showForm = false;
   submitting = false;

@@ -89,21 +89,24 @@ export class MainComponent implements OnInit {
 
 
   userRole: string = '';
+currentUserName: string = '';
   baLeaveBalance: any = null;
   private projectStatusMap: { [status: string]: string[] } = {};
-  constructor(
-    private dashboardService: DashboardService,
-    private todayService: TodayService,
-    private dailyUpdateService: EmployeeDailyUpdateService,
-    private projectService: ProjectService,
-    private clientsService: ClientsService,
-    // private interviewService: InterviewService,
-    private ieavesService: LeavesService,
-    private authService: AuthService,
-    private http: HttpClient,
-  ) {
-    this.userRole = this.authService.currentUserValue?.role?.toLowerCase() ?? '';
-  }
+ constructor(
+  private dashboardService: DashboardService,
+  private todayService: TodayService,
+  private dailyUpdateService: EmployeeDailyUpdateService,
+  private projectService: ProjectService,
+  private clientsService: ClientsService,
+  private ieavesService: LeavesService,
+  private authService: AuthService,
+  private http: HttpClient,
+) {
+  this.userRole = this.authService.currentUserValue?.role?.toLowerCase() ?? '';
+  this.currentUserName = this.authService.currentUserValue?.fullName
+    || this.authService.currentUserValue?.username
+    || '';
+}
 
   // ApexChart variables
   public chartSeries: ApexAxisChartSeries = [];

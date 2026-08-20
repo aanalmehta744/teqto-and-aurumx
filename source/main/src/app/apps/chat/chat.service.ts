@@ -147,6 +147,8 @@ export interface ChatMessage {
   sender_id: number;
   sender_name: string;
   message: string;
+  attachment_url?: string | null;
+  attachment_type?: string | null;
   created_at: string;
 }
 

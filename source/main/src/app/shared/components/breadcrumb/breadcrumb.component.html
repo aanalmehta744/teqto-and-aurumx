@@ -22,12 +22,12 @@
 </div>  -->
 
 <div class="w-full flex justify-center items-center mb-4">
-  <div class="w-full flex flex-col md:flex-row justify-between items-center">
-    <div class="w-full md:w-[50%]">
+  <div class="w-full flex flex-col md:flex-row items-center" [ngClass]="hideTitle ? 'justify-start' : 'justify-between'">
+    <div class="w-full md:w-[50%]" *ngIf="!hideTitle">
       <h1 class="text-[0.9rem] md:text-[1.3rem] text-[#474747]">{{title}}</h1>
     </div>
-    <div class="w-full md:w-[50%]">
-      <ul class="w-full flex md:justify-end items-center">
+    <div class="w-full" [ngClass]="hideTitle ? '' : 'md:w-[50%]'">
+      <ul class="w-full flex items-center" [ngClass]="hideTitle ? 'md:justify-start' : 'md:justify-end'">
         <li class="flex items-center">
           <a>
             <app-feather-icons [icon]="'home'" [class]="'breadcrumb-icon'"></app-feather-icons>

@@ -3,6 +3,8 @@ const router = express.Router();
 
 const db = require("../connection");
 const { getIO } = require("../socket");
+const { createUpload } = require("../cloudinary");
+const upload = createUpload("chat_attachments");
 
 /*                                                                         |
 | -------------------------------------------------------------------------- |
@@ -169,7 +171,7 @@ connection.release();
 | -------------------------------------------------------------------------- |
 | */                                                                         
 
-router.post("/message", async (req, res) => {
+router.post("/message", upload.single("attachment"), async (req, res) => {
 try {
 const {
 conversation_id,
@@ -177,12 +179,14 @@ sender_id,
 message
 } = req.body;
 
+const trimmedMessage = (message || "").trim();
+const attachmentUrl = req.file ? (req.file.path || req.file.filename) : null;
+const attachmentType = req.file ? req.file.mimetype : null;
 
 if (
   !conversation_id ||
   !sender_id ||
-  !message ||
-  !message.trim()
+  (!trimmedMessage && !attachmentUrl)
 ) {
   return res.status(400).json({
     error: "Missing required fields"
@@ -201,13 +205,17 @@ if (member.length === 0) {
 }
 
 const [result] = await db.query(
-  "INSERT INTO messages (conversation_id, sender_id, message) VALUES (?, ?, ?)",
+  "INSERT INTO messages (conversation_id, sender_id, message, attachment_url, attachment_type) VALUES (?, ?, ?, ?, ?)",
   [
     conversation_id,
     sender_id,
-    message.trim()
+    trimmedMessage,
+    attachmentUrl,
+    attachmentType
   ]
 );
+
+const createdAt = new Date();
 
 const io = getIO();
 
@@ -216,12 +224,17 @@ io.to(`conversation_${conversation_id}`)
     id: result.insertId,
     conversation_id,
     sender_id,
-    message: message.trim(),
-    created_at: new Date()
+    message: trimmedMessage,
+    attachment_url: attachmentUrl,
+    attachment_type: attachmentType,
+    created_at: createdAt
   });
 
 res.status(201).json({
-  messageId: result.insertId
+  messageId: result.insertId,
+  attachment_url: attachmentUrl,
+  attachment_type: attachmentType,
+  created_at: createdAt
 });
 
 
@@ -247,6 +260,8 @@ const [messages] = await db.query(
   "SELECT " +
   "m.id, " +
   "m.message, " +
+  "m.attachment_url, " +
+  "m.attachment_type, " +
   "m.created_at, " +
   "m.sender_id, " +
   "e.fullName AS sender_name " +
