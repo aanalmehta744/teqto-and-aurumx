@@ -1,0 +1,225 @@
+<section>
+  <div class="space-y-6">
+
+    <!-- Breadcrumb -->
+    <div>
+      <app-breadcrumb [title]="'Today Attendance'" [items]="['Attendance']" [active_item]="'Today'">
+      </app-breadcrumb>
+    </div>
+
+    <!-- Attendance Card -->
+    <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+
+      <!-- Table Header -->
+      <div
+        class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 px-4 py-4 border-b bg-white">
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+          <h2 class="text-lg font-medium text-gray-800">Attendance</h2>
+          <div class="relative">
+            <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">search</mat-icon>
+            <input type="text" #filter placeholder="Search"
+              class="pl-10 pr-4 py-2 rounded-full border text-[black] border-gray-300 focus:outline-none  placeholder:text-[15px] w-[250px]"
+              aria-label="Search box" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Table Content -->
+      <div class="overflow-auto p-4">
+        <div class="min-w-full">
+
+          <table mat-table [dataSource]="dataSource" matSort class="min-w-full text-sm table-auto">
+
+            <!-- ID -->
+            <ng-container matColumnDef="id">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Id</mat-header-cell>
+              <mat-cell *matCellDef="let row">{{ row.id }}</mat-cell>
+            </ng-container>
+
+            <!-- Image -->
+            <ng-container matColumnDef="img">
+              <mat-header-cell *matHeaderCellDef class="font-medium">Image</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <img [src]="row.img" alt="profile" class="w-10 h-10 object-cover rounded-full" />
+              </mat-cell>
+            </ng-container>
+
+            <!-- Name -->
+            <ng-container matColumnDef="name">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Name</mat-header-cell>
+              <mat-cell *matCellDef="let row">{{ row.fullName }}</mat-cell>
+            </ng-container>
+
+            <!-- Check In -->
+            <ng-container matColumnDef="first_in">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Punch In</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                {{ row.check_in ? (row.check_in | date : 'mediumTime') : '--' }}
+              </mat-cell>
+            </ng-container>
+
+            <!-- Check Out -->
+            <ng-container matColumnDef="last_out">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Punch Out</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                {{ row.check_out ? (row.check_out | date : 'mediumTime') : '--' }}
+              </mat-cell>
+            </ng-container>
+
+            <!-- Total -->
+            <ng-container matColumnDef="total">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Total</mat-header-cell>
+              <mat-cell *matCellDef="let row">{{ row.hours }}</mat-cell>
+            </ng-container>
+
+
+
+            
+<!-- Pause Time -->
+<ng-container matColumnDef="pause_start">
+
+  <mat-header-cell
+    *matHeaderCellDef
+    mat-sort-header
+    class="font-medium">
+    Pause Time
+  </mat-header-cell>
+
+  <mat-cell *matCellDef="let row">
+
+    <div class="flex flex-col gap-1">
+
+      <ng-container *ngIf="row.pause_history?.length > 0; else noPause">
+
+        <div
+          *ngFor="let pause of row.pause_history"
+          class="text-sm whitespace-nowrap">
+
+          {{ pause.pause_start | date:'h:mm:ss a' }}
+
+          <span class="text-gray-400 mx-1">
+            →
+          </span>
+
+          <span *ngIf="pause.pause_end">
+            {{ pause.pause_end | date:'h:mm:ss a' }}
+          </span>
+
+          <span *ngIf="!pause.pause_end" class="text-orange-600">
+            Paused
+          </span>
+
+        </div>
+
+      </ng-container>
+
+      <ng-template #noPause>
+        <span class="text-gray-400">
+          --
+        </span>
+      </ng-template>
+
+    </div>
+
+  </mat-cell>
+
+</ng-container>
+            <!-- Status -->
+            <ng-container matColumnDef="status">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">
+                Status
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row" class="px-4 py-2">
+                <!-- Present -->
+                <span *ngIf="row.status === 'Present'"
+                  class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.status }}
+                </span>
+
+                <!-- Absent -->
+                <span *ngIf="row.status === 'Absent'"
+                  class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.status }}
+                </span>
+                <!-- Half Day -->
+                <span *ngIf="row.status === 'Half Day'"
+                  class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.status }}
+                </span>
+                <!-- Leave -->
+                <span *ngIf="row.status === 'Leave'"
+                  class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.status }}
+                </span>
+
+                <span *ngIf="row.final_status === 'Leave'"
+                  class="bg-yellow-100 text-yellow-800 px-3 py-1 ml-2 rounded-full text-xs font-medium">
+                  {{ row.final_status }}
+                </span>
+
+                <!-- Fallback for any other status -->
+                <span
+                  *ngIf="row.status !== 'Present' && row.status !== 'Absent' && row.status !== 'Leave' && row.status !== 'Half Day'"
+                  class=" bg-blue-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.status }}
+                </span>
+              </mat-cell>
+            </ng-container>
+
+
+            <!-- Shift -->
+            <ng-container matColumnDef="break">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="font-medium">Break</mat-header-cell>
+              <mat-cell *matCellDef="let row">{{ row.break }}</mat-cell>
+            </ng-container>
+<!-- Pause History -->
+<ng-container matColumnDef="pause_history">
+
+  <mat-header-cell
+    *matHeaderCellDef
+    class="font-medium">
+    Pause History
+  </mat-header-cell>
+
+  <mat-cell *matCellDef="let row">
+
+    <button
+      type="button"
+      (click)="openPauseHistory(row); $event.stopPropagation()"
+      class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 text-sm font-medium hover:bg-blue-100 transition">
+      View
+    </button>
+
+  </mat-cell>
+
+</ng-container>
+            <!-- Row Definitions -->
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns" [style.cursor]="'pointer'" class="hover:bg-gray-50"
+              matRipple>
+            </mat-row>
+          </table>
+
+          <!-- Spinner -->
+          <!-- @if (exampleDatabase?.isTblLoading) {
+          <div class="flex justify-center items-center py-6">
+            <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate"></mat-progress-spinner>
+          </div>
+          } -->
+
+          <!-- No Results -->
+          @if (!exampleDatabase?.isTblLoading) {
+          <div class="text-center text-gray-500 py-4"
+            [style.display]="dataSource.renderedData.length === 0 ? '' : 'none'">
+            No results
+          </div>
+          }
+
+        </div>
+      </div>
+      <!-- Paginator -->
+      <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0" [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25, 100]" class="mt-4"></mat-paginator>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,154 @@
+<section>
+  <div class="mx-auto">
+    <div class="mb-4">
+      <app-breadcrumb [title]="'Add Projects'" [items]="['Projects']" [active_item]="'Add Projects'"></app-breadcrumb>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-xl p-6">
+      <h2 class="text-lg text-[#5B626B] mb-3">Add Projects</h2>
+
+      <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+
+        <!-- Project Title -->
+        <mat-form-field class="w-full mb-4 custom-notch" appearance="outline">
+          <mat-label>Project Title</mat-label>
+          <input matInput formControlName="projectTitle" placeholder="Project Title" required />
+          @if (projectForm.get('projectTitle')?.hasError('required')) {
+          <mat-error>Project Title is required</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Department & Priority -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+          <mat-form-field class="w-full" appearance="outline">
+            <mat-label>Department</mat-label>
+            <mat-select formControlName="department" required>
+              <mat-option value="Designing">Designing</mat-option>
+              <mat-option value="Development">Development</mat-option>
+              <mat-option value="Testing">Testing</mat-option>
+              <mat-option value="Marketing">Marketing</mat-option>
+              <mat-option value="Accounts">Accounts</mat-option>
+            </mat-select>
+            @if (projectForm.get('department')?.hasError('required')) {
+            <mat-error>Department is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field class="w-full" appearance="outline">
+            <mat-label>Project Priority</mat-label>
+            <mat-select formControlName="priority" required>
+              <mat-option value="Low">Low</mat-option>
+              <mat-option value="Medium">Medium</mat-option>
+              <mat-option value="High">High</mat-option>
+            </mat-select>
+            @if (projectForm.get('priority')?.hasError('required')) {
+            <mat-error>Project Priority is required</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <!-- Client & Price -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+          <mat-form-field class="w-full" appearance="outline">
+            <mat-label>Select Client</mat-label>
+            <mat-select formControlName="client">
+              <mat-option *ngFor="let client of clients" [value]="client.id">
+                {{ client.fullName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Team -->
+          <mat-form-field class="w-full" appearance="outline">
+            <mat-label>Select Team</mat-label>
+            <mat-select formControlName="team" multiple>
+              <mat-option *ngFor="let employee of employees" [value]="employee.id">
+                {{ employee.fullName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <!-- <mat-form-field class="w-full" appearance="outline">
+            <mat-label>Price</mat-label>
+            <input matInput type="number" formControlName="price" required min="0" />
+            @if (projectForm.get('price')?.hasError('required')) {
+            <mat-error>Price is required</mat-error>
+            }
+          </mat-form-field> -->
+        </div>
+
+        <!-- Start & End Dates -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+          <mat-form-field class="w-full" appearance="outline">
+            <mat-label>Project Start Date</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="startDate" required />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            @if (projectForm.get('startDate')?.hasError('required')) {
+            <mat-error>Please select date</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field class="w-full" appearance="outline">
+            <mat-label>Project End Date</mat-label>
+            <input matInput [matDatepicker]="picker1" formControlName="endDate" required />
+            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+            @if (projectForm.get('endDate')?.hasError('required')) {
+            <mat-error>Please select date</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+
+        <!-- Status -->
+        <div class="mb-4">
+          <mat-label class="text-gray-700 block mb-2">Work Status</mat-label>
+          <mat-radio-group formControlName="status" class="flex flex-wrap gap-4">
+            <mat-radio-button value="Active">Active</mat-radio-button>
+            <mat-radio-button value="Completed">Completed</mat-radio-button>
+            <mat-radio-button value="Running">Running</mat-radio-button>
+            <mat-radio-button value="Pending">Pending</mat-radio-button>
+            <mat-radio-button value="Not Started">Not Started</mat-radio-button>
+            <mat-radio-button value="Cancled">Canceled</mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <!-- Tags -->
+        <mat-form-field class="w-full mb-4" appearance="outline" floatLabel="always">
+          <mat-label>Tags</mat-label>
+          <mat-chip-grid #chipList aria-label="Tag selection">
+            <mat-chip *ngFor="let tag of tagList" [selectable]="selectable" [removable]="removable"
+              (removed)="removeTag(tag)">
+              {{ tag }}
+              <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+            </mat-chip>
+            <input matInput placeholder="New tag..." [matChipInputFor]="chipList"
+              [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
+              (matChipInputTokenEnd)="addTag($event)" />
+          </mat-chip-grid>
+        </mat-form-field>
+
+        <!-- Description -->
+        <div class="mb-4">
+          <mat-label class="block mb-2 !text-gray-600">Descriptions</mat-label>
+          <div class="NgxEditor__Wrapper">
+            <ngx-editor-menu class="text-gray-600" [editor]="editor!" [toolbar]="toolbar"></ngx-editor-menu>
+            <ngx-editor [editor]="editor" formControlName="description" [placeholder]="'Type here...'"
+              class="NgxEditorStyles">
+            </ngx-editor>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex gap-4">
+          <button mat-raised-button color="primary" [disabled]="!projectForm.valid" class="px-6 py-2">
+            Submit
+          </button>
+          <button type="button" mat-raised-button color="warn" class="px-6 py-2">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

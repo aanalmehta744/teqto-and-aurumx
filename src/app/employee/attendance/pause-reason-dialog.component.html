@@ -1,0 +1,47 @@
+<div class="p-6">
+
+  <h2 class="text-xl font-semibold text-gray-800 mb-2">
+    Reason for Break
+  </h2>
+
+  <p class="text-sm text-gray-500 mb-5">
+    Please enter the reason for taking this break.
+  </p>
+
+  <mat-form-field appearance="outline" class="w-full">
+
+    <mat-label>
+      Break reason
+    </mat-label>
+
+    <input
+      matInput
+      [(ngModel)]="reason"
+      placeholder="e.g. Tea break, personal work"
+      maxlength="255"
+      (keyup.enter)="submit()"
+    />
+
+  </mat-form-field>
+
+  <div class="flex justify-end gap-3 mt-4">
+
+    <button
+      mat-button
+      type="button"
+      (click)="cancel()">
+      Cancel
+    </button>
+
+    <button
+      mat-raised-button
+      color="primary"
+      type="button"
+      [disabled]="!reason.trim()"
+      (click)="submit()">
+      Pause
+    </button>
+
+  </div>
+
+</div>

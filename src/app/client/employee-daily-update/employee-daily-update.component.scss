@@ -1,0 +1,18 @@
+/* Update column (80%) */
+.mat-column-update,
+.update-column-header {
+    width: 80% !important;
+    max-width: 80% !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+/* Actions column (20%) */
+.mat-column-actions,
+.actions-column-header {
+    width: 20% !important;
+    max-width: 20% !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}

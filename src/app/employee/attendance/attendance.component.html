@@ -1,0 +1,239 @@
+<section>
+  <div class="rounded-lg">
+    <!-- Breadcrumb -->
+    <app-breadcrumb [title]="'Attendance'" [items]="['Home']" [active_item]="'Attendance'"></app-breadcrumb>
+    <!-- Clockity Card -->
+    <div class="bg-white rounded-xl shadow mb-6 p-4 sm:flex justify-between items-center">
+      <h2 class="text-xl font-medium text-[#00383F]">Clockity</h2>
+      <div class="flex flex-wrap items-center gap-3 mt-2 sm:mt-0">
+
+        <input type="text" class="border border-gray-300 rounded px-3 py-2 w-[80px] text-md text-[#00383F]"
+          [value]="timerDisplay" readonly />
+
+        <button *ngIf="!isTiming" mat-raised-button (click)="onCheckIn()"
+          class="bg-[#d6d5ea] text-[#00383F] px-4 py-2 rounded shadow-lg" [disabled]="hasCheckedInToday">
+          Punch-In
+        </button>
+
+        <button *ngIf="hasCheckedInToday && isTiming" mat-raised-button (click)="onCheckOut()"
+          class="bg-[#00383F] text-[#d6d5ea] px-4 py-2 rounded shadow-lg">
+          Punch-Out
+        </button>
+
+        <!-- <button *ngIf="isTiming" mat-raised-button color="warn"
+          class="bg-orange-600 text-[#d6d5ea] px-4 py-2 rounded shadow-lg" (click)="togglePauseResume()">
+          {{ isPaused ? 'Resume' : 'Pause' }}
+        </button> -->
+
+        <button *ngIf="isTiming" mat-raised-button color="warn"
+          class="bg-orange-600 text-[#d6d5ea] px-4 py-2 rounded shadow-lg" (click)="togglePauseResume()">
+          {{ isPaused ? 'Break-out' : 'Break-in' }}
+        </button>
+
+      </div>
+
+
+    </div>
+    <!-- Attendance Table Card -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <!-- Table Header -->
+      <div class="flex flex-col md:flex-row justify-between items-center px-5 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-4 mb-3 md:mb-0">
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-[#0b0b88]"></span>
+            <h6 class="text-sm font-semibold text-[#1B1B2F]">Attendances</h6>
+          </div>
+          <div class="relative">
+            <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 !text-[18px]">search</mat-icon>
+            <input placeholder="Search" type="text" #filter (keyup)="applyFilter($event)"
+              class="pl-9 pr-4 py-2 rounded-full border border-gray-200 bg-gray-50 text-sm focus:outline-none w-[220px] placeholder:text-gray-400"
+              aria-label="Search box">
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="cursor-pointer p-2 rounded-xl bg-[#d6d5ea] hover:bg-gray-100" matTooltip="XLSX">
+            <img src="assets/images/icons/xlsx.png" alt="" class="w-6 h-6" (click)="exportExcel()" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Table Body -->
+      <div class="overflow-auto">
+        <div class="min-w-full">
+          <table mat-table [dataSource]="dataSource" matSort class="w-full text-sm">
+            <!-- ID Column -->
+            <ng-container matColumnDef="id">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">Id</mat-header-cell>
+              <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.id }}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="date">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">Date</mat-header-cell>
+              <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.date | date }}</mat-cell>
+            </ng-container>
+<ng-container matColumnDef="day">
+
+  <mat-header-cell
+    *matHeaderCellDef
+    mat-sort-header
+    class="font-medium">
+    Day
+  </mat-header-cell>
+
+  <mat-cell *matCellDef="let row">
+    {{ row.date ? (row.date | date:'EEEE') : '-' }}
+  </mat-cell>
+
+</ng-container>
+            <ng-container matColumnDef="check_in">
+              <mat-header-cell *matHeaderCellDef mat-sort-header
+                class="px-4 py-2 font-medium">Punch-In</mat-header-cell>
+              <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.check_in ? (row.check_in | date:'h:mm:ss a') :
+                '--' }}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="check_out">
+              <mat-header-cell *matHeaderCellDef mat-sort-header
+                class="px-4 py-2 font-medium">Punch-Out</mat-header-cell>
+              <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.check_out ? (row.check_out | date:'h:mm:ss a') :
+                '--' }}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="hours">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">Hours</mat-header-cell>
+              <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.hours ? row.hours : '--' }}</mat-cell>
+            </ng-container>
+            <!-- <ng-container matColumnDef="break">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">Break</mat-header-cell>
+              <mat-cell *matCellDef="let row" class="px-4 py-2">{{ row.break ? row.break : '--' }}</mat-cell>
+            </ng-container> -->
+            <ng-container matColumnDef="break">
+
+  <mat-header-cell
+    *matHeaderCellDef
+    mat-sort-header
+    class="px-4 py-2 font-medium">
+    Break
+  </mat-header-cell>
+
+  <mat-cell *matCellDef="let row" class="px-4 py-2">
+
+    <span
+      [style.color]="
+        isBreakGreaterThanOneHour(row.break)
+          ? 'red'
+          : 'inherit'
+      "
+      [style.font-weight]="
+        isBreakGreaterThanOneHour(row.break)
+          ? '600'
+          : 'normal'
+      "
+    >
+      {{ row.break || '--' }}
+    </span>
+
+  </mat-cell>
+
+</ng-container>
+            <!-- PAUSE TIME -->
+<ng-container matColumnDef="pause_start">
+
+  <mat-header-cell
+    *matHeaderCellDef
+    mat-sort-header
+    class="px-4 py-2 font-medium">
+    Pause Time
+  </mat-header-cell>
+
+  <mat-cell *matCellDef="let row" class="px-4 py-2">
+    {{ row.pause_start
+      ? (row.pause_start | date:'h:mm:ss a')
+      : '--'
+    }}
+  </mat-cell>
+
+</ng-container>
+            <ng-container matColumnDef="status">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="px-4 py-2 font-medium">
+                Status
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row" class="px-4 py-2 flex flex-wrap gap-2">
+                <!-- Present -->
+                <span *ngIf="row.final_status === 'Present'"
+                  class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.final_status }}
+                </span>
+
+                <!-- Absent -->
+                <span *ngIf="row.final_status === 'Absent'"
+                  class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.final_status }}
+                </span>
+                <!-- Half Day -->
+                <span *ngIf="row.status === 'Half Day'"
+                  class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap">
+                  {{ row.final_status }}
+                </span>
+                <!-- Leave -->
+                <!-- <span *ngIf="row.final_status === 'Leave'"
+                  class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.final_status }}
+                </span> -->
+
+                <!-- Leave label -->
+                <span *ngIf="row.leave_status"
+                  class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.leave_status }}
+                </span>
+
+                <!-- Fallback for any other status -->
+                <span
+                  *ngIf="row.final_status !== 'Present' && row.final_status !== 'Absent' && row.final_status !== 'Leave' && row.final_status !== 'Half Day'"
+                  class=" bg-blue-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {{ row.final_status }}
+                </span>
+              </mat-cell>
+            </ng-container>
+
+
+
+<!-- Pause History -->
+<ng-container matColumnDef="pause_history">
+
+  <mat-header-cell
+    *matHeaderCellDef
+    class="font-medium">
+    Pause History
+  </mat-header-cell>
+
+  <mat-cell *matCellDef="let row">
+
+    <button
+      type="button"
+      (click)="openPauseHistory(row); $event.stopPropagation()"
+      class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 text-sm font-medium hover:bg-blue-100 transition">
+      View
+    </button>
+
+  </mat-cell>
+
+</ng-container>
+
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="detailsCall(row)"
+              class="hover:bg-gray-50 cursor-pointer"></mat-row>
+          </table>
+
+          <!-- <div *ngIf="!exampleDatabase?.isTblLoading && dataSource?.renderedData.length === 0" class="text-center py-4 text-gray-500">
+            No results
+          </div> -->
+
+
+        </div>
+      </div>
+      <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0" [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25, 100]" class="!border-t border-gray-100 !bg-white"></mat-paginator>
+    </div>
+  </div>
+</section>

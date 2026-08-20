@@ -1,0 +1,96 @@
+<section class="space-y-5">
+  <app-breadcrumb [title]="'My Performance'" [items]="['Home']" [active_item]="'Performance'"></app-breadcrumb>
+
+  <!-- Filter Card -->
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4">
+    <div class="flex items-center gap-2 mb-4">
+      <span class="h-2 w-2 rounded-full bg-[#0b0b88]"></span>
+      <h6 class="text-sm font-semibold text-[#1B1B2F]">Filter Period</h6>
+    </div>
+    <div class="flex flex-wrap gap-3 items-center">
+      <select [(ngModel)]="selectedMonth"
+        class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:outline-none text-[#1B1B2F]">
+        <option *ngFor="let m of months" [value]="m.v">{{ m.l }}</option>
+      </select>
+      <input [(ngModel)]="selectedYear" type="number"
+        class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:outline-none w-24 text-[#1B1B2F]" />
+      <button (click)="load()"
+        class="bg-[#d6d5ea] text-[#00383F] px-5 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors">
+        Load Performance
+      </button>
+    </div>
+  </div>
+
+  <!-- Period Title -->
+  <div class="flex items-center gap-2 px-1">
+    <span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span>
+    <p class="text-sm font-semibold text-[#1B1B2F]">
+      KPI Performance — {{ monthName(selectedMonth) }} {{ selectedYear }}
+    </p>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="bg-white rounded-2xl border border-gray-100 shadow-sm py-12 text-center">
+    <div class="flex justify-center items-center gap-2 text-gray-400 text-sm">
+      <mat-progress-spinner diameter="24" mode="indeterminate" color="primary"></mat-progress-spinner>
+      <span>Loading…</span>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && kpis.length === 0"
+    class="bg-white rounded-2xl border border-gray-100 shadow-sm py-14 text-center">
+    <mat-icon class="text-gray-300 !text-5xl">bar_chart</mat-icon>
+    <p class="mt-3 text-sm text-gray-400">No KPI targets set for this month.</p>
+    <p class="text-xs text-gray-300 mt-1">Ask your admin to set targets.</p>
+  </div>
+
+  <!-- KPI Cards -->
+  <div *ngIf="!loading && kpis.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div *ngFor="let kpi of kpis" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+      <div class="flex justify-between items-start mb-3">
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">{{ kpi.kpi_name }}</p>
+        <span [class]="statusColor(kpi.status) + ' text-xs px-2.5 py-0.5 rounded-full font-medium'">
+          {{ kpi.status | titlecase }}
+        </span>
+      </div>
+      <div class="text-2xl font-bold text-[#1B1B2F]">
+        {{ kpi.achieved_value }}
+        <span class="text-sm font-normal text-gray-400">/ {{ kpi.target_value }} {{ kpi.unit }}</span>
+      </div>
+      <div class="mt-4">
+        <div class="flex justify-between text-xs text-gray-400 mb-1.5">
+          <span>Achievement</span>
+          <span class="font-medium text-[#1B1B2F]">{{ kpi.achievement_percentage }}%</span>
+        </div>
+        <div class="w-full bg-gray-100 rounded-full h-1.5">
+          <div
+            [style.width.%]="kpi.achievement_percentage > 100 ? 100 : kpi.achievement_percentage"
+            [ngClass]="{
+              'bg-green-500': kpi.status === 'green',
+              'bg-yellow-400': kpi.status === 'yellow',
+              'bg-red-400': kpi.status === 'red'
+            }"
+            class="h-1.5 rounded-full transition-all"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Card -->
+  <div *ngIf="!loading && kpis.length > 0" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+    <div class="flex items-center gap-2 mb-4 border-b border-gray-100 pb-4">
+      <span class="h-2 w-2 rounded-full bg-[#0b0b88]"></span>
+      <h6 class="text-sm font-semibold text-[#1B1B2F]">Target vs Achieved</h6>
+    </div>
+    <apx-chart
+      [series]="chartSeries"
+      [chart]="chartOptions"
+      [xaxis]="xaxis"
+      [dataLabels]="dataLabels"
+      [yaxis]="chartYAxis"
+      [tooltip]="chartTooltip"
+      [colors]="['#94a3b8','#0b0b88']">
+    </apx-chart>
+  </div>
+</section>

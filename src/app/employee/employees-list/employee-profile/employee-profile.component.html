@@ -1,0 +1,366 @@
+<!-- ------------------------------- -->
+<section>
+  <div class="mx-auto">
+
+    <div>
+      <app-breadcrumb [title]="'Employee Profile'" [items]="['Employees']" [active_item]="'Profile'"></app-breadcrumb>
+    </div>
+    <div class="flex flex-wrap -mx-3">
+      <div class="w-full lg:w-1/3 px-3 mb-6">
+        <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+          <div *ngIf="employee">
+            <div class="text-center">
+
+              <!-- Top Banner -->
+              <div class="bg-gray-100 text-gray-800 min-h-[145px] py-6 rounded-t-xl border-b border-gray-200">
+                <div class="text-xl font-medium">{{ employee.fullName | titlecase }}</div>
+                <div class="text-gray-500">{{ employee.department || 'Employee' }}</div>
+              </div>
+
+              <!-- Profile Image (fixed) -->
+              <div class="flex justify-center -mt-16">
+                <div class="w-32 h-32 rounded-full border-4 border-white overflow-hidden shadow-lg bg-white">
+                  <img [src]="getProfileImage()" alt="Profile Image" class="w-full h-full object-cover" />
+                </div>
+              </div>
+
+              <!-- Info Section -->
+              <div class="p-5">
+                <p class="text-gray-600">{{ employee.address || 'No address provided' }}</p>
+
+                <div class="mt-4 flex items-center justify-center text-gray-600">
+                  <mat-icon class="text-gray-500 mr-2">phone</mat-icon>
+                  <span>{{ employee.mobile || 'N/A' }}</span>
+                </div>
+
+                <div class="mt-2 flex items-center justify-center text-blue-600">
+                  <mat-icon class="text-gray-500 mr-2">email</mat-icon>
+                  <a [href]="'mailto:' + employee.email" class="hover:underline">
+                    {{ employee.email || 'No email provided' }}
+                  </a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div *ngIf="isLoading" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <mat-spinner diameter="60"></mat-spinner>
+      </div>
+
+
+      <div class="w-full lg:w-2/3 px-3 mb-6">
+        <div class="bg-white rounded-xl shadow-xl">
+          <mat-tab-group>
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <mat-icon class="mr-2">face</mat-icon>
+                About Me
+              </ng-template>
+
+              <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                  <div class="flex items-end">
+                    <mat-icon class="text-blue-500 mt-1 mr-2 align-middle">cake</mat-icon>
+                    <div class="text-[#7C6D84] flex gap-3">
+
+                      <b class="text-[#0E264A]">Date of Birth :</b> {{ employee?.dob ? (employee.dob | date:'longDate')
+                      : 'N/A' }}
+
+                    </div>
+                  </div>
+
+                  <!-- <div class="flex items-end">
+                    <mat-icon class="text-green-500 mt-1 mr-2 align-middle">school</mat-icon>
+                    <div class="text-[#7C6D84] flex gap-3">
+                      <b class="text-[#0E264A]">Education :</b> {{ employee?.education || 'Not available' }}
+                    </div>
+                  </div> -->
+
+                  <div class="flex items-end">
+                    <mat-icon class="text-yellow-500 mt-1 mr-2 align-middle">attach_money</mat-icon>
+                    <div class="text-[#7C6D84] flex gap-3">
+                      <b class="text-[#0E264A]">Salary :</b> ₹{{ employee?.salary || 'N/A' }}
+                    </div>
+                  </div>
+
+                  <div class="flex items-end">
+                    <mat-icon class="text-blue-500 mt-1 mr-2 align-middle">event</mat-icon>
+                    <div class="text-[#7C6D84] flex gap-3">
+                      <b class="text-[#0E264A]">Joining Date :</b> {{ employee?.joining_date ? (employee.joining_date |
+                      date:'longDate') : 'N/A' }}
+
+                    </div>
+                  </div>
+
+                  <div class="flex items-end">
+                    <mat-icon class="text-green-500 mt-1 mr-2 align-middle">badge</mat-icon>
+                    <div class="text-[#7C6D84] flex gap-3">
+                      <b class="text-[#0E264A]">Department :</b> {{ employee?.department || 'N/A' }}
+                    </div>
+                  </div>
+
+                  <div class="flex items-end">
+                    <mat-icon class="text-yellow-500 mt-1 mr-2 align-middle">credit_card</mat-icon>
+                    <div class="text-[#7C6D84] ">
+                      <b class="text-[#0E264A]">PAN Card Number :</b> {{ employee?.panCard || 'N/A' }}
+                    </div>
+                  </div>
+                  <div class="flex items-end">
+                    <mat-icon class="text-yellow-500 mt-1 mr-2 align-middle">fingerprint</mat-icon>
+                    <div class="text-[#7C6D84] ">
+                      <b class="text-[#0E264A]">Aadhar Card Number :</b> {{ employee?.aadharCard || 'N/A' }}
+                    </div>
+                  </div>
+                  <div class="flex items-end">
+                    <mat-icon class="text-green-500 mt-1 mr-2 align-middle"
+                      *ngIf="employee?.status === 1">check_circle</mat-icon>
+                    <mat-icon class="text-red-500 mt-1 mr-2 align-middle"
+                      *ngIf="employee?.status === 0">highlight_off</mat-icon>
+                    <div class="text-[#7C6D84] flex gap-3">
+                      <b class="text-[#0E264A]">Status :</b>
+                      <span *ngIf="employee?.status === 1" class="text-green-600 font-medium">Active</span>
+                      <span *ngIf="employee?.status === 0" class="text-red-600 font-medium">Inactive</span>
+                    </div>
+                  </div>
+
+                  <div class="flex items-end">
+                    <mat-icon class="text-blue-500 mt-1 mr-2 align-middle">person</mat-icon>
+                    <div class="text-[#7C6D84] flex gap-3">
+                      <b class="text-[#0E264A]">Employment Type :</b>
+                      <span *ngIf="employee?.employment_type === 1" class="font-medium">Full-Time</span>
+                      <span *ngIf="employee?.employment_type === 0" class="font-medium">Part-Time</span>
+                    </div>
+                    <!-- <div class="text-[#7C6D84] ">
+                      <b class="text-[#0E264A]">Employment Type :</b> {{ employee?.employment_type || 'N/A' }}
+                    </div> -->
+                  </div>
+
+                  <!-- Termination Date (only if inactive) -->
+                  <div class="flex items-end" *ngIf="employee?.status === 0">
+                    <mat-icon class="text-red-500 mt-1 mr-2 align-middle">event_busy</mat-icon>
+                    <div class="text-[#7C6D84] flex gap-3">
+                      <b class="text-[#0E264A]">Termination Date :</b>
+                      {{ employee?.termination_date ? (employee.termination_date | date:'longDate') : 'N/A' }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="bg-white rounded-xl shadow-xl mt-6 w-full">
+      <mat-tab-group mat-align-tabs="start">
+
+        <!-- Attendance Tab -->
+        <mat-tab label="Attendance">
+          <div class="p-6">
+            <h4 class="text-xl font-medium mb-4 text-[#00383F]">Attendance Record</h4>
+            <div class="h-[400px] overflow-auto border border-gray-200 rounded-lg">
+              <div class="h-full w-[200%] sm:w-[100%] md:w-[100%]">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50 sticky top-0 text-gray-700 z-10">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Date</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Punch-in</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Punch-out</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Hours Worked</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200 !text-[black]">
+                    <tr
+                      *ngFor="let record of attendanceRecords.data.slice(attendancePaginator.pageIndex * attendancePaginator.pageSize, (attendancePaginator.pageIndex + 1) * attendancePaginator.pageSize)">
+                      <td class="px-6 py-4 whitespace-nowrap">{{ record.date | date }}</td>
+
+                      <td class="px-6 py-4 whitespace-nowrap">{{ record.check_in ? (record.check_in | date: 'h:mm:ss a')
+                        :
+                        '-' }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">{{ record.check_out ? (record.check_out | date: 'h:mm:ss
+                        a')
+                        : '-' }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">{{ record.hours }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span
+                          [class]="record.status === 'Present' ? '!bg-green-100 !text-green-800' : '!bg-red-100 !text-red-800'"
+                          class="px-2 py-1 rounded-full text-xs font-medium">
+                          {{ record.status }}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <mat-paginator class="border-t" #attendancePaginator [length]="attendanceRecords.data.length"
+                  [pageSize]="10" [pageSizeOptions]="[5, 10, 25]"></mat-paginator>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Leave Tab -->
+        <mat-tab label="Leave">
+          <div class="p-6">
+            <h4 class="text-xl font-medium mb-4 text-[#00383F]">Leave Record</h4>
+            <div class="max-h-96 block overflow-auto border border-gray-200 rounded-lg">
+              <div *ngIf="leaveRecords.data.length > 0; else noLeaves" class="h-full w-[200%] sm:w-[100%] md:w-[100%]">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50 sticky top-0 text-gray-700 z-10">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Start Date</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">End Date</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Half Day</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Leave Type</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Reason</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200 text-[black]">
+                    <tr
+                      *ngFor="let record of leaveRecords.data.slice(leavePaginator.pageIndex * leavePaginator.pageSize, (leavePaginator.pageIndex + 1) * leavePaginator.pageSize)">
+                      <td class="px-6 py-4 whitespace-nowrap">{{ record.start_date | date }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">{{ record.end_date | date }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">{{ record.halfDay ? 'Yes' : 'No' }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">{{ record.leave_type }}</td>
+                      <td class="px-6 py-4">{{ record.reason }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">{{ record.status }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <ng-template #noLeaves>
+                <p class="text-gray-500 p-4">No leaves record found for this employee.</p>
+              </ng-template>
+              <mat-paginator class="border-t" #leavePaginator [length]="leaveRecords.data.length" [pageSize]="10"
+                [pageSizeOptions]="[5, 10, 25]"></mat-paginator>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Projects Tab -->
+        <mat-tab label="Projects">
+          <div class="p-6">
+            <h4 class="text-xl font-medium mb-4 text-[#00383F]">Projects</h4>
+            <div class="max-h-96 block overflow-auto border border-gray-200 rounded-lg">
+              <div *ngIf="projects.data.length > 0; else noProjects" class="h-full w-[200%] sm:w-[100%] md:w-[100%]">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50 sticky top-0 text-gray-700 z-10">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Project Name</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Start Date</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">End Date</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Team Name</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200 text-[black]">
+                    <tr
+                      *ngFor="let project of projects.data.slice(projectPaginator.pageIndex * projectPaginator.pageSize, (projectPaginator.pageIndex + 1) * projectPaginator.pageSize)">
+                      <td class="px-6 py-4 whitespace-nowrap">{{ project.projectTitle }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">{{ project.status }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">{{ project.startDate | date }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">{{ project.endDate | date }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">{{ project.teamName }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <ng-template #noProjects>
+                <p class="text-gray-500 p-4">No projects found for this employee.</p>
+              </ng-template>
+              <mat-paginator class="border-t" #projectPaginator [length]="projects.data.length" [pageSize]="10"
+                [pageSizeOptions]="[5, 10, 25]"></mat-paginator>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Payroll Tab -->
+        <!-- <mat-tab label="Payroll">
+          <div class="p-6">
+            <h4 class="text-xl font-medium mb-4 text-[#00383F]">Payroll Details</h4>
+            <div class="max-h-96 block overflow-auto border border-gray-200 rounded-lg">
+              <div class="h-full w-[200%] sm:w-[100%] md:w-[100%]">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50 sticky top-0 text-gray-700 z-10">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Month</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Salary</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Unpaid Leave Days
+                      </th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Total Earnings</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200 text-[black]">
+                    <tr
+                      *ngFor="let record of payrollRecords.data.slice(payrollPaginator.pageIndex * payrollPaginator.pageSize, (payrollPaginator.pageIndex + 1) * payrollPaginator.pageSize)">
+                      <td class="px-6 py-4 whitespace-nowrap">{{ getMonthName(record.month) }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">{{ record.final_salary }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">{{ record.unpaid_leave_days }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">{{ record.final_salary }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <mat-paginator class="border-t" #payrollPaginator [length]="payrollRecords.data.length" [pageSize]="10"
+                  [pageSizeOptions]="[5, 10, 25]"></mat-paginator>
+              </div>
+            </div>
+
+          </div>
+        </mat-tab> -->
+
+        <!-- Monthly Target Tab -->
+        <mat-tab label="Monthly Target" *ngIf="employee.role === 'BDE'">
+          <div class="p-6">
+            <h4 class="text-xl font-medium mb-4 text-[#00383F]">Monthly Targets</h4>
+            <div class="max-h-96 block overflow-auto border border-gray-200 rounded-lg">
+              <div class="h-full w-[200%] sm:w-[100%] md:w-[100%]">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50 sticky top-0 text-gray-700 z-10">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Target Amount</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Target Date</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Achieved Amount</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200 text-[black]">
+                    <tr
+                      *ngFor="let target of monthlyTargets.data.slice(targetPaginator.pageIndex * targetPaginator.pageSize, (targetPaginator.pageIndex + 1) * targetPaginator.pageSize)">
+                      <td class="px-6 py-4 whitespace-nowrap">{{ target.amount | currency:'USD' }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">{{ target.target_month | date }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">{{ target.achieved_amount }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <button mat-icon-button color="primary" (click)="editTarget(target)" class="mr-2">
+                          <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'"></app-feather-icons>
+                        </button>
+                        <button mat-icon-button color="warn" (click)="deleteTarget(target)">
+                          <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'"></app-feather-icons>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <mat-paginator class="border-t" #targetPaginator [length]="monthlyTargets.data.length" [pageSize]="10"
+                  [pageSizeOptions]="[5, 10, 25]"></mat-paginator>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <button mat-raised-button (click)="addTarget()" class="!bg-[#d6d5ea] !text-[#00383F] !shadow-lg">
+                Add Target
+              </button>
+            </div>
+          </div>
+        </mat-tab>
+
+      </mat-tab-group>
+    </div>
+  </div>
+</section>

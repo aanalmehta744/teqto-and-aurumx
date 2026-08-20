@@ -1,0 +1,198 @@
+<section>
+  <div class="mx-auto">
+    <!-- Breadcrumb -->
+    <div>
+      <app-breadcrumb [title]="'Task'" [items]="['Home']" [active_item]="'Task'"></app-breadcrumb>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-xl p-5">
+      <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2">
+        <div>
+          <h4 class="text-xl font-medium text-[#00383F]">Tasks</h4>
+          <p class="text-sm text-[#009F9F]">{{tasks.length}} Total task</p>
+        </div>
+        <button mat-raised-button class="!bg-[#d6d5ea] !shadow-md !text-[#00383F]" (click)="addNewTask()">Add
+          Task</button>
+      </div>
+
+      <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2">
+        <div>
+          <div class="flex justify-center mb-4 mt-2">
+            <div class="flex bg-gray-100 rounded-full overflow-hidden">
+              <button class="px-5 py-2 text-sm font-medium transition-all"
+                [class.bg-gray-800]="activeTab === 'pending'" [class.text-black]="activeTab === 'pending'"
+                [class.text-gray-600]="activeTab !== 'pending'" (click)="setTab('pending')">
+                Pending
+              </button>
+              <button class="px-5 py-2 text-sm font-medium transition-all"
+                [class.bg-gray-800]="activeTab === 'completed'" [class.text-black]="activeTab === 'completed'"
+                [class.text-gray-600]="activeTab !== 'completed'" (click)="setTab('completed')">
+                Completed
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div *ngIf="activeTab === 'pending'" class="flex justify-center mb-4 mt-2">
+            <div class="flex bg-gray-100 rounded-full overflow-hidden">
+              <button class="px-4 py-1.5 text-sm font-medium transition-all"
+                [class.bg-gray-800]="activePriority === 'All'" [class.text-black]="activePriority === 'All'"
+                [class.text-gray-600]="activePriority !== 'All'" (click)="setPriorityFilter('All')">
+                All
+              </button>
+              <button class="px-4 py-1.5 text-sm font-medium transition-all"
+                [class.bg-gray-800]="activePriority === 'High'" [class.text-black]="activePriority === 'High'"
+                [class.text-gray-600]="activePriority !== 'High'" (click)="setPriorityFilter('High')">
+                High
+              </button>
+              <button class="px-4 py-1.5 text-sm font-medium transition-all"
+                [class.bg-gray-800]="activePriority === 'Normal'" [class.text-black]="activePriority === 'Normal'"
+                [class.text-gray-600]="activePriority !== 'Normal'" (click)="setPriorityFilter('Normal')">
+                Normal
+              </button>
+              <button class="px-4 py-1.5 text-sm font-medium transition-all"
+                [class.bg-gray-800]="activePriority === 'Low'" [class.text-black]="activePriority === 'Low'"
+                [class.text-gray-600]="activePriority !== 'Low'" (click)="setPriorityFilter('Low')">
+                Low
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <mat-sidenav-container class="!border !rounded-md">
+
+        <mat-sidenav-content class="flex-1 !border-r">
+
+          <ng-scrollbar style="max-height: 500px" visibility="hover">
+            <table class="w-full table-auto text-left">
+              <thead class="bg-gray-50 text-md">
+                <tr class="text-gray-700">
+                  <th class="w-4"></th>
+                  <th class="p-4 font-medium px-4">Task Name</th>
+                  <th class="p-4 font-medium px-4">Project</th>
+                  <th class="p-4 font-medium px-4">Employee</th>
+                  <th class="p-4 font-medium px-4">Priority</th>
+                  <th class="p-4 font-medium px-4">Due Date</th>
+                  <th class="p-4 font-medium px-4 text-center">Actions</th>
+                </tr>
+              </thead>
+
+              <tbody cdkDropList (cdkDropListDropped)="drop($event)" class="text-sm">
+                @for (task of getFilteredTasks(); track task) {
+                <tr cdkDrag (click)="taskClick(task)" class="hover:bg-gray-100 cursor-pointer border-b bg-[white]">
+                  <td cdkDragHandle class="pl-2 p-4">
+                    <mat-icon>
+                      {{ activeTab === 'pending' ? 'drag_indicator' : 'check_circle' }}
+                    </mat-icon>
+                  </td>
+                  <td>
+                    <span class="text-gray-800" [ngClass]="{ 'line-through text-gray-400': task.done }">{{ task.title
+                      }}</span>
+                  </td>
+                  <td>
+                    {{ getProjectTitle(task.project_id) !== 'Unknown Project'
+                    ? getProjectTitle(task.project_id)
+                    : (task.trainer_project_name || 'Not Assigned') }}
+                  </td>
+                  <td>{{ getemployeeName(task.employee_id) }}</td>
+                  <td>
+                    <span class="inline-flex items-center gap-1" [ngClass]="{
+                  'text-green-600': task.priority === 'Low',
+                  'text-yellow-600': task.priority === 'Normal',
+                  'text-red-600': task.priority === 'High'
+                }">
+                      <mat-icon class="text-sm">
+                        @if (task?.priority === 'Low') { arrow_downward }
+                        @if (task?.priority === 'High') { arrow_upward }
+                        @if (task?.priority === 'Normal') { remove }
+                      </mat-icon>
+                      {{ task.priority }}
+                    </span>
+                  </td>
+                  <td>{{ task.due_date | date }}</td>
+                  <td class="text-center">
+                    <button mat-icon-button color="primary" (click)="editTask(task)">
+                      <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'"></app-feather-icons>
+                    </button>
+                    <button mat-icon-button color="warn" (click)="deleteItem(task)">
+                      <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'"></app-feather-icons>
+                    </button>
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </ng-scrollbar>
+        </mat-sidenav-content>
+      </mat-sidenav-container>
+
+      <!-- <mat-sidenav-container class="!border !rounded-md">
+
+
+        <mat-sidenav-content class="flex-1 !border-r">
+          <ng-scrollbar style="height: 500px" visibility="hover">
+            <table class="w-full table-auto text-left">
+              <thead class="bg-gray-50 text-md">
+                <tr class="text-gray-700">
+                  <th class="w-4"></th>
+                  <th class="p-4 font-medium px-4">Task Name</th>
+                  <th class="p-4 font-medium px-4">Project</th>
+                  <th class="p-4 font-medium px-4">Employee</th>
+                  <th class="p-4 font-medium px-4">Priority</th>
+                  <th class="p-4 font-medium px-4">Due Date</th>
+                  <th class="p-4 font-medium px-4 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody cdkDropList (cdkDropListDropped)="drop($event)" class="text-sm">
+                @for (task of tasks; track task) {
+                <tr cdkDrag (click)="taskClick(task)" class="hover:bg-gray-100 cursor-pointer border-b bg-[white]">
+                  <td cdkDragHandle class="pl-2 p-4">
+                    <mat-icon>drag_indicator</mat-icon>
+                  </td>
+
+                  <td>
+                    <span class="text-gray-800" [ngClass]="{ 'line-through text-gray-400': task.done }">{{ task.title
+                      }}</span>
+                  </td>
+                  <td>
+                    {{ getProjectTitle(task.project_id) !== 'Unknown Project'
+                    ? getProjectTitle(task.project_id)
+                    : (task.trainer_project_name || 'Not Assigned') }}
+                  </td>
+
+                  <td>{{ getemployeeName(task.employee_id) }}</td>
+                  <td>
+                    <span class="inline-flex items-center gap-1" [ngClass]="{
+                        'text-green-600': task.priority === 'Low',
+                        'text-yellow-600': task.priority === 'Normal',
+                        'text-red-600': task.priority === 'High'
+                      }">
+                      <mat-icon class="text-sm">
+                        @if (task?.priority === 'Low') { arrow_downward }
+                        @if (task?.priority === 'High') { arrow_upward }
+                        @if (task?.priority === 'Normal') { remove }
+                      </mat-icon>
+                      {{ task.priority }}
+                    </span>
+                  </td>
+                  <td>{{ task.due_date | date }}</td>
+                  <td class="text-center">
+                    <button mat-icon-button color="primary" (click)="editTask(task)">
+                      <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'"></app-feather-icons>
+                    </button>
+                    <button mat-icon-button color="warn" (click)="deleteItem(task)">
+                      <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'"></app-feather-icons>
+                    </button>
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </ng-scrollbar>
+        </mat-sidenav-content>
+      </mat-sidenav-container> -->
+    </div>
+  </div>
+</section>

@@ -1,0 +1,45 @@
+.NgxEditorStyles {
+  overflow: auto;
+  display: block;
+
+  .NgxEditor__Content {
+    height: 300px;
+  }
+}
+
+.NgxEditor__Content ul {
+  list-style: disc !important;
+  color: black !important;
+}
+
+.NgxEditor__Content ol {
+  list-style: decimal !important;
+  list-style-position: inside !important;
+}
+
+.NgxEditor__Content li p {
+  display: inline !important;
+  margin: 0;
+  padding: 0;
+}
+
+/* Fix lists inside ngx-editor */
+::ng-deep .NgxEditor__Content ul {
+  list-style: disc !important;
+  list-style-position: inside !important;
+  // margin-left: 1.5rem !important;
+  // padding-left: 1.5rem !important;
+}
+
+::ng-deep .NgxEditor__Content ol {
+  list-style-type: decimal !important;
+  list-style-position: inside !important;
+  // margin-left: 1.5rem !important;
+  // padding-left: 1.5rem !important;
+}
+
+:host ::ng-deep .NgxEditor__Content li p {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}

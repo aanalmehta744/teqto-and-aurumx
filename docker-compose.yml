@@ -1,0 +1,60 @@
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: elite-mysql
+    restart: unless-stopped
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: elite_backend
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    container_name: elite-backend
+    restart: unless-stopped
+
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: elite_backend
+      DB_CONNECTION_LIMIT: 10
+      DB_SSL: "false"
+
+      JWT_SECRET: ${JWT_SECRET}
+      SUPPORT_EMAIL: ${SUPPORT_EMAIL}
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: elite-frontend
+    restart: unless-stopped
+
+    ports:
+      - "5001:80"
+
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

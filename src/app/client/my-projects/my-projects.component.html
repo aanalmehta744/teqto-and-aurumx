@@ -1,0 +1,182 @@
+<section class="content">
+  <div class="content-block">
+    <div class="block-header">
+      <!-- breadcrumb -->
+      <app-breadcrumb [title]="'My Projects'" [items]="['Home']" [active_item]="'My Projects'">
+      </app-breadcrumb>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="tabbable-line">
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <div class="card">
+                <div class="materialTableHeader">
+                  <div class="left">
+                    <ul class="header-buttons-left ms-0">
+                      <li class="tbl-title">
+                        <h2>My Projects</h2>
+                      </li>
+                      <li class="tbl-search-box">
+                        <label for="search-input"><i class="material-icons search-icon">search</i></label>
+                        <input placeholder="Search" type="text" #filter class="browser-default search-field"
+                          aria-label="Search box">
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="body overflow-auto">
+                    <div class="responsive_table">
+                      <table mat-table [dataSource]="dataSource" matSort class="mat-cell advance-table">
+                        <!-- ID Column -->
+                        <ng-container matColumnDef="id">
+                          <mat-header-cell *matHeaderCellDef mat-sort-header>ID
+                          </mat-header-cell>
+                          <mat-cell *matCellDef="let row"><span class="mobile-label">ID:</span>{{row.id}}</mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="title">
+                          <mat-header-cell *matHeaderCellDef mat-sort-header>Project Title
+                          </mat-header-cell>
+                          <mat-cell *matCellDef="let row"> <span class="mobile-label">Project Title:</span>{{row.projectTitle}}
+                        </mat-cell>
+                      </ng-container>
+                      <ng-container matColumnDef="clientName">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header>Client Name
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row"> <span class="mobile-label">Client
+                        Name:</span>{{row.clientName}}
+                      </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="startDate">
+                      <mat-header-cell *matHeaderCellDef mat-sort-header>Start Date
+                      </mat-header-cell>
+                      <mat-cell *matCellDef="let row"> <span class="mobile-label">Start
+                      Date:</span>{{row.startDate | date}}
+                    </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="endDate">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>End Date
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row"> <span class="mobile-label">End
+                    Date:</span>{{row.endDate | date}}
+                  </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="deadLine">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header>DeadLine
+                  </mat-header-cell>
+                  <mat-cell *matCellDef="let row"> <span class="mobile-label">DeadLine:</span>
+                    {{ row.deadLine ? (row.deadLine | date: 'MM/dd/yyyy') : '--' }}
+                </mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="noOfMembers">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Members </mat-header-cell>
+                <mat-cell mat-cell *matCellDef="let row">
+                  <span class="mobile-label">Members:</span>
+                  <div *ngIf="row.teamName; else noMembers">
+                    {{ row.teamName }}
+                  </div>
+                  <ng-template #noMembers> -- </ng-template>
+                </mat-cell>
+              </ng-container>
+              
+              <ng-container matColumnDef="priority">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Priority
+                </mat-header-cell>
+                <mat-cell mat-cell *matCellDef="let row">
+                  <span class="mobile-label">Priority:</span>
+                  @if (row.priority==='High') {
+                    <div>
+                      <span class="badge badge-solid-red">High</span>
+                    </div>
+                  }
+                  @if (row.priority==='Medium') {
+                    <div>
+                      <span class="badge badge-solid-blue">Medium</span>
+                    </div>
+                  }
+                  @if (row.priority==='Low') {
+                    <div>
+                      <span class="badge badge-solid-green">Low</span>
+                    </div>
+                  }
+                </mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="progress">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Progress
+                </mat-header-cell>
+                <mat-cell mat-cell *matCellDef="let row">
+                  <span class="mobile-label">Progress:</span>
+                  <mat-progress-bar mode="determinate" value="{{ row.progress }}" style="width: 80%;">
+                  </mat-progress-bar>
+                </mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="status">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Status </mat-header-cell>
+                <mat-cell mat-cell *matCellDef="let row">
+                  <span class="mobile-label">Status:</span>
+                  <div [ngSwitch]="row.status">
+                    
+                    <span *ngSwitchCase="'Active'" class="badge badge-pill badge-primary col-green">
+                      {{ row.status }}
+                    </span>
+              
+                    <span *ngSwitchCase="'Completed'" class="badge badge-pill badge-primary col-blue">
+                      {{ row.status }}
+                    </span>
+              
+                    <span *ngSwitchCase="'Running'" class="badge badge-pill badge-primary col-purple">
+                      {{ row.status }}
+                    </span>
+              
+                    <span *ngSwitchCase="'Pending'" class="badge badge-pill badge-primary col-orange">
+                      {{ row.status }}
+                    </span>
+              
+                    <span *ngSwitchCase="'Not Started'" class="badge badge-pill badge-primary col-gray">
+                      {{ row.status }}
+                    </span>
+              
+                    <span *ngSwitchCase="'Cancled'" class="badge badge-pill badge-primary col-red">
+                      {{ row.status }}
+                    </span>
+              
+                    <span *ngSwitchDefault class="badge badge-pill badge-secondary">
+                      {{ row.status }}
+                    </span>
+                    
+                  </div>
+                </mat-cell>
+              </ng-container>
+              
+              <mat-header-row *matHeaderRowDef="displayedColumns">
+              </mat-header-row>
+              <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="detailsCall(row)"
+                [style.cursor]="'pointer'" matRipple>
+              </mat-row>
+            </table>
+            <!-- Loading spinner -->
+            @if (exampleDatabase?.isTblLoading) {
+              <div class="tbl-spinner">
+                <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate">
+                </mat-progress-spinner>
+              </div>
+            }
+            @if (!exampleDatabase?.isTblLoading) {
+              <div class="no-results"
+                [style.display]="dataSource.renderedData.length === 0 ? '' : 'none'">
+                No results
+              </div>
+            }
+            <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0" [pageSize]="10"
+              [pageSizeOptions]="[5, 10, 25, 100]">
+            </mat-paginator>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+</section>
