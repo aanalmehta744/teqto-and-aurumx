@@ -1303,11 +1303,10 @@ router.get(
         endOfMonth.date();
 
 
-      // const dailySalary =
-      //   salary /
-      //   daysInMonth;
-const dailySalary =
-  Number((salary / daysInMonth).toFixed(2));
+      const dailySalary =
+        salary /
+        daysInMonth;
+
 
       /**
        * Deduction days.
@@ -1338,13 +1337,19 @@ const dailySalary =
         totalLeaveDays > 0;
 
 
+      // const netSalary =
+      //   hasActivity
+
+      //     ? netPaidDays *
+      //       dailySalary
+
+      //     : 0;
       const netSalary =
-        hasActivity
-
-          ? netPaidDays *
-            dailySalary
-
-          : 0;
+  hasActivity
+    ? Number(
+        ((netPaidDays * salary) / daysInMonth).toFixed(2)
+      )
+    : 0;
 
 
       const leaveDeduction =

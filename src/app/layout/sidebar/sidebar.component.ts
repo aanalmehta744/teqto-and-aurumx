@@ -151,57 +151,6 @@ export class SidebarComponent
       this.userFullName = user.fullName;
       this.userGender = user.gender;
       this.userImg = user.img || this.getImgUrl(user.gender);
-
-      // this.sidebarItems = ROUTES.filter(item => {
-      //   const roles = (item.role ?? []).map(r => r.toLowerCase());
-      //   const depts = (item.department ?? []).map(d => d.toLowerCase());
-
-      //   const roleMatch = roles.includes(userRole) || roles.includes('all');
-      //   const deptMatch = depts.includes(userDepartment) || depts.includes('all') || userRole === 'admin' || userRole === 'ba';
-
-      //   if (!(roleMatch && deptMatch)) return false;
-
-      //   if (item.submenu && item.submenu.length > 0) {
-      //     item.submenu = item.submenu.filter(sub => {
-      //       if (sub.path === '/employee/attendance') return true;
-      //       if (userRole === 'admin' || userRole === 'ba') return true;
-      //       return sub.department?.map(d => d.toLowerCase()).includes(userDepartment);
-      //     });
-      //   }
-
-      //   return true;
-      // });
-
-      // Build the sidebar from the logged-in user's role + department.
-      // Admin sees only Admin items. All other users use role=Employee and
-      // their department (HR, BDE, BA, Backend Developer, Frontend Developer,
-      // Fullstack Developer or Graphic).
-      // this.sidebarItems = ROUTES.filter(item => {
-      //   const roles = (item.role ?? []).map(r => r.toLowerCase().trim());
-      //   const depts = (item.department ?? []).map(d => d.toLowerCase().trim());
-
-      //   if (userRole === 'admin') {
-      //     return roles.includes('admin') || roles.includes('all');
-      //   }
-
-      //   if (userRole !== 'employee') {
-      //     return false;
-      //   }
-
-      //   const roleMatch = roles.includes('employee') || roles.includes('all');
-      //   if (!roleMatch) {
-      //     return false;
-      //   }
-
-      //   // Empty department = not department-restricted.
-      //   // 'all' = available to every Employee department.
-      //   const departmentMatch =
-      //     depts.length === 0 ||
-      //     depts.includes('all') ||
-      //     depts.includes(userDepartment);
-
-      //   return departmentMatch;
-      // });
       this.sidebarItems = ROUTES.filter(item => {
   const roles = (item.role ?? []).map(r => r.toLowerCase().trim());
   const depts = (item.department ?? []).map(d => d.toLowerCase().trim());
@@ -414,13 +363,6 @@ export class SidebarComponent
       if (result.isConfirmed) {
         this.authService.logout();
         this.router.navigate(['/authentication/login']);
-        // Swal.fire({
-        //   icon: 'success',
-        //   title: 'Logged Out',
-        //   text: 'You have been successfully logged out.',
-        //   confirmButtonText: 'Okay',
-        //   confirmButtonColor: '#3085d6'
-        // });
       }
     });
   }

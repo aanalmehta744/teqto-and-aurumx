@@ -6,6 +6,7 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { AllHoliday } from './all-holidays.model';
 import { DataSource } from '@angular/cdk/collections';
+import { CommonModule } from '@angular/common';
 import {
   MatSnackBar,
   MatSnackBarHorizontalPosition,
@@ -36,6 +37,7 @@ import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.co
   styleUrls: ['./all-holidays.component.scss'],
   standalone: true,
   imports: [
+    CommonModule,
     BreadcrumbComponent,
     MatTooltipModule,
     MatButtonModule,
@@ -54,6 +56,7 @@ import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.co
 export class AllHolidayComponent
   extends UnsubscribeOnDestroyAdapter
   implements OnInit {
+    isAdminOrHR = false;
   displayedColumns = [
     // 'select',
     'hName',
@@ -79,6 +82,19 @@ export class AllHolidayComponent
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
   @ViewChild('filter', { static: true }) filter!: ElementRef;
   ngOnInit() {
+    const currentUser = JSON.parse(
+  localStorage.getItem('currentUser') || '{}'
+);
+
+this.isAdminOrHR =
+  currentUser.role === 'Admin' ||
+  currentUser.department === 'HR';
+
+console.log('Holiday permissions:', {
+  role: currentUser.role,
+  department: currentUser.department,
+  isAdminOrHR: this.isAdminOrHR
+});
     this.loadData();
   }
   refresh() {

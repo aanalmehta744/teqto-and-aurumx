@@ -47,11 +47,15 @@ export class FormDialogComponent {
     { name: 'October', value: 10 }, { name: 'November', value: 11 }, { name: 'December', value: 12 }
   ];
 
-  months: { name: string; value: number }[] = [];
-  selectedMonth = new Date().getMonth() + 1;
-  selectedYear = new Date().getFullYear();
-  currentYear = new Date().getFullYear();
-  currentMonth = new Date().getMonth() + 1;
+  // months: { name: string; value: number }[] = [];
+  // selectedMonth = new Date().getMonth() + 1;
+  // selectedYear = new Date().getFullYear();
+  // currentYear = new Date().getFullYear();
+  // currentMonth = new Date().getMonth() + 1;
+  months: { name: string; value: number }[] = this.allMonths;
+
+selectedMonth = new Date().getMonth() + 1;
+selectedYear = new Date().getFullYear();
 
   constructor(
     public dialogRef: MatDialogRef<FormDialogComponent>,
@@ -61,25 +65,25 @@ export class FormDialogComponent {
     private router: Router,
       private authService: AuthService,
   ) {
-    this.updateMonthOptions(); // initialize with current filter
+    // this.updateMonthOptions(); // initialize with current filter
   }
 
-  updateMonthOptions() {
-    if (this.selectedYear === this.currentYear) {
-      this.months = this.allMonths.filter(month => month.value <= this.currentMonth);
-    } else {
-      this.months = this.allMonths;
-    }
+  // updateMonthOptions() {
+  //   if (this.selectedYear === this.currentYear) {
+  //     this.months = this.allMonths.filter(month => month.value <= this.currentMonth);
+  //   } else {
+  //     this.months = this.allMonths;
+  //   }
 
-    // Auto-correct selected month if it's now out of range
-    if (!this.months.find(m => m.value === this.selectedMonth)) {
-      this.selectedMonth = this.currentMonth;
-    }
-  }
+  //   // Auto-correct selected month if it's now out of range
+  //   if (!this.months.find(m => m.value === this.selectedMonth)) {
+  //     this.selectedMonth = this.currentMonth;
+  //   }
+  // }
 
-  onYearChange() {
-    this.updateMonthOptions();
-  }
+  // onYearChange() {
+  //   this.updateMonthOptions();
+  // }
 
   // onGenerate() {
   //   const row = this.data;
