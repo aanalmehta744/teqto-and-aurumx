@@ -49,10 +49,10 @@
           <span class="text-gray-500">Base Monthly Salary</span>
           <span class="font-semibold text-gray-800">₹{{ employeeSalary?.salary }}</span>
         </div>
-        <div class="flex justify-between text-sm -mt-3 pb-4 border-b border-dashed border-gray-200">
+        <!-- <div class="flex justify-between text-sm -mt-3 pb-4 border-b border-dashed border-gray-200">
           <span class="text-gray-400 text-xs pl-2">Daily Rate (÷ {{ employeeSalary?.totalDays }} days)</span>
           <span class="text-gray-400 text-xs">₹{{ employeeSalary?.dailySalary }} / day</span>
-        </div>
+        </div> -->
 
         <!-- Attendance Summary -->
         <div>
@@ -171,10 +171,10 @@
               <span class="font-medium">+₹{{ (+(employeeSalary?.incentiveAmount || 0)).toFixed(2) }}</span>
             </div>
 
-            <div class="flex justify-between items-center text-xs text-gray-400 pt-1 border-t border-dashed border-gray-100">
+            <!-- <div class="flex justify-between items-center text-xs text-gray-400 pt-1 border-t border-dashed border-gray-100">
               <span>Net Working Days</span>
               <span>{{ employeeSalary?.workingDays }} days × ₹{{ employeeSalary?.dailySalary }}</span>
-            </div>
+            </div> -->
 
           </div>
         </div>
