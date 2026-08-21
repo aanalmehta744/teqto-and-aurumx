@@ -335,6 +335,38 @@ io.on("connection", (socket) => {
   );
 
   socket.on(
+    "identify",
+    async (employeeId) => {
+
+      try {
+
+        const [rows] = await db.query(
+          "SELECT conversation_id FROM conversation_members WHERE employee_id = ?",
+          [employeeId]
+        );
+
+        rows.forEach((row) => {
+
+          socket.join(
+            `conversation_${row.conversation_id}`
+          );
+        });
+
+        console.log(
+          `Socket ${socket.id} identified as employee ${employeeId}, joined ${rows.length} conversation(s)`
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Identify Error:",
+          error
+        );
+      }
+    }
+  );
+
+  socket.on(
     "join_conversation",
     (conversationId) => {
 
@@ -360,8 +392,6 @@ io.on("connection", (socket) => {
 
 });
 
-
-// Middleware
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -369,65 +399,44 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Serve static files from the uploads folder
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Log incoming requests
 app.use((req, res, next) => {
     console.log(`Received ${req.method} request for ${req.url}`);
     next();
 });
 
-// Use the routes with respective prefixes
-app.use('/api/authentication', authRoutes); // Prefix for authentication routes
-app.use('/api/projects', projectsRouter); // Prefix for project routes
-app.use('/api/employees', employeesRoutes); // Prefix for employee routes
-app.use('/api/holidays', holidaysRouter); // Prefix for holiday routes
-app.use('/api/leaveRequests', leaveRoutes); // Prefix for leave routes
-app.use('/api/myleave', myleaveRoutes); // Prefix for employeeleave routes
+app.use('/api/authentication', authRoutes); 
+app.use('/api/projects', projectsRouter); 
+app.use('/api/employees', employeesRoutes); 
+app.use('/api/holidays', holidaysRouter); 
+app.use('/api/leaveRequests', leaveRoutes); 
+app.use('/api/myleave', myleaveRoutes); 
 app.use('/api/attendances', attendancesRoutes);
-app.use('/api/clients', clientRoutes); // Prefix for client routes
+app.use('/api/clients', clientRoutes); 
 app.use('/api/todayattendances', todayAttendancesRoutes);
 app.use('/api/payroll', payrollRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/calendar', calendarRoutes);
 app.use('/api/candidate', candidateRoutes);
-app.use('/api/jobs', jobRoutes); // Prefix for job routes
-app.use('/api/interviews', interviewRoutes); // Prefix for job routes
+app.use('/api/jobs', jobRoutes); 
+app.use('/api/interviews', interviewRoutes); 
 app.use('/api/admindashboard', admindashboardRoutes);
 app.use('/api/dailyUpdates', dailyUpdatesRoutes);
 app.use('/api/announcements', announcementRoutes);
 app.use('/api/kpi', bdeKpiRoutes);
-// app.use('/api/bde', bdeActivitiesRoutes);
 app.use('/api/bde-performance', bdePerformanceRoutes);
 app.use('/api/bde-client-targets', bdeClientTargetsRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/client-daily-notes', clientDailyNotesRoutes);
 app.use('/api/login-settings', loginSettingsRoutes);
 app.use('/api/departments', departmentRoutes);
-
-
-
 app.use("/api/chat", chatRoutes);
 
-
-
-
-
-// Default error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send({ message: 'Internal Server Error' });
 });
-
-
-
-
-// Start server
-// app.listen(port, () => {
-//     console.log(`Server running on http://localhost:${port}`);
-// });
 
 server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);

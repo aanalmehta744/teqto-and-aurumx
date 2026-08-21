@@ -1,231 +1,839 @@
-<div class="flex h-[calc(100vh-100px)] bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+<div
+  class="flex h-[calc(100vh-100px)] bg-white rounded-xl shadow border border-gray-100 overflow-hidden"
+>
+  <!-- ===================================================== -->
+  <!-- LEFT SIDEBAR -->
+  <!-- ===================================================== -->
+
   <div class="w-72 border-r border-gray-100 flex flex-col flex-shrink-0">
     <!-- Header -->
     <div class="p-4 border-b border-gray-100">
-      <h2 class="text-base font-semibold text-gray-700 mb-3">Team Chat</h2>
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-base font-semibold text-gray-700">Team Chat</h2>
+
+        <!-- CREATE GROUP BUTTON -->
+        <button
+          type="button"
+          (click)="openCreateGroupModal()"
+          class="w-8 h-8 rounded-lg flex items-center justify-center text-indigo-900 hover:bg-indigo-50 transition-colors"
+          title="Create Group"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Search Employees -->
       <input
         type="text"
         [(ngModel)]="searchText"
         (input)="filterUsers()"
         placeholder="Search employees..."
-        class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg
-               focus:outline-none focus:ring-2 focus:ring-indigo-900"
+        class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-900"
       />
     </div>
- 
-    <!-- Scrollable user list -->
+
+    <!-- =================================================== -->
+    <!-- CHAT LIST -->
+    <!-- =================================================== -->
+
     <ng-scrollbar class="flex-1" visibility="hover">
-      <ul class="py-2">
- 
-        <!-- One row per employee -->
-        <li
+      <div class="py-2">
+        <!-- ================================================= -->
+        <!-- GROUPS -->
+        <!-- ================================================= -->
+
+        <div *ngIf="groups.length > 0" class="px-4 pt-2 pb-1">
+          <p
+            class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider"
+          >
+            Groups
+          </p>
+        </div>
+
+        <!-- Group rows -->
+
+        <div
+          *ngFor="let group of groups"
+          (click)="selectGroup(group)"
+          class="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[#F0F9F9] transition-colors"
+          [ngClass]="{
+            'bg-[#d6d5ea]': selectedGroup?.id === group.id,
+          }"
+        >
+          <!-- Group Avatar -->
+
+          <div class="relative flex-shrink-0">
+            <div
+              class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center text-white"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M17 21v-2a4 4 0 0 0-4-4H5
+                     a4 4 0 0 0-4 4v2"
+                ></path>
+
+                <circle cx="9" cy="7" r="4"></circle>
+
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+
+            <!-- Unread badge -->
+
+            <span
+              *ngIf="getGroupUnreadCount(group) > 0"
+              class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold leading-[18px] text-center"
+            >
+              {{
+                getGroupUnreadCount(group) > 99
+                  ? "99+"
+                  : getGroupUnreadCount(group)
+              }}
+            </span>
+          </div>
+
+          <!-- Group Name -->
+
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-gray-800 truncate">
+              {{ group.name }}
+            </p>
+
+            <p class="text-xs text-gray-400 truncate">Group</p>
+          </div>
+        </div>
+
+        <!-- ================================================= -->
+        <!-- EMPLOYEES -->
+        <!-- ================================================= -->
+
+        <div class="px-4 pt-4 pb-1">
+          <p
+            class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider"
+          >
+            Employees
+          </p>
+        </div>
+
+        <!-- Employee rows -->
+
+        <div
           *ngFor="let user of filteredUsers"
           (click)="selectUser(user)"
           class="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-[#F0F9F9] transition-colors"
-          [ngClass]="{ 'bg-[#d6d5ea]': selectedUser?.id === user.id }"
+          [ngClass]="{
+            'bg-[#d6d5ea]': selectedUser?.id === user.id,
+          }"
         >
-          <!-- Avatar circle showing first 2 initials -->
-          <div class="flex-shrink-0 w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center
-                      text-white text-xs font-bold">
-            {{ getInitials(user.fullName) }}
+          <!-- Avatar -->
+
+          <div class="relative flex-shrink-0">
+            <div
+              class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center text-white text-xs font-bold"
+            >
+              {{ getInitials(user.fullName) }}
+            </div>
+
+            <!-- Unread badge -->
+
+            <span
+              *ngIf="getUserUnreadCount(user) > 0"
+              class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold leading-[18px] text-center"
+            >
+              {{
+                getUserUnreadCount(user) > 99 ? "99+" : getUserUnreadCount(user)
+              }}
+            </span>
           </div>
- 
-          <!-- Name and role text -->
+
+          <!-- Name -->
+
           <div class="min-w-0">
-            <p class="text-sm font-medium text-gray-800 truncate">{{ user.fullName }}</p>
-            <p class="text-xs text-gray-400 truncate">{{ user.role }}</p>
+            <p class="text-sm font-medium text-gray-800 truncate">
+              {{ user.fullName }}
+            </p>
+
+            <p class="text-xs text-gray-400 truncate">
+              {{ user.role }}
+            </p>
           </div>
-        </li>
- 
-        <!-- Empty state -->
-        <li *ngIf="filteredUsers.length === 0"
-            class="px-4 py-6 text-center text-sm text-gray-400">
-          No employees found
-        </li>
- 
-      </ul>
-    </ng-scrollbar>
-  </div>
- 
-  <!-- ───────────────────────────────────────────────
-       RIGHT PANEL — Active conversation
-  ─────────────────────────────────────────────── -->
-  <div class="flex-1 flex flex-col">
- 
-    <!-- Placeholder when no user is selected -->
-    <div *ngIf="!selectedUser"
-         class="flex-1 flex flex-col items-center justify-center text-gray-400">
-      <svg xmlns="http://www.w3.org/2000/svg"
-           class="h-16 w-16 mb-4 text-gray-200" fill="none"
-           viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8
-             a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72
-             C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-      </svg>
-      <p class="text-base font-medium">Select a person to start chatting</p>
-    </div>
- 
-    <!-- Conversation view -->
-    <ng-container *ngIf="selectedUser">
- 
-      <!-- Conversation header bar -->
-      <div class="flex items-center gap-3 px-5 py-3 border-b border-gray-100 bg-white flex-shrink-0">
-        <div class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center
-                    text-white text-xs font-bold flex-shrink-0">
-          {{ getInitials(selectedUser.fullName) }}
         </div>
-        <div>
-          <p class="text-sm font-semibold text-gray-800">{{ selectedUser.fullName }}</p>
-          <p class="text-xs text-gray-400">{{ selectedUser.role }}</p>
+
+        <!-- Empty employee state -->
+
+        <div
+          *ngIf="filteredUsers.length === 0"
+          class="px-4 py-6 text-center text-sm text-gray-400"
+        >
+          No employees found
         </div>
       </div>
- 
-      <!-- Message list -->
-      <ng-scrollbar #messageScroll class="flex-1 px-5 py-4" visibility="hover">
- 
-        <!-- Loading spinner -->
-        <div *ngIf="loading" class="flex justify-center py-8">
-          <div class="w-6 h-6 border-2 border-indigo-900 border-t-transparent rounded-full animate-spin"></div>
+    </ng-scrollbar>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- RIGHT PANEL -->
+  <!-- ===================================================== -->
+
+  <div class="flex-1 flex flex-col">
+    <!-- =================================================== -->
+    <!-- EMPTY STATE -->
+    <!-- =================================================== -->
+
+    <div
+      *ngIf="!selectedUser && !selectedGroup"
+      class="flex-1 flex flex-col items-center justify-center text-gray-400"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-16 w-16 mb-4 text-gray-200"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8
+             a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72
+             C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+        />
+      </svg>
+
+      <p class="text-base font-medium">
+        Select a person or group to start chatting
+      </p>
+    </div>
+
+    <!-- =================================================== -->
+    <!-- CONVERSATION -->
+    <!-- =================================================== -->
+
+    <ng-container *ngIf="selectedUser || selectedGroup">
+      <!-- ================================================= -->
+      <!-- DIRECT CHAT HEADER -->
+      <!-- ================================================= -->
+
+      <div
+        *ngIf="selectedUser"
+        class="flex items-center gap-3 px-5 py-3 border-b border-gray-100 bg-white flex-shrink-0"
+      >
+        <div
+          class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+        >
+          {{ getInitials(selectedUser.fullName) }}
         </div>
- 
-        <!-- Empty conversation -->
-        <div *ngIf="!loading && messages.length === 0"
-             class="text-center text-sm text-gray-400 py-8">
+
+        <div>
+          <p class="text-sm font-semibold text-gray-800">
+            {{ selectedUser.fullName }}
+          </p>
+
+          <p class="text-xs text-gray-400">
+            {{ selectedUser.role }}
+          </p>
+        </div>
+      </div>
+
+      <!-- ================================================= -->
+      <!-- GROUP CHAT HEADER -->
+      <!-- ================================================= -->
+
+      <div
+        *ngIf="selectedGroup"
+        class="flex items-center gap-3 px-5 py-3 border-b border-gray-100 bg-white flex-shrink-0"
+      >
+        <div
+          class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center text-white flex-shrink-0"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M17 21v-2a4 4 0 0 0-4-4H5
+                 a4 4 0 0 0-4 4v2"
+            ></path>
+
+            <circle cx="9" cy="7" r="4"></circle>
+
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+
+        <div>
+          <p class="text-sm font-semibold text-gray-800">
+            {{ selectedGroup.name }}
+          </p>
+
+          <p class="text-xs text-gray-400">Group conversation</p>
+        </div>
+      </div>
+
+      <!-- ================================================= -->
+      <!-- MESSAGE LIST -->
+      <!-- ================================================= -->
+
+      <ng-scrollbar #messageScroll class="flex-1 px-5 py-4" visibility="hover">
+        <!-- Loading -->
+
+        <div *ngIf="loading" class="flex justify-center py-8">
+          <div
+            class="w-6 h-6 border-2 border-indigo-900 border-t-transparent rounded-full animate-spin"
+          ></div>
+        </div>
+
+        <!-- Empty -->
+
+        <div
+          *ngIf="!loading && messages.length === 0"
+          class="text-center text-sm text-gray-400 py-8"
+        >
           No messages yet. Say hello!
         </div>
- 
-        <!-- Each message -->
-        <div *ngFor="let msg of messages" class="mb-4">
- 
-          <!-- MY message — right-aligned, teal bubble -->
+
+        <!-- Messages -->
+
+        <div *ngFor="let msg of messages; let i = index" class="mb-4">
+
+  <!-- Date separator -->
+
+  <div
+    *ngIf="getDateSeparator(i)"
+    class="flex items-center justify-center my-4"
+  >
+    <span
+      class="px-3 py-1 text-xs font-medium text-gray-500
+             bg-gray-100 rounded-full"
+    >
+      {{ getDateSeparator(i) }}
+    </span>
+  </div>
+          <!-- ================================================= -->
+          <!-- MY MESSAGE -->
+          <!-- ================================================= -->
+
           <div *ngIf="msg.sender_id === currentUserId" class="flex justify-end">
             <div class="max-w-xs lg:max-w-md">
- 
-              <!-- Image attachment -->
-              <a *ngIf="msg.attachment_url && msg.attachment_type?.startsWith('image/')"
-                 [href]="msg.attachment_url" target="_blank" class="block mb-1">
-                <img [src]="msg.attachment_url" alt="attachment"
-                     class="max-w-[220px] rounded-xl border border-gray-200" />
+              <!-- Image -->
+
+              <a
+                *ngIf="
+                  msg.attachment_url &&
+                  msg.attachment_type?.startsWith('image/')
+                "
+                [href]="msg.attachment_url"
+                target="_blank"
+                class="block mb-1"
+              >
+                <img
+                  [src]="msg.attachment_url"
+                  alt="attachment"
+                  class="max-w-[220px] rounded-xl border border-gray-200"
+                />
               </a>
- 
-              <!-- Non-image file attachment -->
-              <a *ngIf="msg.attachment_url && !msg.attachment_type?.startsWith('image/')"
-                 [href]="msg.attachment_url" target="_blank"
-                 class="flex items-center gap-2 mb-1 px-3 py-2 rounded-xl bg-indigo-50 text-indigo-900 text-xs font-medium hover:bg-indigo-100 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+
+              <!-- File -->
+
+              <a
+                *ngIf="
+                  msg.attachment_url &&
+                  !msg.attachment_type?.startsWith('image/')
+                "
+                [href]="msg.attachment_url"
+                target="_blank"
+                class="flex items-center gap-2 mb-1 px-3 py-2 rounded-xl bg-indigo-50 text-indigo-900 text-xs font-medium hover:bg-indigo-100 transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4 flex-shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49
+                       l9.19-9.19a4 4 0 0 1 5.66 5.66
+                       l-9.2 9.19a2 2 0 0 1-2.83-2.83
+                       l8.49-8.48"
+                  ></path>
                 </svg>
-                <span class="truncate">View attachment</span>
+
+                <span class="truncate"> View attachment </span>
               </a>
- 
-              <div *ngIf="msg.message" class="bg-indigo-900 text-white px-4 py-2 rounded-2xl rounded-tr-sm text-sm shadow-sm">
-                {{ msg.message }}
+
+              <!-- Text -->
+
+              <div
+                *ngIf="msg.message"
+                class="group flex items-end justify-end gap-2"
+              >
+                <span
+                  class="text-[10px] text-gray-400 whitespace-nowrap
+                         opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  {{ formatTime(msg.created_at) }}
+                </span>
+
+                <div
+                  class="bg-indigo-900 text-white px-4 py-2
+                         rounded-2xl rounded-tr-sm text-sm shadow-sm"
+                >
+                  {{ msg.message }}
+                </div>
               </div>
-              <p class="text-xs text-gray-400 mt-1 text-right">
-                {{ formatTime(msg.created_at) }}
-              </p>
             </div>
           </div>
- 
-          <!-- THEIR message — left-aligned, gray bubble -->
-          <div *ngIf="msg.sender_id !== currentUserId" class="flex items-end gap-2">
-            <div class="w-7 h-7 rounded-full bg-gray-300 flex items-center justify-center
-                        text-gray-600 text-xs font-bold flex-shrink-0">
+
+          <!-- ================================================= -->
+          <!-- OTHER USER MESSAGE -->
+          <!-- ================================================= -->
+
+          <div
+            *ngIf="msg.sender_id !== currentUserId"
+            class="flex items-start gap-2"
+          >
+            <div
+              class="w-7 h-7 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-xs font-bold flex-shrink-0"
+            >
               {{ getInitials(msg.sender_name) }}
             </div>
+
             <div class="max-w-xs lg:max-w-md">
- 
-              <!-- Image attachment -->
-              <a *ngIf="msg.attachment_url && msg.attachment_type?.startsWith('image/')"
-                 [href]="msg.attachment_url" target="_blank" class="block mb-1">
-                <img [src]="msg.attachment_url" alt="attachment"
-                     class="max-w-[220px] rounded-xl border border-gray-200" />
+              <p
+                *ngIf="selectedGroup"
+                class="text-xs font-normal text-gray-500 mb-1"
+              >
+                {{ msg.sender_name }}
+              </p>
+
+              <!-- Image -->
+
+              <a
+                *ngIf="
+                  msg.attachment_url &&
+                  msg.attachment_type?.startsWith('image/')
+                "
+                [href]="msg.attachment_url"
+                target="_blank"
+                class="block mb-1"
+              >
+                <img
+                  [src]="msg.attachment_url"
+                  alt="attachment"
+                  class="max-w-[220px] rounded-xl border border-gray-200"
+                />
               </a>
- 
-              <!-- Non-image file attachment -->
-              <a *ngIf="msg.attachment_url && !msg.attachment_type?.startsWith('image/')"
-                 [href]="msg.attachment_url" target="_blank"
-                 class="flex items-center gap-2 mb-1 px-3 py-2 rounded-xl bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+
+              <!-- File -->
+
+              <a
+                *ngIf="
+                  msg.attachment_url &&
+                  !msg.attachment_type?.startsWith('image/')
+                "
+                [href]="msg.attachment_url"
+                target="_blank"
+                class="flex items-center gap-2 mb-1 px-3 py-2 rounded-xl bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4 flex-shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49
+                       l9.19-9.19a4 4 0 0 1 5.66 5.66
+                       l-9.2 9.19a2 2 0 0 1-2.83-2.83
+                       l8.49-8.48"
+                  ></path>
                 </svg>
-                <span class="truncate">View attachment</span>
+
+                <span class="truncate"> View attachment </span>
               </a>
- 
-              <div *ngIf="msg.message" class="bg-gray-100 text-gray-800 px-4 py-2 rounded-2xl rounded-tl-sm text-sm shadow-sm">
-                {{ msg.message }}
+
+              <!-- Text -->
+
+              <div
+                *ngIf="msg.message"
+                class="group flex items-end gap-2"
+              >
+                <div
+                  class="bg-gray-100 text-gray-800 px-4 py-2
+                         rounded-2xl rounded-tl-sm text-sm shadow-sm"
+                >
+                  {{ msg.message }}
+                </div>
+
+                <span
+                  class="text-[10px] text-gray-400 whitespace-nowrap
+                         opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  {{ formatTime(msg.created_at) }}
+                </span>
               </div>
-              <p class="text-xs text-gray-400 mt-1">{{ formatTime(msg.created_at) }}</p>
             </div>
           </div>
- 
         </div>
       </ng-scrollbar>
- 
-      <!-- Message input bar -->
+
+      <!-- ================================================= -->
+      <!-- MESSAGE INPUT -->
+      <!-- ================================================= -->
+
       <div class="px-4 py-3 border-t border-gray-100 bg-white flex-shrink-0">
- 
-        <!-- Selected attachment preview, shown above the input row -->
-        <div *ngIf="selectedFile"
-             class="flex items-center gap-2 mb-2 px-3 py-2 rounded-lg bg-indigo-50 text-indigo-900 text-xs w-fit max-w-full">
-          <img *ngIf="filePreviewUrl" [src]="filePreviewUrl" alt="preview"
-               class="h-8 w-8 rounded object-cover flex-shrink-0" />
-          <svg *ngIf="!filePreviewUrl" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+        <!-- Attachment preview -->
+
+        <div
+          *ngIf="selectedFile"
+          class="flex items-center gap-2 mb-2 px-3 py-2 rounded-lg bg-indigo-50 text-indigo-900 text-xs w-fit max-w-full"
+        >
+          <img
+            *ngIf="filePreviewUrl"
+            [src]="filePreviewUrl"
+            alt="preview"
+            class="h-8 w-8 rounded object-cover flex-shrink-0"
+          />
+
+          <svg
+            *ngIf="!filePreviewUrl"
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 flex-shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49
+                 l9.19-9.19a4 4 0 0 1 5.66 5.66
+                 l-9.2 9.19a2 2 0 0 1-2.83-2.83
+                 l8.49-8.48"
+            ></path>
           </svg>
-          <span class="truncate max-w-[180px] font-medium">{{ selectedFile.name }}</span>
-          <button (click)="removeSelectedFile()" class="ml-1 text-indigo-400 hover:text-indigo-700">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+          <span class="truncate max-w-[180px] font-medium">
+            {{ selectedFile.name }}
+          </span>
+
+          <button
+            type="button"
+            (click)="removeSelectedFile()"
+            class="ml-1 text-indigo-400 hover:text-indigo-700"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <line x1="18" y1="6" x2="6" y2="18"></line>
+
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
           </button>
         </div>
- 
+
+        <!-- Input row -->
+
         <div class="flex items-center gap-2">
- 
-          <!-- Attach button -->
-          <input #fileInput type="file" class="hidden" (change)="onFileSelected($event)" />
+          <!-- Attach -->
+
+          <input
+            #fileInput
+            type="file"
+            class="hidden"
+            (change)="onFileSelected($event)"
+          />
+
           <button
             type="button"
             (click)="fileInput.click()"
-            class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0
-                   text-gray-500 hover:bg-gray-100 transition-colors"
+            class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-gray-500 hover:bg-gray-100 transition-colors"
             aria-label="Attach a file"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49
+                   l9.19-9.19a4 4 0 0 1 5.66 5.66
+                   l-9.2 9.19a2 2 0 0 1-2.83-2.83
+                   l8.49-8.48"
+              ></path>
             </svg>
           </button>
- 
+
+          <!-- Message -->
+
           <input
             type="text"
             [(ngModel)]="newMessage"
             (keydown)="onEnter($event)"
             placeholder="Type a message..."
-            class="flex-1 px-4 py-2 text-sm text-gray-900 bg-white border border-gray-200
-                   rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-900"
+            class="flex-1 px-4 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-900"
           />
+
+          <!-- Send -->
+
           <button
+            type="button"
             (click)="send()"
             [disabled]="!newMessage.trim() && !selectedFile"
-            class="w-10 h-10 rounded-full bg-indigo-900 hover:bg-indigo-800
-                   disabled:opacity-40 flex items-center justify-center transition-colors flex-shrink-0"
+            class="w-10 h-10 rounded-full bg-indigo-900 hover:bg-indigo-800 disabled:opacity-40 flex items-center justify-center transition-colors flex-shrink-0"
           >
-            <!-- Send icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white"
-                 viewBox="0 0 24 24" fill="currentColor">
-              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-white"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path
+                d="M2.01 21L23 12 2.01 3
+                   2 10l15 2-15 2z"
+              />
             </svg>
           </button>
         </div>
       </div>
- 
     </ng-container>
   </div>
- 
 </div>
- 
 
- 
+<!-- ======================================================= -->
+<!-- CREATE GROUP MODAL -->
+<!-- ======================================================= -->
+
+<div
+  *ngIf="showCreateGroupModal"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+>
+  <div
+    class="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- =================================================== -->
+    <!-- MODAL HEADER -->
+    <!-- =================================================== -->
+
+    <div
+      class="flex items-center justify-between px-5 py-4 border-b border-gray-100"
+    >
+      <div>
+        <h3 class="text-base font-semibold text-gray-800">Create New Group</h3>
+
+        <p class="text-xs text-gray-400 mt-1">Add employees to your group</p>
+      </div>
+
+      <button
+        type="button"
+        (click)="closeCreateGroupModal()"
+        class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- =================================================== -->
+    <!-- MODAL BODY -->
+    <!-- =================================================== -->
+
+    <div class="p-5">
+      <!-- GROUP NAME -->
+
+      <label class="block text-sm font-medium text-gray-700 mb-2">
+        Group Name
+      </label>
+
+      <input
+        type="text"
+        [(ngModel)]="groupName"
+        placeholder="e.g. Development Team"
+        class="w-full px-3 py-2.5 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-900"
+      />
+
+      <!-- SELECT MEMBERS -->
+
+      <div class="flex items-center justify-between mt-5 mb-2">
+        <label class="text-sm font-medium text-gray-700">
+          Select Members
+        </label>
+
+        <span class="text-xs text-gray-400">
+          {{ selectedGroupMemberIds.length }}
+          selected
+        </span>
+      </div>
+
+      <!-- MEMBER SEARCH -->
+
+      <input
+        type="text"
+        [(ngModel)]="groupSearchText"
+        placeholder="Search employees..."
+        class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-900 mb-2"
+      />
+
+      <!-- MEMBERS -->
+
+      <div class="border border-gray-100 rounded-xl max-h-56 overflow-y-auto">
+        <button
+          *ngFor="let user of groupUsers"
+          type="button"
+          (click)="toggleGroupMember(user.id)"
+          class="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-gray-50 transition-colors"
+        >
+          <!-- Checkbox -->
+
+          <div
+            class="w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0"
+            [ngClass]="{
+              'bg-indigo-900 border-indigo-900': isGroupMember(user.id),
+              'border-gray-300': !isGroupMember(user.id),
+            }"
+          >
+            <svg
+              *ngIf="isGroupMember(user.id)"
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-3.5 w-3.5 text-white"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+
+          <!-- Avatar -->
+
+          <div
+            class="w-8 h-8 rounded-full bg-indigo-900 text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0"
+          >
+            {{ getInitials(user.fullName) }}
+          </div>
+
+          <!-- User -->
+
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-gray-800 truncate">
+              {{ user.fullName }}
+            </p>
+
+            <p class="text-xs text-gray-400 truncate">
+              {{ user.role }}
+            </p>
+          </div>
+        </button>
+
+        <!-- No users -->
+
+        <div
+          *ngIf="groupUsers.length === 0"
+          class="px-4 py-6 text-center text-sm text-gray-400"
+        >
+          No employees found
+        </div>
+      </div>
+    </div>
+
+    <!-- =================================================== -->
+    <!-- MODAL FOOTER -->
+    <!-- =================================================== -->
+
+    <div
+      class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100 bg-gray-50"
+    >
+      <button
+        type="button"
+        (click)="closeCreateGroupModal()"
+        [disabled]="creatingGroup"
+        class="px-4 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-200 disabled:opacity-50"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        (click)="createGroup()"
+        [disabled]="!groupName.trim() || creatingGroup"
+        class="px-4 py-2 text-sm font-medium text-white bg-indigo-900 rounded-lg hover:bg-indigo-800 disabled:opacity-40 flex items-center gap-2"
+      >
+        <!-- Spinner -->
+
+        <span
+          *ngIf="creatingGroup"
+          class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+        ></span>
+
+        {{ creatingGroup ? "Creating..." : "Create Group" }}
+      </button>
+    </div>
+  </div>
+</div>
