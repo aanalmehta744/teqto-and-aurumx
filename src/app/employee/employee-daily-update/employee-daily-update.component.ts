@@ -86,30 +86,103 @@ export class EmployeeDailyUpdateComponent implements OnInit, AfterViewInit {
   isAssignerRole(): boolean {
     return ['Admin', 'BDE', 'BA'].includes(this.userData?.role || '');
   }
+isSeniorEmployee(): boolean {
+  return (
+    String(this.userData?.role || '').toLowerCase() === 'employee' &&
+    String(this.userData?.employee_level || '').toLowerCase() === 'senior'
+  );
+}
+  // loadUserDataFromLocalStorage(): void {
+  //   const userJson = localStorage.getItem('currentUser');
+  //   if (userJson) {
+  //     this.userData = JSON.parse(userJson);
+
+  //     if (this.isAssignerRole()) {
+  //       this.ishr = 'false';
+  //       this.displayedColumns = ['employeeName', 'project', 'taskTitle', 'taskDetails', 'update', 'status', 'actions'];
+  //     } 
+  //     else if (this.userData?.department === 'HR') {
+  //       this.ishr = 'true';
+  //       this.displayedColumns = ['update', 'actions'];
+  //     } else {
+  //       this.ishr = 'false';
+  //       this.displayedColumns = ['project', 'taskTitle', 'taskDetails', 'update', 'status', 'actions'];
+  //     }
+
+  //     this.fetchDailyUpdates();
+  //   } else {
+  //     console.warn('No logged-in user found in localStorage');
+  //     this.isTblLoading = false;
+  //   }
+  // }
 
   loadUserDataFromLocalStorage(): void {
-    const userJson = localStorage.getItem('currentUser');
-    if (userJson) {
-      this.userData = JSON.parse(userJson);
+  const userJson = localStorage.getItem('currentUser');
 
-      if (this.isAssignerRole()) {
-        this.ishr = 'false';
-        this.displayedColumns = ['employeeName', 'project', 'taskTitle', 'taskDetails', 'update', 'status', 'actions'];
-      } else if (this.userData?.department === 'HR') {
-        this.ishr = 'true';
-        this.displayedColumns = ['update', 'actions'];
-      } else {
-        this.ishr = 'false';
-        this.displayedColumns = ['project', 'taskTitle', 'taskDetails', 'update', 'status', 'actions'];
-      }
+  if (userJson) {
+    this.userData = JSON.parse(userJson);
 
-      this.fetchDailyUpdates();
+    if (this.isAssignerRole()) {
+      // Admin / BDE / BA
+      this.ishr = 'false';
+
+      this.displayedColumns = [
+        'employeeName',
+        'project',
+        'taskTitle',
+        'taskDetails',
+        'update',
+        'status',
+        'actions'
+      ];
+
+    } else if (this.userData?.department === 'HR') {
+      // HR
+      this.ishr = 'true';
+
+      this.displayedColumns = [
+        'update',
+        'actions'
+      ];
+
+    } else if (this.isSeniorEmployee()) {
+      // Senior employee
+      // Senior can see employee name because
+      // backend will return Junior + Intern
+      // from the same department.
+      this.ishr = 'false';
+
+      this.displayedColumns = [
+        'employeeName',
+        'project',
+        'taskTitle',
+        'taskDetails',
+        'update',
+        'status',
+        'actions'
+      ];
+
     } else {
-      console.warn('No logged-in user found in localStorage');
-      this.isTblLoading = false;
-    }
-  }
+      // Junior / Intern / normal employee
+      this.ishr = 'false';
 
+      this.displayedColumns = [
+        'project',
+        'taskTitle',
+        'taskDetails',
+        'update',
+        'status',
+        'actions'
+      ];
+    }
+
+    this.fetchDailyUpdates();
+
+  } else {
+    console.warn('No logged-in user found in localStorage');
+    this.isTblLoading = false;
+  }
+}
   fetchDailyUpdates(): void {
     if (!this.userData?.id) {
       this.isTblLoading = false;

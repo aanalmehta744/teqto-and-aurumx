@@ -1,3 +1,4 @@
+
 // :host {
 //   display: block;
 // }
@@ -91,6 +92,16 @@
 // }
 // .login_shell{width:100%;max-width:1020px;max-height:100%;display:flex;}
  
+// // .login_card{
+// //   flex:1;min-height:0;
+// //   display:grid;grid-template-columns:1fr 1fr;align-items:stretch;
+// //   background:var(--login_surface);
+// //   border:1px solid var(--login_line);
+// //   border-radius:calc(var(--login_radius) + 6px);
+// //   overflow:hidden;
+// //   box-shadow:0 30px 80px -20px rgba(8,20,40,.35);
+// // }
+ 
 // .login_card{
 //   flex:1;min-height:0;
 //   display:grid;grid-template-columns:1fr 1fr;align-items:stretch;
@@ -100,7 +111,6 @@
 //   overflow:hidden;
 //   box-shadow:0 30px 80px -20px rgba(8,20,40,.35);
 // }
- 
 // .login_panel{padding:var(--login_pad);min-width:0;min-height:0;display:flex;flex-direction:column;}
 // .login_panel--form{order:1;justify-content:center;}
 // .login_panel--brand{order:2;background:var(--login_surface-2);border-left:1px solid var(--login_line);}
@@ -427,76 +437,593 @@
 //     padding-left: 2px !important;
  
 // }
- :host {
+ 
+// /* =========================================================
+//    MOBILE FLIP LOGIN
+//    Only active below 500px
+//    ========================================================= */
+
+// .login_flip-btn {
+//   display: none;
+// }
+
+
+// /* ---------------------------------------------------------
+//    MOBILE: <= 499px
+//    --------------------------------------------------------- */
+
+// @media (max-width: 499px) {
+
+//   .login_body {
+//     --login_pad: 20px;
+//     --login_shell-pad: 12px;
+//     --login_radius: 20px;
+//     --login_radius-sm: 12px;
+//     --login_fieldH: 52px;
+//     --login_gap: 14px;
+
+//     overflow: hidden;
+//   }
+
+//   .login_main {
+//     min-height: 100dvh;
+//     height: 100dvh;
+//     padding: 12px;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     perspective: 1400px;
+//   }
+
+//   .login_shell {
+//     width: 100%;
+//     max-width: 100%;
+//     height: min(720px, calc(100dvh - 24px));
+//     max-height: calc(100dvh - 24px);
+//     display: block;
+//     perspective: 1400px;
+//   }
+
+//   /*
+//    * The card itself is the 3D container.
+//    */
+//   .login_card {
+//     position: relative;
+
+//     width: 100%;
+//     height: 100%;
+
+//     display: block;
+
+//     border-radius: calc(var(--login_radius) + 4px);
+
+//     background: transparent;
+//     border: 1px solid var(--login_line);
+
+//     overflow: visible;
+
+//     box-shadow:
+//       0 25px 60px -20px rgba(8, 20, 40, .30);
+
+//     transform-style: preserve-3d;
+
+//     /*
+//      * We don't rotate the whole card.
+//      * Each panel rotates independently.
+//      */
+//     transform: none;
+//   }
+
+
+//   /*
+//    * Both panels occupy exactly the same space.
+//    */
+//   .login_panel {
+//     position: absolute;
+
+//     inset: 0;
+
+//     width: 100%;
+//     height: 100%;
+
+//     min-width: 0;
+//     min-height: 0;
+
+//     padding: var(--login_pad);
+
+//     border-radius: calc(var(--login_radius) + 4px);
+
+//     overflow-y: auto;
+//     overflow-x: hidden;
+
+//     backface-visibility: hidden;
+//     -webkit-backface-visibility: hidden;
+
+//     transform-style: preserve-3d;
+
+//     transition:
+//       transform .75s cubic-bezier(.4, .2, .2, 1),
+//       opacity .15s ease;
+
+//     /*
+//      * Don't allow the desktop order to affect mobile.
+//      */
+//     order: unset;
+//   }
+
+
+//   /* -------------------------------------------------------
+//      LOGIN SIDE — FRONT
+//      ------------------------------------------------------- */
+
+//   .login_panel--form {
+//     z-index: 2;
+
+//     justify-content: center;
+
+//     background: var(--login_surface);
+
+//     border: 0;
+
+//     transform: rotateY(0deg);
+//   }
+
+
+//   /* -------------------------------------------------------
+//      BRAND SIDE — BACK
+//      ------------------------------------------------------- */
+
+//   .login_panel--brand {
+//     z-index: 1;
+
+//     justify-content: center;
+
+//     background: var(--login_surface-2);
+
+//     border: 0;
+
+//     transform: rotateY(180deg);
+
+//     /*
+//      * Prevent the back side from being clickable
+//      * before the flip.
+//      */
+//     pointer-events: none;
+//   }
+
+
+//   /* -------------------------------------------------------
+//      FLIPPED STATE
+//      ------------------------------------------------------- */
+
+//   .login_card.is-flipped .login_panel--form {
+//     transform: rotateY(-180deg);
+
+//     pointer-events: none;
+//   }
+
+//   .login_card.is-flipped .login_panel--brand {
+//     transform: rotateY(0deg);
+
+//     pointer-events: auto;
+//   }
+
+
+//   /* -------------------------------------------------------
+//      MOBILE FLIP BUTTON
+//      ------------------------------------------------------- */
+
+//   .login_flip-btn {
+//     display: flex;
+
+//     width: 100%;
+//     min-height: 46px;
+
+//     align-items: center;
+//     justify-content: center;
+
+//     margin-top: 12px;
+
+//     border: 1px solid var(--login_line);
+//     border-radius: var(--login_radius-sm);
+
+//     background: var(--login_surface-2);
+//     color: #4C1D95;
+
+//     font-family: inherit;
+//     font-size: 14px;
+//     font-weight: 600;
+
+//     cursor: pointer;
+
+//     transition:
+//       background .2s ease,
+//       transform .15s ease,
+//       box-shadow .2s ease;
+//   }
+
+//   .login_flip-btn:hover {
+//     background: var(--login_surface);
+//     box-shadow: 0 6px 18px rgba(76, 29, 149, .12);
+//   }
+
+//   .login_flip-btn:active {
+//     transform: scale(.98);
+//   }
+
+//   .login_flip-btn:focus-visible {
+//     outline: 2px solid var(--login_accent);
+//     outline-offset: 3px;
+//   }
+
+
+//   /* -------------------------------------------------------
+//      FORM SIDE MOBILE SIZING
+//      ------------------------------------------------------- */
+
+//   .login_brand {
+//     justify-content: center;
+//     margin-bottom: 24px;
+//   }
+
+//   .login_brand-mark {
+//     width: 100%;
+//     max-width: 280px;
+//     height: auto;
+//     max-height: 110px;
+//     object-fit: contain;
+//   }
+
+//   .login_legend {
+//     font-size: 13px;
+//   }
+
+//   .login_role-face {
+//     min-height: 46px;
+//     font-size: 13px;
+//   }
+
+//   .login_field {
+//     min-height: var(--login_fieldH);
+//     height: var(--login_fieldH);
+//   }
+
+//   .login_input {
+//     font-size: 14px;
+//   }
+
+//   .login_submit {
+//     min-height: var(--login_fieldH);
+//     height: var(--login_fieldH);
+//   }
+
+
+// /* -------------------------------------------------------
+//    BRAND SIDE MOBILE
+//    ------------------------------------------------------- */
+
+// .login_panel--brand {
+//   justify-content: flex-start;
+//   align-items: center;
+//   padding: 20px;
+//   overflow: hidden;
+//   box-sizing: border-box;
+// }
+
+// .login_panel--brand .login_title {
+//   display: block;
+//   width: 100%;
+
+//   margin: 0;
+
+//   font-size: clamp(1.5rem, 7vw, 2.5rem);
+//   line-height: 1.15;
+//   text-align: center;
+// }
+
+// .login_panel--brand .login_lede {
+//   display: block;
+//   width: 100%;
+
+//   margin: 10px 0 0;
+
+//   font-size: 14px;
+//   line-height: 1.45;
+//   text-align: center;
+// }
+
+// .login_media {
+//   width: 100%;
+//   height: auto;
+//   min-height: 0;
+
+//   flex: 0 0 auto;
+
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+
+//   margin-top: 16px;
+
+//   overflow: hidden;
+//   cursor: default;
+// }
+
+// .login_media-img {
+//   display: block;
+
+//   width: auto;
+//   height: auto;
+
+//   max-width: 100%;
+//   max-height: 32dvh;
+
+//   object-fit: contain;
+//   object-position: center;
+// }
+
+// .login_media-overlay {
+//   display: none !important;
+// }
+
+// .login_note {
+//   width: 100%;
+
+//   margin: 12px 0 0;
+
+//   font-size: 11px;
+//   line-height: 1.4;
+//   text-align: center;
+// }
+
+// .login_panel--brand .login_flip-btn {
+//   width: 100%;
+
+//   min-height: 46px;
+
+//   margin-top: 14px;
+//   flex-shrink: 0;
+// }
+// }
+
+
+// /* =========================================================
+//    VERY SMALL PHONES
+//    ========================================================= */
+
+// @media (max-width: 380px) {
+
+//   .login_main {
+//     padding: 8px;
+//   }
+
+//   .login_shell {
+//     height: calc(100dvh - 16px);
+//     max-height: calc(100dvh - 16px);
+//   }
+
+//   .login_panel {
+//     padding: 16px;
+//   }
+
+//   .login_brand {
+//     margin-bottom: 18px;
+//   }
+
+//   .login_brand-mark {
+//     max-width: 230px;
+//     max-height: 85px;
+//   }
+
+//   .login_form {
+//     gap: 11px;
+//   }
+
+//   .login_role-face {
+//     font-size: 12px;
+//     padding: 8px 4px;
+//   }
+
+//   .login_role-face svg {
+//     width: 14px;
+//     height: 14px;
+//   }
+
+//   .login_field {
+//     height: 48px;
+//     min-height: 48px;
+//     padding: 0 11px;
+//   }
+
+//   .login_submit {
+//     height: 48px;
+//     min-height: 48px;
+//   }
+
+//   .login_flip-btn {
+//     min-height: 42px;
+//     font-size: 13px;
+//   }
+
+//   .login_media {
+//     height: 200px;
+//     min-height: 200px;
+//   }
+
+//   .login_panel--brand .login_title {
+//     font-size: 2rem;
+//   }
+
+//   .login_panel--brand .login_lede {
+//     font-size: 13px;
+//   }
+// }
+
+
+// /* =========================================================
+//    EXTRA SMALL: 320px AND BELOW
+//    ========================================================= */
+
+// @media (max-width: 320px) {
+
+//   .login_main {
+//     padding: 5px;
+//   }
+
+//   .login_shell {
+//     height: calc(100dvh - 10px);
+//     max-height: calc(100dvh - 10px);
+//   }
+
+//   .login_panel {
+//     padding: 13px;
+//   }
+
+//   .login_brand-mark {
+//     max-width: 205px;
+//     max-height: 75px;
+//   }
+
+//   .login_legend {
+//     font-size: 12px;
+//   }
+
+//   .login_role-face {
+//     font-size: 11px;
+//   }
+
+//   .login_field {
+//     height: 44px;
+//     min-height: 44px;
+//   }
+
+//   .login_input {
+//     font-size: 13px;
+//   }
+
+//   .login_submit {
+//     height: 44px;
+//     min-height: 44px;
+//     font-size: 14px;
+//   }
+
+//   .login_flip-btn {
+//     min-height: 40px;
+//     font-size: 12px;
+//   }
+
+//   .login_media {
+//     height: 170px;
+//     min-height: 170px;
+//   }
+// }
+// @media (max-width: 499px) {
+
+//   .login_panel--brand {
+//     overflow-y: auto;
+//     justify-content: flex-start;
+//     align-items: center;
+//     padding: 20px;
+//   }
+
+//   .login_panel--brand .login_media {
+//     width: 100%;
+//     height: auto;
+//     min-height: 0;
+
+//     margin-top: 20px;
+
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+
+//     background: transparent;
+//   }
+
+//   .login_panel--brand .login_media-img {
+//     width: 100%;
+//     height: auto;
+
+//     /*
+//      * Show the COMPLETE image.
+//      */
+//     object-fit: contain;
+
+//     object-position: center;
+
+//     display: block;
+
+//     max-width: 100%;
+//     max-height: 55dvh;
+//   }
+
+//   .login_panel--brand .login_note {
+//     margin-top: 15px;
+//   }
+
+//   .login_panel--brand .login_flip-btn {
+//     margin-top: 15px;
+//   }
+// }
+// @media (max-width: 380px) {
+
+//   .login_panel--brand {
+//     padding: 16px;
+//   }
+
+//   .login_panel--brand .login_media-img {
+//     max-height: 48dvh;
+//   }
+
+// }
+:host {
   display: block;
 }
-
-/* =========================================================
-   THEME VARIABLES
-   ========================================================= */
 
 :root,
 .login_body {
   --login_bg: #EAF2F5;
   --login_surface: #FFFFFF;
   --login_surface-2: #F7F9FA;
-
   --login_ink: #0B1120;
   --login_muted: #5B6577;
   --login_faint: #9AA4B2;
   --login_line: #E3E8EE;
   --login_field: #FFFFFF;
-
   --login_accent: #0D9488;
   --login_accent-strong: #0F766E;
   --login_accent-soft: rgba(13, 148, 136, .12);
-
   --login_danger: #E11D48;
   --login_ghost: #D8DEE6;
 
   --login_radius: 22px;
   --login_radius-sm: 14px;
-
   --login_pad: 44px;
   --login_gap: 18px;
   --login_fieldH: 54px;
   --login_shell-pad: 28px;
 }
 
-
-/* =========================================================
-   DARK THEME
-   ========================================================= */
-
 .login_theme-dark {
   --login_bg: #05080F;
   --login_surface: #0B1120;
   --login_surface-2: #0E1526;
-
   --login_ink: #E7ECF3;
   --login_muted: #94A0B4;
   --login_faint: #6B7686;
   --login_line: #1B2434;
   --login_field: #0F1729;
-
   --login_accent: #14B8A6;
   --login_accent-strong: #0D9488;
   --login_accent-soft: rgba(20, 184, 166, .16);
-
   --login_ghost: #243044;
 }
-
-
-/* =========================================================
-   GLOBAL BOX SIZING
-   ========================================================= */
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
-
 
 /* =========================================================
    MAIN LOGIN BODY
@@ -505,9 +1032,6 @@
 .login_body {
   position: relative;
   z-index: 0;
-
-  width: 100%;
-  min-width: 0;
 
   min-height: 100vh;
   min-height: 100dvh;
@@ -525,10 +1049,8 @@
 
   -webkit-font-smoothing: antialiased;
 
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
 }
-
 
 /* =========================================================
    BACKGROUND
@@ -538,74 +1060,55 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-
   overflow: hidden;
-  pointer-events: none;
 }
 
 .login_blob {
   position: absolute;
-
   border-radius: 50%;
-
   filter: blur(90px);
   opacity: .7;
-
-  pointer-events: none;
 }
 
 .login_blob--teal {
   width: 46rem;
   height: 46rem;
-
   top: -10rem;
   left: -10rem;
 
   background: rgba(109, 40, 217, .45);
 
   animation:
-    login_drift1
-    26s
-    ease-in-out
-    infinite;
+    login_drift1 26s ease-in-out infinite;
 }
 
 .login_blob--violet {
   width: 40rem;
   height: 40rem;
-
   top: 32%;
   right: -8rem;
 
   background: rgba(139, 92, 246, .45);
 
   animation:
-    login_drift2
-    32s
-    ease-in-out
-    infinite;
+    login_drift2 32s ease-in-out infinite;
 }
 
 .login_blob--sky {
   width: 34rem;
   height: 34rem;
-
   bottom: -10rem;
   left: 24%;
 
   background: rgba(196, 181, 253, .55);
 
   animation:
-    login_drift3
-    29s
-    ease-in-out
-    infinite;
+    login_drift3 29s ease-in-out infinite;
 }
 
 .login_veil {
   position: absolute;
   inset: 0;
-
   background: rgba(255, 255, 255, .3);
 }
 
@@ -617,56 +1120,38 @@
   opacity: .4;
 }
 
-
-/* =========================================================
-   BACKGROUND ANIMATIONS
-   ========================================================= */
-
 @keyframes login_drift1 {
   0%,
   100% {
-    transform:
-      translate3d(0, 0, 0)
-      scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 
   50% {
-    transform:
-      translate3d(6vw, -4vh, 0)
-      scale(1.12);
+    transform: translate3d(6vw, -4vh, 0) scale(1.12);
   }
 }
 
 @keyframes login_drift2 {
   0%,
   100% {
-    transform:
-      translate3d(0, 0, 0)
-      scale(1.05);
+    transform: translate3d(0, 0, 0) scale(1.05);
   }
 
   50% {
-    transform:
-      translate3d(-7vw, 5vh, 0)
-      scale(.92);
+    transform: translate3d(-7vw, 5vh, 0) scale(.92);
   }
 }
 
 @keyframes login_drift3 {
   0%,
   100% {
-    transform:
-      translate3d(0, 0, 0)
-      scale(.95);
+    transform: translate3d(0, 0, 0) scale(.95);
   }
 
   50% {
-    transform:
-      translate3d(4vw, 6vh, 0)
-      scale(1.15);
+    transform: translate3d(4vw, 6vh, 0) scale(1.15);
   }
 }
-
 
 /* =========================================================
    THEME BUTTON
@@ -674,10 +1159,8 @@
 
 .login_theme-btn {
   position: fixed;
-
   top: 16px;
   left: 16px;
-
   z-index: 30;
 
   width: 40px;
@@ -692,16 +1175,15 @@
   background: rgba(255, 255, 255, .85);
   color: var(--login_ink);
 
-  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 
   cursor: pointer;
 
   box-shadow:
     0 2px 10px rgba(8, 20, 40, .1);
 
-  transition:
-    transform .18s ease;
+  transition: transform .18s ease;
 }
 
 .login_theme-dark .login_theme-btn {
@@ -727,20 +1209,16 @@
   display: none !important;
 }
 
-
 /* =========================================================
-   MAIN CONTAINER
+   MAIN / SHELL
    ========================================================= */
 
 .login_main {
   position: relative;
   z-index: 1;
 
-  width: 100%;
-  min-width: 0;
-
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
 
   display: flex;
   align-items: center;
@@ -749,41 +1227,26 @@
   padding: var(--login_shell-pad);
 }
 
-
-/* =========================================================
-   SHELL
-   ========================================================= */
-
 .login_shell {
   width: 100%;
   max-width: 1020px;
-
-  min-width: 0;
-
   max-height: 100%;
 
   display: flex;
 }
 
-
 /* =========================================================
-   CARD
+   LOGIN CARD
    ========================================================= */
 
 .login_card {
-  width: 100%;
+  position: relative;
 
   flex: 1;
-
-  min-width: 0;
   min-height: 0;
 
   display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(0, 1fr);
-
+  grid-template-columns: 1fr 1fr;
   align-items: stretch;
 
   background: var(--login_surface);
@@ -796,21 +1259,18 @@
   overflow: hidden;
 
   box-shadow:
-    0 30px 80px -20px
-    rgba(8, 20, 40, .35);
+    0 30px 80px -20px rgba(8, 20, 40, .35);
 }
-
 
 /* =========================================================
    PANELS
    ========================================================= */
 
 .login_panel {
-  width: 100%;
+  padding: var(--login_pad);
+
   min-width: 0;
   min-height: 0;
-
-  padding: var(--login_pad);
 
   display: flex;
   flex-direction: column;
@@ -827,16 +1287,25 @@
   background: var(--login_surface-2);
 
   border-left: 1px solid var(--login_line);
-}
 
+  display: flex;
+  flex-direction: column;
+
+  /*
+   * Important:
+   * Keep title + description visible on desktop.
+   */
+  justify-content: flex-start;
+  align-items: stretch;
+
+  overflow: hidden;
+}
 
 /* =========================================================
    BRAND
    ========================================================= */
 
 .login_brand {
-  width: 100%;
-
   display: flex;
   align-items: center;
 
@@ -845,16 +1314,20 @@
   margin-bottom: 28px;
 }
 
+// .login_brand-mark {
+//   height: 152px;
+//   width: auto;
+
+//   flex: none;
+
+//   object-fit: contain;
+// }
 .login_brand-mark {
   display: block;
-
   width: auto;
   height: 152px;
-
   max-width: 100%;
-
   flex: none;
-
   object-fit: contain;
 }
 
@@ -883,33 +1356,25 @@
   color: var(--login_muted);
 }
 
-
 /* =========================================================
    FORM
    ========================================================= */
 
 .login_form {
-  width: 100%;
-  min-width: 0;
-
   display: flex;
   flex-direction: column;
-
   gap: var(--login_gap);
 }
 
 .login_fieldset {
   border: 0;
-
   margin: 0;
   padding: 0;
-
   min-width: 0;
 }
 
 .login_legend {
   padding: 0;
-
   margin-bottom: 8px;
 
   font-size: 12px;
@@ -918,20 +1383,13 @@
   color: var(--login_muted);
 }
 
-
 /* =========================================================
-   ROLE SELECTOR
+   ROLES
    ========================================================= */
 
 .login_roles {
-  width: 100%;
-  min-width: 0;
-
   display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(0, 1fr);
+  grid-template-columns: 1fr 1fr;
 
   gap: 4px;
 
@@ -948,9 +1406,7 @@
 
 .login_role {
   position: relative;
-
   display: block;
-
   min-width: 0;
 }
 
@@ -966,9 +1422,6 @@
 }
 
 .login_role-face {
-  width: 100%;
-  min-width: 0;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -997,7 +1450,6 @@
 .login_role-face svg {
   width: 15px;
   height: 15px;
-
   flex: none;
 }
 
@@ -1007,8 +1459,7 @@
   color: #4C1D95;
 
   box-shadow:
-    0 1px 3px
-    rgba(8, 20, 40, .12);
+    0 1px 3px rgba(8, 20, 40, .12);
 }
 
 .login_theme-dark
@@ -1018,21 +1469,16 @@
   color: #7C3AED;
 }
 
-.login_role-input:focus-visible
-+ .login_role-face {
+.login_role-input:focus-visible + .login_role-face {
   outline: 2px solid var(--login_accent);
   outline-offset: 2px;
 }
 
-
 /* =========================================================
-   INPUT FIELDS
+   INPUTS
    ========================================================= */
 
 .login_field {
-  width: 100%;
-  min-width: 0;
-
   display: flex;
   align-items: center;
 
@@ -1057,8 +1503,7 @@
   border-color: var(--login_accent);
 
   box-shadow:
-    0 0 0 4px
-    var(--login_accent-soft);
+    0 0 0 4px var(--login_accent-soft);
 }
 
 .login_field-icon {
@@ -1072,8 +1517,6 @@
 
 .login_input {
   flex: 1;
-
-  width: 100%;
   min-width: 0;
 
   border: 0;
@@ -1091,40 +1534,27 @@
   color: var(--login_faint);
 }
 
-
-/* =========================================================
-   AUTOFILL
-   ========================================================= */
-
 .login_input:-webkit-autofill,
 .login_input:-webkit-autofill:hover,
 .login_input:-webkit-autofill:focus {
   -webkit-text-fill-color: var(--login_ink);
 
   -webkit-box-shadow:
-    0 0 0 1000px
-    var(--login_field)
-    inset;
+    0 0 0px 1000px var(--login_field) inset;
 
   box-shadow:
-    0 0 0 1000px
-    var(--login_field)
-    inset;
+    0 0 0px 1000px var(--login_field) inset;
 
   transition:
-    background-color
-    9999s
-    ease-in-out
-    0s;
+    background-color 9999s ease-in-out 0s;
 }
-
 
 /* =========================================================
    PASSWORD EYE
    ========================================================= */
 
 .login_eye {
-  flex: 0 0 auto;
+  flex: none;
 
   display: grid;
   place-items: center;
@@ -1158,14 +1588,12 @@
   height: 19px;
 }
 
-
 /* =========================================================
-   OPTIONAL ROW
+   ROW / LINKS
    ========================================================= */
 
 .login_row {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
 
@@ -1216,7 +1644,6 @@
   text-underline-offset: 4px;
 }
 
-
 /* =========================================================
    ERROR
    ========================================================= */
@@ -1228,21 +1655,17 @@
   font-weight: 500;
 
   color: var(--login_danger);
-
-  overflow-wrap: anywhere;
 }
 
-
 /* =========================================================
-   SUBMIT
+   SUBMIT BUTTON
    ========================================================= */
 
 .login_submit {
-  width: 100%;
   height: var(--login_fieldH);
+  width: 100%;
 
   border: 0;
-
   border-radius: var(--login_radius-sm);
 
   background: #4C1D95;
@@ -1259,8 +1682,7 @@
     transform .12s ease;
 
   box-shadow:
-    0 12px 24px -10px
-    rgba(76, 29, 149, .5);
+    0 12px 24px -10px rgba(76, 29, 149, .5);
 }
 
 .login_submit:hover {
@@ -1281,12 +1703,16 @@
   cursor: not-allowed;
 }
 
-
 /* =========================================================
-   RIGHT / BRAND PANEL
+   BRAND TITLE
    ========================================================= */
 
 .login_title {
+  display: block;
+
+  visibility: visible;
+  opacity: 1;
+
   margin: 0;
 
   font-family:
@@ -1296,43 +1722,45 @@
 
   font-weight: 700;
 
-  font-size:
-    clamp(2rem, 5vw, 3.6rem);
+  font-size: clamp(2rem, 5vw, 3.6rem);
 
-  line-height: .95;
+  line-height: 1;
 
   letter-spacing: -.03em;
 
   color: var(--login_ghost);
-
-  overflow-wrap: anywhere;
 }
 
+/* =========================================================
+   BRAND SUBTEXT
+   IMPORTANT: NEVER HIDE ON DESKTOP
+   ========================================================= */
+
 .login_lede {
-  width: 100%;
-  max-width: 26rem;
+  display: block;
+
+  visibility: visible;
+  opacity: 1;
 
   margin: 14px 0 0;
 
-  font-size: 14.5px;
+  max-width: 26rem;
+
+  font-size: 16px;
+
+  line-height: 1.5;
 
   color: var(--login_muted);
-
-  overflow-wrap: anywhere;
 }
 
-
 /* =========================================================
-   IMAGE
-   No upload / no click / no overlay
+   MEDIA
    ========================================================= */
 
 .login_media {
   position: relative;
 
   display: block;
-
-  width: 100%;
 
   flex: 1 1 auto;
 
@@ -1347,6 +1775,8 @@
   background: var(--login_surface);
 
   border: 1px solid var(--login_line);
+
+  cursor: pointer;
 }
 
 .login_media-img {
@@ -1356,174 +1786,544 @@
   height: 100%;
 
   object-fit: cover;
+
   object-position: center;
 }
 
+.login_media-input {
+  position: absolute;
+
+  opacity: 0;
+
+  width: 1px;
+  height: 1px;
+
+  pointer-events: none;
+}
 
 /* =========================================================
-   FOOTER
+   MEDIA OVERLAY
+   ========================================================= */
+
+.login_media-overlay {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+
+  align-items: flex-end;
+  justify-content: center;
+
+  padding: 14px;
+
+  gap: 8px;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(6, 12, 24, .72),
+      rgba(6, 12, 24, 0) 55%
+    );
+
+  opacity: 0;
+
+  transition: opacity .2s ease;
+}
+
+.login_media:hover .login_media-overlay,
+.login_media:focus-visible .login_media-overlay {
+  opacity: 1;
+}
+
+.login_media:focus-visible {
+  outline: 2px solid var(--login_accent);
+  outline-offset: 3px;
+}
+
+.login_media-chip {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 7px 13px;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, .94);
+
+  color: #0B1120;
+
+  font-size: 12.5px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   FOOTER NOTE
    ========================================================= */
 
 .login_note {
+  flex: 0 0 auto;
+
   margin: 16px 0 0;
 
-  font-size: 11.5px;
+  font-size: 11px;
+
+  line-height: 1.4;
 
   color: var(--login_faint);
 
-  overflow-wrap: anywhere;
+  text-align: center;
 }
 
-
 /* =========================================================
-   TABLET
+   FLIP BUTTON
    ========================================================= */
 
-@media (max-width: 880px) {
+.login_flip-btn {
+  display: none;
+}
+
+/* =========================================================
+   DESKTOP HEIGHT FIX
+   ========================================================= */
+
+/*
+ * IMPORTANT:
+ * Do NOT hide .login_lede on short desktop screens.
+ *
+ * Previously a max-height media query was hiding it.
+ * The description must remain visible.
+ */
+
+@media (min-width: 500px) {
+
+  .login_panel--brand {
+    overflow: hidden;
+  }
+
+  .login_panel--brand .login_title {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .login_panel--brand .login_lede {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+/* =========================================================
+   MOBILE FLIP LOGIN
+   ONLY ACTIVE BELOW 500PX
+   ========================================================= */
+
+@media (max-width: 499px) {
 
   .login_body {
-    --login_pad: 26px;
+    --login_pad: 20px;
+    --login_shell-pad: 12px;
+    --login_radius: 20px;
+    --login_radius-sm: 12px;
+    --login_fieldH: 52px;
     --login_gap: 14px;
-    --login_shell-pad: 14px;
-    --login_fieldH: 50px;
 
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: hidden;
   }
 
   .login_main {
     min-height: 100dvh;
-    height: auto;
+    height: 100dvh;
 
-    align-items: flex-start;
+    padding: 12px;
 
-    padding: var(--login_shell-pad);
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    perspective: 1400px;
   }
 
   .login_shell {
     width: 100%;
-    max-width: 600px;
+    max-width: 100%;
 
-    max-height: none;
+    height: min(720px, calc(100dvh - 24px));
+    max-height: calc(100dvh - 24px);
 
-    margin: auto;
+    display: block;
+
+    perspective: 1400px;
   }
+
+  /* =======================================================
+     CARD
+     ======================================================= */
 
   .login_card {
-    display: flex;
-    flex-direction: column;
+    position: relative;
 
     width: 100%;
+    height: 100%;
+
+    display: block;
+
+    border-radius:
+      calc(var(--login_radius) + 4px);
+
+    background: transparent;
+
+    border: 1px solid var(--login_line);
+
+    overflow: visible;
+
+    box-shadow:
+      0 25px 60px -20px rgba(8, 20, 40, .30);
+
+    transform-style: preserve-3d;
+
+    transform: none;
   }
+
+  /* =======================================================
+     PANELS
+     ======================================================= */
 
   .login_panel {
+    position: absolute;
+
+    inset: 0;
+
     width: 100%;
+    height: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    padding: var(--login_pad);
+
+    border-radius:
+      calc(var(--login_radius) + 4px);
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+
+    transform-style: preserve-3d;
+
+    transition:
+      transform .75s cubic-bezier(.4, .2, .2, 1),
+      opacity .15s ease;
+
+    order: unset;
   }
 
-  .login_panel--brand {
-    order: 1;
-
-    border-left: 0;
-
-    border-bottom:
-      1px solid
-      var(--login_line);
-
-    padding-bottom: 22px;
-  }
+  /* =======================================================
+     FORM FRONT
+     ======================================================= */
 
   .login_panel--form {
-    order: 2;
+    z-index: 2;
 
-    flex: none;
+    justify-content: center;
+
+    background: var(--login_surface);
+
+    border: 0;
+
+    transform: rotateY(0deg);
+  }
+
+  /* =======================================================
+     BRAND BACK
+     ======================================================= */
+
+  .login_panel--brand {
+    z-index: 1;
+
+    justify-content: center;
+
+    background: var(--login_surface-2);
+
+    border: 0;
+
+    transform: rotateY(180deg);
+
+    pointer-events: none;
+  }
+
+  /* =======================================================
+     FLIPPED
+     ======================================================= */
+
+  .login_card.is-flipped .login_panel--form {
+    transform: rotateY(-180deg);
+
+    pointer-events: none;
+  }
+
+  .login_card.is-flipped .login_panel--brand {
+    transform: rotateY(0deg);
+
+    pointer-events: auto;
+  }
+
+  /* =======================================================
+     FLIP BUTTON
+     ======================================================= */
+
+  .login_flip-btn {
+    display: flex;
+
+    width: 100%;
+
+    min-height: 46px;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-top: 12px;
+
+    border: 1px solid var(--login_line);
+
+    border-radius: var(--login_radius-sm);
+
+    background: var(--login_surface-2);
+
+    color: #4C1D95;
+
+    font-family: inherit;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+      background .2s ease,
+      transform .15s ease,
+      box-shadow .2s ease;
+  }
+
+  .login_flip-btn:hover {
+    background: var(--login_surface);
+
+    box-shadow:
+      0 6px 18px rgba(76, 29, 149, .12);
+  }
+
+  .login_flip-btn:active {
+    transform: scale(.98);
+  }
+
+  .login_flip-btn:focus-visible {
+    outline: 2px solid var(--login_accent);
+    outline-offset: 3px;
+  }
+
+  /* =======================================================
+     FORM MOBILE
+     ======================================================= */
+
+  .login_brand {
+    justify-content: center;
+
+    margin-bottom: 24px;
   }
 
   .login_brand-mark {
-    max-width: 100%;
-    max-height: 110px;
+    width: 100%;
+
+    max-width: 280px;
 
     height: auto;
+
+    max-height: 110px;
+
+    object-fit: contain;
   }
 
-  .login_title {
-    font-size:
-      clamp(1.8rem, 7vw, 2.6rem);
-
-    line-height: 1;
+  .login_legend {
+    font-size: 13px;
   }
 
-  .login_lede {
-    max-width: 100%;
+  .login_role-face {
+    min-height: 46px;
+
+    font-size: 13px;
+  }
+
+  .login_field {
+    min-height: var(--login_fieldH);
+    height: var(--login_fieldH);
+  }
+
+  .login_input {
     font-size: 14px;
+  }
+
+  .login_submit {
+    min-height: var(--login_fieldH);
+    height: var(--login_fieldH);
+  }
+
+  /* =======================================================
+     BRAND MOBILE
+     ======================================================= */
+
+  .login_panel--brand {
+    justify-content: flex-start;
+
+    align-items: center;
+
+    padding: 20px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    box-sizing: border-box;
+  }
+
+  .login_panel--brand .login_title {
+    display: block;
+
+    width: 100%;
+
+    margin: 0;
+
+    font-size:
+      clamp(1.5rem, 7vw, 2.5rem);
+
+    line-height: 1.15;
+
+    text-align: center;
+  }
+
+  .login_panel--brand .login_lede {
+    display: block;
+
+    width: 100%;
+
+    margin: 10px 0 0;
+
+    font-size: 14px;
+
+    line-height: 1.45;
+
+    text-align: center;
   }
 
   .login_media {
     width: 100%;
 
-    height: 180px;
-    min-height: 180px;
+    height: auto;
+
+    min-height: 0;
+
+    flex: 0 0 auto;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
 
     margin-top: 16px;
+
+    overflow: hidden;
+
+    cursor: default;
+  }
+
+  .login_media-img {
+    display: block;
+
+    width: auto;
+    height: auto;
+
+    max-width: 100%;
+
+    /*
+     * Keep the complete image visible.
+     */
+    max-height: 32dvh;
+
+    object-fit: contain;
+
+    object-position: center;
+  }
+
+  .login_media-overlay {
+    display: none !important;
   }
 
   .login_note {
-    display: none;
+    width: 100%;
+
+    margin: 12px 0 0;
+
+    font-size: 11px;
+
+    line-height: 1.4;
+
+    text-align: center;
+  }
+
+  .login_panel--brand .login_flip-btn {
+    width: 100%;
+
+    min-height: 46px;
+
+    margin-top: 14px;
+
+    flex-shrink: 0;
   }
 }
 
-
 /* =========================================================
-   MOBILE
+   VERY SMALL PHONES
    ========================================================= */
 
-@media (max-width: 600px) {
-
-  .login_body {
-    --login_pad: 20px;
-    --login_shell-pad: 10px;
-    --login_gap: 13px;
-    --login_fieldH: 50px;
-  }
+@media (max-width: 380px) {
 
   .login_main {
-    padding: 10px;
+    padding: 8px;
   }
 
   .login_shell {
-    max-width: 100%;
-  }
+    height: calc(100dvh - 16px);
 
-  .login_card {
-    border-radius: 18px;
+    max-height:
+      calc(100dvh - 16px);
   }
 
   .login_panel {
-    padding: 20px;
+    padding: 16px;
   }
 
   .login_brand {
-    justify-content: center;
-
     margin-bottom: 18px;
   }
 
   .login_brand-mark {
-    width: auto;
-
-    max-width: 85%;
-    max-height: 90px;
+    max-width: 230px;
+    max-height: 85px;
   }
 
-  .login_roles {
-    width: 100%;
+  .login_form {
+    gap: 11px;
   }
 
   .login_role-face {
-    font-size: 13px;
-
-    padding: 10px 5px;
-
-    gap: 5px;
+    font-size: 12px;
+    padding: 8px 4px;
   }
 
   .login_role-face svg {
@@ -1532,750 +2332,166 @@
   }
 
   .login_field {
-    width: 100%;
-
-    padding: 0 12px;
-  }
-
-  .login_input {
-    font-size: 14px;
+    height: 48px;
+    min-height: 48px;
+    padding: 0 11px;
   }
 
   .login_submit {
-    width: 100%;
+    height: 48px;
+    min-height: 48px;
   }
 
-  .login_media {
-    height: 150px;
-    min-height: 150px;
-  }
-}
-
-
-/* =========================================================
-   375px AND BELOW
-   ========================================================= */
-
-@media (max-width: 375px) {
-
-  .login_body {
-    --login_pad: 16px;
-    --login_shell-pad: 6px;
-    --login_gap: 11px;
-    --login_fieldH: 46px;
-
-    --login_radius: 16px;
-    --login_radius-sm: 11px;
-  }
-
-  .login_main {
-    padding: 6px;
-  }
-
-  .login_card {
-    border-radius: 16px;
-  }
-
-  .login_panel {
-    padding: 16px;
-  }
-
-  .login_brand {
-    margin-bottom: 14px;
-  }
-
-  .login_brand-mark {
-    max-width: 80%;
-    max-height: 75px;
-  }
-
-  .login_legend {
-    font-size: 11px;
-
-    margin-bottom: 6px;
-  }
-
-  .login_roles {
-    gap: 3px;
-    padding: 3px;
-  }
-
-  .login_role-face {
-    font-size: 12px;
-
-    padding: 8px 3px;
-
-    gap: 4px;
-  }
-
-  .login_role-face svg {
-    width: 13px;
-    height: 13px;
-  }
-
-  .login_field {
-    height: var(--login_fieldH);
-
-    padding: 0 10px;
-
-    gap: 7px;
-  }
-
-  .login_field-icon {
-    width: 17px;
-    height: 17px;
-  }
-
-  .login_input {
+  .login_flip-btn {
+    min-height: 42px;
     font-size: 13px;
   }
 
-  .login_input::placeholder {
+  .login_media {
+    height: 200px;
+    min-height: 200px;
+  }
+
+  .login_panel--brand .login_title {
+    font-size: 2rem;
+  }
+
+  .login_panel--brand .login_lede {
     font-size: 13px;
   }
 
-  .login_eye {
-    width: 24px;
-    height: 24px;
-  }
-
-  .login_eye svg {
-    width: 17px;
-    height: 17px;
-  }
-
-  .login_submit {
-    height: var(--login_fieldH);
-
-    font-size: 14px;
-  }
-
-  .login_title {
-    font-size: 1.65rem;
-  }
-
-  .login_lede {
-    font-size: 12.5px;
-    line-height: 1.45;
-  }
-
-  .login_media {
-    height: 125px;
-    min-height: 125px;
-
-    margin-top: 12px;
-
-    border-radius: 12px;
+  .login_panel--brand .login_media-img {
+    max-height: 48dvh;
   }
 }
 
-
 /* =========================================================
-   320px AND BELOW
+   EXTRA SMALL: 320PX AND BELOW
    ========================================================= */
 
 @media (max-width: 320px) {
 
-  .login_body {
-    --login_pad: 12px;
-    --login_shell-pad: 4px;
-    --login_gap: 9px;
-    --login_fieldH: 44px;
-
-    --login_radius: 14px;
-    --login_radius-sm: 10px;
-  }
-
   .login_main {
-    width: 100%;
-    min-width: 0;
-
-    padding: 4px;
+    padding: 5px;
   }
 
   .login_shell {
-    width: 100%;
-    min-width: 0;
-  }
+    height: calc(100dvh - 10px);
 
-  .login_card {
-    width: 100%;
-    min-width: 0;
-
-    border-radius: 14px;
+    max-height:
+      calc(100dvh - 10px);
   }
 
   .login_panel {
-    width: 100%;
-    min-width: 0;
-
-    padding: 12px;
-  }
-
-  /* Logo */
-  .login_brand {
-    width: 100%;
-
-    justify-content: center;
-
-    margin-bottom: 12px;
+    padding: 13px;
   }
 
   .login_brand-mark {
-    display: block;
-
-    width: auto;
-
-    max-width: 75%;
-    max-height: 65px;
-
-    height: auto;
+    max-width: 205px;
+    max-height: 75px;
   }
 
-  /* Title */
-  .login_title {
-    width: 100%;
-
-    font-size: 1.4rem;
-
-    line-height: 1.05;
-
-    overflow-wrap: anywhere;
-  }
-
-  /* Description */
-  .login_lede {
-    width: 100%;
-
-    margin-top: 8px;
-
-    font-size: 11.5px;
-
-    line-height: 1.4;
-
-    overflow-wrap: anywhere;
-  }
-
-  /* Image */
-  .login_media {
-    width: 100%;
-
-    height: 105px;
-    min-height: 105px;
-
-    margin-top: 10px;
-
-    border-radius: 10px;
-  }
-
-  .login_media-img {
-    width: 100%;
-    height: 100%;
-
-    object-fit: cover;
-  }
-
-  /* Roles */
-  .login_roles {
-    width: 100%;
-    min-width: 0;
-
-    grid-template-columns:
-      minmax(0, 1fr)
-      minmax(0, 1fr);
-
-    gap: 2px;
-
-    padding: 2px;
-  }
-
-  .login_role {
-    min-width: 0;
+  .login_legend {
+    font-size: 12px;
   }
 
   .login_role-face {
-    width: 100%;
-    min-width: 0;
-
-    padding: 8px 2px;
-
     font-size: 11px;
-
-    gap: 3px;
   }
 
-  .login_role-face svg {
-    display: none;
-  }
-
-  /* Inputs */
   .login_field {
-    width: 100%;
-    min-width: 0;
-
     height: 44px;
-
-    padding: 0 9px;
-
-    gap: 6px;
-  }
-
-  .login_field-icon {
-    width: 16px;
-    height: 16px;
+    min-height: 44px;
   }
 
   .login_input {
-    width: 100%;
-    min-width: 0;
-
-    font-size: 12px;
-  }
-
-  .login_input::placeholder {
-    font-size: 12px;
-  }
-
-  /* Password icon */
-  .login_eye {
-    width: 22px;
-    height: 22px;
-
-    flex: 0 0 22px;
-  }
-
-  .login_eye svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  /* Error */
-  .login_error {
-    font-size: 11px;
-
-    line-height: 1.35;
-
-    overflow-wrap: anywhere;
-  }
-
-  /* Button */
-  .login_submit {
-    width: 100%;
-
-    height: 44px;
-
     font-size: 13px;
   }
-}
-
-
-/* =========================================================
-   EXTREMELY SMALL — 280px
-   ========================================================= */
-
-@media (max-width: 280px) {
-
-  .login_body {
-    --login_pad: 10px;
-    --login_shell-pad: 3px;
-    --login_gap: 8px;
-    --login_fieldH: 42px;
-  }
-
-  .login_main {
-    padding: 3px;
-  }
-
-  .login_card {
-    border-radius: 12px;
-  }
-
-  .login_panel {
-    padding: 10px;
-  }
-
-  .login_brand {
-    margin-bottom: 10px;
-  }
-
-  .login_brand-mark {
-    max-width: 70%;
-    max-height: 55px;
-  }
-
-  .login_title {
-    font-size: 1.2rem;
-  }
-
-  .login_lede {
-    font-size: 10.5px;
-  }
-
-  .login_role-face {
-    font-size: 10px;
-
-    padding: 7px 1px;
-  }
-
-  .login_field {
-    height: 42px;
-
-    padding: 0 7px;
-
-    gap: 5px;
-  }
-
-  .login_field-icon {
-    width: 15px;
-    height: 15px;
-  }
-
-  .login_input {
-    font-size: 11px;
-  }
-
-  .login_input::placeholder {
-    font-size: 11px;
-  }
-
-  .login_eye {
-    width: 20px;
-    height: 20px;
-
-    flex-basis: 20px;
-  }
-
-  .login_eye svg {
-    width: 15px;
-    height: 15px;
-  }
 
   .login_submit {
-    height: 42px;
+    height: 44px;
+    min-height: 44px;
 
+    font-size: 14px;
+  }
+
+  .login_flip-btn {
+    min-height: 40px;
     font-size: 12px;
   }
 
   .login_media {
-    height: 90px;
-    min-height: 90px;
+    height: 170px;
+    min-height: 170px;
   }
 }
-
 
 /* =========================================================
-   SHORT SCREEN
+   FINAL MOBILE BRAND OVERRIDES
    ========================================================= */
 
-@media (max-height: 640px) and (min-width: 321px) {
+@media (max-width: 499px) {
 
-  .login_main {
-    align-items: flex-start;
+  .login_panel--brand {
+    overflow-y: auto;
 
-    padding-top: 8px;
-    padding-bottom: 8px;
+    justify-content: flex-start;
+    align-items: center;
+
+    padding: 20px;
   }
 
-  .login_panel {
-    padding-top: 16px;
-    padding-bottom: 16px;
+  .login_panel--brand .login_media {
+    width: 100%;
+
+    height: auto;
+
+    min-height: 0;
+
+    margin-top: 20px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: transparent;
   }
 
-  .login_lede {
-    display: none;
+  .login_panel--brand .login_media-img {
+    width: 100%;
+    height: auto;
+
+    object-fit: contain;
+
+    object-position: center;
+
+    display: block;
+
+    max-width: 100%;
+
+    /*
+     * Complete image remains visible.
+     */
+    max-height: 55dvh;
   }
 
-  .login_media {
-    height: 100px;
-    min-height: 100px;
-  }
-}
-
-
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-  .login_blob {
-    animation: none;
+  .login_panel--brand .login_note {
+    margin-top: 15px;
   }
 
-  * {
-    transition-duration: .01ms !important;
-  }
-}
-
-
-/* =========================================================
-   ANGULAR MATERIAL SNACKBAR
-   ========================================================= */
-
-::ng-deep .mat-snack-bar-container {
-  border-radius: 8px;
-
-  font-weight: 500;
-  font-size: 14px;
-
-  padding: 12px 24px;
-}
-
-::ng-deep .custom-snackbar-success {
-  background-color: #16a34a !important;
-  color: white !important;
-}
-
-::ng-deep .custom-snackbar-error {
-  background-color: #dc2626 !important;
-  color: white !important;
-}
-
-
-/* =========================================================
-   CLIP LOGO
-   ========================================================= */
-
-@media (min-width: 320px) and (max-width: 375px) {
-
-  #clip-logo {
-    clip-path:
-      polygon(
-        0% 0,
-        100% 0,
-        100% 100%,
-        0 100%,
-        0 5%
-      );
+  .login_panel--brand .login_flip-btn {
+    margin-top: 15px;
   }
 }
 
-@media (min-width: 375px) and (max-width: 425px) {
+@media (max-width: 380px) {
 
-  #clip-logo {
-    clip-path:
-      polygon(
-        6% 0,
-        100% 0,
-        100% 100%,
-        0 100%,
-        0 7%
-      );
+  .login_panel--brand {
+    padding: 16px;
   }
-}
 
-@media (min-width: 425px) and (max-width: 640px) {
-
-  #clip-logo {
-    clip-path:
-      polygon(
-        5.5% 0,
-        100% 0,
-        100% 100%,
-        0 100%,
-        0 10%
-      ) !important;
+  .login_panel--brand .login_media-img {
+    max-height: 48dvh;
   }
-}
-
-@media (min-width: 640px) and (max-width: 768px) {
-
-  #clip-logo {
-    clip-path:
-      polygon(
-        4.5% 0,
-        100% 0,
-        100% 100%,
-        0 100%,
-        0 9%
-      );
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1024px) {
-
-  #clip-logo {
-    clip-path:
-      polygon(
-        5% 0,
-        100% 0,
-        100% 100%,
-        0 100%,
-        0 7%
-      );
-  }
-}
-
-@media (min-width: 1024px) and (max-width: 1280px) {
-
-  #clip-logo {
-    clip-path:
-      polygon(
-        3.5% 0,
-        100% 0,
-        100% 100%,
-        0 100%,
-        0 7%
-      );
-  }
-}
-
-@media (min-width: 1280px) and (max-width: 1536px) {
-
-  #clip-logo {
-    clip-path:
-      polygon(
-        8% 0,
-        100% 0,
-        100% 100%,
-        0 100%,
-        0 10%
-      );
-  }
-}
-
-@media (min-width: 1536px) and (max-width: 2560px) {
-
-  #clip-logo {
-    clip-path:
-      polygon(
-        8% 0,
-        100% 0,
-        100% 100%,
-        0 100%,
-        0 10%
-      );
-  }
-}
-
-@media (min-width: 2560px) {
-
-  #clip-logo {
-    clip-path:
-      polygon(
-        5% 0,
-        100% 0,
-        100% 100%,
-        0 100%,
-        0 10%
-      );
-  }
-}
-
-
-/* =========================================================
-   ORBIT ANIMATION
-   ========================================================= */
-
-#icondiv {
-  position: relative;
-
-  border-radius:
-    33% 67% 32% 68%
-    /
-    41% 32% 68% 59%;
-}
-
-.orbit-container {
-  position: absolute;
-
-  top: 0;
-  left: 0;
-
-  width: 100%;
-  height: 100%;
-
-  animation:
-    rotateOrbit
-    25s
-    linear
-    infinite;
-}
-
-.orbit-item {
-  position: absolute;
-
-  top: 50%;
-  left: 50%;
-
-  transform:
-    translate(-50%, -50%);
-
-  width: 100%;
-  height: 100%;
-}
-
-.orbit-item > div {
-  position: absolute;
-
-  will-change: transform;
-}
-
-
-/* Orbit positions */
-
-.orbit-item:nth-child(1) > div {
-  left: 0%;
-  top: 0%;
-}
-
-.orbit-item:nth-child(2) > div {
-  right: 0%;
-  top: 0%;
-}
-
-.orbit-item:nth-child(3) > div {
-  left: 0%;
-  bottom: 9%;
-}
-
-.orbit-item:nth-child(4) > div {
-  right: 0%;
-  bottom: 5%;
-}
-
-
-/* =========================================================
-   CUSTOM MATERIAL FIELD
-   ========================================================= */
-
-::ng-deep .custom-field .mat-mdc-form-field-flex {
-  background-color: transparent !important;
-
-  transition: none !important;
-}
-
-::ng-deep .custom-field .mat-mdc-form-field-flex:hover {
-  background-color: transparent !important;
-
-  box-shadow: none !important;
-}
-
-::ng-deep .custom-field .mat-mdc-form-field-focus-overlay {
-  background: transparent !important;
-}
-
-::ng-deep .custom-field .mdc-text-field--filled {
-  background-color: transparent !important;
-
-  box-shadow: none !important;
-}
-
-::ng-deep .custom-field .mdc-text-field--filled:hover {
-  background-color: transparent !important;
-
-  box-shadow: none !important;
-
-  padding-right: 0 !important;
-}
-
-::ng-deep .custom-field .mdc-text-field--focused {
-  background-color: transparent !important;
-}
-
-::ng-deep
-.mat-mdc-form-field-has-icon-suffix
-.mat-mdc-text-field-wrapper {
-  padding-right: 0 !important;
-  padding-left: 2px !important;
 }

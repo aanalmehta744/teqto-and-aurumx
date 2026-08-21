@@ -137,13 +137,65 @@ export class TaskComponent implements OnInit {
     });
   }
   loadEmployees() {
-    this.employeesService.getAllEmployeess().subscribe((data) => {
-      this.employees = data;
-      const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
-      this.assignableEmployees = (user?.role?.toLowerCase() === 'employee' && user?.employee_level === 'Senior')
-        ? data.filter((e: any) => e.employee_level === 'Junior' || e.employee_level === 'Intern')
-        : data;
+    // this.employeesService.getAllEmployeess().subscribe((data) => {
+    //   this.employees = data;
+    //   const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    //   this.assignableEmployees = (user?.role?.toLowerCase() === 'employee' && user?.employee_level === 'Senior')
+    //     ? data.filter((e: any) => e.employee_level === 'Junior' || e.employee_level === 'Intern')
+    //     : data;
+    // });
+  this.employeesService.getAllEmployeess().subscribe((data) => {
+  this.employees = data;
+
+  const currentUser = JSON.parse(
+    localStorage.getItem('currentUser') || 'null'
+  );
+
+  const currentRole = String(currentUser?.role || '')
+    .toLowerCase()
+    .trim();
+
+  const currentLevel = String(currentUser?.employee_level || '')
+    .toLowerCase()
+    .trim();
+
+  const currentDepartment = String(currentUser?.department || '')
+    .toLowerCase()
+    .trim();
+
+  // Admin can assign to everyone
+  if (currentRole === 'admin') {
+    this.assignableEmployees = data;
+    return;
+  }
+
+  // Senior can assign ONLY to Junior and Intern
+  // in the SAME department
+  if (
+    currentRole === 'employee' &&
+    currentLevel === 'senior'
+  ) {
+    this.assignableEmployees = data.filter((emp: any) => {
+      const employeeLevel = String(emp.employee_level || '')
+        .toLowerCase()
+        .trim();
+
+      const employeeDepartment = String(emp.department || '')
+        .toLowerCase()
+        .trim();
+
+      return (
+        ['junior', 'intern'].includes(employeeLevel) &&
+        employeeDepartment === currentDepartment
+      );
     });
+
+    return;
+  }
+
+  // Existing/default behavior for other users
+  this.assignableEmployees = data;
+});
   }
   loadProjects() {
     this.projectService.getAllProjects().subscribe((data) => {

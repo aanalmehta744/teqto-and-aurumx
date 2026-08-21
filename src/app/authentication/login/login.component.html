@@ -1,3 +1,4 @@
+
 <div class="login_body" [ngClass]="{'login_theme-dark': isDarkTheme}">
  
   <div class="login_backdrop" aria-hidden="true">
@@ -7,24 +8,31 @@
     <span class="login_veil"></span>
   </div>
  
+  
+ 
   <main class="login_main">
     <div class="login_shell">
-      <div class="login_card">
+      <!-- <div class="login_card"> -->
+        <div class="login_card" [class.is-flipped]="isFlipped">
  
         <!-- ============ form side ============ -->
         <section class="login_panel login_panel--form">
  
          <div class="login_brand">
-  <img
+  <!-- <img
     src="../../../assets/images/Company_Log.png"
     alt="Teqto Infotech / AurumX Technologies"
-    class="login_brand-mark">
+    class="login_brand-mark"> -->
+    <img
+  alt="logo"
+  class="login_brand-mark"
+  src="/assets/images/Company_Log.png">
 </div>
  
           <form
             class="login_form"
             [formGroup]="authForm"
-            (ngSubmit)="onSubmit()"
+            (submit)="onSubmit($event)"
             novalidate>
  
             <fieldset class="login_fieldset">
@@ -78,7 +86,7 @@
               </button>
             </div>
  
- 
+        
             <p class="login_error" *ngIf="error" role="alert">{{ error }}</p>
  
             <button
@@ -87,24 +95,45 @@
               [disabled]="!authForm.valid || loading">
               {{ loading ? 'Signing in...' : 'Sign in' }}
             </button>
+            <button
+  type="button"
+  class="login_flip-btn login_flip-btn--to-brand"
+  (click)="toggleFlip()">
+  Highlights!!
+</button>
           </form>
         </section>
  
         <!-- ============ brand side ============ -->
-        <section class="login_panel login_panel--brand">
-          <h1 class="login_title">{{ loginHeading || defaultTitle }}</h1>
-          <p class="login_lede">{{ loginDescription || defaultLede }}</p>
- 
-          <!-- click the image itself to swap it (client-side preview only) -->
-         <div class="login_media">
-  <img
-    class="login_media-img"
-    [src]="mediaImage"
-    alt="Workspace preview">
-</div>
- 
-          <p class="login_note">&copy; 2026 Teqto Infotech & Aurum X Technologies. All rights reserved</p>
-        </section>
+      <!-- ============ brand side ============ -->
+<section class="login_panel login_panel--brand">
+
+  <h1 class="login_title">
+    {{ loginHeading || defaultTitle }}
+  </h1>
+
+  <p class="login_lede">
+    {{ loginDescription || defaultLede }}
+  </p>
+
+  <!-- Static image - no upload/change option -->
+  <div class="login_media">
+    <img
+      class="login_media-img"
+      [src]="mediaImage"
+      alt="Workspace preview">
+  </div>
+
+  <p class="login_note">
+    &copy; 2026 Teqto Infotech & Aurum X Technologies. All rights reserved
+  </p>
+ <button
+    type="button"
+    class="login_flip-btn login_flip-btn--back"
+    (click)="toggleFlip()">
+    Back to Signin
+  </button>
+</section>
  
       </div>
     </div>

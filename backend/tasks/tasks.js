@@ -3,15 +3,62 @@ const router = express.Router();
 const db = require('../connection'); // <-- use promise interface
 
 async function validateAssignment(assignedBy, employeeId) {
+  // if (!assignedBy || !employeeId) return null;
+  // const [[assigner]] = await db.query('SELECT role, department, employee_level FROM employees WHERE id = ?', [assignedBy]);
+  // const [[assignee]] = await db.query('SELECT role, employee_level FROM employees WHERE id = ?', [employeeId]);
+  // if (!assigner || !assignee) return 'Invalid assigning or assigned employee';
+  // const isSenior = String(assigner.employee_level || '').toLowerCase() === 'senior' && String(assigner.role || '').toLowerCase() === 'employee';
+  // if (isSenior && !['junior', 'intern'].includes(String(assignee.employee_level || '').toLowerCase())) {
+  //   return 'Senior employees can assign tasks only to Junior and Intern employees';
+  // }
+  // return null;
   if (!assignedBy || !employeeId) return null;
-  const [[assigner]] = await db.query('SELECT role, department, employee_level FROM employees WHERE id = ?', [assignedBy]);
-  const [[assignee]] = await db.query('SELECT role, employee_level FROM employees WHERE id = ?', [employeeId]);
-  if (!assigner || !assignee) return 'Invalid assigning or assigned employee';
-  const isSenior = String(assigner.employee_level || '').toLowerCase() === 'senior' && String(assigner.role || '').toLowerCase() === 'employee';
-  if (isSenior && !['junior', 'intern'].includes(String(assignee.employee_level || '').toLowerCase())) {
-    return 'Senior employees can assign tasks only to Junior and Intern employees';
+
+const [[assigner]] = await db.query(
+  'SELECT role, department, employee_level FROM employees WHERE id = ?',
+  [assignedBy]
+);
+
+const [[assignee]] = await db.query(
+  'SELECT role, department, employee_level FROM employees WHERE id = ?',
+  [employeeId]
+);
+
+const isSenior =
+  String(assigner.employee_level || '').toLowerCase().trim() === 'senior' &&
+  String(assigner.role || '').toLowerCase().trim() === 'employee';
+
+if (isSenior) {
+  const assigneeLevel = String(
+    assignee.employee_level || ''
+  ).toLowerCase().trim();
+
+  const assignerDepartment = String(
+    assigner.department || ''
+  ).toLowerCase().trim();
+
+  const assigneeDepartment = String(
+    assignee.department || ''
+  ).toLowerCase().trim();
+
+  // Senior can assign ONLY to Junior or Intern
+  if (!['junior', 'intern'].includes(assigneeLevel)) {
+    return res.status(403).json({
+      message:
+        'Senior employees can assign tasks only to Junior and Intern employees.'
+    });
   }
-  return null;
+
+  // Senior can assign ONLY within the same department
+  if (assignerDepartment !== assigneeDepartment) {
+    return res.status(403).json({
+      message:
+        'Senior employees can assign tasks only within their own department.'
+    });
+  }
+}
+
+return null;
 }
 
 // Fetch all tasks

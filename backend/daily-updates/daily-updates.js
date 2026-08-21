@@ -3,22 +3,138 @@ const router = express.Router();
 const db = require('../connection');
 
 // GET all daily updates (no filters)
-router.get('/all', async (req, res) => {
+// router.get('/all', async (req, res) => {
+//     try {
+//         const [rows] = await db.query(`
+//         SELECT du.*, e.fullName AS employeeName, e.department, p.projectTitle, t.title, t.note
+//         FROM daily_updates du
+//         LEFT JOIN employees e ON du.employee_id = e.id
+//         LEFT JOIN projects p ON du.project_id = p.id
+//         LEFT JOIN tasks t ON du.task_id = t.id
+//         ORDER BY du.update_date DESC
+//         `);
+//         res.json(rows);
+//     } catch (err) {
+//         res.status(500).send({ error: err.message });
+//     }
+// });
+
+// GET daily updates based on employee hierarchy
+router.get('/', async (req, res) => {
+    const employeeId = req.query.employeeId;
+
+    if (!employeeId) {
+        return res.status(400).send({
+            error: "employeeId is required"
+        });
+    }
+
     try {
-        const [rows] = await db.query(`
-        SELECT du.*, e.fullName AS employeeName, e.department, p.projectTitle, t.title, t.note
-        FROM daily_updates du
-        LEFT JOIN employees e ON du.employee_id = e.id
-        LEFT JOIN projects p ON du.project_id = p.id
-        LEFT JOIN tasks t ON du.task_id = t.id
-        ORDER BY du.update_date DESC
-        `);
+        const [[currentEmployee]] = await db.query(
+            `SELECT id, role, department, employee_level
+             FROM employees
+             WHERE id = ?`,
+            [employeeId]
+        );
+
+        if (!currentEmployee) {
+            return res.status(404).send({
+                error: "Employee not found"
+            });
+        }
+
+        const role = String(currentEmployee.role || '')
+            .trim()
+            .toLowerCase();
+
+        const department = String(currentEmployee.department || '')
+            .trim();
+
+        const employeeLevel = String(currentEmployee.employee_level || '')
+            .trim()
+            .toLowerCase();
+
+        let query;
+        let params;
+
+        // SENIOR EMPLOYEE
+        // Own + Junior + Intern from same department
+        if (
+            role === 'employee' &&
+            employeeLevel === 'senior'
+        ) {
+            query = `
+                SELECT
+                    du.*,
+                    e.fullName AS employeeName,
+                    e.department,
+                    e.role,
+                    e.employee_level,
+                    p.projectTitle,
+                    t.title,
+                    t.note
+                FROM daily_updates du
+                LEFT JOIN employees e
+                    ON du.employee_id = e.id
+                LEFT JOIN projects p
+                    ON du.project_id = p.id
+                LEFT JOIN tasks t
+                    ON du.task_id = t.id
+                WHERE
+                    du.employee_id = ?
+                    OR (
+                        LOWER(TRIM(e.department)) = LOWER(TRIM(?))
+                        AND LOWER(TRIM(e.employee_level))
+                            IN ('junior', 'intern')
+                    )
+                ORDER BY du.update_date DESC
+            `;
+
+            params = [
+                employeeId,
+                department
+            ];
+
+        } else {
+
+            // JUNIOR / INTERN / OTHER EMPLOYEE
+            // Only their own updates
+            query = `
+                SELECT
+                    du.*,
+                    e.fullName AS employeeName,
+                    e.department,
+                    e.role,
+                    e.employee_level,
+                    p.projectTitle,
+                    t.title,
+                    t.note
+                FROM daily_updates du
+                LEFT JOIN employees e
+                    ON du.employee_id = e.id
+                LEFT JOIN projects p
+                    ON du.project_id = p.id
+                LEFT JOIN tasks t
+                    ON du.task_id = t.id
+                WHERE du.employee_id = ?
+                ORDER BY du.update_date DESC
+            `;
+
+            params = [employeeId];
+        }
+
+        const [rows] = await db.query(query, params);
+
         res.json(rows);
+
     } catch (err) {
-        res.status(500).send({ error: err.message });
+        console.error('Get daily updates error:', err);
+
+        res.status(500).send({
+            error: err.message
+        });
     }
 });
-
 // GET all daily updates for an employee (optionally filtered by date)
 router.get('/', async (req, res) => {
     const employeeId = req.query.employeeId;

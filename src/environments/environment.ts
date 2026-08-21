@@ -11,7 +11,7 @@ export const environment = {
   //   'https://hudson-evaluate-courage-measure.trycloudflare.com/api',
 
   // Change this to whichever backend you want to use
-  apiUrl: 'https://machine-smtp-lighter-happens.trycloudflare.com/api'
+  apiUrl: 'https://protect-everything-pac-volumes.trycloudflare.com/api'
 };
 
 console.log(

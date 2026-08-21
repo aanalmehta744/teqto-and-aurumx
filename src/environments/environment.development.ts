@@ -7,7 +7,7 @@ export const environment = {
   //   'https://hudson-evaluate-courage-measure.trycloudflare.com/api',
 
   apiUrl:
-    'https://machine-smtp-lighter-happens.trycloudflare.com/api'
+    'https://protect-everything-pac-volumes.trycloudflare.com/api'
 };
 
 console.log(

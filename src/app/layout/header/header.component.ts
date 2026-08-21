@@ -78,9 +78,9 @@ export class HeaderComponent
   getLogUrl(): string {
     const isMobile = window.innerWidth < 425;
     if (isMobile) {
-      return 'assets/images/favicon-150x150.jpg'; // Mobile view
+      return 'assets/images/Company_Logo.png'; // Mobile view
     }
-    return this.collapsed && !this.isHovered ? 'assets/images/favicon-150x150.jpg' : '../../../../assets/images/Teqto(bg).png';
+    return this.collapsed && !this.isHovered ? 'assets/images/Company_Logo.png' : '../../../../assets/images/Company_Logo.png'; // Desktop view
   }
 
   ngOnInit() {
