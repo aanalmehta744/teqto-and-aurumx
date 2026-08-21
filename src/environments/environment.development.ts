@@ -7,7 +7,11 @@ export const environment = {
   //   'https://hudson-evaluate-courage-measure.trycloudflare.com/api',
 
   apiUrl:
+<<<<<<< Updated upstream
     'https://protect-everything-pac-volumes.trycloudflare.com/api'
+=======
+    'http://localhost:5001/api'
+>>>>>>> Stashed changes
 };
 
 console.log(

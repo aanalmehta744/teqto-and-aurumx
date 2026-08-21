@@ -13,7 +13,6 @@ function createUpload(folder) {
     cloudinary,
     params: {
       folder: `teqto/${folder}`,
-      allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf'],
       resource_type: 'auto',
     },
   });

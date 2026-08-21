@@ -3,6 +3,7 @@ import {
   OnInit,
   OnDestroy,
   ViewChild,
+  ElementRef,
   AfterViewChecked,
 } from '@angular/core';
 
@@ -36,6 +37,9 @@ export class ChatComponent
 
   @ViewChild('messageScroll')
   messageScroll!: NgScrollbar;
+
+   @ViewChild('messageInput')
+  messageInputRef!: ElementRef<HTMLTextAreaElement>;
 
   // ---------------------------------------------------------
   // USERS
@@ -82,6 +86,9 @@ export class ChatComponent
 
   // conversationId -> unread count
   unreadCounts: { [conversationId: number]: number } = {};
+    otherUserLastReadAt: string | null = null;
+
+  private readStatusSub!: Subscription;
 
   // userId -> direct conversationId (built from this.conversations)
   private directConversationByUserId: {
@@ -225,6 +232,27 @@ export class ChatComponent
                 ),
             });
         });
+
+            this.readStatusSub =
+      this.chatService
+        .onConversationRead()
+        .subscribe((data) => {
+
+          // Only relevant for the direct chat currently open,
+          // and only when it's the OTHER person who read it
+          if (
+            !this.selectedUser ||
+            data.conversation_id !==
+              this.activeConversationId ||
+            data.employee_id ===
+              this.currentUserId
+          ) {
+            return;
+          }
+
+          this.otherUserLastReadAt =
+            data.last_read_at;
+        });
   }
 
   // =========================================================
@@ -347,7 +375,7 @@ export class ChatComponent
       )
       .subscribe({
 
-        next: ({
+             next: ({
           conversationId,
         }) => {
 
@@ -370,6 +398,29 @@ export class ChatComponent
           this.loadMessages(
             conversationId
           );
+
+          this.otherUserLastReadAt =
+            null;
+
+          this.chatService
+            .getReadStatus(
+              conversationId,
+              this.currentUserId
+            )
+            .subscribe({
+
+              next: (res) => {
+
+                this.otherUserLastReadAt =
+                  res.last_read_at;
+              },
+
+              error: (err) =>
+                console.error(
+                  'Read status error',
+                  err
+                ),
+            });
         },
 
         error: (err) => {
@@ -388,6 +439,21 @@ export class ChatComponent
   // GROUP CHAT
   // =========================================================
 
+    // =========================================================
+  // BACK TO LIST (mobile)
+  // =========================================================
+
+  goBackToList(): void {
+
+    this.selectedUser = null;
+
+    this.selectedGroup = null;
+
+    this.activeConversationId = null;
+
+    this.messages = [];
+  }
+
   selectGroup(
     group: Conversation
   ): void {
@@ -402,8 +468,11 @@ export class ChatComponent
 
     this.loading = true;
 
-    this.activeConversationId =
+      this.activeConversationId =
       group.id;
+
+    this.otherUserLastReadAt =
+      null;
 
     this.clearUnread(
       group.id
@@ -684,8 +753,13 @@ export class ChatComponent
               new Date().toISOString(),
           });
 
-          this.newMessage =
+                    this.newMessage =
             '';
+
+          if (this.messageInputRef) {
+            this.messageInputRef.nativeElement.style.height =
+              'auto';
+          }
 
           this.removeSelectedFile();
 
@@ -776,6 +850,20 @@ export class ChatComponent
 
       this.send();
     }
+  }
+
+  // =========================================================
+  // AUTO-GROW TEXTAREA
+  // =========================================================
+
+  autoGrow(
+    textarea: HTMLTextAreaElement
+  ): void {
+
+    textarea.style.height = 'auto';
+
+    textarea.style.height =
+      textarea.scrollHeight + 'px';
   }
 
   // =========================================================
@@ -990,6 +1078,42 @@ export class ChatComponent
   }
 
   // =========================================================
+  // READ RECEIPTS (individual chats only)
+  // =========================================================
+
+  getTickStatus(
+    msg: ChatMessage
+  ): 'sent' | 'seen' | null {
+
+    // Only show ticks on your own messages in a direct chat
+    if (
+      !this.selectedUser ||
+      msg.sender_id !==
+        this.currentUserId
+    ) {
+      return null;
+    }
+
+    if (!this.otherUserLastReadAt) {
+      return 'sent';
+    }
+
+    const msgTime =
+      new Date(
+        msg.created_at
+      ).getTime();
+
+    const readTime =
+      new Date(
+        this.otherUserLastReadAt
+      ).getTime();
+
+    return msgTime <= readTime
+      ? 'seen'
+      : 'sent';
+  }
+
+  // =========================================================
   // DESTROY
   // =========================================================
 
@@ -1003,5 +1127,7 @@ export class ChatComponent
     }
 
     this.socketSub?.unsubscribe();
+
+    this.readStatusSub?.unsubscribe();
   }
 }

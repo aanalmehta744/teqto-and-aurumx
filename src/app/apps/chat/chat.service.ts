@@ -192,7 +192,7 @@ export class ChatService implements OnDestroy {
   // MARK CONVERSATION AS READ
   // ---------------------------------------------------------
 
-  markRead(
+   markRead(
     conversationId: number,
     employeeId: number
   ): Observable<{ success: boolean }> {
@@ -204,6 +204,47 @@ export class ChatService implements OnDestroy {
       },
       {
         headers: this.getHeaders(),
+      }
+    );
+  }
+
+  // ---------------------------------------------------------
+  // READ STATUS (for tick marks)
+  // ---------------------------------------------------------
+
+  getReadStatus(
+    conversationId: number,
+    employeeId: number
+  ): Observable<{ last_read_at: string | null }> {
+    return this.http.get<{ last_read_at: string | null }>(
+      `${this.apiUrl}/read-status/${conversationId}/${employeeId}`,
+      {
+        headers: this.getHeaders(),
+      }
+    );
+  }
+
+  // ---------------------------------------------------------
+  // SOCKET - CONVERSATION READ (live tick updates)
+  // ---------------------------------------------------------
+
+  onConversationRead(): Observable<{
+    conversation_id: number;
+    employee_id: number;
+    last_read_at: string;
+  }> {
+    return new Observable(
+      (observer) => {
+        this.socket.on(
+          'conversation_read',
+          (data) => {
+            observer.next(data);
+          }
+        );
+
+        return () => {
+          this.socket.off('conversation_read');
+        };
       }
     );
   }

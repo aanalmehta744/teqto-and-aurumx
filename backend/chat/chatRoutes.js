@@ -361,11 +361,56 @@ await db.query(
   [conversation_id, employee_id]
 );
 
+// Let the other person's screen update their sent messages to
+// "seen" live, without needing to refresh.
+const io = getIO();
+
+io.to(`conversation_${conversation_id}`)
+  .emit("conversation_read", {
+    conversation_id,
+    employee_id,
+    last_read_at: new Date()
+  });
+
 res.status(200).json({ success: true });
 
 
 } catch (error) {
 console.error("Mark Read Error:", error);
+
+
+res.status(500).json({
+  error: "Internal server error"
+});
+
+
+}
+});
+
+// ---------------------------------------------------------------------
+// READ STATUS
+// Returns when the OTHER member of a direct conversation last read it,
+// used to show single/double tick on your own sent messages.
+// ---------------------------------------------------------------------
+
+router.get("/read-status/:conversationId/:employeeId", async (req, res) => {
+try {
+const { conversationId, employeeId } = req.params;
+
+const [rows] = await db.query(
+  "SELECT last_read_at FROM conversation_reads " +
+  "WHERE conversation_id = ? AND employee_id != ? " +
+  "LIMIT 1",
+  [conversationId, employeeId]
+);
+
+res.status(200).json({
+  last_read_at: rows.length > 0 ? rows[0].last_read_at : null
+});
+
+
+} catch (error) {
+console.error("Read Status Error:", error);
 
 
 res.status(500).json({
