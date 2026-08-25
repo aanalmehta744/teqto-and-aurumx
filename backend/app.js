@@ -33,6 +33,9 @@ const notificationsRoutes = require('./notifications/notifications');
 const clientDailyNotesRoutes = require('./client-daily-notes/client-daily-notes');
 const loginSettingsRoutes = require('./login-settings/login-settings');
 const departmentRoutes = require('./departments/departments');
+
+
+const interviewRoutes = require('./interviews/interviews');
 const db = require('./connection');
 const app = express();
 
@@ -387,6 +390,7 @@ app.use('/api/client-daily-notes', clientDailyNotesRoutes);
 app.use('/api/login-settings', loginSettingsRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use("/api/chat", chatRoutes);
+app.use( '/api/interviews',interviewRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

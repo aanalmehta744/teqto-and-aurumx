@@ -4,6 +4,8 @@ import { EmployeeDailyUpdateComponent } from './employee-daily-update/employee-d
 import { LoginSettingsComponent } from './login-settings/login-settings.component';
 import { AllTasksComponent } from '../employee/all-tasks/all-tasks.component';
 import { DepartmentsComponent } from '../departments/departments.component';
+import { AllInterviewsComponent } from './interviews/all-interviews/all-interviews.component';
+
 export const ADMIN_ROUTE: Route[] = [
   {
     path: 'dashboard',
@@ -41,26 +43,24 @@ export const ADMIN_ROUTE: Route[] = [
       import('./holidays/holidays.routes').then((m) => m.HOLIDAY_ROUTE),
   },
   {
+  path: 'interviews',
+
+  loadChildren: () =>
+    import('./interviews/interview.routes')
+      .then((m) => m.INTERVIEW_ROUTE),
+},
+  {
     path: 'attendance',
     loadChildren: () =>
       import('./attendance/attendance.routes').then((m) => m.ATTENDANCE_ROUTE),
   },
+  
   {
     path: 'payroll',
     loadChildren: () =>
       import('./payroll/payroll.routes').then((m) => m.PAYROLL_ROUTE),
   },
-  // {
-  //   path: 'leads',
-  //   loadChildren: () =>
-  //     import('./leads/leads.routes').then((m) => m.LEADS_ROUTE),
-  // },
- 
-  // {
-  //   path: 'reports',
-  //   loadChildren: () =>
-  //     import('./reports/reports.routes').then((m) => m.REPORT_ROUTE),
-  // },
+
   {
     path: 'daily-update',
     component: EmployeeDailyUpdateComponent,
