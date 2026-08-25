@@ -19,7 +19,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
 import { Direction } from '@angular/cdk/bidi';
 import { TableExportUtil, TableElement } from '@shared';
-import { formatDate, NgClass, DatePipe } from '@angular/common';
+import { formatDate, NgClass, NgIf, DatePipe } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRippleModule } from '@angular/material/core';
 import { FeatherIconsComponent } from '@shared/components/feather-icons/feather-icons.component';
@@ -43,6 +43,7 @@ import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.co
     MatTableModule,
     MatSortModule,
     NgClass,
+    NgIf,
     MatCheckboxModule,
     FeatherIconsComponent,
     MatRippleModule,
@@ -67,6 +68,12 @@ export class AllHolidayComponent
   index?: number;
   id?: number;
   holiday?: AllHoliday;
+
+  // Only HR can add/edit/delete holidays here; BDE/BA see this list view-only.
+  isHR =
+    (JSON.parse(localStorage.getItem('currentUser') || '{}')?.department || '')
+      .toString()
+      .toUpperCase() === 'HR';
   constructor(
     public httpClient: HttpClient,
     public dialog: MatDialog,

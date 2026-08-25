@@ -8,7 +8,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { formatDate } from '@angular/common';
+import { MatNativeDateModule } from '@angular/material/core';
+import { CommonModule, formatDate } from '@angular/common';
 import Swal from 'sweetalert2';
 
 export interface DialogData {
@@ -23,6 +24,7 @@ export interface DialogData {
   styleUrls: ['./form-dialog.component.scss'],
   standalone: true,
   imports: [
+    CommonModule,
     MatButtonModule,
     MatIconModule,
     MatDialogContent,
@@ -31,6 +33,7 @@ export interface DialogData {
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
+    MatNativeDateModule,
     MatDialogClose,
   ],
 })
