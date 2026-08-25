@@ -317,6 +317,7 @@ export interface ChatUser {
   fullName: string;
   role: string;
   email: string;
+  uploadImg?: string | null;
 }
 
 export interface ChatMessage {
@@ -324,6 +325,7 @@ export interface ChatMessage {
   conversation_id: number;
   sender_id: number;
   sender_name: string;
+  sender_avatar?: string | null;
   message: string;
   attachment_url?: string | null;
   attachment_type?: string | null;
@@ -375,10 +377,6 @@ export class ChatService implements OnDestroy {
     });
   }
 
-  // ---------------------------------------------------------
-  // GET ALL USERS
-  // ---------------------------------------------------------
-
   getUsers(): Observable<ChatUser[]> {
     return this.http.get<ChatUser[]>(
       `${this.apiUrl}/users`,
@@ -387,10 +385,6 @@ export class ChatService implements OnDestroy {
       }
     );
   }
-
-  // ---------------------------------------------------------
-  // GET USER CONVERSATIONS
-  // ---------------------------------------------------------
 
   getConversations(
     employeeId: number
@@ -456,11 +450,6 @@ onChatRequestRejected(): Observable<any> {
     return () => this.socket.off('chat_request_rejected');
   });
 }
-
-  // ---------------------------------------------------------
-  // CREATE DIRECT CONVERSATION
-  // ---------------------------------------------------------
-
   openDirectConversation(
     user1: number,
     user2: number
@@ -476,10 +465,6 @@ onChatRequestRejected(): Observable<any> {
       }
     );
   }
-
-  // ---------------------------------------------------------
-  // CREATE GROUP CONVERSATION
-  // ---------------------------------------------------------
 
   createGroup(
     name: string,
@@ -499,10 +484,6 @@ onChatRequestRejected(): Observable<any> {
     );
   }
 
-  // ---------------------------------------------------------
-  // GET MESSAGES
-  // ---------------------------------------------------------
-
   getMessages(
     conversationId: number
   ): Observable<ChatMessage[]> {
@@ -514,9 +495,6 @@ onChatRequestRejected(): Observable<any> {
     );
   }
 
-  // ---------------------------------------------------------
-  // SEND MESSAGE
-  // ---------------------------------------------------------
 
   sendMessage(
     conversation_id: number,
@@ -564,10 +542,6 @@ onChatRequestRejected(): Observable<any> {
     );
   }
 
-  // ---------------------------------------------------------
-  // ONLINE / OFFLINE PRESENCE
-  // ---------------------------------------------------------
-
   getOnlineStatus(): Observable<{ [employeeId: number]: boolean }> {
     return this.http.get<{ [employeeId: number]: boolean }>(
       `${this.apiUrl}/online-status`,
@@ -587,18 +561,10 @@ onChatRequestRejected(): Observable<any> {
     });
   }
 
-  // ---------------------------------------------------------
-  // DOWNLOAD ATTACHMENT (proxied through backend so the
-  // saved filename is correct, not Cloudinary's storage id)
-  // ---------------------------------------------------------
-
   getAttachmentDownloadUrl(messageId: number): string {
     return `${this.apiUrl}/download/${messageId}`;
   }
 
-  // ---------------------------------------------------------
-  // MARK CONVERSATION AS READ
-  // ---------------------------------------------------------
 
    markRead(
     conversationId: number,
@@ -616,10 +582,6 @@ onChatRequestRejected(): Observable<any> {
     );
   }
 
-  // ---------------------------------------------------------
-  // READ STATUS (for tick marks)
-  // ---------------------------------------------------------
-
   getReadStatus(
     conversationId: number,
     employeeId: number
@@ -631,10 +593,6 @@ onChatRequestRejected(): Observable<any> {
       }
     );
   }
-
-  // ---------------------------------------------------------
-  // SOCKET - CONVERSATION READ (live tick updates)
-  // ---------------------------------------------------------
 
   onConversationRead(): Observable<{
     conversation_id: number;
@@ -657,11 +615,6 @@ onChatRequestRejected(): Observable<any> {
     );
   }
 
-  // ---------------------------------------------------------
-  // SOCKET - IDENTIFY (joins every conversation room the
-  // employee belongs to, so unread badges work for chats
-  // that haven't been opened yet)
-  // ---------------------------------------------------------
 
   identify(
     employeeId: number
@@ -672,9 +625,6 @@ onChatRequestRejected(): Observable<any> {
     );
   }
 
-  // ---------------------------------------------------------
-  // SOCKET - JOIN CONVERSATION
-  // ---------------------------------------------------------
 
   joinConversation(
     conversationId: number
@@ -684,10 +634,6 @@ onChatRequestRejected(): Observable<any> {
       conversationId
     );
   }
-
-  // ---------------------------------------------------------
-  // SOCKET - RECEIVE MESSAGE
-  // ---------------------------------------------------------
 
   onMessage(): Observable<ChatMessage> {
     return new Observable(
@@ -706,11 +652,6 @@ onChatRequestRejected(): Observable<any> {
     );
   }
 
-  // ---------------------------------------------------------
-  // DESTROY
-  // ---------------------------------------------------------
 
-  ngOnDestroy(): void {
-    this.socket.disconnect();
-  }
+  ngOnDestroy(): void {this.socket.disconnect();}
 }

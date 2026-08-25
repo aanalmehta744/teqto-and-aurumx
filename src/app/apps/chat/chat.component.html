@@ -163,7 +163,16 @@
           [ngClass]="{ 'bg-[#d6d5ea]': selectedUser?.id === user.id,}"
         >
           <div class="relative flex-shrink-0">
-            <div class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center text-white text-xs font-bold">
+            <img
+              *ngIf="getAvatarUrl(user.uploadImg) as sidebarAvatarUrl"
+              [src]="sidebarAvatarUrl"
+              alt="{{ user.fullName }}"
+              class="w-9 h-9 rounded-full object-cover"
+            />
+            <div
+              *ngIf="!getAvatarUrl(user.uploadImg)"
+              class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center text-white text-xs font-bold"
+            >
               {{ getInitials(user.fullName) }}
             </div>
             <span
@@ -194,7 +203,16 @@
           class="flex items-center gap-3 px-4 py-3 opacity-60"
         >
           <div class="relative flex-shrink-0">
-            <div class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center text-white text-xs font-bold">
+            <img
+              *ngIf="getAvatarUrl(user.uploadImg) as pendingAvatarUrl"
+              [src]="pendingAvatarUrl"
+              alt="{{ user.fullName }}"
+              class="w-9 h-9 rounded-full object-cover"
+            />
+            <div
+              *ngIf="!getAvatarUrl(user.uploadImg)"
+              class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center text-white text-xs font-bold"
+            >
               {{ getInitials(user.fullName) }}
             </div>
             <span
@@ -223,7 +241,16 @@
             class="flex items-center gap-3 px-4 py-3"
           >
             <div class="relative flex-shrink-0">
-              <div class="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-white text-xs font-bold">
+              <img
+                *ngIf="getAvatarUrl(user.uploadImg) as searchAvatarUrl"
+                [src]="searchAvatarUrl"
+                alt="{{ user.fullName }}"
+                class="w-9 h-9 rounded-full object-cover"
+              />
+              <div
+                *ngIf="!getAvatarUrl(user.uploadImg)"
+                class="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-white text-xs font-bold"
+              >
                 {{ getInitials(user.fullName) }}
               </div>
               <span
@@ -298,7 +325,16 @@
         </button>
 
         <div class="relative flex-shrink-0">
-          <div class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center text-white text-xs font-bold">
+          <img
+            *ngIf="getAvatarUrl(selectedUser.uploadImg) as avatarUrl"
+            [src]="avatarUrl"
+            alt="{{ selectedUser.fullName }}"
+            class="w-9 h-9 rounded-full object-cover"
+          />
+          <div
+            *ngIf="!getAvatarUrl(selectedUser.uploadImg)"
+            class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center text-white text-xs font-bold"
+          >
             {{ getInitials(selectedUser.fullName) }}
           </div>
           <span
@@ -495,7 +531,14 @@
             *ngIf="msg.sender_id !== currentUserId"
             class="flex items-start gap-2"
           >
+            <img
+              *ngIf="getAvatarUrl(msg.sender_avatar) as msgAvatarUrl"
+              [src]="msgAvatarUrl"
+              alt="{{ msg.sender_name }}"
+              class="w-7 h-7 rounded-full object-cover flex-shrink-0"
+            />
             <div
+              *ngIf="!getAvatarUrl(msg.sender_avatar)"
               class="w-7 h-7 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-xs font-bold flex-shrink-0"
             >
               {{ getInitials(msg.sender_name) }}
@@ -765,10 +808,6 @@
   </div>
 </div>
 
-<!-- ======================================================= -->
-<!-- CREATE GROUP MODAL -->
-<!-- ======================================================= -->
-
 <div
   *ngIf="showCreateGroupModal"
   class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
@@ -777,9 +816,6 @@
     class="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden"
     (click)="$event.stopPropagation()"
   >
-    <!-- =================================================== -->
-    <!-- MODAL HEADER -->
-    <!-- =================================================== -->
 
     <div
       class="flex items-center justify-between px-5 py-4 border-b border-gray-100"
@@ -809,10 +845,6 @@
         </svg>
       </button>
     </div>
-
-    <!-- =================================================== -->
-    <!-- MODAL BODY -->
-    <!-- =================================================== -->
 
     <div class="p-5">
       <!-- GROUP NAME -->
@@ -914,10 +946,6 @@
         </div>
       </div>
     </div>
-
-    <!-- =================================================== -->
-    <!-- MODAL FOOTER -->
-    <!-- =================================================== -->
 
     <div
       class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100 bg-gray-50"
