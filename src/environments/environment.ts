@@ -10,12 +10,9 @@ export const environment = {
   // cloudflareApiUrl:
   //   'https://hudson-evaluate-courage-measure.trycloudflare.com/api',
 
-  // Change this to whichever backend you want to use
-<<<<<<< Updated upstream
-  apiUrl: 'https://protect-everything-pac-volumes.trycloudflare.com/api'
-=======
+  // Change this to whichever backend you want to us
+
   apiUrl: 'http://localhost:5001/api'
->>>>>>> Stashed changes
 };
 
 console.log(

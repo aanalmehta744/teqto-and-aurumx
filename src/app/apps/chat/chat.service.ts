@@ -19,6 +19,7 @@ export interface ChatMessage {
   message: string;
   attachment_url?: string | null;
   attachment_type?: string | null;
+  attachment_name?: string | null;
   created_at: string;
 }
 
@@ -32,6 +33,17 @@ export interface Conversation {
   unread_count?: number;
 }
 
+export interface ChatRequest {
+  id: number;
+  sender_id?: number;
+  receiver_id?: number;
+  status: 'pending' | 'accepted' | 'rejected';
+  created_at: string;
+  sender_name?: string;
+  sender_role?: string;
+  receiver_name?: string;
+  receiver_role?: string;
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -82,6 +94,60 @@ export class ChatService implements OnDestroy {
       }
     );
   }
+
+  searchUsers(query: string, employeeId: number): Observable<ChatUser[]> {
+  return this.http.get<ChatUser[]>(
+    `${this.apiUrl}/search`,
+    {
+      headers: this.getHeaders(),
+      params: { q: query, employeeId: String(employeeId) },
+    }
+  );
+}
+
+sendChatRequest(senderId: number, receiverId: number): Observable<any> {
+  return this.http.post(
+    `${this.apiUrl}/request`,
+    { sender_id: senderId, receiver_id: receiverId },
+    { headers: this.getHeaders() }
+  );
+}
+
+getChatRequests(employeeId: number): Observable<{ incoming: ChatRequest[]; outgoing: ChatRequest[] }> {
+  return this.http.get<{ incoming: ChatRequest[]; outgoing: ChatRequest[] }>(
+    `${this.apiUrl}/requests/${employeeId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+respondToRequest(requestId: number, employeeId: number, action: 'accept' | 'reject'): Observable<any> {
+  return this.http.post(
+    `${this.apiUrl}/request/respond`,
+    { request_id: requestId, employee_id: employeeId, action },
+    { headers: this.getHeaders() }
+  );
+}
+
+onChatRequestReceived(): Observable<ChatRequest> {
+  return new Observable((observer) => {
+    this.socket.on('chat_request_received', (data) => observer.next(data));
+    return () => this.socket.off('chat_request_received');
+  });
+}
+
+onChatRequestAccepted(): Observable<any> {
+  return new Observable((observer) => {
+    this.socket.on('chat_request_accepted', (data) => observer.next(data));
+    return () => this.socket.off('chat_request_accepted');
+  });
+}
+
+onChatRequestRejected(): Observable<any> {
+  return new Observable((observer) => {
+    this.socket.on('chat_request_rejected', (data) => observer.next(data));
+    return () => this.socket.off('chat_request_rejected');
+  });
+}
 
   // ---------------------------------------------------------
   // CREATE DIRECT CONVERSATION
@@ -153,6 +219,7 @@ export class ChatService implements OnDestroy {
     messageId: number;
     attachment_url?: string | null;
     attachment_type?: string | null;
+    attachment_name?: string | null;
   }> {
     const formData = new FormData();
 
@@ -182,10 +249,43 @@ export class ChatService implements OnDestroy {
       messageId: number;
       attachment_url?: string | null;
       attachment_type?: string | null;
+      attachment_name?: string | null;
     }>(
       `${this.apiUrl}/message`,
       formData
     );
+  }
+
+  // ---------------------------------------------------------
+  // ONLINE / OFFLINE PRESENCE
+  // ---------------------------------------------------------
+
+  getOnlineStatus(): Observable<{ [employeeId: number]: boolean }> {
+    return this.http.get<{ [employeeId: number]: boolean }>(
+      `${this.apiUrl}/online-status`,
+      {
+        headers: this.getHeaders(),
+      }
+    );
+  }
+
+  onPresenceChanged(): Observable<{
+    employeeId: number;
+    online: boolean;
+  }> {
+    return new Observable((observer) => {
+      this.socket.on('presence_changed', (data) => observer.next(data));
+      return () => this.socket.off('presence_changed');
+    });
+  }
+
+  // ---------------------------------------------------------
+  // DOWNLOAD ATTACHMENT (proxied through backend so the
+  // saved filename is correct, not Cloudinary's storage id)
+  // ---------------------------------------------------------
+
+  getAttachmentDownloadUrl(messageId: number): string {
+    return `${this.apiUrl}/download/${messageId}`;
   }
 
   // ---------------------------------------------------------

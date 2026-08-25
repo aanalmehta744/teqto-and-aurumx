@@ -16,6 +16,7 @@ import {
   ChatUser,
   ChatMessage,
   Conversation,
+  ChatRequest,
 } from './chat.service';
 
 import { AuthService } from '@core/service/auth.service';
@@ -47,6 +48,41 @@ export class ChatComponent
 
   users: ChatUser[] = [];
   filteredUsers: ChatUser[] = [];
+
+  // People found via backend search who are NOT yet a contact
+  // (no accepted conversation) - shown with a Send Request button
+  searchResults: ChatUser[] = [];
+
+  // ---------------------------------------------------------
+  // CHAT REQUESTS
+  // ---------------------------------------------------------
+
+  // userId -> requestId, for people I've sent a pending request to
+  pendingOutgoingRequests: { [userId: number]: number } = {};
+
+  // people I've sent a request to - shown in the Chats list
+  // with a "Pending" tag until they accept
+  pendingContacts: ChatUser[] = [];
+  filteredPendingContacts: ChatUser[] = [];
+
+  // requests waiting on me to accept/reject (bell dropdown)
+  incomingRequests: ChatRequest[] = [];
+  showRequestsDropdown = false;
+
+  private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+  private chatRequestReceivedSub!: Subscription;
+  private chatRequestAcceptedSub!: Subscription;
+  private chatRequestRejectedSub!: Subscription;
+
+  // ---------------------------------------------------------
+  // ONLINE / OFFLINE PRESENCE
+  // ---------------------------------------------------------
+
+  // userId -> true (online) / false (offline)
+  onlineStatus: { [userId: number]: boolean } = {};
+
+  private presenceSub!: Subscription;
 
   // ---------------------------------------------------------
   // GROUPS
@@ -104,6 +140,11 @@ export class ChatComponent
 
   loading = false;
 
+  // true while a message (with or without an attachment) is
+  // being sent - blocks the send button so a slow file upload
+  // can't be double-submitted
+  sending = false;
+
   private socketSub!: Subscription;
   private shouldScroll = false;
 
@@ -151,8 +192,7 @@ export class ChatComponent
               u.id !== this.currentUserId
           );
 
-        this.filteredUsers =
-          [...this.users];
+        this.filterUsers();
       },
 
       error: (err) =>
@@ -167,6 +207,108 @@ export class ChatComponent
     // -------------------------------------------------------
 
     this.loadConversations();
+
+    // -------------------------------------------------------
+    // LOAD CHAT REQUESTS (bell dropdown + pending state)
+    // -------------------------------------------------------
+
+    this.loadChatRequests();
+
+    // -------------------------------------------------------
+    // ONLINE / OFFLINE PRESENCE
+    // -------------------------------------------------------
+
+    this.chatService.getOnlineStatus().subscribe({
+
+      next: (status) => {
+
+        this.onlineStatus = status;
+      },
+
+      error: (err) =>
+        console.error(
+          'Failed to load online status',
+          err
+        ),
+    });
+
+    this.presenceSub =
+      this.chatService
+        .onPresenceChanged()
+        .subscribe((data) => {
+
+          this.onlineStatus[data.employeeId] =
+            data.online;
+        });
+
+    // -------------------------------------------------------
+    // CHAT REQUEST SOCKET LISTENERS
+    // -------------------------------------------------------
+
+    this.chatRequestReceivedSub =
+      this.chatService
+        .onChatRequestReceived()
+        .subscribe((data) => {
+
+          const sender =
+            this.users.find(
+              (u) => u.id === data.sender_id
+            );
+
+          this.incomingRequests.unshift({
+            id: data.id,
+            sender_id: data.sender_id,
+            status: 'pending',
+            created_at: new Date().toISOString(),
+            sender_name: sender?.fullName ?? 'Unknown',
+            sender_role: sender?.role ?? '',
+          });
+        });
+
+    this.chatRequestAcceptedSub =
+      this.chatService
+        .onChatRequestAccepted()
+        .subscribe((data) => {
+
+          // I sent the request; the other person accepted it
+          delete this.pendingOutgoingRequests[
+            data.by_employee_id
+          ];
+
+          this.pendingContacts =
+            this.pendingContacts.filter(
+              (u) => u.id !== data.by_employee_id
+            );
+
+          this.filterUsers();
+
+          this.loadConversations();
+        });
+
+    this.chatRequestRejectedSub =
+      this.chatService
+        .onChatRequestRejected()
+        .subscribe((data) => {
+
+          const userId =
+            Object.keys(this.pendingOutgoingRequests)
+              .find(
+                (uid) =>
+                  this.pendingOutgoingRequests[+uid] ===
+                  data.request_id
+              );
+
+          if (userId) {
+            delete this.pendingOutgoingRequests[+userId];
+
+            this.pendingContacts =
+              this.pendingContacts.filter(
+                (u) => u.id !== +userId!
+              );
+
+            this.filterUsers();
+          }
+        });
 
     // -------------------------------------------------------
     // SOCKET LISTENER
@@ -184,6 +326,12 @@ export class ChatComponent
           ) {
             return;
           }
+
+          // New activity on this conversation - move it to
+          // the top of the sidebar, same as Teams/WhatsApp
+          this.bumpConversationToTop(
+            msg.conversation_id
+          );
 
           // Message for a conversation that isn't open right
           // now - bump its unread badge instead of dropping it
@@ -304,6 +452,10 @@ export class ChatComponent
               }
             }
           );
+
+          // Contacts (people with an accepted conversation)
+          // depend on this map, so refresh the visible list
+          this.filterUsers();
         },
 
         error: (err) => {
@@ -314,6 +466,44 @@ export class ChatComponent
           );
         },
       });
+  }
+
+  // =========================================================
+  // BUMP CONVERSATION TO TOP (most recent activity first)
+  // =========================================================
+
+  private bumpConversationToTop(
+    conversationId: number
+  ): void {
+
+    const idx =
+      this.conversations.findIndex(
+        (c) => c.id === conversationId
+      );
+
+    // Not in our local list yet (e.g. brand new conversation
+    // from an accepted request) - just refetch the real order
+    if (idx === -1) {
+      this.loadConversations();
+      return;
+    }
+
+    if (idx > 0) {
+
+      const [conversation] =
+        this.conversations.splice(idx, 1);
+
+      this.conversations.unshift(
+        conversation
+      );
+
+      this.groups =
+        this.conversations.filter(
+          (c) => c.type === 'group'
+        );
+
+      this.filterUsers();
+    }
   }
 
   // =========================================================
@@ -341,13 +531,227 @@ export class ChatComponent
         .toLowerCase()
         .trim();
 
+    // Sidebar default = only people I already have an
+    // accepted conversation with, most recently active
+    // conversation first (matches Teams-style ordering)
+    const contacts: ChatUser[] = [];
+
+    this.conversations
+      .filter(
+        (c) =>
+          c.type === 'direct' &&
+          !!c.other_employee_id
+      )
+      .forEach((c) => {
+
+        const user =
+          this.users.find(
+            (u) => u.id === c.other_employee_id
+          );
+
+        if (user) {
+          contacts.push(user);
+        }
+      });
+
     this.filteredUsers =
-      this.users.filter(
+      contacts.filter(
         (user) =>
           user.fullName
             .toLowerCase()
             .includes(q)
       );
+
+    this.filteredPendingContacts =
+      this.pendingContacts.filter(
+        (user) =>
+          user.fullName
+            .toLowerCase()
+            .includes(q)
+      );
+
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
+
+    if (!q) {
+      this.searchResults = [];
+      return;
+    }
+
+    // New people (not yet a contact, not already pending) only
+    // ever surface through a live backend search, never from a
+    // preloaded full employee list
+    this.searchDebounceTimer =
+      setTimeout(() => {
+
+        this.chatService
+          .searchUsers(
+            this.searchText.trim(),
+            this.currentUserId
+          )
+          .subscribe({
+
+            next: (results) => {
+
+              this.searchResults =
+                results.filter(
+                  (user) =>
+                    !this.directConversationByUserId[user.id] &&
+                    !this.pendingOutgoingRequests[user.id]
+                );
+            },
+
+            error: (err) =>
+              console.error(
+                'Search users failed',
+                err
+              ),
+          });
+      }, 250);
+  }
+
+  // =========================================================
+  // CHAT REQUESTS
+  // =========================================================
+
+  loadChatRequests(): void {
+
+    this.chatService
+      .getChatRequests(
+        this.currentUserId
+      )
+      .subscribe({
+
+        next: ({ incoming, outgoing }) => {
+
+          this.incomingRequests =
+            incoming;
+
+          this.pendingContacts = [];
+
+          outgoing.forEach((req) => {
+
+            if (req.receiver_id) {
+
+              this.pendingOutgoingRequests[
+                req.receiver_id
+              ] = req.id;
+
+              this.pendingContacts.push({
+                id: req.receiver_id,
+                fullName: req.receiver_name ?? 'Unknown',
+                role: req.receiver_role ?? '',
+                email: '',
+              });
+            }
+          });
+
+          this.filterUsers();
+        },
+
+        error: (err) =>
+          console.error(
+            'Failed to load chat requests',
+            err
+          ),
+      });
+  }
+
+  isPendingRequest(
+    user: ChatUser
+  ): boolean {
+
+    return !!this.pendingOutgoingRequests[user.id];
+  }
+
+  sendRequestToUser(
+    user: ChatUser
+  ): void {
+
+    if (this.pendingOutgoingRequests[user.id]) {
+      return;
+    }
+
+    this.chatService
+      .sendChatRequest(
+        this.currentUserId,
+        user.id
+      )
+      .subscribe({
+
+        next: (res) => {
+
+          if (
+            res.status === 'already_conversation' &&
+            res.conversationId
+          ) {
+            this.loadConversations();
+            this.selectUser(user);
+            return;
+          }
+
+          if (res.requestId) {
+            this.pendingOutgoingRequests[user.id] =
+              res.requestId;
+
+            if (
+              !this.pendingContacts.some(
+                (u) => u.id === user.id
+              )
+            ) {
+              this.pendingContacts.push(user);
+            }
+
+            this.filterUsers();
+          }
+        },
+
+        error: (err) =>
+          console.error(
+            'Send chat request failed',
+            err
+          ),
+      });
+  }
+
+  toggleRequestsDropdown(): void {
+
+    this.showRequestsDropdown =
+      !this.showRequestsDropdown;
+  }
+
+  respondToRequest(
+    req: ChatRequest,
+    action: 'accept' | 'reject'
+  ): void {
+
+    this.chatService
+      .respondToRequest(
+        req.id,
+        this.currentUserId,
+        action
+      )
+      .subscribe({
+
+        next: (res) => {
+
+          this.incomingRequests =
+            this.incomingRequests.filter(
+              (r) => r.id !== req.id
+            );
+
+          if (action === 'accept' && res.conversationId) {
+            this.loadConversations();
+          }
+        },
+
+        error: (err) =>
+          console.error(
+            'Respond to chat request failed',
+            err
+          ),
+      });
   }
 
   // =========================================================
@@ -710,10 +1114,13 @@ export class ChatComponent
     if (
       (!text &&
         !this.selectedFile) ||
-      !this.activeConversationId
+      !this.activeConversationId ||
+      this.sending
     ) {
       return;
     }
+
+    this.sending = true;
 
     this.chatService
       .sendMessage(
@@ -749,6 +1156,9 @@ export class ChatComponent
             attachment_type:
               res.attachment_type,
 
+            attachment_name:
+              res.attachment_name,
+
             created_at:
               new Date().toISOString(),
           });
@@ -763,16 +1173,50 @@ export class ChatComponent
 
           this.removeSelectedFile();
 
+          this.sending = false;
+
+          this.bumpConversationToTop(
+            this.activeConversationId!
+          );
+
           this.shouldScroll =
             true;
         },
 
-        error: (err) =>
+        error: (err) => {
+
           console.error(
             'Send error',
             err
-          ),
+          );
+
+          this.sending = false;
+        },
       });
+  }
+
+  // =========================================================
+  // ONLINE / OFFLINE PRESENCE
+  // =========================================================
+
+  isOnline(
+    userId: number
+  ): boolean {
+
+    return !!this.onlineStatus[userId];
+  }
+
+  // =========================================================
+  // ATTACHMENT DOWNLOAD
+  // =========================================================
+
+  getDownloadUrl(
+    msg: ChatMessage
+  ): string {
+
+    return this.chatService.getAttachmentDownloadUrl(
+      msg.id
+    );
   }
 
   // =========================================================
@@ -1129,5 +1573,17 @@ export class ChatComponent
     this.socketSub?.unsubscribe();
 
     this.readStatusSub?.unsubscribe();
+
+    this.chatRequestReceivedSub?.unsubscribe();
+
+    this.chatRequestAcceptedSub?.unsubscribe();
+
+    this.chatRequestRejectedSub?.unsubscribe();
+
+    this.presenceSub?.unsubscribe();
+
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
   }
 }

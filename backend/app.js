@@ -340,6 +340,33 @@ io.on("connection", (socket) => {
 
       try {
 
+        // Track which employee this socket belongs to, so we
+        // know who to mark offline when it disconnects
+        socket.employeeId = employeeId;
+
+        const wasAlreadyOnline = !!io.sockets.adapter.rooms.get(
+          `user_${employeeId}`
+        );
+
+        // Personal room, independent of any conversation - this is what
+        // lets us push chat_request_received / accepted / rejected events
+        // straight to a person even before a conversation exists between them.
+        socket.join(
+          `user_${employeeId}`
+        );
+
+        // First socket for this employee - they just came online
+        if (!wasAlreadyOnline) {
+
+          io.emit(
+            "presence_changed",
+            {
+              employeeId,
+              online: true,
+            }
+          );
+        }
+
         const [rows] = await db.query(
           "SELECT conversation_id FROM conversation_members WHERE employee_id = ?",
           [employeeId]
@@ -387,6 +414,27 @@ io.on("connection", (socket) => {
       "User Disconnected:",
       socket.id
     );
+
+    // socket.io removes this socket from all its rooms before
+    // the disconnect event fires, so checking the room here
+    // tells us if the employee has any other tab/session left
+    if (socket.employeeId) {
+
+      const stillOnline = !!io.sockets.adapter.rooms.get(
+        `user_${socket.employeeId}`
+      );
+
+      if (!stillOnline) {
+
+        io.emit(
+          "presence_changed",
+          {
+            employeeId: socket.employeeId,
+            online: false,
+          }
+        );
+      }
+    }
 
   });
 
