@@ -1,11 +1,11 @@
 export const environment = {
   production: true,
   cloudflareApiUrl:
-    'https://anyway-associates-overview-psychological.trycloudflare.com/api',
+    'https://correct-manitoba-retention-assistant.trycloudflare.com/api',
 
-  // Change this to whichever backend you want to us
-
-  apiUrl: 'http://localhost:5001/api'
+  apiUrl: 
+  // 'http://localhost:5001/api'
+  'https://correct-manitoba-retention-assistant.trycloudflare.com/api'
 };
 
 console.log(

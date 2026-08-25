@@ -4,10 +4,11 @@ export const environment = {
   localApiUrl: 'http://localhost:5001/api',
 
   cloudflareApiUrl:
-    'https://anyway-associates-overview-psychological.trycloudflare.com/api',
+    'https://correct-manitoba-retention-assistant.trycloudflare.com/api',
 
   apiUrl:
-    'http://localhost:5001/api'
+    // 'http://localhost:5001/api'
+    'https://correct-manitoba-retention-assistant.trycloudflare.com/api'
 };
 
 console.log(

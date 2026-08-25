@@ -1153,6 +1153,13 @@
   }
 }
 
+/* Loader spinner for the full-screen "Signing you in…" overlay */
+@keyframes login_spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* =========================================================
    THEME BUTTON
    ========================================================= */

@@ -14,8 +14,13 @@ export class ErrorInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
       catchError((err) => {
-        if (err.status === 401) {
-          // auto logout if 401 response returned from api
+        // Auto-logout + reload ONLY for an expired session on an authenticated
+        // request. Do NOT reload on the login attempt itself — a failed login
+        // (401) should just surface the error and stay on the page.
+        const isAuthRequest = request.url.includes('/authentication/');
+        const hasToken = !!this.authenticationService.getToken();
+
+        if (err.status === 401 && !isAuthRequest && hasToken) {
           this.authenticationService.logout();
           location.reload();
         }

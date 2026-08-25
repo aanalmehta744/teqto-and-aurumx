@@ -11,7 +11,14 @@ export class EmployeeDailyUpdateService {
 
   constructor(private http: HttpClient) { }
 
-  getAllUpdates(): Observable<any[]> {
+  // When a viewerId is passed, the backend returns a role-scoped set:
+  //   BDE → updates on his clients' projects; Senior BA → BDE + BA + junior/senior
+  //   employees; other BA → BA only; Admin/HR → all.
+  getAllUpdates(viewerId?: number): Observable<any[]> {
+    if (viewerId) {
+      const params = new HttpParams().set('viewerId', viewerId.toString());
+      return this.http.get<any[]>(this.API_URL, { params });
+    }
     return this.http.get<any[]>(this.API_URL);
   }
 

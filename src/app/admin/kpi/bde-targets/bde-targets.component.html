@@ -33,14 +33,16 @@
       </label>
     </div>
 
-    <!-- BDE dropdown (single mode only) -->
+    <!-- BDE dropdown (single mode only) — a dropdown to pick one OR more BDEs -->
     <div *ngIf="mode === 'single'" class="mt-4">
-      <label class="block text-xs text-gray-500 mb-1">Choose BDE</label>
-      <select [(ngModel)]="selectedBdeId" (change)="onBdeSelect()"
-        class="border rounded px-3 py-2 text-sm w-72 focus:outline-none focus:ring-2 focus:ring-indigo-300">
-        <option [ngValue]="null">-- Select a BDE --</option>
-        <option *ngFor="let b of bdeList" [ngValue]="b.id">{{ b.fullName }}</option>
-      </select>
+      <label class="block text-xs text-gray-500 mb-1">Choose BDE(s)</label>
+      <mat-form-field appearance="outline" class="w-72">
+        <mat-select multiple [(ngModel)]="selectedBdeIds" (selectionChange)="onBdeSelect()"
+          placeholder="Select one or more BDEs">
+          <mat-option *ngFor="let b of bdeList" [value]="b.id">{{ b.fullName }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <p class="text-[11px] text-gray-400 mt-1" *ngIf="!bdeList.length">No BDEs found.</p>
     </div>
   </div>
 
@@ -235,11 +237,11 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <ng-container *ngIf="mode === 'single'">
 
-    <div *ngIf="!selectedBdeId" class="bg-white rounded-xl shadow p-10 text-center text-gray-400 text-sm">
-      Select a BDE from the dropdown above to set their targets.
+    <div *ngIf="!selectedBdeIds.length" class="bg-white rounded-xl shadow p-10 text-center text-gray-400 text-sm">
+      Select one or more BDEs from the list above to set their targets.
     </div>
 
-    <ng-container *ngIf="selectedBdeId">
+    <ng-container *ngIf="selectedBdeIds.length">
 
       <!-- Target Input Form -->
       <div class="bg-white rounded-xl shadow mb-6 overflow-hidden">

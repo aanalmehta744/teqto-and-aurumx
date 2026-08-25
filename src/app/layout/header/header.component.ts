@@ -74,15 +74,6 @@ export class HeaderComponent
     super();
   }
 
-  // logo
-  // getLogUrl(): string {
-  //   const isMobile = window.innerWidth < 425;
-  //   if (isMobile) {
-  //     return 'assets/images/Company_Logo.png'; // Mobile view
-  //   }
-  //   return this.collapsed && !this.isHovered ? 'assets/images/Company_Logo.png' : '../../../../assets/images/Company_Logo.png'; // Desktop view
-  // }
-
   getLogUrl(): string {
   return '/assets/images/imagecopy.png'; // Updated logo path
 }
@@ -96,7 +87,9 @@ export class HeaderComponent
     if (user) {
       const userRole = user.role;
       this.userRole = userRole;
-      this.userImg = user.img; // Access img safely
+      // Fall back to `uploadImg` when `img` is empty, so photos uploaded before
+      // the columns were synced still show after re-login.
+      this.userImg = user.img || user.uploadImg;
       this.userGender = user.gender; // Access img safely
       this.docElement = document.documentElement;
       // Display user's first and last name
@@ -230,10 +223,7 @@ if (userRole === 'Admin') {
     }
   }
 
-  // logout() {
-  //   this.authService.logout();  // Clears token and user data
-  //   this.router.navigate(['/authentication/login']);
-  // }
+
   logout() {
     Swal.fire({
       title: 'Are you sure?',
@@ -248,13 +238,6 @@ if (userRole === 'Admin') {
       if (result.isConfirmed) {
         this.authService.logout();
         this.router.navigate(['/authentication/login']);
-        // Swal.fire({
-        //   icon: 'success',
-        //   title: 'Logged Out',
-        //   text: 'You have been successfully logged out.',
-        //   confirmButtonText: 'Okay',
-        //   confirmButtonColor: '#3085d6'
-        // });
       }
     });
   }

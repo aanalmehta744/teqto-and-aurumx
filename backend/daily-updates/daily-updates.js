@@ -22,11 +22,95 @@ const db = require('../connection');
 // GET daily updates based on employee hierarchy
 router.get('/', async (req, res) => {
     const employeeId = req.query.employeeId;
+    const viewerId = req.query.viewerId;
 
+    // Shared SELECT — aliases match the fields the frontend tables bind to.
+    const BASE_SELECT = `
+        SELECT
+            du.*,
+            e.fullName AS employee_name,
+            e.department,
+            e.role,
+            e.employee_level,
+            p.projectTitle,
+            t.title AS task_title,
+            t.note
+        FROM daily_updates du
+        LEFT JOIN employees e ON du.employee_id = e.id
+        LEFT JOIN projects p ON du.project_id = p.id
+        LEFT JOIN tasks t ON du.task_id = t.id
+    `;
+
+    // ── Role-scoped "Employee Updates" view (viewerId = the logged-in user) ──
+    //   Admin / HR   → all updates
+    //   BDE          → updates on projects of clients the BDE owns
+    //   Senior BA    → BDE + BA departments + junior/senior employees
+    //   Other BA     → BA department only
+    if (viewerId) {
+        try {
+            const [[viewer]] = await db.query(
+                `SELECT id, role, department, employee_level FROM employees WHERE id = ?`,
+                [viewerId]
+            );
+            if (!viewer) {
+                return res.status(404).send({ error: 'Viewer not found' });
+            }
+
+            const vRole = String(viewer.role || '').trim().toLowerCase();
+            const vDept = String(viewer.department || '').trim().toLowerCase();
+            const vLevel = String(viewer.employee_level || '').trim().toLowerCase();
+
+            let where = '';
+            let params = [];
+
+            if (vRole === 'admin' || vDept === 'hr') {
+                where = '';
+            } else if (vDept === 'bde') {
+                // Updates whose project belongs to a client owned by this BDE.
+                where = `
+                    WHERE du.project_id IN (
+                        SELECT p2.id
+                        FROM projects p2
+                        JOIN clients c2 ON p2.client = c2.id
+                        WHERE c2.employee_id = ?
+                    )
+                `;
+                params = [viewerId];
+            } else if (vDept === 'ba' && vLevel === 'senior') {
+                where = `
+                    WHERE (
+                        LOWER(TRIM(e.department)) IN ('bde', 'ba')
+                        OR LOWER(TRIM(e.employee_level)) IN ('junior', 'senior')
+                    )
+                `;
+            } else if (vDept === 'ba') {
+                where = `WHERE LOWER(TRIM(e.department)) = 'ba'`;
+            } else {
+                // Any other viewer → only their own updates.
+                where = `WHERE du.employee_id = ?`;
+                params = [viewerId];
+            }
+
+            const [rows] = await db.query(
+                `${BASE_SELECT} ${where} ORDER BY du.update_date DESC`,
+                params
+            );
+            return res.json(rows);
+        } catch (err) {
+            console.error('Get scoped daily updates error:', err);
+            return res.status(500).send({ error: err.message });
+        }
+    }
+
+    // No employeeId → return ALL daily updates (Admin view).
     if (!employeeId) {
-        return res.status(400).send({
-            error: "employeeId is required"
-        });
+        try {
+            const [rows] = await db.query(`${BASE_SELECT} ORDER BY du.update_date DESC`);
+            return res.json(rows);
+        } catch (err) {
+            console.error('Get all daily updates error:', err);
+            return res.status(500).send({ error: err.message });
+        }
     }
 
     try {

@@ -3,8 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { environment } from 'environments/environment';
+import { forkJoin } from 'rxjs';
 
 interface TargetForm {
   full_time: number | null;
@@ -17,7 +20,7 @@ interface TargetForm {
 @Component({
   selector: 'app-bde-targets',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatButtonModule, BreadcrumbComponent],
+  imports: [CommonModule, FormsModule, MatButtonModule, MatFormFieldModule, MatSelectModule, BreadcrumbComponent],
   templateUrl: './bde-targets.component.html',
 })
 export class BdeTargetsComponent implements OnInit {
@@ -29,6 +32,9 @@ export class BdeTargetsComponent implements OnInit {
   mode: 'all' | 'single' = 'all';
 
   bdeList: any[] = [];
+  // Multi-select: one or more BDEs. `selectedBdeId` mirrors the single selection
+  // (only set when exactly one is chosen) so the prefill + achievement view still works.
+  selectedBdeIds: number[] = [];
   selectedBdeId: number | null = null;
 
   form: TargetForm = this.blankForm();
@@ -63,7 +69,8 @@ export class BdeTargetsComponent implements OnInit {
 
   loadBdeList() {
     this.http.get<any[]>(`${this.base}/kpi/bde-list`).subscribe({
-      next: d => (this.bdeList = d),
+      next: d => (this.bdeList = d || []),
+      error: err => console.error('Failed to load BDE list:', err),
     });
   }
 
@@ -90,6 +97,9 @@ export class BdeTargetsComponent implements OnInit {
     this.errorMsg = '';
     this.form = this.blankForm();
     this.singleAchievement = null;
+    // Prefill the form + show achievement only when exactly ONE BDE is selected.
+    // For multiple, the admin enters fresh targets applied to all of them.
+    this.selectedBdeId = this.selectedBdeIds.length === 1 ? this.selectedBdeIds[0] : null;
     if (this.selectedBdeId) this.loadSingleData();
   }
 
@@ -147,24 +157,28 @@ export class BdeTargetsComponent implements OnInit {
   }
 
   saveForSingle() {
-    if (!this.selectedBdeId || !this.formValid()) return;
+    if (!this.selectedBdeIds.length || !this.formValid()) return;
     this.saving = true;
     this.successMsg = '';
     this.errorMsg = '';
     const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    this.http
-      .post(`${this.base}/bde-client-targets/save`, {
-        bde_id: this.selectedBdeId, month: this.month, year: this.year,
+
+    // Apply the same target form to every selected BDE.
+    const requests = this.selectedBdeIds.map(id =>
+      this.http.post(`${this.base}/bde-client-targets/save`, {
+        bde_id: id, month: this.month, year: this.year,
         ...this.form, created_by: user.id,
       })
-      .subscribe({
-        next: () => {
-          this.saving = false;
-          this.successMsg = 'Targets saved successfully!';
-          this.loadSingleData();
-        },
-        error: () => { this.saving = false; this.errorMsg = 'Failed to save. Please try again.'; },
-      });
+    );
+
+    forkJoin(requests).subscribe({
+      next: () => {
+        this.saving = false;
+        this.successMsg = `Targets saved for ${this.selectedBdeIds.length} BDE(s) successfully!`;
+        if (this.selectedBdeId) this.loadSingleData();
+      },
+      error: () => { this.saving = false; this.errorMsg = 'Failed to save. Please try again.'; },
+    });
   }
 
   // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -196,6 +210,9 @@ export class BdeTargetsComponent implements OnInit {
   }
 
   get selectedBdeName(): string {
-    return this.bdeList.find(b => b.id === this.selectedBdeId)?.fullName || '';
+    return this.bdeList
+      .filter(b => this.selectedBdeIds.includes(b.id))
+      .map(b => b.fullName)
+      .join(', ');
   }
 }

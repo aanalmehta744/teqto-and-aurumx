@@ -1086,6 +1086,8 @@ router.patch(
         req.file.filename;
 
 
+      // Photo is stored in `uploadImg`; login returns it and the header/sidebar
+      // read `user.img || user.uploadImg`, so it persists after logout + login.
       const [result] =
         await db.query(
           `
@@ -1753,6 +1755,9 @@ router.patch(
         req.file.filename;
 
 
+      // The employees table stores the photo in `uploadImg`. Login returns this
+      // column, and the header/sidebar read `user.img || user.uploadImg`, so the
+      // photo persists after logout + login.
       await db.query(
         `
         UPDATE employees

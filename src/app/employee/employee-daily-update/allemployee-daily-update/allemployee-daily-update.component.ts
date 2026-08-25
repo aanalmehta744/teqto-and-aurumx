@@ -52,27 +52,6 @@ export class AllEmployeeDailyUpdateComponent implements OnInit, AfterViewInit {
 
   constructor(private dailyUpdateService: EmployeeDailyUpdateService, public dialog: MatDialog) { }
 
-  /** Filter all-employee records based on current user's department and level */
-  private filterByRole(data: any[]): any[] {
-    const dept = (this.userData?.department || '').toUpperCase();
-    const level = (this.userData?.employee_level || '').toLowerCase();
-
-    if (dept === 'BDE') {
-      // BDE sees only updates from employees in the BDE department (project-wise)
-      return data.filter(u => (u.department || '').toUpperCase() === 'BDE');
-    } else if (dept === 'BA') {
-      if (level === 'senior') {
-        // Senior BA sees all BDE and BA updates
-        return data.filter(u => ['BDE', 'BA'].includes((u.department || '').toUpperCase()));
-      } else {
-        // Non-senior BA sees only BA department updates (project-wise)
-        return data.filter(u => (u.department || '').toUpperCase() === 'BA');
-      }
-    }
-    // Admin, HR, and any other role — see everything
-    return data;
-  }
-
   ngOnInit(): void {
     this.loadUserDataFromLocalStorage();
   }
@@ -120,20 +99,16 @@ export class AllEmployeeDailyUpdateComponent implements OnInit, AfterViewInit {
   fetchDailyUpdates(): void {
     this.isTblLoading = true;
 
-    // CHANGED: was getUpdates() → called GET /api/dailyUpdates/all which is admin-only on the backend.
-    // getAllUpdates() calls GET /api/dailyUpdates (base endpoint, no /all suffix) which is accessible
-    // to all roles including BDE and BA.
-    // OLD: this.dailyUpdateService.getUpdates().subscribe((data) => {
-    this.dailyUpdateService.getAllUpdates().subscribe({
+    // Pass the logged-in user's id as viewerId so the backend returns the
+    // role-scoped set (BDE → his clients' project updates; Senior BA → BDE + BA +
+    // junior/senior employees; other BA → BA only; Admin/HR → all).
+    this.dailyUpdateService.getAllUpdates(this.userData?.id).subscribe({
       next: (data) => {
         this.isTblLoading = false;
 
-        // Apply role-based filtering: BDE sees BDE only; Senior BA sees BDE+BA; other BA sees BA only
-        const filtered = this.filterByRole(data);
-
         const grouped: { [key: string]: any[] } = {};
 
-        filtered.forEach((update: any) => {
+        data.forEach((update: any) => {
           const date = formatDate(update.update_date, 'yyyy-MM-dd', 'en-IN');
           if (!grouped[date]) {
             grouped[date] = [];

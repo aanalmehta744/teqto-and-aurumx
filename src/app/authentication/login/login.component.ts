@@ -35,6 +35,9 @@ export class LoginComponent extends UnsubscribeOnDestroyAdapter
     error = '';
     hide = true;
     isDarkTheme = false;
+
+    /** Full-screen loader stays until the company logo image has fully loaded. */
+    logoLoaded = false;
  
     loginImage: string | null = null;
     loginHeading: string | null = null;
@@ -76,7 +79,24 @@ export class LoginComponent extends UnsubscribeOnDestroyAdapter
         });
  
         this.loadLoginSettings();
-    }isFlipped = false;
+
+        // Safety net: never leave the loader stuck if the load event doesn't fire
+        // (e.g. cached image on some browsers).
+        setTimeout(() => {
+            if (!this.logoLoaded) {
+                this.logoLoaded = true;
+                this.changeDetector.detectChanges();
+            }
+        }, 5000);
+    }
+
+    /** Hide the full-screen loader once the company logo has finished loading. */
+    onLogoLoaded(): void {
+        this.logoLoaded = true;
+        this.changeDetector.detectChanges();
+    }
+
+    isFlipped = false;
 
 toggleFlip(): void {
   this.isFlipped = !this.isFlipped;

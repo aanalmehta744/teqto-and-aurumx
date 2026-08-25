@@ -225,7 +225,8 @@ export class SidebarComponent
 
       this.userFullName = user.fullName;
       this.userGender = user.gender;
-      this.userImg = user.img || this.getImgUrl(user.gender);
+      // Fall back to `uploadImg` when `img` is empty so photos persist after re-login.
+      this.userImg = user.img || user.uploadImg || this.getImgUrl(user.gender);
       this.sidebarItems = ROUTES.filter(item => {
   const roles = (item.role ?? []).map(r => r.toLowerCase().trim());
   const depts = (item.department ?? []).map(d => d.toLowerCase().trim());

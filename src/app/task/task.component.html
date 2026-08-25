@@ -20,12 +20,12 @@
           <div class="flex justify-center mb-4 mt-2">
             <div class="flex bg-gray-100 rounded-full overflow-hidden">
               <button class="px-5 py-2 text-sm font-medium transition-all"
-                [class.bg-gray-800]="activeTab === 'pending'" [class.text-black]="activeTab === 'pending'"
+                [class.bg-lightblue-800]="activeTab === 'pending'" [class.text-black]="activeTab === 'pending'"
                 [class.text-gray-600]="activeTab !== 'pending'" (click)="setTab('pending')">
                 Pending
               </button>
               <button class="px-5 py-2 text-sm font-medium transition-all"
-                [class.bg-gray-800]="activeTab === 'completed'" [class.text-black]="activeTab === 'completed'"
+                [class.bg-lightblue-800]="activeTab === 'completed'" [class.text-black]="activeTab === 'completed'"
                 [class.text-gray-600]="activeTab !== 'completed'" (click)="setTab('completed')">
                 Completed
               </button>
@@ -37,22 +37,22 @@
           <div *ngIf="activeTab === 'pending'" class="flex justify-center mb-4 mt-2">
             <div class="flex bg-gray-100 rounded-full overflow-hidden">
               <button class="px-4 py-1.5 text-sm font-medium transition-all"
-                [class.bg-gray-800]="activePriority === 'All'" [class.text-black]="activePriority === 'All'"
+                [class.bg-lightblue-800]="activePriority === 'All'" [class.text-black]="activePriority === 'All'"
                 [class.text-gray-600]="activePriority !== 'All'" (click)="setPriorityFilter('All')">
                 All
               </button>
               <button class="px-4 py-1.5 text-sm font-medium transition-all"
-                [class.bg-gray-800]="activePriority === 'High'" [class.text-black]="activePriority === 'High'"
+                [class.bg-lightblue-800]="activePriority === 'High'" [class.text-black]="activePriority === 'High'"
                 [class.text-gray-600]="activePriority !== 'High'" (click)="setPriorityFilter('High')">
                 High
               </button>
               <button class="px-4 py-1.5 text-sm font-medium transition-all"
-                [class.bg-gray-800]="activePriority === 'Normal'" [class.text-black]="activePriority === 'Normal'"
+                [class.bg-lightblue-800]="activePriority === 'Normal'" [class.text-black]="activePriority === 'Normal'"
                 [class.text-gray-600]="activePriority !== 'Normal'" (click)="setPriorityFilter('Normal')">
                 Normal
               </button>
               <button class="px-4 py-1.5 text-sm font-medium transition-all"
-                [class.bg-gray-800]="activePriority === 'Low'" [class.text-black]="activePriority === 'Low'"
+                [class.bg-lightblue-800]="activePriority === 'Low'" [class.text-black]="activePriority === 'Low'"
                 [class.text-gray-600]="activePriority !== 'Low'" (click)="setPriorityFilter('Low')">
                 Low
               </button>

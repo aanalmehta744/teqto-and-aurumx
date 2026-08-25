@@ -29,16 +29,19 @@
     <div class="w-full md:w-[50%]">
       <ul class="w-full flex md:justify-end items-center">
         <li class="flex items-center">
-          <a>
+          <a [routerLink]="homePage"
+             class="cursor-pointer text-[#565660] hover:text-indigo-600 transition-colors">
             <app-feather-icons [icon]="'home'" [class]="'breadcrumb-icon'"></app-feather-icons>
           </a>
         </li>
         @for(item of items; track item){
-        <li class="flex items-center text-[#565660]"><mat-icon
-            class="text-[1.4rem] content-center">keyboard_arrow_right</mat-icon> {{item}}</li>
+        <li class="flex items-center text-[#565660]">
+          <mat-icon class="text-[1.4rem] content-center">keyboard_arrow_right</mat-icon>
+          <a [routerLink]="homePage" class="cursor-pointer hover:text-indigo-600 transition-colors">{{item}}</a>
+        </li>
         }
-        <li class="active flex items-center text-[#565660]"><mat-icon
-            class="text-[1.4rem] content-center">keyboard_arrow_right</mat-icon> {{active_item}}</li>
+        <li class="active flex items-center text-indigo-600 font-medium"><mat-icon
+            class="text-[1.4rem] content-center text-[#565660]">keyboard_arrow_right</mat-icon> {{active_item}}</li>
       </ul>
     </div>
   </div>
