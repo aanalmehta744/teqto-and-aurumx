@@ -152,7 +152,7 @@
     <div *ngIf="loading" class="text-center py-8 text-gray-400 text-sm">Loading...</div>
 
     <div *ngIf="!loading && allAchievements.length > 0" class="bg-white rounded-xl shadow overflow-hidden">
-      <div class="bg-teal-600 text-white px-5 py-3">
+      <div class="bg-indigo-600 text-white px-5 py-3">
         <span class="font-semibold text-sm">Achievement Overview — {{ monthLabel }} {{ year }}</span>
       </div>
       <div class="overflow-auto">
@@ -333,7 +333,7 @@
 
       <!-- Achievement Card for selected BDE -->
       <div *ngIf="singleAchievement" class="bg-white rounded-xl shadow overflow-hidden">
-        <div class="bg-teal-600 text-white px-5 py-3">
+        <div class="bg-indigo-600 text-white px-5 py-3">
           <span class="font-semibold text-sm">Achievement — {{ selectedBdeName }} — {{ monthLabel }} {{ year }}</span>
         </div>
 

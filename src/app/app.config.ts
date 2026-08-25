@@ -6,7 +6,7 @@ import {
 } from '@angular/common/http';
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { APP_ROUTE } from './app.routes';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withPreloading, PreloadAllModules } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { JwtInterceptor } from '@core/interceptor/jwt.interceptor';
@@ -32,7 +32,9 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(),
-    provideRouter(APP_ROUTE),
+    // Preload lazy route chunks in the background after the app loads →
+    // page switching becomes near-instant instead of fetching on each click.
+    provideRouter(APP_ROUTE, withPreloading(PreloadAllModules)),
     provideAnimations(),
     // { provide: LocationStrategy, useClass: HashLocationStrategy },
     DirectionService,

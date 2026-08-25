@@ -35,7 +35,6 @@ export class MainLayoutComponent
   isMobile: boolean = window.innerWidth < 1024;
   isMobileOpen: boolean = false;
 
-
   @HostListener('window:resize', [])
   onResize() {
     this.isMobile = window.innerWidth < 1024;
@@ -49,14 +48,23 @@ export class MainLayoutComponent
 
   @HostListener('document:mouseover', ['$event'])
   onMouseOver(event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    const sidebarElement = document.querySelector('app-sidebar');
-    if (!this.isMobile && sidebarElement?.contains(target)) {
-      this.isHovered = true;
-    } else if (!this.isMobile && this.isSidebarCollapsed) {
-      this.isHovered = false;
+    // Only relevant on desktop; bail out early on mobile to avoid work on every hover.
+    if (this.isMobile) return;
+
+    // Cache the sidebar element instead of querying the DOM on every mouse move.
+    if (!this.sidebarEl) {
+      this.sidebarEl = document.querySelector('app-sidebar');
+    }
+
+    const inside = !!this.sidebarEl?.contains(event.target as HTMLElement);
+    const next = inside ? true : (this.isSidebarCollapsed ? false : this.isHovered);
+
+    // Only assign when the value actually changes → avoids needless change detection.
+    if (next !== this.isHovered) {
+      this.isHovered = next;
     }
   }
+  private sidebarEl: Element | null = null;
   navigateAndClose(path: string) {
     this.router.navigate([path]);
     if (this.isMobile) {
@@ -65,16 +73,10 @@ export class MainLayoutComponent
   }
 
   ngOnInit(): void {
-    // Set collapsed state
-    if (window.innerWidth < 1024) {
-      this.isSidebarCollapsed = true;
-      this.isMobile = true;
-    } else {
-      this.isSidebarCollapsed = false;
-      this.isMobile = false;
-    }
+    const w = window.innerWidth;
+    this.isMobile = w < 1024;
+    this.isSidebarCollapsed = w < 1024;
 
-    // Optional: Listen to window resize to dynamically update
     window.addEventListener('resize', () => {
       this.isMobile = window.innerWidth < 1024;
     });

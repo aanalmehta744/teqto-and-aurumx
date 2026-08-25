@@ -2,6 +2,8 @@ import { Page404Component } from '../authentication/page404/page404.component';
 import { Route } from '@angular/router';
 import { AllEmployeeDailyUpdateComponent } from '../employee/employee-daily-update/allemployee-daily-update/allemployee-daily-update.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+// ADDED: View-only holiday list for BDE
+import { AllHolidayComponent } from '../employee/holidays/all-holidays/all-holidays.component';
 // import { BillingComponent } from './billing/billing.component';
 // import { SettingsComponent } from './settings/settings.component';
 import { ChatComponent } from './chat/chat.component';
@@ -94,6 +96,8 @@ export const CLIENT_ROUTE: Route[] = [
   { path: 'performance', component: PerformanceComponent },
   { path: 'my-targets', component: MyTargetsComponent },
   { path: 'daily-notes', component: DailyNotesComponent },
+  // ADDED: View-only holiday list for BDE
+  { path: 'holidays', component: AllHolidayComponent },
   { path: '**', component: Page404Component },
 ];
 

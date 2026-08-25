@@ -137,11 +137,19 @@ isSeniorEmployee(): boolean {
       ];
 
     } else if (this.userData?.department === 'HR') {
-      // HR
+      // HR — should see all employees' updates (same as Admin view)
       this.ishr = 'true';
 
+      // CHANGED: was ['update', 'actions'] — HR was seeing only their own update column.
+      // Now HR sees all employees' updates with full columns like Admin does.
+      // OLD: this.displayedColumns = ['update', 'actions'];
       this.displayedColumns = [
+        'employeeName',
+        'project',
+        'taskTitle',
+        'taskDetails',
         'update',
+        'status',
         'actions'
       ];
 
@@ -191,7 +199,10 @@ isSeniorEmployee(): boolean {
 
     this.isTblLoading = true;
 
-    const fetch$ = this.isAssignerRole()
+    // CHANGED: added `|| this.userData?.department === 'HR'` so HR also fetches all employees' updates.
+    // Previously HR fell into getUpdates(id) and only saw their own daily update entry.
+    // OLD: const fetch$ = this.isAssignerRole()
+    const fetch$ = (this.isAssignerRole() || this.userData?.department === 'HR')
       ? this.dailyUpdateService.getAllUpdates()
       : this.dailyUpdateService.getUpdates(this.userData.id);
 

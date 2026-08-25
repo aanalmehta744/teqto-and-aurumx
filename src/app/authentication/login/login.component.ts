@@ -324,7 +324,7 @@ onSubmit(event: Event): void {
           } else if (userDepartment === 'ba') {
 
             this.router.navigate([
-              '/ba/dashboard/main'
+              '/ba/dashboard'
             ]);
 
           } else {

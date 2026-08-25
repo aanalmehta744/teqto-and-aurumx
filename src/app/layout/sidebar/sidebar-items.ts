@@ -999,6 +999,21 @@ export const ROUTES: RouteInfo[] = [
     submenu: [],
   },
 
+  // ADDED: View-only holidays for BDE
+  {
+    path: '/client/holidays',
+    title: 'MENUITEMS.HOLIDAYS.TEXT',
+    iconType: 'feather',
+    icon: 'coffee',
+    class: '',
+    groupTitle: false,
+    badge: '',
+    badgeClass: '',
+    role: ['Employee'],
+    department: ['BDE'],
+    submenu: [],
+  },
+
   {
     path: '/client/myteam',
     title: 'Team',
@@ -1027,19 +1042,19 @@ export const ROUTES: RouteInfo[] = [
     submenu: [],
   },
 
-  {
-    path: '/client/employee-updates',
-    title: 'Employee Updates',
-    iconType: 'feather',
-    icon: 'activity',
-    class: '',
-    groupTitle: false,
-    badge: '',
-    badgeClass: '',
-    role: ['Employee'],
-    department: ['BDE'],
-    submenu: [],
-  },
+  // {
+  //   path: '/client/employee-updates',
+  //   title: 'Employee Updates',
+  //   iconType: 'feather',
+  //   icon: 'activity',
+  //   class: '',
+  //   groupTitle: false,
+  //   badge: '',
+  //   badgeClass: '',
+  //   role: ['Employee'],
+  //   department: ['BDE'],
+  //   submenu: [],
+  // },
 
   {
     path: '',
@@ -1173,7 +1188,10 @@ export const ROUTES: RouteInfo[] = [
   // ============================================================
 
   {
-    path: '/ba/dashboard/main',
+    // CHANGED: Was '/ba/dashboard/main' (admin dashboard route).
+    // Now points to '/ba/dashboard' so BA sees the employee-style dashboard.
+    // path: '/ba/dashboard/main', // OLD — admin dashboard
+    path: '/ba/dashboard',
     title: 'Dashboard',
     iconType: 'feather',
     icon: 'monitor',
@@ -1269,6 +1287,21 @@ export const ROUTES: RouteInfo[] = [
     submenu: [],
   },
 
+  // ADDED: View-only holidays for BA
+  {
+    path: '/ba/holidays',
+    title: 'MENUITEMS.HOLIDAYS.TEXT',
+    iconType: 'feather',
+    icon: 'coffee',
+    class: '',
+    groupTitle: false,
+    badge: '',
+    badgeClass: '',
+    role: ['Employee'],
+    department: ['BA'],
+    submenu: [],
+  },
+
   {
     path: '/ba/employees/allEmployees',
     title: 'Team',
@@ -1297,19 +1330,19 @@ export const ROUTES: RouteInfo[] = [
     submenu: [],
   },
 
-  {
-    path: '/ba/employee-updates',
-    title: 'Employee Updates',
-    iconType: 'feather',
-    icon: 'activity',
-    class: '',
-    groupTitle: false,
-    badge: '',
-    badgeClass: '',
-    role: ['Employee'],
-    department: ['BA'],
-    submenu: [],
-  },
+  // {
+  //   path: '/ba/employee-updates',
+  //   title: 'Employee Updates',
+  //   iconType: 'feather',
+  //   icon: 'activity',
+  //   class: '',
+  //   groupTitle: false,
+  //   badge: '',
+  //   badgeClass: '',
+  //   role: ['Employee'],
+  //   department: ['BA'],
+  //   submenu: [],
+  // },
 
   {
     path: '/ba/payroll/employee-salary',

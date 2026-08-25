@@ -48,9 +48,30 @@ export class AllEmployeeDailyUpdateComponent implements OnInit, AfterViewInit {
   groupedData: { date: string, updates: any[], dataSource: MatTableDataSource<any> }[] = [];
   filteredGroupedData: { date: string, updates: any[], dataSource: MatTableDataSource<any> }[] = [];
 
-  ishr: string = ''; // you may get this from auth service or localStorage
+  ishr: string = '';
 
   constructor(private dailyUpdateService: EmployeeDailyUpdateService, public dialog: MatDialog) { }
+
+  /** Filter all-employee records based on current user's department and level */
+  private filterByRole(data: any[]): any[] {
+    const dept = (this.userData?.department || '').toUpperCase();
+    const level = (this.userData?.employee_level || '').toLowerCase();
+
+    if (dept === 'BDE') {
+      // BDE sees only updates from employees in the BDE department (project-wise)
+      return data.filter(u => (u.department || '').toUpperCase() === 'BDE');
+    } else if (dept === 'BA') {
+      if (level === 'senior') {
+        // Senior BA sees all BDE and BA updates
+        return data.filter(u => ['BDE', 'BA'].includes((u.department || '').toUpperCase()));
+      } else {
+        // Non-senior BA sees only BA department updates (project-wise)
+        return data.filter(u => (u.department || '').toUpperCase() === 'BA');
+      }
+    }
+    // Admin, HR, and any other role — see everything
+    return data;
+  }
 
   ngOnInit(): void {
     this.loadUserDataFromLocalStorage();
@@ -97,48 +118,65 @@ export class AllEmployeeDailyUpdateComponent implements OnInit, AfterViewInit {
   }
 
   fetchDailyUpdates(): void {
-    this.dailyUpdateService.getUpdates().subscribe((data) => {
-      const grouped: { [key: string]: any[] } = {};
+    this.isTblLoading = true;
 
-      data.forEach((update: any) => {
-        const date = formatDate(update.update_date, 'yyyy-MM-dd', 'en-IN');
-        if (!grouped[date]) {
-          grouped[date] = [];
-        }
-        grouped[date].push(update);
-      });
+    // CHANGED: was getUpdates() → called GET /api/dailyUpdates/all which is admin-only on the backend.
+    // getAllUpdates() calls GET /api/dailyUpdates (base endpoint, no /all suffix) which is accessible
+    // to all roles including BDE and BA.
+    // OLD: this.dailyUpdateService.getUpdates().subscribe((data) => {
+    this.dailyUpdateService.getAllUpdates().subscribe({
+      next: (data) => {
+        this.isTblLoading = false;
 
-      this.groupedData = Object.keys(grouped).map((date) => {
-        const ds = new MatTableDataSource(grouped[date]);
-        ds.filterPredicate = (data: any, filter: string) => {
-          const str = filter.trim().toLowerCase();
-          const fullDate = formatDate(data.update_date, 'yyyy-MM-dd', 'en-IN');         // 2025-07-23
-          const readableDate = formatDate(data.update_date, 'MMM d, y', 'en-US');       // Jul 23, 2025
-          const altDate = formatDate(data.update_date, 'dd-MM-yyyy', 'en-IN');          // 23-07-2025
-          const monthOnly = formatDate(data.update_date, 'MMMM', 'en-US').toLowerCase(); // july
-          return (
-            data.employee_name?.toLowerCase().includes(str) ||
-            data.department?.toLowerCase().includes(str) ||
-            data.projectTitle?.toLowerCase().includes(str) ||
-            data.task_title?.toLowerCase().includes(str) ||
-            fullDate.includes(str) ||
-            readableDate.toLowerCase().includes(str) ||
-            altDate.includes(str) ||
-            monthOnly.includes(str) // match only month
-          );
-        };
-        return {
-          date,
-          updates: grouped[date],
-          dataSource: ds,
-        };
-      });
+        // Apply role-based filtering: BDE sees BDE only; Senior BA sees BDE+BA; other BA sees BA only
+        const filtered = this.filterByRole(data);
 
-      this.filteredGroupedData = [...this.groupedData];
+        const grouped: { [key: string]: any[] } = {};
 
-      setTimeout(() => {
-        this.assignPaginators();
-      });
+        filtered.forEach((update: any) => {
+          const date = formatDate(update.update_date, 'yyyy-MM-dd', 'en-IN');
+          if (!grouped[date]) {
+            grouped[date] = [];
+          }
+          grouped[date].push(update);
+        });
+
+        this.groupedData = Object.keys(grouped).map((date) => {
+          const ds = new MatTableDataSource(grouped[date]);
+          ds.filterPredicate = (data: any, filter: string) => {
+            const str = filter.trim().toLowerCase();
+            const fullDate = formatDate(data.update_date, 'yyyy-MM-dd', 'en-IN');
+            const readableDate = formatDate(data.update_date, 'MMM d, y', 'en-US');
+            const altDate = formatDate(data.update_date, 'dd-MM-yyyy', 'en-IN');
+            const monthOnly = formatDate(data.update_date, 'MMMM', 'en-US').toLowerCase();
+            return (
+              data.employee_name?.toLowerCase().includes(str) ||
+              data.department?.toLowerCase().includes(str) ||
+              data.projectTitle?.toLowerCase().includes(str) ||
+              data.task_title?.toLowerCase().includes(str) ||
+              fullDate.includes(str) ||
+              readableDate.toLowerCase().includes(str) ||
+              altDate.includes(str) ||
+              monthOnly.includes(str)
+            );
+          };
+          return {
+            date,
+            updates: grouped[date],
+            dataSource: ds,
+          };
+        });
+
+        this.filteredGroupedData = [...this.groupedData];
+
+        setTimeout(() => {
+          this.assignPaginators();
+        });
+      },
+      error: (err) => {
+        this.isTblLoading = false; // FIX: ensure loading stops on error so "No results" shows
+        console.error('Error fetching daily updates:', err);
+      }
     });
   }
 

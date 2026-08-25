@@ -59,12 +59,87 @@ export class SidebarComponent
   headerHeight = 70;
   currentRoute?: string;
   isMobileView: boolean = window.innerWidth < 1024;
+  isXsScreen: boolean = window.innerWidth < 500;
   @Input() collapsed: boolean = false;
   @Input() isHovered: boolean = false;
 
   @HostListener('window:resize', ['$event'])
   onResize() {
     this.isMobileView = window.innerWidth < 1024;
+    this.isXsScreen = window.innerWidth < 500;
+  }
+
+  /** All role-based navigable items (with icons) for the mobile bottom nav.
+   *  The bar scrolls horizontally so every item is reachable.
+   *  Computed ONCE and stored (not a getter) so the *ngFor keeps stable object
+   *  references — otherwise Angular would recreate the icons every change-detection
+   *  cycle and taps would land on elements mid-recreation and never navigate. */
+  bottomNavItems: { icon: string; path: string; title: string }[] = [];
+
+  private buildBottomNavItems(): void {
+    this.bottomNavItems = this.sidebarItems
+      .filter(item => !item.groupTitle && item.icon)
+      .map(item => {
+        const raw = item.submenu?.length ? item.submenu[0].path : item.path;
+        const path = raw ? (raw.startsWith('/') ? raw : '/' + raw) : '';
+        return { icon: item.icon, path, title: item.title };
+      });
+  }
+
+  /** trackBy for the bottom-nav *ngFor — keeps DOM nodes stable across renders. */
+  trackByPath(_i: number, item: { path: string }): string {
+    return item.path;
+  }
+
+  isBottomNavActive(path: string): boolean {
+    if (!this.currentRoute || !path) return false;
+    const segment = path.split('/')[1];
+    return !!segment && this.currentRoute.includes(segment);
+  }
+
+  // ── Mobile bottom-nav ──
+  // Navigation runs on (click) — the mechanism that reliably fires on mobile
+  // (this is exactly how the profile icon worked before). The long-press label
+  // is purely visual and never blocks navigation.
+  // A single label (centered above the bar) is used instead of per-item tooltips,
+  // because the horizontally-scrollable bar would clip tooltips placed above each icon.
+  pressedTitleKey: string | null = null;
+  private pressTimer: any = null;
+
+  // Navigate / act on a tap.
+  onNavClick(item: { path: string; type?: string }): void {
+    if (item.type === 'profile') {
+      this.goToProfile();
+    } else if (item.type === 'logout') {
+      this.logout();
+    } else {
+      this.navigateBottomNav(item.path);
+    }
+  }
+
+  // Hold (press ≥ 500ms) → reveal the item's name label above the bar.
+  onHoldStart(titleKey: string): void {
+    clearTimeout(this.pressTimer);
+    this.pressTimer = setTimeout(() => {
+      this.pressedTitleKey = titleKey;
+    }, 500);
+  }
+
+  // Release / move → cancel the pending label and hide any shown label.
+  onHoldEnd(): void {
+    clearTimeout(this.pressTimer);
+    if (this.pressedTitleKey) {
+      setTimeout(() => (this.pressedTitleKey = null), 800);
+    }
+  }
+
+  // Same navigation approach as goToProfile() — which works reliably.
+  navigateBottomNav(path: string): void {
+    if (!path) return;
+    this.router.navigate([path]);
+    if (window.innerWidth < 1024) {
+      this.closeSidebarAfterNavigation.emit();
+    }
   }
 
   get isCollapsed(): boolean {
@@ -216,6 +291,9 @@ export class SidebarComponent
         }
       });
 
+      // Build the mobile bottom-nav list once, now that sidebarItems is ready.
+      this.buildBottomNavItems();
+
       // if (userRole === 'admin') this.userType = 'Admin';
       // else if (userRole === 'bde') this.userType = 'BDE';
       // else if (userRole === 'employee') this.userType = 'Employee';
@@ -347,6 +425,13 @@ export class SidebarComponent
     }
 
     if (this.isMobileView) return;
+  }
+
+  goToProfile() {
+    this.router.navigate(['/employee-profile']);
+    if (window.innerWidth < 1024) {
+      this.closeSidebarAfterNavigation.emit();
+    }
   }
 
   logout() {

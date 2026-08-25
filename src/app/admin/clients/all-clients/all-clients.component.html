@@ -182,7 +182,7 @@
               class="whitespace-nowrap text-xs font-medium text-gray-400 uppercase tracking-wide">Tag</th>
             <td mat-cell *matCellDef="let row">
               <span *ngIf="row.tag"
-                class="inline-block text-xs font-medium px-2.5 py-1 rounded-full bg-teal-50 text-teal-700 whitespace-nowrap">
+                class="inline-block text-xs font-medium px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 whitespace-nowrap">
                 {{ row.tag }}
               </span>
               <span *ngIf="!row.tag" class="text-gray-300 text-xs">—</span>
@@ -209,7 +209,7 @@
               class="whitespace-nowrap text-xs font-medium text-gray-400 uppercase tracking-wide">Connect Type</th>
             <td mat-cell *matCellDef="let row">
               <span [ngClass]="{
-                'bg-teal-50 text-teal-700': row.client_Connect_Type === 'Call',
+                'bg-indigo-50 text-indigo-700': row.client_Connect_Type === 'Call',
                 'bg-emerald-50 text-emerald-700': row.client_Connect_Type === 'Whatsapp',
                 'bg-purple-50 text-purple-700': row.client_Connect_Type === 'Email',
                 'bg-blue-50 text-blue-700': row.client_Connect_Type === 'Linkedin',
@@ -381,7 +381,7 @@
                   <th mat-header-cell *matHeaderCellDef class="whitespace-nowrap text-xs font-medium text-gray-400 uppercase tracking-wide">Connect Type</th>
                   <td mat-cell *matCellDef="let client">
                     <span [ngClass]="{
-                      'bg-teal-50 text-teal-700': client.client_Connect_Type === 'Call',
+                      'bg-indigo-50 text-indigo-700': client.client_Connect_Type === 'Call',
                       'bg-emerald-50 text-emerald-700': client.client_Connect_Type === 'Whatsapp',
                       'bg-purple-50 text-purple-700': client.client_Connect_Type === 'Email',
                       'bg-blue-50 text-blue-700': client.client_Connect_Type === 'Linkedin',

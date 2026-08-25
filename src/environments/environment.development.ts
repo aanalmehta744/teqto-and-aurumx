@@ -3,8 +3,8 @@ export const environment = {
   
   localApiUrl: 'http://localhost:5001/api',
 
-  // cloudflareApiUrl:
-  //   'https://hudson-evaluate-courage-measure.trycloudflare.com/api',
+  cloudflareApiUrl:
+    'https://anyway-associates-overview-psychological.trycloudflare.com/api',
 
   apiUrl:
     'http://localhost:5001/api'

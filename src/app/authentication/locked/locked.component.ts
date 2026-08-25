@@ -138,7 +138,7 @@ onSubmit() {
 
     } else if (department === 'ba') {
 
-      this.router.navigate(['/ba/dashboard/main']);
+      this.router.navigate(['/ba/dashboard']);
 
     } else {
 

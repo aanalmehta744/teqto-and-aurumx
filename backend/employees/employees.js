@@ -1452,20 +1452,22 @@ router.post('/:id/targets', async (req, res) => {
 
   try {
 
+    // New schema: bde_targets has (bde_id, amount, month, year) with a UNIQUE key
+    // on (bde_id, month, year). Derive month/year from the incoming target_date.
     const [result] =
       await db.execute(
         `
         INSERT INTO bde_targets
-        (
-          bde_id,
-          target_amount,
-          target_month
-        )
-        VALUES (?, ?, ?)
+          (bde_id, amount, month, year)
+        VALUES
+          (?, ?, MONTH(?), YEAR(?))
+        ON DUPLICATE KEY UPDATE
+          amount = VALUES(amount)
         `,
         [
           employeeId,
           amount,
+          target_date,
           target_date
         ]
       );
@@ -1514,17 +1516,21 @@ router.get('/:id/targets', async (req, res) => {
 
   try {
 
+    // NOTE: the live `bde_targets` table uses the new schema (amount, month, year).
+    // The old columns (target_amount, target_month, achieved_amount) no longer exist,
+    // so we read `amount` directly and synthesize `target_month` from year+month.
+    // `achieved_amount` isn't stored on this table anymore, so it defaults to 0.
     const [targets] =
       await db.execute(
         `
         SELECT
           id,
-          target_amount AS amount,
-          target_month,
-          achieved_amount
+          amount,
+          STR_TO_DATE(CONCAT(year, '-', LPAD(month, 2, '0'), '-01'), '%Y-%m-%d') AS target_month,
+          0 AS achieved_amount
         FROM bde_targets
         WHERE bde_id = ?
-        ORDER BY target_month DESC
+        ORDER BY year DESC, month DESC
         `,
         [employeeId]
       );
@@ -1580,17 +1586,20 @@ router.put('/:targetId/targets', async (req, res) => {
 
   try {
 
+    // New schema: update `amount` and derive month/year from target_date.
     const [result] =
       await db.execute(
         `
         UPDATE bde_targets
         SET
-          target_amount = ?,
-          target_month = ?
+          amount = ?,
+          month = MONTH(?),
+          year = YEAR(?)
         WHERE id = ?
         `,
         [
           amount,
+          target_date,
           target_date,
           targetId
         ]

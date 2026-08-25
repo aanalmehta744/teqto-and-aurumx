@@ -75,14 +75,17 @@ export class HeaderComponent
   }
 
   // logo
-  getLogUrl(): string {
-    const isMobile = window.innerWidth < 425;
-    if (isMobile) {
-      return 'assets/images/Company_Logo.png'; // Mobile view
-    }
-    return this.collapsed && !this.isHovered ? 'assets/images/Company_Logo.png' : '../../../../assets/images/Company_Logo.png'; // Desktop view
-  }
+  // getLogUrl(): string {
+  //   const isMobile = window.innerWidth < 425;
+  //   if (isMobile) {
+  //     return 'assets/images/Company_Logo.png'; // Mobile view
+  //   }
+  //   return this.collapsed && !this.isHovered ? 'assets/images/Company_Logo.png' : '../../../../assets/images/Company_Logo.png'; // Desktop view
+  // }
 
+  getLogUrl(): string {
+  return '/assets/images/imagecopy.png'; // Updated logo path
+}
   ngOnInit() {
     this.config = this.configService.configData;
 
@@ -115,7 +118,7 @@ if (userRole === 'Admin') {
 
   } else if (department === 'ba') {
 
-    this.homePage = 'ba/dashboard/main';
+    this.homePage = 'ba/dashboard';
 
   } else {
 

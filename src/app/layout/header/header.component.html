@@ -1,33 +1,25 @@
-<nav class="w-full h-auto py-2  bg-[white] sticky top-0 z-50 px-4 grid grid-cols-2 shadow-sm">
+<nav class="w-full h-16 bg-[white] sticky top-0 z-50 px-4 grid grid-cols-2 shadow-sm">
 
-  <div class="flex items-center justify-start h-full">
+  <!-- LEFT: 3-line toggle first, then logo always visible and aligned -->
+  <div class="flex items-center justify-start h-full ">
 
-    <!-- <a href="#" onClick="return false;" class="navbar-toggle collapsed !text-[#00383F]"
-      (click)="isNavbarCollapsed = !isNavbarCollapsed" aria-expanded="false"></a> -->
-
-    <a href="#" onClick="return false;" class="lg:!hidden block bars !text-[#00383F]"
-      (click)="mobileSidebarToggle.emit()"></a>
-
-
-    <a [routerLink]="homePage">
-      <img [src]="getLogUrl()" alt="logo"
-        class="object-contain h-[2rem] max-w-[11rem] max-h-[2rem] transition-all duration-300 ms-7 md:ms-10 lg:ms-0"
-        [ngClass]="{
-    'w-[2rem]': collapsed && !isHovered,
-    'w-[11rem]': !collapsed || isHovered   
-  }" />
-    </a>
-
-    <button mat-icon-button (click)="toggleSidebar.emit()" class="!hidden lg:!block ms-12" aria-label="Toggle Sidebar">
+    <!-- Desktop sidebar toggle — 3 lines. Only on laptop/PC; mobile uses the bottom nav. -->
+    <button mat-icon-button (click)="toggleSidebar.emit()" class="!hidden lg:!flex shrink-0" aria-label="Toggle Sidebar">
       <app-feather-icons icon="menu" class="header-icon text-[#00383F]"></app-feather-icons>
     </button>
+
+    <!-- Logo always visible after the 3 lines, aligned to header height -->
+    <a [routerLink]="homePage" class="flex items-center shrink-0 h-full">
+      <img [src]="getLogUrl()" alt="logo"
+        class="object-contain h-full w-auto max-w-[10rem]" />
+    </a>
   </div>
 
-
+  <!-- RIGHT: notifications + profile avatar -->
   <div class="flex items-center justify-end space-x-3 h-full" [ngClass]="isNavbarCollapsed ? '' : 'show'">
 
-    <!-- Notification bell (Admin, BDE, BA, Employee) -->
-    <div *ngIf="userRole === 'Admin' || userRole === 'BDE' || userRole === 'BA' || userRole === 'Employee'" class="relative">
+    <!-- Notification bell -->
+    <div *ngIf="userRole === 'Admin' || userRole === 'Employee'" class="relative">
       <button (click)="toggleNotifPanel()" class="relative p-2 text-gray-600 hover:text-indigo-600 transition-colors">
         <mat-icon class="text-[#00383F]">notifications</mat-icon>
         <span *ngIf="notifCount > 0"
@@ -36,10 +28,10 @@
         </span>
       </button>
 
-      <!-- Backdrop to close panel -->
+      <!-- Backdrop -->
       <div *ngIf="showNotifPanel" class="fixed inset-0 z-40" (click)="showNotifPanel = false"></div>
 
-      <!-- Dropdown panel -->
+      <!-- Notification dropdown -->
       <div *ngIf="showNotifPanel"
         class="absolute right-0 top-12 w-80 bg-white shadow-2xl rounded-xl z-50 border border-gray-100 overflow-hidden">
         <div class="bg-white text-gray-800 border-b border-gray-100 px-4 py-2.5 flex justify-between items-center">
@@ -61,20 +53,36 @@
       </div>
     </div>
 
-    <button matButton [matMenuTriggerFor]="menu"
-      class="!flex !items-center !justify-center !gap-2 !bg-[#d6d5ea] hover:bg-[#0b0b88] px-1.5 py-1 md:px-4 md:py-1 rounded-full">
-      <span class="text-[14px] md:text-[15.5px] font-medium text-[#00383F] overflow-x-auto">{{ userName }}</span>
-      <img [src]="getProfileImgUrl()" alt="User" class="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover" />
+    <!-- Profile avatar button — opens dropdown (like Image #4) -->
+    <button matButton [matMenuTriggerFor]="profileMenu"
+      class="!p-0 !min-w-0 !rounded-full !border-2 !border-indigo-200 hover:!border-indigo-400 transition-all">
+      <img [src]="getProfileImgUrl()" alt="Profile"
+           class="w-9 h-9 rounded-full object-cover" />
     </button>
-    <mat-menu #menu="matMenu">
-      <button mat-menu-item class="!text-[#00383f] !text-[13px]" (click)="goToProfile()">
-        <app-feather-icons icon="user" class="user-menu-icons mr-1 align-top"></app-feather-icons>
-        {{ userName }}
-      </button>
+
+    <!-- Profile dropdown -->
+    <mat-menu #profileMenu="matMenu" class="!p-0">
+      <!-- Company logo -->
+      <div class="flex justify-center items-center px-4 py-3 border-b border-gray-100 bg-gray-50 min-w-[220px]"
+           (click)="$event.stopPropagation()">
+        <img src="/assets/images/imagecopy.img" alt="Logo" class="h-8 max-w-[140px] object-contain" />
+      </div>
+      <!-- Profile card -->
+      <div class="flex items-center gap-3 px-4 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
+           (click)="goToProfile(); $event.stopPropagation()">
+        <img [src]="getProfileImgUrl()" alt="Profile"
+             class="w-10 h-10 rounded-full object-cover shrink-0 ring-2 ring-indigo-100" />
+        <div class="min-w-0">
+          <div class="text-sm font-semibold text-gray-800 truncate">{{ userName }}</div>
+          <div class="text-xs text-gray-400 truncate">{{ userRole }}</div>
+        </div>
+      </div>
+      <!-- Logout -->
       <button mat-menu-item (click)="logout()" class="!text-[#00383f] !text-[13px]">
         <app-feather-icons icon="log-out" class="user-menu-icons mr-1 align-top"></app-feather-icons>
         Logout
       </button>
     </mat-menu>
+
   </div>
 </nav>

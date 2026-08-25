@@ -1,14 +1,7 @@
-// export const environment = {
-//   production: true,
-//   // apiUrl: 'https://portal.eliteinfotec.in/api'
-//   apiUrl: 'http://localhost:5001/api'
-  
-//   // apiUrl: 'https://teqto-and-aurumx.onrender.com/api'
-// };
 export const environment = {
   production: true,
-  // cloudflareApiUrl:
-  //   'https://hudson-evaluate-courage-measure.trycloudflare.com/api',
+  cloudflareApiUrl:
+    'https://anyway-associates-overview-psychological.trycloudflare.com/api',
 
   // Change this to whichever backend you want to us
 

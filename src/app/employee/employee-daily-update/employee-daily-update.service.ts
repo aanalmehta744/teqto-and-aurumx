@@ -12,7 +12,10 @@ export class EmployeeDailyUpdateService {
   constructor(private http: HttpClient) { }
 
   getAllUpdates(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.API_URL}/all`);
+    // CHANGED: was GET /api/dailyUpdates/all which returns empty for all roles.
+    // Now calls GET /api/dailyUpdates (base endpoint) which returns all employees' updates.
+    // OLD: return this.http.get<any[]>(`${this.API_URL}/all`);
+    return this.http.get<any[]>(this.API_URL);
   }
 
   // Get daily updates by employeeId and optional date
