@@ -4,11 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 
 import { InterviewService } from 'app/admin/interviews/interview.service';
 import { AssignedRound } from 'app/admin/interviews/interview.model';
+import {
+  NotesDialogComponent,
+  NotesDialogData
+} from 'app/admin/interviews/all-interviews/notes-dialog/notes-dialog.component';
 
 
 @Component({
@@ -19,6 +24,7 @@ import { AssignedRound } from 'app/admin/interviews/interview.model';
     FormsModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatDialogModule,
     BreadcrumbComponent
   ],
   templateUrl: './my-interviews.component.html',
@@ -33,7 +39,8 @@ export class MyInterviewsComponent implements OnInit {
 
   constructor(
     private interviewService: InterviewService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -80,10 +87,37 @@ export class MyInterviewsComponent implements OnInit {
       });
   }
 
+  openNote(title: string, text: string | null | undefined): void {
+    if (!text) return;
+    this.dialog.open(NotesDialogComponent, {
+      width: '520px',
+      maxWidth: '95vw',
+      data: { title, text } as NotesDialogData
+    });
+  }
+
+  openLink(url: string | null | undefined): void {
+    if (!url) return;
+    let u = String(url).trim();
+    if (!u.startsWith('http://') && !u.startsWith('https://')) {
+      u = 'https://' + u;
+    }
+    window.open(u, '_blank', 'noopener,noreferrer');
+  }
+
+  openResume(url: string | null | undefined): void {
+    if (!url) return;
+    let u = String(url).trim();
+    if (!u.startsWith('http://') && !u.startsWith('https://')) {
+      u = `${window.location.origin}/${u.replace(/^\/+/, '')}`;
+    }
+    window.open(u, '_blank', 'noopener,noreferrer');
+  }
+
   roundLabel(type: string | null | undefined): string {
     switch (String(type || '').toLowerCase()) {
       case 'hr': return 'HR Round';
-      case 'technical': return 'Second Round';
+      case 'technical': return 'Final round';
       case 'ceo': return 'CEO Round';
       default: return type || '';
     }

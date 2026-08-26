@@ -1,0 +1,58 @@
+.dialog-title { margin: 0; font-size: 18px; font-weight: 600; }
+
+.dialog-content { padding-top: 8px; min-width: 360px; max-width: 460px; }
+
+.add-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 6px;
+
+  input {
+    flex: 1;
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    &:focus { border-color: #2563eb; }
+  }
+
+  button mat-icon { font-size: 18px; width: 18px; height: 18px; margin-right: 2px; }
+}
+
+.error { display: block; color: #dc2626; font-size: 12px; margin: 4px 0 8px; }
+
+.list {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 10px;
+  border: 1px solid #eef0f2;
+  border-radius: 8px;
+  background: #fafbff;
+
+  .name { font-size: 14px; color: #374151; font-weight: 500; }
+
+  .edit-input {
+    flex: 1;
+    padding: 7px 10px;
+    border: 1px solid #6366f1;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .row-actions { display: flex; align-items: center; gap: 2px; }
+}
+
+.empty { color: #9ca3af; font-size: 13px; }
+
+.dialog-actions { display: flex; justify-content: flex-end; padding: 12px 12px 12px; }

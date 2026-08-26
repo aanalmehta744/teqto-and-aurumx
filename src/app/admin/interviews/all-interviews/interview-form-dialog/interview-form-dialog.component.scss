@@ -61,6 +61,28 @@
   }
 }
 
+.label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.manage-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: none;
+  background: transparent;
+  color: #4f46e5;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+  &:hover { text-decoration: underline; }
+}
+
 .section-heading {
   margin: 18px 0 10px;
   font-size: 13px;
@@ -135,5 +157,5 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  padding: 16px 0 4px;
+  padding: 16px 16px 16px;
 }

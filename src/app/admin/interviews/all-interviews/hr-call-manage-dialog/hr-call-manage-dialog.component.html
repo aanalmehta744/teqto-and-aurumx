@@ -1,0 +1,54 @@
+<h2 mat-dialog-title class="dialog-title">Manage HR Call Options</h2>
+
+<mat-dialog-content class="dialog-content">
+
+  <!-- Add new -->
+  <div class="add-row">
+    <input type="text" [(ngModel)]="newName" placeholder="New option name"
+      (keyup.enter)="add()" />
+    <button mat-flat-button color="primary" type="button" (click)="add()">
+      <mat-icon>add</mat-icon> Add
+    </button>
+  </div>
+
+  <small class="error" *ngIf="error">{{ error }}</small>
+
+  <!-- List -->
+  <div class="list">
+    <div class="row-item" *ngFor="let s of statuses">
+
+      <ng-container *ngIf="editingId === s.id; else viewMode">
+        <input type="text" class="edit-input" [(ngModel)]="editName"
+          (keyup.enter)="saveEdit(s)" />
+        <div class="row-actions">
+          <button mat-icon-button color="primary" (click)="saveEdit(s)" matTooltip="Save">
+            <mat-icon>check</mat-icon>
+          </button>
+          <button mat-icon-button (click)="cancelEdit()" matTooltip="Cancel">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </ng-container>
+
+      <ng-template #viewMode>
+        <span class="name">{{ s.name }}</span>
+        <div class="row-actions">
+          <button mat-icon-button (click)="startEdit(s)" matTooltip="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="remove(s)" matTooltip="Delete">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </ng-template>
+
+    </div>
+
+    <p class="empty" *ngIf="!loading && statuses.length === 0">No options yet.</p>
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-flat-button color="primary" type="button" (click)="close()">Done</button>
+</mat-dialog-actions>

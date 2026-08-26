@@ -13,6 +13,7 @@ import {
 } from '@angular/forms';
 
 import {
+  MatDialog,
   MatDialogModule,
   MatDialogRef,
   MAT_DIALOG_DATA
@@ -34,6 +35,10 @@ import {
 import {
   InterviewService
 } from '../../interview.service';
+
+import {
+  HrCallManageDialogComponent
+} from '../hr-call-manage-dialog/hr-call-manage-dialog.component';
 
 
 export interface InterviewFormDialogData {
@@ -76,12 +81,17 @@ export class InterviewFormDialogComponent implements OnInit {
   // Profile options (department names).
   departments: string[] = [];
 
+  // HR call options (managed, like departments).
+  hrCallStatuses: string[] = [];
+
 
   constructor(
     private dialogRef:
       MatDialogRef<InterviewFormDialogComponent>,
 
     private interviewService: InterviewService,
+
+    private dialog: MatDialog,
 
     @Inject(MAT_DIALOG_DATA)
     public data: InterviewFormDialogData
@@ -120,6 +130,38 @@ export class InterviewFormDialogComponent implements OnInit {
           .filter((n: any) => !!n);
       },
       error: () => { this.departments = []; }
+    });
+
+    this.loadHrCallStatuses();
+  }
+
+
+  private loadHrCallStatuses(): void {
+    this.interviewService.getHrCallOptions().subscribe({
+      next: (list) => {
+        this.hrCallStatuses = (list || []).map(s => s.name).filter(n => !!n);
+
+        // Default a new interview to the first available option.
+        if (!this.model.hr_call_status && this.hrCallStatuses.length) {
+          this.model.hr_call_status = this.hrCallStatuses[0];
+        }
+      },
+      error: () => { this.hrCallStatuses = []; }
+    });
+  }
+
+
+  // HR can add / edit / delete the HR call options here.
+  openManageHrCall(): void {
+    const ref = this.dialog.open(HrCallManageDialogComponent, {
+      width: '460px',
+      maxWidth: '95vw'
+    });
+
+    ref.afterClosed().subscribe((changed: boolean) => {
+      if (changed) {
+        this.loadHrCallStatuses();
+      }
     });
   }
 

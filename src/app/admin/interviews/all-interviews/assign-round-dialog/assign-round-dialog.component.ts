@@ -82,7 +82,7 @@ export class AssignRoundDialogComponent {
   roundLabel(type: string | null | undefined): string {
     switch (String(type || '').toLowerCase()) {
       case 'hr': return 'HR Round';
-      case 'technical': return 'Second Round';
+      case 'technical': return 'Final round';
       case 'ceo': return 'CEO Round';
       default: return type || '';
     }

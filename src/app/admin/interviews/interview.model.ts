@@ -68,7 +68,7 @@ export interface Interview {
 }
 
 
-// Row shown on a senior developer's "assigned to me" card.
+// Row shown on a senior developer's "assigned to me" card / page.
 export interface AssignedRound {
   round_id: number;
   round_type: string;
@@ -78,6 +78,18 @@ export interface AssignedRound {
   interview_id: number;
   candidate_name: string;
   profile: string | null;
+  resume?: string | null;
+  linkedin_link?: string | null;
+  hr_call_details?: string | null;
+}
+
+
+// A manageable HR-call option (add / edit / delete, like departments).
+export interface HrCallOption {
+  id: number;
+  name: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 

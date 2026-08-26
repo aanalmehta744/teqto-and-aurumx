@@ -8,7 +8,8 @@ import {
   Interview,
   InterviewRound,
   AssignedRound,
-  SeniorDeveloper
+  SeniorDeveloper,
+  HrCallOption
 } from './interview.model';
 
 
@@ -104,6 +105,29 @@ export class InterviewService {
   // Departments power the "Profile" dropdown.
   getDepartments(): Observable<any[]> {
     return this.http.get<any[]>(`${environment.apiUrl}/departments`);
+  }
+
+
+  // =====================================================
+  // HR CALL OPTIONS (managed, like departments)
+  // =====================================================
+
+  private hrStatusUrl = `${environment.apiUrl}/hr-call-statuses`;
+
+  getHrCallOptions(): Observable<HrCallOption[]> {
+    return this.http.get<HrCallOption[]>(this.hrStatusUrl);
+  }
+
+  createHrCallOption(name: string): Observable<HrCallOption> {
+    return this.http.post<HrCallOption>(this.hrStatusUrl, { name });
+  }
+
+  updateHrCallOption(id: number, name: string): Observable<HrCallOption> {
+    return this.http.put<HrCallOption>(`${this.hrStatusUrl}/${id}`, { name });
+  }
+
+  deleteHrCallOption(id: number): Observable<any> {
+    return this.http.delete(`${this.hrStatusUrl}/${id}`);
   }
 
 }

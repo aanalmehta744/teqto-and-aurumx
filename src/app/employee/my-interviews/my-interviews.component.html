@@ -10,7 +10,7 @@
     <div class="row m-b-20 align-items-center justify-content-between">
       <div class="col-md-8">
         <h2 class="page-title">Interviews to Take</h2>
-        <p class="page-subtitle">Candidates assigned to you for the second round</p>
+        <p class="page-subtitle">Candidates assigned to you for the Final round</p>
       </div>
       <div class="col-md-4 d-flex justify-content-end">
         <button class="refresh-btn" type="button" (click)="load()">
@@ -48,8 +48,11 @@
               <th>Profile</th>
               <th>Round</th>
               <th>Date</th>
+              <th>Resume</th>
+              <th>LinkedIn</th>
+              <th>HR Call Notes</th>
               <th>Status</th>
-              <th>Notes</th>
+              <th>My Notes</th>
               <th></th>
             </tr>
           </thead>
@@ -64,6 +67,28 @@
               </td>
               <td>{{ roundLabel(r.round_type) }}</td>
               <td>{{ r.scheduled_date ? (r.scheduled_date | date:'dd MMM yyyy') : '—' }}</td>
+
+              <!-- Resume -->
+              <td>
+                <a *ngIf="r.resume" class="plain-link" (click)="openResume(r.resume)">View</a>
+                <span *ngIf="!r.resume" class="text-muted">—</span>
+              </td>
+
+              <!-- LinkedIn -->
+              <td>
+                <a *ngIf="r.linkedin_link" class="plain-link" (click)="openLink(r.linkedin_link)">Open</a>
+                <span *ngIf="!r.linkedin_link" class="text-muted">—</span>
+              </td>
+
+              <!-- HR call notes (read-only, popup) -->
+              <td>
+                <div class="note-preview" *ngIf="r.hr_call_details; else noHrNote"
+                  (click)="openNote('HR Call Notes', r.hr_call_details)"
+                  title="Click to view full note">
+                  {{ r.hr_call_details }}
+                </div>
+                <ng-template #noHrNote><span class="text-muted">—</span></ng-template>
+              </td>
 
               <!-- Editable status -->
               <td>
@@ -90,7 +115,7 @@
               </td>
             </tr>
             <tr *ngIf="rounds.length === 0">
-              <td colspan="7" class="empty">
+              <td colspan="10" class="empty">
                 <mat-icon>event_busy</mat-icon>
                 <p>No interviews assigned to you yet.</p>
               </td>

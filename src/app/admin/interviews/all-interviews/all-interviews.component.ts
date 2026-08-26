@@ -196,7 +196,7 @@ export class AllInterviewsComponent
   ];
 
 
-  // Senior developers available to assign the second round to.
+  // Senior developers available to assign the Final round to.
   seniorDevelopers: SeniorDeveloper[] = [];
 
 
@@ -228,6 +228,9 @@ export class AllInterviewsComponent
   // Distinct values present in the data (for dropdowns).
   profileOptions: string[] = [];
   hrNameOptions: string[] = [];
+
+  // Managed HR call options (for the filter dropdown).
+  hrCallStatusOptions: string[] = [];
 
 
   loading = false;
@@ -300,6 +303,13 @@ export class AllInterviewsComponent
     this.checkPermissions();
 
     this.loadSeniorDevelopers();
+
+    this.interviewService.getHrCallOptions().subscribe({
+      next: (list) => {
+        this.hrCallStatusOptions = (list || []).map(s => s.name).filter(n => !!n);
+      },
+      error: () => { this.hrCallStatusOptions = []; }
+    });
 
   }
 
@@ -1175,10 +1185,14 @@ export class AllInterviewsComponent
   // =====================================================
 
   getHrCallLabel(status: string | null | undefined): string {
-    switch (String(status || '').toLowerCase()) {
+    const raw = String(status || '').trim();
+    if (!raw) return 'Pending';
+    // Map legacy lowercase keys; otherwise show the custom option as-is.
+    switch (raw.toLowerCase()) {
+      case 'pending': return 'Pending';
       case 'done': return 'Done';
       case 'no_response': return 'No Response';
-      default: return 'Pending';
+      default: return raw;
     }
   }
 
@@ -1186,7 +1200,9 @@ export class AllInterviewsComponent
     switch (String(status || '').toLowerCase()) {
       case 'done': return 'badge-green';
       case 'no_response': return 'badge-red';
-      default: return 'badge-gray';
+      case 'pending':
+      case '': return 'badge-gray';
+      default: return 'badge-blue';
     }
   }
 
@@ -1237,7 +1253,7 @@ export class AllInterviewsComponent
   roundTypeLabel(type: string | null | undefined): string {
     switch (String(type || '').toLowerCase()) {
       case 'hr': return 'HR Round';
-      case 'technical': return 'Second Round';
+      case 'technical': return 'Final round';
       case 'ceo': return 'CEO Round';
       default: return type || '';
     }

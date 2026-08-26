@@ -254,7 +254,10 @@ router.get('/assigned/mine', requireLoggedIn, async (req, res) => {
          r.notes,
          i.id            AS interview_id,
          i.candidate_name,
-         i.profile
+         i.profile,
+         i.resume,
+         i.linkedin_link,
+         i.hr_call_details
        FROM interview_rounds r
        INNER JOIN interviews i ON i.id = r.interview_id
        WHERE r.assigned_to_id = ?
@@ -279,7 +282,7 @@ router.get('/assigned/mine', requireLoggedIn, async (req, res) => {
 
 router.get('/meta/senior-developers', requireInterviewViewAccess, async (req, res) => {
   try {
-    // Second round can be assigned to Senior developers OR Admins.
+    // Final round can be assigned to Senior developers OR Admins.
     const [rows] = await db.query(
       `SELECT id, fullName, department, employee_level, role
        FROM employees

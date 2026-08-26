@@ -76,11 +76,16 @@
   <div class="section-heading">HR Round</div>
   <div class="form-grid">
     <div class="form-field">
-      <label>HR Call Status</label>
+      <label class="label-row">
+        <span>HR Call Status</span>
+        <button type="button" class="manage-link" (click)="openManageHrCall()">
+          <mat-icon>settings</mat-icon> Manage
+        </button>
+      </label>
       <select [(ngModel)]="model.hr_call_status">
-        <option value="pending">Pending</option>
-        <option value="done">Done</option>
-        <option value="no_response">No Response</option>
+        <option *ngIf="model.hr_call_status && !hrCallStatuses.includes(model.hr_call_status)"
+          [value]="model.hr_call_status">{{ model.hr_call_status }}</option>
+        <option *ngFor="let s of hrCallStatuses" [value]="s">{{ s }}</option>
       </select>
     </div>
     <div class="form-field full">
