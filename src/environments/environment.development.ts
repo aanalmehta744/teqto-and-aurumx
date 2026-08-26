@@ -4,11 +4,11 @@ export const environment = {
   localApiUrl: 'http://localhost:5001/api',
 
   cloudflareApiUrl:
-    'https://correct-manitoba-retention-assistant.trycloudflare.com/api',
+    'https://yoga-agent-qualifying-paper.trycloudflare.com/api',
 
   apiUrl:
     // 'http://localhost:5001/api'
-    'https://correct-manitoba-retention-assistant.trycloudflare.com/api'
+    'https://yoga-agent-qualifying-paper.trycloudflare.com/api'
 };
 
 console.log(

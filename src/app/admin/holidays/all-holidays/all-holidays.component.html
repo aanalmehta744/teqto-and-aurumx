@@ -525,25 +525,25 @@
           <!-- PAGINATION -->
           <!-- ================================================= -->
 
-          @if (dataSource) {
+          <!--
+            The paginator must always be rendered so @ViewChild(MatPaginator)
+            resolves in ngAfterViewInit; loadData() needs it to build the
+            dataSource. Guarding it with @if (dataSource) created a deadlock
+            (no dataSource -> no paginator -> loadData bails -> no dataSource).
+          -->
+          <mat-paginator
+            [length]="dataSource?.filteredData?.length || 0"
+            [pageIndex]="0"
+            [pageSize]="10"
+            [pageSizeOptions]="[
+              5,
+              10,
+              25,
+              100
+            ]"
+            class="!border-t !p-2">
 
-            <mat-paginator
-              [length]="
-                dataSource.filteredData.length
-              "
-              [pageIndex]="0"
-              [pageSize]="10"
-              [pageSizeOptions]="[
-                5,
-                10,
-                25,
-                100
-              ]"
-              class="!border-t !p-2">
-
-            </mat-paginator>
-
-          }
+          </mat-paginator>
 
 
         </div>

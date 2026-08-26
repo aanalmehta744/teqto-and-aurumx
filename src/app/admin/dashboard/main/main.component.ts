@@ -32,7 +32,7 @@ import {
   ApexNonAxisChartSeries,
   NgApexchartsModule,
 } from 'ng-apexcharts';
-// import { InterviewService } from 'app/employee/jobs/interview-schedule/interview.service';
+import { InterviewService } from 'app/admin/interviews/interview.service';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { LeavesService } from 'app/admin/leaves/leave-requests/leaves.service';
@@ -97,7 +97,7 @@ export class MainComponent implements OnInit {
     private dailyUpdateService: EmployeeDailyUpdateService,
     private projectService: ProjectService,
     private clientsService: ClientsService,
-    // private interviewService: InterviewService,
+    private interviewService: InterviewService,
     private ieavesService: LeavesService,
     private authService: AuthService,
     private http: HttpClient,
@@ -347,14 +347,22 @@ export class MainComponent implements OnInit {
   }
   loadInterviews(): void {
 
-    // this.interviewService.getInterviews().subscribe((interviews: any[]) => {
-    //   // Only show upcoming interviews (today or future)
-    //   const now = new Date();
-    //   const upcoming = interviews.filter(i => new Date(i.interview_date) >= now);
-    //   console.log("Interviews List", interviews);
-    //   this.interviewDataSource.data = upcoming;
-    //   this.updateInterviewPagination();
-    // });
+    this.interviewService.getAllInterviews().subscribe({
+      next: (interviews: any[]) => {
+        // Only show upcoming interviews.
+        const upcoming = (interviews || [])
+          .filter(i => String(i.status || '').toLowerCase() === 'upcoming')
+          .sort(
+            (a, b) =>
+              new Date(a.interview_date).getTime() -
+              new Date(b.interview_date).getTime()
+          );
+
+        this.interviewDataSource.data = upcoming;
+        this.updateInterviewPagination();
+      },
+      error: (err) => console.error('Error fetching interviews:', err),
+    });
 
   }
   updateInterviewPagination(): void {

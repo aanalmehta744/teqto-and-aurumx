@@ -1,0 +1,33 @@
+<h2 mat-dialog-title class="dialog-title">
+  Final (CEO) Decision — {{ data.candidateName }}
+</h2>
+
+<mat-dialog-content class="dialog-content">
+
+  <div class="field">
+    <label>Final Status</label>
+    <select [(ngModel)]="status">
+      <option value="pending">Pending</option>
+      <option value="select">Select</option>
+      <option value="hold">Hold</option>
+      <option value="reject">Reject</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Final Call Notes</label>
+    <textarea rows="3" [(ngModel)]="notes"
+      placeholder="Notes from the final round"></textarea>
+  </div>
+
+  <small class="error" *ngIf="error">{{ error }}</small>
+
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-stroked-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" type="button"
+    [disabled]="saving" (click)="save()">
+    Save Decision
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,104 @@
+<div class="page-wrapper">
+  <div class="content-block">
+
+    <app-breadcrumb
+      [title]="'My Interviews'"
+      [items]="['Employee']"
+      [active_item]="'Interviews'">
+    </app-breadcrumb>
+
+    <div class="row m-b-20 align-items-center justify-content-between">
+      <div class="col-md-8">
+        <h2 class="page-title">Interviews to Take</h2>
+        <p class="page-subtitle">Candidates assigned to you for the second round</p>
+      </div>
+      <div class="col-md-4 d-flex justify-content-end">
+        <button class="refresh-btn" type="button" (click)="load()">
+          <mat-icon>refresh</mat-icon> Refresh
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+
+      <div class="card-header">
+        <h5>Assigned Interviews</h5>
+        <span class="text-muted">{{ rounds.length }} assigned</span>
+      </div>
+
+      <!-- LOADING -->
+      <div *ngIf="loading" class="state">
+        <mat-spinner diameter="36"></mat-spinner>
+        <p>Loading...</p>
+      </div>
+
+      <!-- ERROR -->
+      <div *ngIf="!loading && error" class="state">
+        <mat-icon class="err">error_outline</mat-icon>
+        <p>{{ error }}</p>
+        <button class="refresh-btn" type="button" (click)="load()">Try Again</button>
+      </div>
+
+      <!-- TABLE -->
+      <div *ngIf="!loading && !error" class="table-responsive">
+        <table class="w-100">
+          <thead>
+            <tr>
+              <th>Candidate Name</th>
+              <th>Profile</th>
+              <th>Round</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Notes</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of rounds">
+              <td>
+                <span class="candidate-name">{{ r.candidate_name }}</span>
+              </td>
+              <td>
+                <span *ngIf="r.profile" class="pill">{{ r.profile }}</span>
+                <span *ngIf="!r.profile" class="text-muted">—</span>
+              </td>
+              <td>{{ roundLabel(r.round_type) }}</td>
+              <td>{{ r.scheduled_date ? (r.scheduled_date | date:'dd MMM yyyy') : '—' }}</td>
+
+              <!-- Editable status -->
+              <td>
+                <select class="cell-input" [(ngModel)]="r.status">
+                  <option value="pending">Pending</option>
+                  <option value="scheduled">Scheduled</option>
+                  <option value="cleared">Cleared</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="hold">Hold</option>
+                </select>
+              </td>
+
+              <!-- Editable notes -->
+              <td>
+                <textarea class="cell-input notes" rows="2"
+                  [(ngModel)]="r.notes" placeholder="Add your notes"></textarea>
+              </td>
+
+              <td>
+                <button class="save-btn" type="button"
+                  [disabled]="savingId === r.round_id" (click)="save(r)">
+                  <mat-icon>save</mat-icon> Save
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="rounds.length === 0">
+              <td colspan="7" class="empty">
+                <mat-icon>event_busy</mat-icon>
+                <p>No interviews assigned to you yet.</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>

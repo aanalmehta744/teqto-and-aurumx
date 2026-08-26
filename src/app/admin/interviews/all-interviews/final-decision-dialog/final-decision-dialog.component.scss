@@ -1,0 +1,52 @@
+.dialog-title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.dialog-content {
+  padding-top: 8px;
+  min-width: 340px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+
+  label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+  }
+
+  select,
+  textarea {
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+    resize: vertical;
+
+    &:focus {
+      border-color: #2563eb;
+    }
+  }
+}
+
+.error {
+  display: block;
+  color: #dc2626;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 12px 0 4px;
+}

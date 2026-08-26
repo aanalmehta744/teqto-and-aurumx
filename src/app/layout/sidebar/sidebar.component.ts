@@ -240,6 +240,14 @@ export class SidebarComponent
     );
   }
 
+  // Interviews (senior developer) → only Senior-level employees.
+  if (item.path === '/employee/my-interviews') {
+    return (
+      userRole === 'employee' &&
+      user.employee_level?.toLowerCase().trim() === 'senior'
+    );
+  }
+
   // Admin can only see Admin menus
   if (userRole === 'admin') {
     return roles.includes('admin');

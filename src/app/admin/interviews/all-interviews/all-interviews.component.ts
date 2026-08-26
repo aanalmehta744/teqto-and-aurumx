@@ -60,7 +60,8 @@ import {
   BehaviorSubject,
   fromEvent,
   merge,
-  Observable
+  Observable,
+  of
 } from 'rxjs';
 
 import {
@@ -89,12 +90,29 @@ import {
 
 import {
   Interview,
-  InterviewStatus
+  InterviewStatus,
+  SeniorDeveloper
 } from '../interview.model';
 
 import {
   InterviewService
 } from '../interview.service';
+
+import {
+  InterviewFormDialogComponent,
+  InterviewFormDialogData,
+  InterviewFormResult
+} from './interview-form-dialog/interview-form-dialog.component';
+
+import {
+  AssignRoundDialogComponent,
+  AssignRoundDialogData
+} from './assign-round-dialog/assign-round-dialog.component';
+
+import {
+  NotesDialogComponent,
+  NotesDialogData
+} from './notes-dialog/notes-dialog.component';
 
 
 @Component({
@@ -141,34 +159,75 @@ export class AllInterviewsComponent
 
   displayedColumns: string[] = [
 
+    'srno',
+
     'hr_name',
+
+    'created_at',
 
     'candidate_name',
 
+    'profile',
+
     'candidate_number',
+
+    'candidate_email',
 
     'linkedin_link',
 
     'resume',
 
-    'photo',
+    'hr_call_notes',
+
+    'hr_call_status',
 
     'interview_date',
 
-    'status',
+    'technical',
+
+    'final_call_notes',
+
+    'final_call_status',
+
+    'joining',
 
     'actions'
 
   ];
 
 
+  // Senior developers available to assign the second round to.
+  seniorDevelopers: SeniorDeveloper[] = [];
+
+
   // =====================================================
   // DATA
   // =====================================================
 
+  // Raw data from the API (unfiltered).
+  allInterviews: Interview[] = [];
+
+  // Filtered rows shown in the table.
   interviews: Interview[] = [];
 
   dataSource!: InterviewDataSource;
+
+
+  // =====================================================
+  // FILTERS
+  // =====================================================
+
+  filterHrName = '';
+  filterProfile = '';
+  filterOverall = '';
+  filterHr = '';
+  filterFinal = '';
+  filterJoined = '';
+  filterRound = '';
+
+  // Distinct values present in the data (for dropdowns).
+  profileOptions: string[] = [];
+  hrNameOptions: string[] = [];
 
 
   loading = false;
@@ -185,6 +244,9 @@ export class AllInterviewsComponent
   isHR = false;
 
   canManage = false;
+
+  // Logged-in user's name, used to prefill HR name on new interviews.
+  currentUserName = '';
 
 
   // =====================================================
@@ -236,6 +298,32 @@ export class AllInterviewsComponent
   ngOnInit(): void {
 
     this.checkPermissions();
+
+    this.loadSeniorDevelopers();
+
+  }
+
+
+  // =====================================================
+  // LOAD SENIOR DEVELOPERS (for round assignment)
+  // =====================================================
+
+  private loadSeniorDevelopers(): void {
+
+    if (!this.canManage) {
+      return;
+    }
+
+    this.interviewService
+      .getSeniorDevelopers()
+      .subscribe({
+        next: (devs) => {
+          this.seniorDevelopers = devs || [];
+        },
+        error: () => {
+          this.seniorDevelopers = [];
+        }
+      });
 
   }
 
@@ -311,6 +399,14 @@ export class AllInterviewsComponent
       this.isHR;
 
 
+    this.currentUserName =
+      String(
+        currentUser?.fullName ||
+        currentUser?.name ||
+        ''
+      ).trim();
+
+
     console.log(
       '================ INTERVIEW PERMISSION ================'
     );
@@ -373,40 +469,42 @@ export class AllInterviewsComponent
           );
 
 
-          this.interviews =
+          this.allInterviews =
             Array.isArray(data)
               ? data
               : [];
 
 
+          // Build distinct values for the filter dropdowns.
+          this.profileOptions =
+            Array.from(
+              new Set(
+                this.allInterviews
+                  .map(i => i.profile)
+                  .filter((p): p is string => !!p)
+              )
+            ).sort();
+
+          this.hrNameOptions =
+            Array.from(
+              new Set(
+                this.allInterviews
+                  .map(i => i.hr_name)
+                  .filter((n): n is string => !!n)
+              )
+            ).sort();
+
+
           /*
-           * Create datasource only after
-           * paginator and sort exist.
+           * Turn loading off FIRST so the table (which is behind
+           * *ngIf="!loading") is rendered and its MatPaginator /
+           * MatSort ViewChildren exist.
            */
 
-          if (
-            this.paginator &&
-            this.sort
-          ) {
-
-            this.dataSource =
-              new InterviewDataSource(
-
-                this.interviews,
-
-                this.paginator,
-
-                this.sort
-
-              );
-
-          }
-
-
-          this.setupFilter();
-
-
           this.loading = false;
+
+
+          this.applyFilters();
 
         },
 
@@ -444,44 +542,146 @@ export class AllInterviewsComponent
 
 
   // =====================================================
+  // APPLY FILTERS
+  // =====================================================
+
+  applyFilters(): void {
+
+    let data = [...this.allInterviews];
+
+    const eq = (a: any, b: string) =>
+      String(a || 'pending').toLowerCase() === b.toLowerCase();
+
+    if (this.filterHrName) {
+      data = data.filter(
+        i => String(i.hr_name || '') === this.filterHrName
+      );
+    }
+
+    if (this.filterProfile) {
+      data = data.filter(
+        i => String(i.profile || '') === this.filterProfile
+      );
+    }
+
+    if (this.filterOverall) {
+      data = data.filter(i => eq(i.status, this.filterOverall));
+    }
+
+    if (this.filterHr) {
+      data = data.filter(i => eq(i.hr_call_status, this.filterHr));
+    }
+
+    if (this.filterFinal) {
+      data = data.filter(i => eq(i.final_call_status, this.filterFinal));
+    }
+
+    if (this.filterJoined) {
+      data = data.filter(i => eq(i.joined_status, this.filterJoined));
+    }
+
+    if (this.filterRound) {
+      data = data.filter(
+        i => (i.rounds || []).some(r => eq(r.status, this.filterRound))
+      );
+    }
+
+    this.interviews = data;
+
+    this.rebuildDataSource();
+
+  }
+
+
+  clearFilters(): void {
+    this.filterHrName = '';
+    this.filterProfile = '';
+    this.filterOverall = '';
+    this.filterHr = '';
+    this.filterFinal = '';
+    this.filterJoined = '';
+    this.filterRound = '';
+    this.applyFilters();
+  }
+
+
+  hasActiveFilters(): boolean {
+    return !!(
+      this.filterHrName ||
+      this.filterProfile ||
+      this.filterOverall ||
+      this.filterHr ||
+      this.filterFinal ||
+      this.filterJoined ||
+      this.filterRound
+    );
+  }
+
+
+  private rebuildDataSource(): void {
+
+    setTimeout(() => {
+
+      if (this.paginator && this.sort) {
+
+        this.dataSource =
+          new InterviewDataSource(
+            this.interviews,
+            this.paginator,
+            this.sort
+          );
+
+        this.setupFilter();
+
+      }
+
+    });
+
+  }
+
+
+  // =====================================================
   // SETUP SEARCH FILTER
   // =====================================================
 
+  private searchWired = false;
+
   private setupFilter(): void {
 
-    if (!this.filter) {
+    if (!this.filter || !this.dataSource) {
       return;
     }
 
+    // Re-apply the current search term to the freshly built data source
+    // (filters rebuild the data source, so keep search in sync).
+    this.dataSource.filter =
+      String(this.filter.nativeElement.value || '')
+        .trim()
+        .toLowerCase();
 
-    /*
-     * Prevent duplicate subscriptions
-     * when loadInterviews() is called again.
-     */
-
-    if (
-      this.dataSource
-    ) {
-
-      this.subs.sink =
-        fromEvent(
-          this.filter.nativeElement,
-          'keyup'
-        )
-        .subscribe(() => {
-
-          const value =
-            this.filter.nativeElement.value
-              .trim()
-              .toLowerCase();
-
-
-          this.dataSource.filter =
-            value;
-
-        });
-
+    // Wire the keyup listener only once to avoid stacking subscriptions.
+    if (this.searchWired) {
+      return;
     }
+    this.searchWired = true;
+
+    this.subs.sink =
+      fromEvent(
+        this.filter.nativeElement,
+        'keyup'
+      )
+      .subscribe(() => {
+
+        const value =
+          this.filter.nativeElement.value
+            .trim()
+            .toLowerCase();
+
+        if (this.dataSource) {
+          this.dataSource.filter = value;
+        }
+
+      });
 
   }
 
@@ -523,14 +723,67 @@ export class AllInterviewsComponent
     }
 
 
-    /*
-     * Dialog will be added in the
-     * next step.
-     */
+    const dialogRef =
+      this.dialog.open(
+        InterviewFormDialogComponent,
+        {
+          width: '640px',
+          maxWidth: '95vw',
+          data: {
+            mode: 'add',
+            interview: null,
+            hrName: this.currentUserName
+          } as InterviewFormDialogData
+        }
+      );
 
-    console.log(
-      'ADD INTERVIEW'
-    );
+
+    this.subs.sink =
+      dialogRef
+        .afterClosed()
+        .subscribe(
+          (result: InterviewFormResult | undefined) => {
+
+            if (!result) {
+              return;
+            }
+
+            this.interviewService
+              .createInterview(result)
+              .subscribe({
+
+                next: () => {
+
+                  this.showNotification(
+                    'Interview added successfully.',
+                    'bottom',
+                    'center'
+                  );
+
+                  this.loadInterviews();
+
+                },
+
+                error: (error) => {
+
+                  console.error(
+                    'ADD INTERVIEW ERROR:',
+                    error
+                  );
+
+                  this.showNotification(
+                    error?.error?.message ||
+                    'Unable to add interview.',
+                    'bottom',
+                    'center'
+                  );
+
+                }
+
+              });
+
+          }
+        );
 
   }
 
@@ -556,10 +809,75 @@ export class AllInterviewsComponent
     }
 
 
-    console.log(
-      'EDIT INTERVIEW:',
-      interview
-    );
+    if (!interview.id) {
+      return;
+    }
+
+
+    const dialogRef =
+      this.dialog.open(
+        InterviewFormDialogComponent,
+        {
+          width: '640px',
+          maxWidth: '95vw',
+          data: {
+            mode: 'edit',
+            interview: interview,
+            hrName: this.currentUserName
+          } as InterviewFormDialogData
+        }
+      );
+
+
+    this.subs.sink =
+      dialogRef
+        .afterClosed()
+        .subscribe(
+          (result: InterviewFormResult | undefined) => {
+
+            if (!result) {
+              return;
+            }
+
+            this.interviewService
+              .updateInterview(
+                interview.id!,
+                result
+              )
+              .subscribe({
+
+                next: () => {
+
+                  this.showNotification(
+                    'Interview updated successfully.',
+                    'bottom',
+                    'center'
+                  );
+
+                  this.loadInterviews();
+
+                },
+
+                error: (error) => {
+
+                  console.error(
+                    'UPDATE INTERVIEW ERROR:',
+                    error
+                  );
+
+                  this.showNotification(
+                    error?.error?.message ||
+                    'Unable to update interview.',
+                    'bottom',
+                    'center'
+                  );
+
+                }
+
+              });
+
+          }
+        );
 
   }
 
@@ -791,36 +1109,138 @@ export class AllInterviewsComponent
 
 
   // =====================================================
-  // PHOTO URL
+  // ASSIGN ROUNDS (HR)
   // =====================================================
 
-  getPhotoUrl(
-    photo: string | null | undefined
-  ): string {
+  openAssignRounds(
+    interview: Interview
+  ): void {
 
-    if (!photo) {
-
-      return 'assets/images/default-profile.png';
-
+    if (!this.canManage || !interview.id) {
+      return;
     }
 
+    const dialogRef = this.dialog.open(
+      AssignRoundDialogComponent,
+      {
+        width: '640px',
+        maxWidth: '95vw',
+        data: {
+          interviewId: interview.id,
+          candidateName: interview.candidate_name,
+          rounds: interview.rounds || [],
+          seniorDevelopers: this.seniorDevelopers
+        } as AssignRoundDialogData
+      }
+    );
 
-    if (
-      photo.startsWith(
-        'http://'
-      ) ||
-      photo.startsWith(
-        'https://'
-      )
-    ) {
+    this.subs.sink = dialogRef
+      .afterClosed()
+      .subscribe((changed: boolean) => {
+        if (changed) {
+          this.loadInterviews();
+        }
+      });
 
-      return photo;
+  }
 
+
+  // =====================================================
+  // VIEW A NOTE (popup)
+  // =====================================================
+
+  openNote(
+    title: string,
+    text: string | null | undefined
+  ): void {
+
+    if (!text) {
+      return;
     }
 
+    this.dialog.open(
+      NotesDialogComponent,
+      {
+        width: '520px',
+        maxWidth: '95vw',
+        data: { title, text } as NotesDialogData
+      }
+    );
 
-    return `${window.location.origin}/${photo.replace(/^\/+/, '')}`;
+  }
 
+
+  // =====================================================
+  // LABEL / CLASS HELPERS
+  // =====================================================
+
+  getHrCallLabel(status: string | null | undefined): string {
+    switch (String(status || '').toLowerCase()) {
+      case 'done': return 'Done';
+      case 'no_response': return 'No Response';
+      default: return 'Pending';
+    }
+  }
+
+  getHrCallClass(status: string | null | undefined): string {
+    switch (String(status || '').toLowerCase()) {
+      case 'done': return 'badge-green';
+      case 'no_response': return 'badge-red';
+      default: return 'badge-gray';
+    }
+  }
+
+  getFinalLabel(status: string | null | undefined): string {
+    switch (String(status || '').toLowerCase()) {
+      case 'select': return 'Select';
+      case 'hold': return 'Hold';
+      case 'reject': return 'Reject';
+      default: return 'Pending';
+    }
+  }
+
+  getFinalClass(status: string | null | undefined): string {
+    switch (String(status || '').toLowerCase()) {
+      case 'select': return 'badge-green';
+      case 'hold': return 'badge-amber';
+      case 'reject': return 'badge-red';
+      default: return 'badge-gray';
+    }
+  }
+
+  getJoinedLabel(status: string | null | undefined): string {
+    switch (String(status || '').toLowerCase()) {
+      case 'joined': return 'Joined';
+      case 'not_joined': return 'Not Joined';
+      default: return 'Pending';
+    }
+  }
+
+  getJoinedClass(status: string | null | undefined): string {
+    switch (String(status || '').toLowerCase()) {
+      case 'joined': return 'badge-green';
+      case 'not_joined': return 'badge-red';
+      default: return 'badge-gray';
+    }
+  }
+
+  getRoundClass(status: string | null | undefined): string {
+    switch (String(status || '').toLowerCase()) {
+      case 'cleared': return 'badge-green';
+      case 'rejected': return 'badge-red';
+      case 'hold': return 'badge-amber';
+      case 'scheduled': return 'badge-blue';
+      default: return 'badge-gray';
+    }
+  }
+
+  roundTypeLabel(type: string | null | undefined): string {
+    switch (String(type || '').toLowerCase()) {
+      case 'hr': return 'HR Round';
+      case 'technical': return 'Second Round';
+      case 'ceo': return 'CEO Round';
+      default: return type || '';
+    }
   }
 
 
@@ -970,7 +1390,11 @@ export class InterviewDataSource
     Observable<Interview[]> {
 
 
-    const displayDataChanges = [
+    const displayDataChanges: Observable<any>[] = [
+
+      // Emit once immediately so the table renders on first load,
+      // before the user sorts / filters / changes pages.
+      of(null),
 
       this.sort.sortChange,
 
@@ -1053,6 +1477,11 @@ export class InterviewDataSource
         /*
          * PAGINATION
          */
+
+        // Keep the paginator's total in sync with the filtered rows,
+        // otherwise it shows "0 of 0" and hides all data.
+        this.paginator.length =
+          this.filteredData.length;
 
         const startIndex =
           this.paginator.pageIndex *

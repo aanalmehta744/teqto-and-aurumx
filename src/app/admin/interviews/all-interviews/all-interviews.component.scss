@@ -13,12 +13,18 @@
 .page-title {
   margin: 0;
   font-size: 24px;
-  font-weight: 600;
-  color: #1f2937;
+  font-weight: 700;
+
+  background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  letter-spacing: -0.02em;
 }
 
 .page-subtitle {
-  margin: 4px 0 0;
+  margin: 5px 0 0;
   color: #6b7280;
   font-size: 13px;
 }
@@ -31,16 +37,18 @@
 .card {
   width: 100%;
   background: #ffffff;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  border-radius: 16px;
+  border: 1px solid #eceef2;
+  box-shadow:
+    0 1px 2px rgba(16, 24, 40, 0.04),
+    0 6px 20px rgba(16, 24, 40, 0.05);
   overflow: hidden;
 }
 
 .card-header {
   padding: 18px 20px;
   border-bottom: 1px solid #eef0f2;
-  background: #ffffff;
+  background: linear-gradient(180deg, #fafbff, #ffffff);
 }
 
 .card-header h5 {
@@ -126,8 +134,133 @@
 
 table {
   width: 100%;
-  min-width: 1100px;
+  min-width: 2200px;
   background: #ffffff;
+}
+
+
+/* =========================================================
+   FILTER BAR
+   ========================================================= */
+
+.filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #eef0f2;
+  background: #fbfcfe;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  select {
+    min-width: 150px;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid #dfe3e8;
+    border-radius: 8px;
+    background: #ffffff;
+    font-size: 13px;
+    color: #374151;
+    outline: none;
+
+    &:focus { border-color: #6366f1; }
+  }
+}
+
+.clear-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  &:hover { background: #fee2e2; }
+}
+
+
+/* Header label with a leading icon. */
+.th-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #94a3b8;
+  }
+}
+
+
+/* Fixed-size, scrollable note cells (HR / Final call notes). */
+.note-box {
+  width: 190px;
+  height: 52px;
+  overflow-y: auto;
+  padding: 6px 8px;
+  border: 1px solid #eef0f2;
+  border-radius: 6px;
+  background: #fafbff;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #4b5563;
+  white-space: pre-wrap;
+
+  &.small {
+    width: 170px;
+    height: 40px;
+    margin-top: 6px;
+  }
+
+  &.clickable {
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+
+    &:hover {
+      border-color: #6366f1;
+      background: #eef2ff;
+    }
+  }
+}
+
+.round-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+/* Plain text link (no icon) used in data cells. */
+.plain-link {
+  color: #4f46e5;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover { text-decoration: underline; }
 }
 
 th.mat-mdc-header-cell {
@@ -154,11 +287,13 @@ td.mat-mdc-cell {
 
 .interview-row {
   transition:
-    background-color 0.15s ease;
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .interview-row:hover {
-  background: #f8fafc;
+  background: #f6f8ff;
+  box-shadow: inset 3px 0 0 #6366f1;
 }
 
 
@@ -199,11 +334,15 @@ td.mat-mdc-cell {
   font-weight: 600;
 
   text-transform: uppercase;
+
+  box-shadow: inset 0 0 0 1px rgba(79, 70, 229, 0.12);
 }
 
 .avatar-hr {
   background: #ecfeff;
   color: #0f766e;
+
+  box-shadow: inset 0 0 0 1px rgba(15, 118, 110, 0.12);
 }
 
 
@@ -284,38 +423,144 @@ td button[mat-icon-button]:hover {
    ========================================================= */
 
 .candidate-photo {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
 
   object-fit: cover;
 
-  border-radius: 8px;
+  border-radius: 50%;
 
-  border: 1px solid #e5e7eb;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 1px #e5e7eb;
 
   display: block;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-.no-photo {
-  width: 40px;
-  height: 40px;
+.candidate-photo:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 2px #6366f1;
+}
+
+/* Fallback initials avatar when a photo is missing or fails to load. */
+.photo-avatar {
+  width: 42px;
+  height: 42px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 8px;
+  border-radius: 50%;
 
-  background: #f3f4f6;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #ffffff;
 
-  color: #9ca3af;
+  font-size: 15px;
+  font-weight: 600;
+
+  text-transform: uppercase;
+
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 1px #e5e7eb;
 }
 
-.no-photo mat-icon {
-  width: 20px;
-  height: 20px;
 
-  font-size: 20px;
+/* =========================================================
+   CANDIDATE NAME
+   ========================================================= */
+
+.candidate-name {
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   PROFILE PILL / EMAIL
+   ========================================================= */
+
+.pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.email-link {
+  color: #4f46e5;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+
+/* =========================================================
+   GENERIC BADGES (call statuses / rounds)
+   ========================================================= */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.badge-green { background: #ecfdf5; color: #059669; }
+.badge-red   { background: #fef2f2; color: #dc2626; }
+.badge-amber { background: #fffbeb; color: #b45309; }
+.badge-blue  { background: #eff6ff; color: #2563eb; }
+.badge-gray  { background: #f3f4f6; color: #6b7280; }
+
+
+/* Truncated note under a badge, full text on hover. */
+.cell-note {
+  margin-top: 4px;
+  max-width: 200px;
+  font-size: 11px;
+  color: #9ca3af;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   TECHNICAL ROUNDS (mini list in cell)
+   ========================================================= */
+
+.rounds-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.round-mini {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.round-dev {
+  font-size: 12px;
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
 }
 
 

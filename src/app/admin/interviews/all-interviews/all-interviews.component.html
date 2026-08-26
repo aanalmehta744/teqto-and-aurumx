@@ -1,9 +1,5 @@
 <div class="page-wrapper">
 
-  <!-- =====================================================
-       BREADCRUMB
-       ===================================================== -->
-
   <div class="content-block">
 
     <app-breadcrumb
@@ -13,61 +9,26 @@
     </app-breadcrumb>
 
 
-    <!-- ===================================================
-         PAGE HEADER
-         =================================================== -->
-
-    <div
-      class="row m-b-20 align-items-center justify-content-between">
+    <!-- PAGE HEADER -->
+    <div class="row m-b-20 align-items-center justify-content-between">
 
       <div class="col-md-6">
-
-        <h2 class="page-title">
-          Interviews
-        </h2>
-
-        <p class="page-subtitle">
-          Manage and view candidate interviews
-        </p>
-
+        <h2 class="page-title">Interviews</h2>
+        <p class="page-subtitle">Manage and view candidate interviews</p>
       </div>
 
+      <div class="col-md-6 d-flex justify-content-end gap-2">
 
-      <div
-        class="col-md-6 d-flex justify-content-end gap-2">
-
-        <!-- Refresh -->
-
-        <button
-          mat-stroked-button
-          type="button"
-          (click)="refresh()"
+        <button mat-stroked-button type="button" (click)="refresh()"
           matTooltip="Refresh interviews">
-
-          <mat-icon>
-            refresh
-          </mat-icon>
-
+          <mat-icon>refresh</mat-icon>
           Refresh
-
         </button>
 
-
-        <!-- ADD — HR ONLY -->
-
-        <button
-          *ngIf="canManage"
-          mat-flat-button
-          color="primary"
-          type="button"
+        <button *ngIf="canManage" mat-flat-button color="primary" type="button"
           (click)="addInterview()">
-
-          <mat-icon>
-            add
-          </mat-icon>
-
+          <mat-icon>add</mat-icon>
           Add Interview
-
         </button>
 
       </div>
@@ -75,580 +36,376 @@
     </div>
 
 
-    <!-- ===================================================
-         MAIN CARD
-         =================================================== -->
-
+    <!-- MAIN CARD -->
     <div class="card">
 
-      <!-- =================================================
-           CARD HEADER
-           ================================================= -->
-
-      <div
-        class="card-header d-flex align-items-center justify-content-between">
-
+      <div class="card-header d-flex align-items-center justify-content-between">
         <div>
-
-          <h5 class="mb-1">
-            Interview List
-          </h5>
-
+          <h5 class="mb-1">Interview List</h5>
           <span class="text-muted">
             {{ interviews.length }}
             interview{{ interviews.length === 1 ? '' : 's' }}
           </span>
-
         </div>
 
-
-        <!-- SEARCH -->
-
-        <div
-          class="search-box">
-
-          <mat-icon>
-            search
-          </mat-icon>
-
-          <input
-            #filter
-            type="text"
-            placeholder="Search interviews..."
+        <div class="search-box">
+          <mat-icon>search</mat-icon>
+          <input #filter type="text" placeholder="Search interviews..."
             aria-label="Search interviews">
+        </div>
+      </div>
 
+
+      <!-- FILTER BAR -->
+      <div class="filters-bar">
+
+        <div class="filter-item">
+          <label>HR Name</label>
+          <select [(ngModel)]="filterHrName" (change)="applyFilters()">
+            <option value="">All HR</option>
+            <option *ngFor="let h of hrNameOptions" [value]="h">{{ h }}</option>
+          </select>
         </div>
 
-      </div>
+        <div class="filter-item">
+          <label>Profile</label>
+          <select [(ngModel)]="filterProfile" (change)="applyFilters()">
+            <option value="">All profiles</option>
+            <option *ngFor="let p of profileOptions" [value]="p">{{ p }}</option>
+          </select>
+        </div>
 
+        <div class="filter-item">
+          <label>Overall</label>
+          <select [(ngModel)]="filterOverall" (change)="applyFilters()">
+            <option value="">All</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="complete">Complete</option>
+          </select>
+        </div>
 
-      <!-- =================================================
-           LOADING
-           ================================================= -->
+        <div class="filter-item">
+          <label>HR Call</label>
+          <select [(ngModel)]="filterHr" (change)="applyFilters()">
+            <option value="">All</option>
+            <option value="pending">Pending</option>
+            <option value="done">Done</option>
+            <option value="no_response">No Response</option>
+          </select>
+        </div>
 
-      <div
-        *ngIf="loading"
-        class="loading-container">
+        <div class="filter-item">
+          <label>Second Round</label>
+          <select [(ngModel)]="filterRound" (change)="applyFilters()">
+            <option value="">All</option>
+            <option value="pending">Pending</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="cleared">Cleared</option>
+            <option value="rejected">Rejected</option>
+            <option value="hold">Hold</option>
+          </select>
+        </div>
 
-        <mat-spinner
-          diameter="40">
-        </mat-spinner>
+        <div class="filter-item">
+          <label>Final Call</label>
+          <select [(ngModel)]="filterFinal" (change)="applyFilters()">
+            <option value="">All</option>
+            <option value="pending">Pending</option>
+            <option value="select">Select</option>
+            <option value="hold">Hold</option>
+            <option value="reject">Reject</option>
+          </select>
+        </div>
 
-        <p>
-          Loading interviews...
-        </p>
+        <div class="filter-item">
+          <label>Joining</label>
+          <select [(ngModel)]="filterJoined" (change)="applyFilters()">
+            <option value="">All</option>
+            <option value="pending">Pending</option>
+            <option value="joined">Joined</option>
+            <option value="not_joined">Not Joined</option>
+          </select>
+        </div>
 
-      </div>
-
-
-      <!-- =================================================
-           ERROR
-           ================================================= -->
-
-      <div
-        *ngIf="!loading && error"
-        class="error-container">
-
-        <mat-icon>
-          error_outline
-        </mat-icon>
-
-        <p>
-          {{ error }}
-        </p>
-
-        <button
-          mat-stroked-button
-          type="button"
-          (click)="refresh()">
-
-          Try Again
-
+        <button *ngIf="hasActiveFilters()" class="clear-filters" type="button"
+          (click)="clearFilters()">
+          <mat-icon>close</mat-icon> Clear
         </button>
 
       </div>
 
 
-      <!-- =================================================
-           TABLE
-           ================================================= -->
-
-      <div
-        *ngIf="!loading && !error"
-        class="table-responsive">
-
-        <table
-          mat-table
-          [dataSource]="dataSource"
-          matSort
-          class="w-100">
+      <!-- LOADING -->
+      <div *ngIf="loading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading interviews...</p>
+      </div>
 
 
-          <!-- =============================================
-               HR NAME
-               ============================================= -->
+      <!-- ERROR -->
+      <div *ngIf="!loading && error" class="error-container">
+        <mat-icon>error_outline</mat-icon>
+        <p>{{ error }}</p>
+        <button mat-stroked-button type="button" (click)="refresh()">Try Again</button>
+      </div>
 
-          <ng-container
-            matColumnDef="hr_name">
 
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-              mat-sort-header>
+      <!-- TABLE -->
+      <div *ngIf="!loading && !error" class="table-responsive">
 
-              HR Name
+        <table mat-table [dataSource]="dataSource" matSort class="w-100">
 
-            </th>
 
-            <td
-              mat-cell
-              *matCellDef="let interview">
-
-              <div class="candidate-cell">
-
-                <div class="avatar avatar-hr">
-
-                  {{ interview.hr_name?.charAt(0)?.toUpperCase() }}
-
-                </div>
-
-                <span>
-                  {{ interview.hr_name }}
-                </span>
-
-              </div>
-
-            </td>
-
+          <!-- SR NO -->
+          <ng-container matColumnDef="srno">
+            <th mat-header-cell *matHeaderCellDef>Sr No.</th>
+            <td mat-cell *matCellDef="let interview; let i = index">{{ i + 1 }}</td>
           </ng-container>
 
 
-          <!-- =============================================
-               CANDIDATE NAME
-               ============================================= -->
-
-          <ng-container
-            matColumnDef="candidate_name">
-
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-              mat-sort-header>
-
-              Candidate Name
-
+          <!-- HR NAME -->
+          <ng-container matColumnDef="hr_name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              <span class="th-with-icon"><mat-icon>badge</mat-icon> HR Name</span>
             </th>
-
-            <td
-              mat-cell
-              *matCellDef="let interview">
-
-              <div class="candidate-cell">
-
-                <div class="avatar">
-
-                  {{ interview.candidate_name?.charAt(0)?.toUpperCase() }}
-
-                </div>
-
-                <span>
-                  {{ interview.candidate_name }}
-                </span>
-
-              </div>
-
+            <td mat-cell *matCellDef="let interview">
+              <span class="candidate-name">{{ interview.hr_name }}</span>
             </td>
-
           </ng-container>
 
 
-          <!-- =============================================
-               CANDIDATE NUMBER
-               ============================================= -->
-
-          <ng-container
-            matColumnDef="candidate_number">
-
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-              mat-sort-header>
-
-              Number
-
+          <!-- DATE ADDED -->
+          <ng-container matColumnDef="created_at">
+            <th mat-header-cell *matHeaderCellDef>
+              <span class="th-with-icon"><mat-icon>event</mat-icon> Date</span>
             </th>
+            <td mat-cell *matCellDef="let interview">
+              {{ interview.created_at ? (interview.created_at | date:'dd MMM yyyy') : '—' }}
+            </td>
+          </ng-container>
 
-            <td
-              mat-cell
-              *matCellDef="let interview">
 
-              <a
-                *ngIf="interview.candidate_number"
-                [href]="'tel:' + interview.candidate_number"
-                class="phone-link">
+          <!-- CANDIDATE NAME -->
+          <ng-container matColumnDef="candidate_name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              <span class="th-with-icon"><mat-icon>person</mat-icon> Candidate</span>
+            </th>
+            <td mat-cell *matCellDef="let interview">
+              <span class="candidate-name">{{ interview.candidate_name }}</span>
+            </td>
+          </ng-container>
 
-                <mat-icon>
-                  phone
-                </mat-icon>
 
+          <!-- PROFILE -->
+          <ng-container matColumnDef="profile">
+            <th mat-header-cell *matHeaderCellDef>
+              <span class="th-with-icon"><mat-icon>work_outline</mat-icon> Profile</span>
+            </th>
+            <td mat-cell *matCellDef="let interview">
+              <span *ngIf="interview.profile" class="pill">{{ interview.profile }}</span>
+              <span *ngIf="!interview.profile" class="text-muted">—</span>
+            </td>
+          </ng-container>
+
+
+          <!-- CONTACT NUMBER -->
+          <ng-container matColumnDef="candidate_number">
+            <th mat-header-cell *matHeaderCellDef>
+              <span class="th-with-icon"><mat-icon>phone</mat-icon> Number</span>
+            </th>
+            <td mat-cell *matCellDef="let interview">
+              <a *ngIf="interview.candidate_number"
+                [href]="'tel:' + interview.candidate_number" class="plain-link">
                 {{ interview.candidate_number }}
-
               </a>
-
-              <span
-                *ngIf="!interview.candidate_number"
-                class="text-muted">
-
-                —
-
-              </span>
-
+              <span *ngIf="!interview.candidate_number" class="text-muted">—</span>
             </td>
-
           </ng-container>
 
 
-          <!-- =============================================
-               LINKEDIN
-               ============================================= -->
-
-          <ng-container
-            matColumnDef="linkedin_link">
-
-            <th
-              mat-header-cell
-              *matHeaderCellDef>
-
-              LinkedIn
-
+          <!-- EMAIL -->
+          <ng-container matColumnDef="candidate_email">
+            <th mat-header-cell *matHeaderCellDef>
+              <span class="th-with-icon"><mat-icon>mail_outline</mat-icon> Email</span>
             </th>
-
-            <td
-              mat-cell
-              *matCellDef="let interview">
-
-              <button
-                *ngIf="interview.linkedin_link"
-                mat-stroked-button
-                type="button"
-                class="linkedin-btn"
-                (click)="openLinkedIn(interview.linkedin_link)">
-
-                <mat-icon>
-                  open_in_new
-                </mat-icon>
-
-                LinkedIn
-
-              </button>
-
-              <span
-                *ngIf="!interview.linkedin_link"
-                class="text-muted">
-
-                —
-
-              </span>
-
+            <td mat-cell *matCellDef="let interview">
+              <a *ngIf="interview.candidate_email"
+                [href]="'mailto:' + interview.candidate_email" class="plain-link">
+                {{ interview.candidate_email }}
+              </a>
+              <span *ngIf="!interview.candidate_email" class="text-muted">—</span>
             </td>
-
           </ng-container>
 
 
-          <!-- =============================================
-               RESUME
-               ============================================= -->
-
-          <ng-container
-            matColumnDef="resume">
-
-            <th
-              mat-header-cell
-              *matHeaderCellDef>
-
-              Resume
-
+          <!-- LINKEDIN -->
+          <ng-container matColumnDef="linkedin_link">
+            <th mat-header-cell *matHeaderCellDef>
+              <span class="th-with-icon"><mat-icon>link</mat-icon> LinkedIn</span>
             </th>
-
-            <td
-              mat-cell
-              *matCellDef="let interview">
-
-              <button
-                *ngIf="interview.resume"
-                mat-icon-button
-                type="button"
-                matTooltip="Open resume"
-                (click)="openResume(interview.resume)">
-
-                <mat-icon>
-                  description
-                </mat-icon>
-
-              </button>
-
-              <span
-                *ngIf="!interview.resume"
-                class="text-muted">
-
-                —
-
-              </span>
-
+            <td mat-cell *matCellDef="let interview">
+              <a *ngIf="interview.linkedin_link" class="plain-link"
+                (click)="openLinkedIn(interview.linkedin_link)">Open</a>
+              <span *ngIf="!interview.linkedin_link" class="text-muted">—</span>
             </td>
-
           </ng-container>
 
 
-          <!-- =============================================
-               PHOTO
-               ============================================= -->
-
-          <ng-container
-            matColumnDef="photo">
-
-            <th
-              mat-header-cell
-              *matHeaderCellDef>
-
-              Photo
-
+          <!-- RESUME -->
+          <ng-container matColumnDef="resume">
+            <th mat-header-cell *matHeaderCellDef>
+              <span class="th-with-icon"><mat-icon>description</mat-icon> Resume</span>
             </th>
+            <td mat-cell *matCellDef="let interview">
+              <a *ngIf="interview.resume" class="plain-link"
+                (click)="openResume(interview.resume)">View</a>
+              <span *ngIf="!interview.resume" class="text-muted">—</span>
+            </td>
+          </ng-container>
 
-            <td
-              mat-cell
-              *matCellDef="let interview">
 
-              <img
-                *ngIf="interview.photo"
-                [src]="getPhotoUrl(interview.photo)"
-                [alt]="interview.candidate_name"
-                class="candidate-photo">
+          <!-- HR CALL STATUS -->
+          <ng-container matColumnDef="hr_call_status">
+            <th mat-header-cell *matHeaderCellDef>HR Call</th>
+            <td mat-cell *matCellDef="let interview">
+              <span class="badge" [ngClass]="getHrCallClass(interview.hr_call_status)">
+                {{ getHrCallLabel(interview.hr_call_status) }}
+              </span>
+            </td>
+          </ng-container>
 
-              <div
-                *ngIf="!interview.photo"
-                class="no-photo">
 
-                <mat-icon>
-                  person
-                </mat-icon>
-
+          <!-- HR CALL NOTES -->
+          <ng-container matColumnDef="hr_call_notes">
+            <th mat-header-cell *matHeaderCellDef>HR Call Notes</th>
+            <td mat-cell *matCellDef="let interview">
+              <div class="note-box clickable" *ngIf="interview.hr_call_details; else noHrNote"
+                matTooltip="Click to view full note"
+                (click)="openNote('HR Call Notes', interview.hr_call_details)">
+                {{ interview.hr_call_details }}
               </div>
-
+              <ng-template #noHrNote><span class="text-muted">—</span></ng-template>
             </td>
-
           </ng-container>
 
 
-          <!-- =============================================
-               INTERVIEW DATE
-               ============================================= -->
-
-          <ng-container
-            matColumnDef="interview_date">
-
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-              mat-sort-header>
-
-              Interview Date
-
+          <!-- INTERVIEW DATE -->
+          <ng-container matColumnDef="interview_date">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              <span class="th-with-icon"><mat-icon>calendar_today</mat-icon> Interview Date</span>
             </th>
+            <td mat-cell *matCellDef="let interview">
+              {{ interview.interview_date | date:'dd MMM yyyy' }}
+            </td>
+          </ng-container>
 
-            <td
-              mat-cell
-              *matCellDef="let interview">
 
-              <div class="date-cell">
-
-                <mat-icon>
-                  calendar_today
-                </mat-icon>
-
-                <span>
-
-                  {{
-                    interview.interview_date
-                      | date:'dd MMM yyyy'
-                  }}
-
-                </span>
-
+          <!-- SECOND ROUND -->
+          <ng-container matColumnDef="technical">
+            <th mat-header-cell *matHeaderCellDef>Second Round</th>
+            <td mat-cell *matCellDef="let interview">
+              <div *ngIf="interview.rounds?.length; else noTech" class="rounds-mini">
+                <div class="round-mini" *ngFor="let r of interview.rounds">
+                  <div class="round-line">
+                    <span class="round-dev">{{ r.assigned_to_name || 'Unassigned' }}</span>
+                    <span class="badge" [ngClass]="getRoundClass(r.status)">{{ r.status }}</span>
+                  </div>
+                  <div class="note-box small clickable" *ngIf="r.notes"
+                    matTooltip="Click to view full note"
+                    (click)="openNote('Second Round Notes', r.notes)">
+                    {{ r.notes }}
+                  </div>
+                </div>
               </div>
-
+              <ng-template #noTech>
+                <span class="text-muted">Not assigned</span>
+              </ng-template>
             </td>
-
           </ng-container>
 
 
-          <!-- =============================================
-               STATUS
-               ============================================= -->
-
-          <ng-container
-            matColumnDef="status">
-
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-              mat-sort-header>
-
-              Status
-
-            </th>
-
-            <td
-              mat-cell
-              *matCellDef="let interview">
-
-              <span
-                class="status-badge"
-                [ngClass]="getStatusClass(interview.status)">
-
-                <span class="status-dot">
-                </span>
-
-                {{ getStatusLabel(interview.status) }}
-
+          <!-- FINAL CALL STATUS -->
+          <ng-container matColumnDef="final_call_status">
+            <th mat-header-cell *matHeaderCellDef>Final Call</th>
+            <td mat-cell *matCellDef="let interview">
+              <span class="badge" [ngClass]="getFinalClass(interview.final_call_status)">
+                {{ getFinalLabel(interview.final_call_status) }}
               </span>
-
             </td>
-
           </ng-container>
 
 
-          <!-- =============================================
-               ACTIONS
-               ============================================= -->
+          <!-- FINAL CALL NOTES -->
+          <ng-container matColumnDef="final_call_notes">
+            <th mat-header-cell *matHeaderCellDef>Final Call Notes</th>
+            <td mat-cell *matCellDef="let interview">
+              <div class="note-box clickable" *ngIf="interview.final_call_notes; else noFinalNote"
+                matTooltip="Click to view full note"
+                (click)="openNote('Final Call Notes', interview.final_call_notes)">
+                {{ interview.final_call_notes }}
+              </div>
+              <ng-template #noFinalNote><span class="text-muted">—</span></ng-template>
+            </td>
+          </ng-container>
 
-          <ng-container
-            matColumnDef="actions">
 
-            <th
-              mat-header-cell
-              *matHeaderCellDef>
+          <!-- JOINING -->
+          <ng-container matColumnDef="joining">
+            <th mat-header-cell *matHeaderCellDef>Joining</th>
+            <td mat-cell *matCellDef="let interview">
+              <span class="badge" [ngClass]="getJoinedClass(interview.joined_status)">
+                {{ getJoinedLabel(interview.joined_status) }}
+              </span>
+              <div class="note-box small" *ngIf="interview.joining_note">
+                {{ interview.joining_note }}
+              </div>
+            </td>
+          </ng-container>
 
-              Actions
 
-            </th>
+          <!-- ACTIONS -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let interview">
+              <div class="action-buttons">
 
-            <td
-              mat-cell
-              *matCellDef="let interview">
-
-              <!-- HR ONLY -->
-
-              <div
-                *ngIf="canManage"
-                class="action-buttons">
-
-                <!-- EDIT -->
-
-                <button
-                  mat-icon-button
-                  type="button"
-                  matTooltip="Edit interview"
-                  (click)="editInterview(interview)">
-
-                  <mat-icon>
-                    edit
-                  </mat-icon>
-
+                <button *ngIf="canManage" mat-icon-button type="button"
+                  matTooltip="Edit interview" (click)="editInterview(interview)">
+                  <mat-icon>edit</mat-icon>
                 </button>
 
-
-                <!-- DELETE -->
-
-                <button
-                  mat-icon-button
-                  type="button"
-                  color="warn"
-                  matTooltip="Delete interview"
-                  (click)="deleteInterview(interview)">
-
-                  <mat-icon>
-                    delete
-                  </mat-icon>
-
+                <button *ngIf="canManage" mat-icon-button type="button"
+                  matTooltip="Assign / manage rounds" (click)="openAssignRounds(interview)">
+                  <mat-icon>groups</mat-icon>
                 </button>
 
+                <button *ngIf="canManage" mat-icon-button type="button" color="warn"
+                  matTooltip="Delete interview" (click)="deleteInterview(interview)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+
+                <span *ngIf="!canManage" class="view-only">View Only</span>
+
               </div>
-
-
-              <!-- ADMIN VIEW ONLY -->
-
-              <span
-                *ngIf="!canManage"
-                class="view-only">
-
-                View Only
-
-              </span>
-
             </td>
-
           </ng-container>
 
 
-          <!-- =============================================
-               HEADER
-               ============================================= -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns" class="interview-row"></tr>
 
-          <tr
-            mat-header-row
-            *matHeaderRowDef="displayedColumns">
-          </tr>
-
-
-          <!-- =============================================
-               ROW
-               ============================================= -->
-
-          <tr
-            mat-row
-            *matRowDef="
-              let row;
-              columns: displayedColumns
-            "
-            class="interview-row">
-          </tr>
-
-
-          <!-- =============================================
-               NO DATA
-               ============================================= -->
-
-          <tr
-            class="mat-row"
-            *matNoDataRow>
-
-            <td
-              class="mat-cell no-data-cell"
-              [attr.colspan]="displayedColumns.length">
-
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell no-data-cell" [attr.colspan]="displayedColumns.length">
               <div class="no-data">
-
-                <mat-icon>
-                  event_busy
-                </mat-icon>
-
-                <h4>
-                  No interviews found
-                </h4>
-
+                <mat-icon>event_busy</mat-icon>
+                <h4>No interviews found</h4>
                 <p>
-                  {{
-                    interviews.length === 0
+                  {{ interviews.length === 0
                       ? 'There are no interviews available.'
-                      : 'No interviews match your search.'
-                  }}
+                      : 'No interviews match your search.' }}
                 </p>
-
               </div>
-
             </td>
-
           </tr>
 
         </table>
@@ -656,10 +413,7 @@
       </div>
 
 
-      <!-- =================================================
-           PAGINATION
-           ================================================= -->
-
+      <!-- PAGINATION -->
       <mat-paginator
         [length]="dataSource?.filteredData?.length || 0"
         [pageSize]="10"

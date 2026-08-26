@@ -20,6 +20,8 @@ import { EmployeeComponent } from '../admin/attendance/employee/employee.compone
 import { AttendanceSheetComponent } from '../admin/attendance/attendance-sheet/attendance-sheet.component';
 import { EmployeeAttendanceComponent } from '../admin/attendance/employee-attendance/employee-attendance.component';
 import { LeaveRequestsComponent } from '../admin/leaves/leave-requests/leave-requests.component';
+import { AllInterviewsComponent } from '../admin/interviews/all-interviews/all-interviews.component';
+import { MyInterviewsComponent } from './my-interviews/my-interviews.component';
 export const EMPLOYEE_ROUTE: Route[] = [
   {
     path: 'dashboard',
@@ -57,6 +59,14 @@ export const EMPLOYEE_ROUTE: Route[] = [
   {
     path: 'hr-leaves/leave-requests',
     component: LeaveRequestsComponent,
+  },
+  {
+    path: 'hr-interviews',
+    component: AllInterviewsComponent,
+  },
+  {
+    path: 'my-interviews',
+    component: MyInterviewsComponent,
   },
   {
     path: 'employee-list',

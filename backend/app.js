@@ -21,7 +21,7 @@ const taskRoutes = require('./tasks/tasks');
 const calendarRoutes = require('./calender/calender');
 const candidateRoutes = require('./jobs/candidates');
 const jobRoutes = require('./jobs/jobs'); 
-const interviewRoutes = require('./jobs/interview'); 
+// const interviewRoutes = require('./jobs/interview'); 
 const chatRoutes = require("./chat/chatRoutes");
 const admindashboardRoutes = require('./dashboard/admindashboard');
 const dailyUpdatesRoutes = require('./daily-updates/daily-updates');
@@ -390,7 +390,6 @@ app.use('/api/client-daily-notes', clientDailyNotesRoutes);
 app.use('/api/login-settings', loginSettingsRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use("/api/chat", chatRoutes);
-app.use( '/api/interviews',interviewRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

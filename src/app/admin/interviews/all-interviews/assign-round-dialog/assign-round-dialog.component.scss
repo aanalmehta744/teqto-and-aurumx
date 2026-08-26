@@ -1,0 +1,144 @@
+.dialog-title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.dialog-content {
+  padding-top: 8px;
+  min-width: 360px;
+  max-width: 560px;
+}
+
+.rounds-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.round-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: #fafbff;
+}
+
+.round-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.round-type {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4f46e5;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.round-assignee {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 10px;
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #6b7280;
+  }
+}
+
+.round-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.rf {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+
+  label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+    margin-bottom: 4px;
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+    font-family: inherit;
+    resize: vertical;
+
+    &:focus {
+      border-color: #2563eb;
+    }
+  }
+}
+
+.save-round {
+  margin-top: 4px;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+  }
+}
+
+.empty {
+  color: #9ca3af;
+  font-size: 13px;
+  margin: 0 0 14px;
+}
+
+.assign-box {
+  border-top: 1px dashed #e5e7eb;
+  padding-top: 14px;
+}
+
+.assign-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #4f46e5;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+}
+
+.assign-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.error {
+  display: block;
+  color: #dc2626;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 0 4px;
+}

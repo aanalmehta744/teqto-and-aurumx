@@ -198,6 +198,20 @@ export const ROUTES: RouteInfo[] = [
   },
 
   {
+    path: '/admin/interviews',
+    title: 'Interviews',
+    iconType: 'feather',
+    icon: 'user-check',
+    class: '',
+    groupTitle: false,
+    badge: '',
+    badgeClass: '',
+    role: ['Admin'],
+    department: [],
+    submenu: [],
+  },
+
+  {
     path: '',
     title: 'MENUITEMS.ATTENDANCE.TEXT',
     iconType: 'feather',
@@ -415,6 +429,20 @@ export const ROUTES: RouteInfo[] = [
     title: 'MENUITEMS.EMPLOYEE.DASHBOARD',
     iconType: 'feather',
     icon: 'airplay',
+    class: '',
+    groupTitle: false,
+    badge: '',
+    badgeClass: '',
+    role: ['Employee'],
+    department: ['HR'],
+    submenu: [],
+  },
+
+  {
+    path: '/employee/hr-interviews',
+    title: 'Interviews',
+    iconType: 'feather',
+    icon: 'user-check',
     class: '',
     groupTitle: false,
     badge: '',
@@ -727,6 +755,22 @@ export const ROUTES: RouteInfo[] = [
     badgeClass: '',
     role: ['Employee'],
     department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
+    submenu: [],
+  },
+
+  // Interviews assigned to a Senior developer to conduct.
+  // Visibility is gated to employee_level = Senior in SidebarComponent.
+  {
+    path: '/employee/my-interviews',
+    title: 'Interviews',
+    iconType: 'feather',
+    icon: 'user-check',
+    class: '',
+    groupTitle: false,
+    badge: '',
+    badgeClass: '',
+    role: ['Employee'],
+    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic', 'BDE', 'BA'],
     submenu: [],
   },
 

@@ -74,15 +74,15 @@
           </div>
         </div>
 
-        <!-- Active Jobs -->
+        <!-- Upcoming Interviews -->
         <div class="stat-card border-l-4 border-l-amber-500">
           <div class="flex items-start justify-between">
             <div>
-              <p class="stat-label">Active Jobs</p>
-              <p class="stat-value">{{ activeJobs }}</p>
+              <p class="stat-label">Upcoming Interviews</p>
+              <p class="stat-value">{{ interviewDataSource.data.length }}</p>
             </div>
             <span class="stat-icon bg-amber-50 text-amber-600">
-              <i class="fas fa-briefcase"></i>
+              <i class="fas fa-user-tie"></i>
             </span>
           </div>
         </div>
@@ -454,41 +454,78 @@
             <thead>
               <tr class="table-head-row">
                 <th class="th-cell">Candidate Name</th>
-                <th class="th-cell">Job Title</th>
                 <th class="th-cell">Interviewed By</th>
+                <th class="th-cell">Number</th>
                 <th class="th-cell">Date</th>
-                <th class="th-cell">Time</th>
-                <th class="th-cell">Type</th>
-                <th class="th-cell">Mode</th>
                 <th class="th-cell">Status</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let interview of paginatedInterviews" class="table-row">
                 <td class="td-cell">{{ interview.candidate_name }}</td>
-                <td class="td-cell">{{ interview.job_name }}</td>
-                <td class="td-cell">{{ interview.assigned_employee_name }}</td>
+                <td class="td-cell">{{ interview.hr_name }}</td>
+                <td class="td-cell">{{ interview.candidate_number || '—' }}</td>
                 <td class="td-cell">{{ interview.interview_date | date:'mediumDate' }}</td>
-                <td class="td-cell">{{ '1970-01-01T' + interview.interview_time | date:'hh:mm a' }}</td>
-                <td class="td-cell">{{ interview.interview_type }}</td>
-                <td class="td-cell">{{ interview.mode }}</td>
                 <td class="td-cell">
                   <span class="badge" [ngClass]="{
-                      'badge-success': interview.status === 'Scheduled',
-                      'badge-danger': interview.status === 'Cancelled',
-                      'badge-neutral': interview.status !== 'Scheduled' && interview.status !== 'Cancelled'
+                      'badge-success': interview.status === 'complete',
+                      'badge-neutral': interview.status !== 'complete'
                     }">
-                    {{ interview.status }}
+                    {{ interview.status === 'complete' ? 'Complete' : 'Upcoming' }}
                   </span>
                 </td>
               </tr>
               <tr *ngIf="!paginatedInterviews || paginatedInterviews.length === 0">
-                <td colspan="8" class="empty-row">No interviews scheduled</td>
+                <td colspan="5" class="empty-row">No interviews scheduled</td>
               </tr>
             </tbody>
           </table>
         </div>
         <mat-paginator #interviewPaginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons></mat-paginator>
+      </div>
+    </ng-container>
+
+    <!-- Interviews Assigned To Me (Senior Developer Only) -->
+    <ng-container *ngIf="isSeniorDev">
+      <div class="panel mt-6">
+        <div class="panel-header">
+          <h6 class="panel-title">
+            <i class="fas fa-user-check text-indigo-600 mr-2"></i>Interviews Assigned to Me
+          </h6>
+        </div>
+        <div class="h-auto p-2 overflow-x-auto responsive_table">
+          <table class="min-w-full text-sm">
+            <thead>
+              <tr class="table-head-row">
+                <th class="th-cell">Candidate Name</th>
+                <th class="th-cell">Profile</th>
+                <th class="th-cell">Round</th>
+                <th class="th-cell">Date</th>
+                <th class="th-cell">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let r of assignedRounds" class="table-row">
+                <td class="td-cell">{{ r.candidate_name }}</td>
+                <td class="td-cell">{{ r.profile || '—' }}</td>
+                <td class="td-cell">{{ roundLabel(r.round_type) }}</td>
+                <td class="td-cell">{{ r.scheduled_date ? (r.scheduled_date | date:'mediumDate') : '—' }}</td>
+                <td class="td-cell">
+                  <span class="badge" [ngClass]="{
+                      'badge-success': r.status === 'cleared',
+                      'badge-danger': r.status === 'rejected',
+                      'badge-neutral': r.status !== 'cleared' && r.status !== 'rejected'
+                    }">
+                    {{ r.status }}
+                  </span>
+                </td>
+              </tr>
+              <tr *ngIf="!assignedRounds || assignedRounds.length === 0">
+                <td colspan="5" class="empty-row">No interviews assigned to you</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </ng-container>
 

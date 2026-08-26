@@ -1,0 +1,111 @@
+<h2 mat-dialog-title class="dialog-title">
+  Interview Rounds — {{ data.candidateName }}
+</h2>
+
+<mat-dialog-content class="dialog-content">
+
+  <!-- EXISTING ROUNDS -->
+  <div class="rounds-list" *ngIf="rounds.length; else noRounds">
+    <div class="round-card" *ngFor="let round of rounds; let i = index">
+
+      <div class="round-top">
+        <span class="round-type">{{ roundLabel(round.round_type) }}</span>
+        <button mat-icon-button color="warn" type="button"
+          (click)="removeRound(round, i)" matTooltip="Remove">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+
+      <div class="round-assignee">
+        <mat-icon>person</mat-icon>
+        {{ round.assigned_to_name || 'Unassigned' }}
+      </div>
+
+      <div class="round-fields">
+        <div class="rf">
+          <label>Date</label>
+          <input type="date" [(ngModel)]="round.scheduled_date" />
+        </div>
+        <div class="rf">
+          <label>Status</label>
+          <select [(ngModel)]="round.status">
+            <option value="pending">Pending</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="cleared">Cleared</option>
+            <option value="rejected">Rejected</option>
+            <option value="hold">Hold</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="rf">
+        <label>Notes</label>
+        <textarea rows="2" [(ngModel)]="round.notes"
+          placeholder="Round notes"></textarea>
+      </div>
+
+      <button mat-stroked-button type="button" class="save-round"
+        (click)="updateRound(round)">
+        <mat-icon>save</mat-icon> Save Round
+      </button>
+
+    </div>
+  </div>
+
+  <ng-template #noRounds>
+    <p class="empty">No rounds assigned yet.</p>
+  </ng-template>
+
+
+  <!-- ASSIGN NEW ROUND -->
+  <div class="assign-box">
+    <div class="assign-title">Assign a Round</div>
+
+    <div class="assign-grid">
+      <div class="rf">
+        <label>Round</label>
+        <select [(ngModel)]="newRound.round_type">
+          <option value="technical">Second Round</option>
+          <option value="hr">HR Round</option>
+        </select>
+      </div>
+
+      <div class="rf">
+        <label>Assign to (Senior / Admin)</label>
+        <select [(ngModel)]="newRound.assigned_to_id">
+          <option [ngValue]="null">Select person</option>
+          <option *ngFor="let dev of seniorDevelopers" [ngValue]="dev.id">
+            {{ dev.fullName }}{{ (dev.role && dev.role.toLowerCase() === 'admin')
+                ? ' (Admin)'
+                : (dev.department ? ' (' + dev.department + ')' : '') }}
+          </option>
+        </select>
+      </div>
+
+      <div class="rf">
+        <label>Date</label>
+        <input type="date" [(ngModel)]="newRound.scheduled_date" />
+      </div>
+    </div>
+
+    <div class="rf">
+      <label>Notes</label>
+      <textarea rows="2" [(ngModel)]="newRound.notes"
+        placeholder="Optional notes"></textarea>
+    </div>
+
+    <small class="error" *ngIf="error">{{ error }}</small>
+
+    <button mat-flat-button color="primary" type="button"
+      [disabled]="saving" (click)="addRound()">
+      <mat-icon>add</mat-icon> Assign Round
+    </button>
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-flat-button color="primary" type="button" (click)="close()">
+    Done
+  </button>
+</mat-dialog-actions>

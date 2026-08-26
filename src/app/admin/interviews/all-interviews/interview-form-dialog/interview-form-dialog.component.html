@@ -1,0 +1,137 @@
+<h2 mat-dialog-title class="dialog-title">
+  {{ mode === 'add' ? 'Add Interview' : 'Edit Interview' }}
+</h2>
+
+<mat-dialog-content class="dialog-content">
+
+  <div class="form-grid">
+
+    <!-- HR NAME -->
+    <div class="form-field">
+      <label>HR Name <span class="req">*</span></label>
+      <input type="text" [(ngModel)]="model.hr_name" placeholder="HR name" />
+      <small class="error" *ngIf="errors['hr_name']">{{ errors['hr_name'] }}</small>
+    </div>
+
+    <!-- CANDIDATE NAME -->
+    <div class="form-field">
+      <label>Candidate Name <span class="req">*</span></label>
+      <input type="text" [(ngModel)]="model.candidate_name" placeholder="Candidate name" />
+      <small class="error" *ngIf="errors['candidate_name']">{{ errors['candidate_name'] }}</small>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="form-field">
+      <label>Profile</label>
+      <select [(ngModel)]="model.profile">
+        <option value="">Select profile</option>
+        <option *ngFor="let d of departments" [value]="d">{{ d }}</option>
+      </select>
+    </div>
+
+    <!-- NUMBER -->
+    <div class="form-field">
+      <label>Contact Number <span class="req">*</span></label>
+      <input type="text" [(ngModel)]="model.candidate_number" placeholder="Contact number" />
+      <small class="error" *ngIf="errors['candidate_number']">{{ errors['candidate_number'] }}</small>
+    </div>
+
+    <!-- EMAIL -->
+    <div class="form-field">
+      <label>Email</label>
+      <input type="email" [(ngModel)]="model.candidate_email" placeholder="Candidate email" />
+    </div>
+
+    <!-- INTERVIEW DATE -->
+    <div class="form-field">
+      <label>Interview Date <span class="req">*</span></label>
+      <input type="date" [(ngModel)]="model.interview_date" />
+      <small class="error" *ngIf="errors['interview_date']">{{ errors['interview_date'] }}</small>
+    </div>
+
+    <!-- LINKEDIN -->
+    <div class="form-field">
+      <label>LinkedIn</label>
+      <input type="text" [(ngModel)]="model.linkedin_link" placeholder="LinkedIn profile URL" />
+    </div>
+
+    <!-- RESUME -->
+    <div class="form-field">
+      <label>Resume</label>
+      <input type="text" [(ngModel)]="model.resume" placeholder="Resume link / URL" />
+    </div>
+
+    <!-- STATUS -->
+    <div class="form-field">
+      <label>Overall Status</label>
+      <select [(ngModel)]="model.status">
+        <option value="upcoming">Upcoming</option>
+        <option value="complete">Complete</option>
+      </select>
+    </div>
+
+  </div>
+
+  <!-- ===== HR CALL ===== -->
+  <div class="section-heading">HR Round</div>
+  <div class="form-grid">
+    <div class="form-field">
+      <label>HR Call Status</label>
+      <select [(ngModel)]="model.hr_call_status">
+        <option value="pending">Pending</option>
+        <option value="done">Done</option>
+        <option value="no_response">No Response</option>
+      </select>
+    </div>
+    <div class="form-field full">
+      <label>HR Call Details</label>
+      <textarea rows="2" [(ngModel)]="model.hr_call_details"
+        placeholder="Notes from the HR call"></textarea>
+    </div>
+  </div>
+
+  <!-- ===== FINAL (CEO) CALL ===== -->
+  <div class="section-heading">Final Call</div>
+  <div class="form-grid">
+    <div class="form-field">
+      <label>Final Call Status</label>
+      <select [(ngModel)]="model.final_call_status">
+        <option value="pending">Pending</option>
+        <option value="select">Select</option>
+        <option value="hold">Hold</option>
+        <option value="reject">Reject</option>
+      </select>
+    </div>
+    <div class="form-field full">
+      <label>Final Call Notes</label>
+      <textarea rows="2" [(ngModel)]="model.final_call_notes"
+        placeholder="Notes from the final call"></textarea>
+    </div>
+  </div>
+
+  <!-- ===== AFTER SELECTION ===== -->
+  <div class="section-heading">After Selection</div>
+  <div class="form-grid">
+    <div class="form-field">
+      <label>Joined?</label>
+      <select [(ngModel)]="model.joined_status">
+        <option value="pending">Pending</option>
+        <option value="joined">Joined</option>
+        <option value="not_joined">Not Joined</option>
+      </select>
+    </div>
+    <div class="form-field full">
+      <label>Last Note (joining condition)</label>
+      <textarea rows="2" [(ngModel)]="model.joining_note"
+        placeholder="e.g. Joins 15 Sep, subject to background verification"></textarea>
+    </div>
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-stroked-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" type="button" (click)="save()">
+    {{ mode === 'add' ? 'Add Interview' : 'Save Changes' }}
+  </button>
+</mat-dialog-actions>

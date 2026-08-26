@@ -16,7 +16,8 @@ import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 // import { JobsListService } from '../jobs/jobs-list/jobs-list.service';
 // import { CandidatesService } from '../jobs/candidates/candidates.service';
 import { TodayService } from '../attendance/today/today.service';
-// import { InterviewService } from '../jobs/interview-schedule/interview.service';
+import { InterviewService } from 'app/admin/interviews/interview.service';
+import { AssignedRound } from 'app/admin/interviews/interview.model';
 import { LeavesService } from 'app/admin/leaves/leave-requests/leaves.service';
 import { AllTasksService } from '../all-tasks/all-tasks.service';
 import { Subject, takeUntil } from 'rxjs';
@@ -62,6 +63,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   userData: any;
   isHR: boolean = false;
+
+  // Senior developer: sees interviews assigned to them to conduct.
+  isSeniorDev: boolean = false;
+  assignedRounds: AssignedRound[] = [];
   leaveBalance = 0;
   checkInTime = '--';
   attendanceStatus = 'Absent';
@@ -98,7 +103,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     // private jobsService: JobsListService,
     // private candidatesService: CandidatesService,
     public todayService: TodayService,
-    // public interviewService: InterviewService,
+    public interviewService: InterviewService,
     public leavesService: LeavesService,
     public allTasksService: AllTasksService,
     private ngZone: NgZone,
@@ -121,6 +126,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.userData = JSON.parse(userJson);
       this.leaveBalance = this.userData.leave_balance;
       this.isHR = this.userData.department === 'HR';
+      this.isSeniorDev =
+        String(this.userData.employee_level || '').trim().toLowerCase() === 'senior';
     }
     this.loadUserDataFromLocalStorage();
     this.loadProjects();
@@ -133,6 +140,30 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.fetchTodayLeaves();
       this.fetchTodayTasks();
     }
+
+    if (this.isSeniorDev) {
+      this.loadAssignedRounds();
+    }
+  }
+
+
+  roundLabel(type: string | null | undefined): string {
+    switch (String(type || '').toLowerCase()) {
+      case 'hr': return 'HR Round';
+      case 'technical': return 'Second Round';
+      case 'ceo': return 'CEO Round';
+      default: return type || '';
+    }
+  }
+
+  // Interviews this senior developer has been assigned to conduct.
+  loadAssignedRounds(): void {
+    this.interviewService.getAssignedRounds()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (rounds) => { this.assignedRounds = rounds || []; },
+        error: () => { this.assignedRounds = []; }
+      });
   }
 isBreakGreaterThanOneHour(
   breakTime: string | null | undefined
@@ -803,17 +834,27 @@ private startTimerInterval(): void {
   }
 
   loadInterviews(): void {
-    if (this.isHR) {
-      // this.interviewService.getInterviews()
-      //   .pipe(takeUntil(this.destroy$))
-      //   .subscribe((interviews: any[]) => {
-      //     const now = new Date();
-      //     const upcoming = interviews.filter(i => new Date(i.interview_date) >= now);
-      //     console.log(interviews);
-        //   this.interviewDataSource.data = upcoming;
-        //   this.updateInterviewPagination();
-        // });
+    if (!this.isHR) {
+      return;
     }
+
+    this.interviewService.getAllInterviews()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (interviews: any[]) => {
+          const upcoming = (interviews || [])
+            .filter(i => String(i.status || '').toLowerCase() === 'upcoming')
+            .sort(
+              (a, b) =>
+                new Date(a.interview_date).getTime() -
+                new Date(b.interview_date).getTime()
+            );
+
+          this.interviewDataSource.data = upcoming;
+          this.updateInterviewPagination();
+        },
+        error: (err) => console.error('Error fetching interviews:', err),
+      });
   }
 
   updateInterviewPagination(): void {

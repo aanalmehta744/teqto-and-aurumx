@@ -5,7 +5,10 @@ import { Observable } from 'rxjs';
 import { environment } from 'environments/environment';
 
 import {
-  Interview
+  Interview,
+  InterviewRound,
+  AssignedRound,
+  SeniorDeveloper
 } from './interview.model';
 
 
@@ -14,89 +17,93 @@ import {
 })
 export class InterviewService {
 
-  private apiUrl =
-    `${environment.apiUrl}/interviews`;
+  private apiUrl = `${environment.apiUrl}/interviews`;
 
-
-  constructor(
-    private http: HttpClient
-  ) {}
+  constructor(private http: HttpClient) {}
 
 
   // =====================================================
-  // GET ALL INTERVIEWS
+  // INTERVIEWS
   // =====================================================
 
-  getAllInterviews():
-    Observable<Interview[]> {
-
-    return this.http.get<Interview[]>(
-      this.apiUrl
-    );
-
+  getAllInterviews(): Observable<Interview[]> {
+    return this.http.get<Interview[]>(this.apiUrl);
   }
 
-
-  // =====================================================
-  // GET SINGLE INTERVIEW
-  // =====================================================
-
-  getInterview(
-    id: number
-  ): Observable<Interview> {
-
-    return this.http.get<Interview>(
-      `${this.apiUrl}/${id}`
-    );
-
+  getInterview(id: number): Observable<Interview> {
+    return this.http.get<Interview>(`${this.apiUrl}/${id}`);
   }
 
-
-  // =====================================================
-  // CREATE INTERVIEW
-  // =====================================================
-
-  createInterview(
-    data: Partial<Interview>
-  ): Observable<any> {
-
-    return this.http.post(
-      this.apiUrl,
-      data
-    );
-
+  createInterview(data: Partial<Interview> | FormData): Observable<any> {
+    return this.http.post(this.apiUrl, data);
   }
-
-
-  // =====================================================
-  // UPDATE INTERVIEW
-  // =====================================================
 
   updateInterview(
     id: number,
-    data: Partial<Interview>
+    data: Partial<Interview> | FormData
   ): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, data);
+  }
 
-    return this.http.put(
-      `${this.apiUrl}/${id}`,
-      data
-    );
-
+  deleteInterview(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
 
   // =====================================================
-  // DELETE INTERVIEW
+  // FINAL (CEO) DECISION — Admin + HR
   // =====================================================
 
-  deleteInterview(
-    id: number
+  setFinalDecision(
+    id: number,
+    data: { final_call_status: string; final_call_notes?: string | null }
   ): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/final-decision`, data);
+  }
 
-    return this.http.delete(
-      `${this.apiUrl}/${id}`
+
+  // =====================================================
+  // ROUNDS
+  // =====================================================
+
+  assignRound(
+    interviewId: number,
+    data: Partial<InterviewRound>
+  ): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${interviewId}/rounds`, data);
+  }
+
+  updateRound(
+    roundId: number,
+    data: Partial<InterviewRound>
+  ): Observable<any> {
+    return this.http.put(`${this.apiUrl}/rounds/${roundId}`, data);
+  }
+
+  deleteRound(roundId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/rounds/${roundId}`);
+  }
+
+
+  // Rounds assigned to the logged-in user (senior developer card).
+  getAssignedRounds(): Observable<AssignedRound[]> {
+    return this.http.get<AssignedRound[]>(`${this.apiUrl}/assigned/mine`);
+  }
+
+
+  // =====================================================
+  // META
+  // =====================================================
+
+  getSeniorDevelopers(): Observable<SeniorDeveloper[]> {
+    return this.http.get<SeniorDeveloper[]>(
+      `${this.apiUrl}/meta/senior-developers`
     );
+  }
 
+  // Departments power the "Profile" dropdown.
+  getDepartments(): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/departments`);
   }
 
 }
