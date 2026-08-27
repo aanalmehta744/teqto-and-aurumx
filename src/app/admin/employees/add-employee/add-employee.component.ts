@@ -99,7 +99,8 @@ export class AddEmployeeComponent {
       ],
       aadharCard: [
         '',
-        [Validators.required, Validators.pattern('^[0-9]{12}$')],
+        // Optional — only validate the format if a value is entered.
+        [Validators.pattern('^[0-9]{12}$')],
       ],
       employment_type: [true],  
       status: [true],  // true = Active, false = Inactive
