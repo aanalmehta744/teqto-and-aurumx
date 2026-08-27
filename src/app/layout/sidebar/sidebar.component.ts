@@ -316,6 +316,8 @@ export class SidebarComponent
   this.userType = 'BA';
 } else if (userRole === 'employee' && userDepartment === 'hr') {
   this.userType = 'HR';
+} else if (userRole === 'employee' && userDepartment === 'hr coordinator') {
+  this.userType = 'HR Coordinator';
 } else if (userRole === 'employee') {
   this.userType = 'Employee';
 } else {

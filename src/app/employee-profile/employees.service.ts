@@ -97,4 +97,20 @@ uploadPhoto(employeeId: number, file: File): Observable<any> {
   return this.httpClient.patch(`${this.API_URL}/${employeeId}/upload-photo`, formData);
 }
 
+// Upload one or more employee documents (10th/12th marksheet, Aadhaar,
+// PAN, passbook, current-sem marksheet). Only the provided files are sent;
+// the backend updates just those columns.
+uploadDocuments(
+  employeeId: number,
+  files: { [field: string]: File }
+): Observable<any> {
+  const formData = new FormData();
+  Object.keys(files).forEach((field) => {
+    if (files[field]) {
+      formData.append(field, files[field]);
+    }
+  });
+  return this.httpClient.patch(`${this.API_URL}/${employeeId}/documents`, formData);
+}
+
 }

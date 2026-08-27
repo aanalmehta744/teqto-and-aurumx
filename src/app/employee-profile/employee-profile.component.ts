@@ -228,6 +228,86 @@ export class EmployeeProfileComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // =====================================================
+  // EMPLOYEE DOCUMENTS (self-service)
+  // =====================================================
+
+  // Each document the employee can upload. `required` drives the
+  // reminder banner; `doc_current_sem` is optional.
+  documentDefs: {
+    field: string;
+    label: string;
+    required: boolean;
+  }[] = [
+    { field: 'doc_tenth', label: '10th Marksheet', required: true },
+    { field: 'doc_twelfth', label: '12th Marksheet', required: true },
+    { field: 'doc_aadhar', label: 'Aadhaar Card', required: true },
+    { field: 'doc_pan', label: 'PAN Card', required: true },
+    { field: 'doc_passbook', label: 'Bank Passbook Copy', required: true },
+    { field: 'doc_current_sem', label: 'Current Sem Marksheet (optional)', required: false }
+  ];
+
+  // Per-document upload state.
+  docUploading: { [field: string]: boolean } = {};
+  docError: { [field: string]: string } = {};
+
+  docReminderDismissed = false;
+
+  hasDoc(field: string): boolean {
+    return !!this.employee?.[field];
+  }
+
+  getDocUrl(field: string): string {
+    return this.employee?.[field] || '';
+  }
+
+  // Required documents the employee still needs to upload.
+  get missingRequiredDocs(): string[] {
+    return this.documentDefs
+      .filter(d => d.required && !this.hasDoc(d.field))
+      .map(d => d.label);
+  }
+
+  get showDocReminder(): boolean {
+    return !this.docReminderDismissed && this.missingRequiredDocs.length > 0;
+  }
+
+  dismissDocReminder(): void {
+    this.docReminderDismissed = true;
+  }
+
+  onDocumentSelected(field: string, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    const file = input.files[0];
+
+    this.docUploading[field] = true;
+    this.docError[field] = '';
+
+    this.employeesService
+      .uploadDocuments(this.employeeId, { [field]: file })
+      .subscribe({
+        next: (res) => {
+          // Backend returns { documents: { <column>: url } }.
+          const url = res?.documents?.[field];
+          if (url) {
+            this.employee[field] = url;
+          }
+          this.docUploading[field] = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.docError[field] =
+            err?.error?.error || 'Upload failed. Please try again.';
+          this.docUploading[field] = false;
+        }
+      });
+
+    // Reset so the same file can be re-selected.
+    input.value = '';
+  }
+
   getMonthName(month: number): string {
     const months = [
       'January', 'February', 'March', 'April', 'May', 'June',

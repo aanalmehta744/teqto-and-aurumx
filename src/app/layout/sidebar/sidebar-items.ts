@@ -448,7 +448,7 @@ export const ROUTES: RouteInfo[] = [
     badge: '',
     badgeClass: '',
     role: ['Employee'],
-    department: ['HR'],
+    department: ['HR', 'HR Coordinator'],
     submenu: [],
   },
 
@@ -754,7 +754,7 @@ export const ROUTES: RouteInfo[] = [
     badge: '',
     badgeClass: '',
     role: ['Employee'],
-    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
+    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic', 'HR Coordinator'],
     submenu: [],
   },
 
@@ -784,7 +784,7 @@ export const ROUTES: RouteInfo[] = [
     badge: '',
     badgeClass: '',
     role: ['Employee'],
-    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
+    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic', 'HR Coordinator'],
     submenu: [
       {
         path: '/employee/attendance',
@@ -796,7 +796,7 @@ export const ROUTES: RouteInfo[] = [
         badge: '',
         badgeClass: '',
         role: ['Employee'],
-        department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
+        department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic', 'HR Coordinator'],
         submenu: [],
       },
     ],
@@ -812,7 +812,7 @@ export const ROUTES: RouteInfo[] = [
     badge: '',
     badgeClass: '',
     role: ['Employee'],
-    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
+    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic', 'HR Coordinator'],
     submenu: [
       {
         path: '/employee/myleaves',
@@ -824,7 +824,7 @@ export const ROUTES: RouteInfo[] = [
         badge: '',
         badgeClass: '',
         role: ['Employee'],
-        department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
+        department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic', 'HR Coordinator'],
         submenu: [],
       },
       {
@@ -837,7 +837,7 @@ export const ROUTES: RouteInfo[] = [
         badge: '',
         badgeClass: '',
         role: ['Employee'],
-        department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
+        department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic', 'HR Coordinator'],
         submenu: [],
       },
     ],
@@ -853,7 +853,7 @@ export const ROUTES: RouteInfo[] = [
     badge: '',
     badgeClass: '',
     role: ['Employee'],
-    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
+    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic', 'HR Coordinator'],
     submenu: [],
   },
 
@@ -867,7 +867,7 @@ export const ROUTES: RouteInfo[] = [
     badge: '',
     badgeClass: '',
     role: ['Employee'],
-    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
+    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic', 'HR Coordinator'],
     submenu: [],
   },
 
@@ -881,7 +881,7 @@ export const ROUTES: RouteInfo[] = [
     badge: '',
     badgeClass: '',
     role: ['Employee'],
-    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
+    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic', 'HR Coordinator'],
     submenu: [],
   },
 
@@ -895,7 +895,7 @@ export const ROUTES: RouteInfo[] = [
     badge: '',
     badgeClass: '',
     role: ['Employee'],
-    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
+    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic', 'HR Coordinator'],
     submenu: [],
   },
 
@@ -909,7 +909,7 @@ export const ROUTES: RouteInfo[] = [
     badge: '',
     badgeClass: '',
     role: ['Employee'],
-    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
+    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic', 'HR Coordinator'],
     submenu: [],
   },
 
@@ -923,7 +923,7 @@ export const ROUTES: RouteInfo[] = [
     badge: '',
     badgeClass: '',
     role: ['Employee'],
-    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
+    department: ['Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic', 'HR Coordinator'],
     submenu: [],
   },
 

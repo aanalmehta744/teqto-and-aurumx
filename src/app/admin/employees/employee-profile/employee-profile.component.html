@@ -163,6 +163,31 @@
     <div class="bg-white rounded-xl shadow-xl mt-6 w-full">
       <mat-tab-group mat-align-tabs="start">
 
+        <!-- Documents Tab (read-only) -->
+        <mat-tab label="Documents">
+          <div class="p-6">
+            <h4 class="text-xl font-medium mb-4 text-[#00383F]">Employee Documents</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div *ngFor="let doc of documentDefs"
+                class="border border-gray-200 rounded-lg p-4 flex items-center justify-between gap-3 bg-white">
+                <span class="font-medium text-gray-800">
+                  {{ doc.label }}
+                  <span *ngIf="doc.required" class="text-red-500">*</span>
+                </span>
+                <a *ngIf="hasDoc(doc.field)" [href]="getDocUrl(doc.field)" target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1 text-sm px-3 py-1.5 rounded-md bg-[#00383F] text-white hover:opacity-90">
+                  <mat-icon class="!text-base !w-4 !h-4">download</mat-icon> View / Download
+                </a>
+                <span *ngIf="!hasDoc(doc.field)"
+                  class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                  Not uploaded
+                </span>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
         <!-- Attendance Tab -->
         <mat-tab label="Attendance">
           <div class="p-6">

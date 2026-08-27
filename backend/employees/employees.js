@@ -66,6 +66,29 @@ db.query(`
   }
 }).catch(() => { });
 
+// Ensure the employee-document columns exist (MySQL 5.7 compatible).
+// Each holds the Cloudinary URL of an uploaded document that the employee
+// fills in from My Profile after HR/Admin creates their account.
+const EMPLOYEE_DOC_COLUMNS = [
+  'doc_tenth',        // 10th marksheet (required)
+  'doc_twelfth',      // 12th marksheet (required)
+  'doc_aadhar',       // Aadhaar card (required)
+  'doc_pan',          // PAN card (required)
+  'doc_passbook',     // Bank passbook copy (required)
+  'doc_current_sem'   // Current semester marksheet (optional)
+];
+
+EMPLOYEE_DOC_COLUMNS.forEach((col) => {
+  db.query(`
+    SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'employees' AND COLUMN_NAME = ?
+  `, [col]).then(([rows]) => {
+    if (rows[0].cnt === 0) {
+      return db.query(`ALTER TABLE employees ADD COLUMN \`${col}\` VARCHAR(512) DEFAULT NULL`);
+    }
+  }).catch(() => { });
+});
+
 // // 🟢 GET all employees
 // router.get('/', async (req, res) => {
 //   try {
@@ -1870,6 +1893,106 @@ router.patch('/:id/incentive', async (req, res) => {
   }
 
 });
+
+
+// ============================================================
+// EMPLOYEE DOCUMENTS
+//
+// The logged-in employee uploads their own documents from
+// My Profile after HR/Admin has created the account:
+//   - 10th marksheet        (required)
+//   - 12th marksheet        (required)
+//   - Aadhaar card          (required)
+//   - PAN card              (required)
+//   - Bank passbook copy    (required)
+//   - Current sem marksheet (optional)
+//
+// Any subset of files may be sent; only provided files are
+// updated, so the employee can upload them over several visits.
+// Files are stored on Cloudinary (images / PDFs).
+// ============================================================
+
+const docUpload = createUpload('employee-documents');
+
+// Map incoming multipart field names -> employees table columns.
+const DOC_FIELD_TO_COLUMN = {
+  doc_tenth: 'doc_tenth',
+  doc_twelfth: 'doc_twelfth',
+  doc_aadhar: 'doc_aadhar',
+  doc_pan: 'doc_pan',
+  doc_passbook: 'doc_passbook',
+  doc_current_sem: 'doc_current_sem'
+};
+
+router.patch(
+  '/:id/documents',
+  docUpload.fields(
+    Object.keys(DOC_FIELD_TO_COLUMN).map((name) => ({ name, maxCount: 1 }))
+  ),
+  async (req, res) => {
+
+    const { id } = req.params;
+
+    try {
+
+      const files = req.files || {};
+
+      // Build the SET clause only for documents that were actually uploaded.
+      const setParts = [];
+      const values = [];
+      const updated = {};
+
+      Object.entries(DOC_FIELD_TO_COLUMN).forEach(([field, column]) => {
+        const file = files[field] && files[field][0];
+        if (file) {
+          const url = file.path || file.filename;
+          setParts.push(`\`${column}\` = ?`);
+          values.push(url);
+          updated[column] = url;
+        }
+      });
+
+      if (setParts.length === 0) {
+        return res.status(400).json({
+          error: 'No documents were uploaded'
+        });
+      }
+
+      const [existing] = await db.query(
+        'SELECT id FROM employees WHERE id = ?',
+        [id]
+      );
+
+      if (existing.length === 0) {
+        return res.status(404).json({
+          error: 'Employee not found'
+        });
+      }
+
+      values.push(id);
+
+      await db.query(
+        `UPDATE employees SET ${setParts.join(', ')} WHERE id = ?`,
+        values
+      );
+
+      res.json({
+        message: 'Documents uploaded successfully',
+        documents: updated
+      });
+
+    } catch (err) {
+
+      console.error('Error uploading employee documents:', err);
+
+      res.status(500).json({
+        error: 'Failed to upload documents'
+      });
+
+    }
+
+  }
+);
 
 
 module.exports = router;

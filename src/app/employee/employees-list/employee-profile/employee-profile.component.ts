@@ -67,6 +67,24 @@ export class EmployeeProfileComponent implements OnInit, AfterViewInit {
   projectColumns = ['name', 'status', 'startDate', 'endDate', 'teamName'];
   targetColumns = ['amount', 'targetDate', 'achieved_amount', 'actions'];
 
+  // Documents uploaded by the employee (read-only view).
+  documentDefs: { field: string; label: string; required: boolean }[] = [
+    { field: 'doc_tenth', label: '10th Marksheet', required: true },
+    { field: 'doc_twelfth', label: '12th Marksheet', required: true },
+    { field: 'doc_aadhar', label: 'Aadhaar Card', required: true },
+    { field: 'doc_pan', label: 'PAN Card', required: true },
+    { field: 'doc_passbook', label: 'Bank Passbook Copy', required: true },
+    { field: 'doc_current_sem', label: 'Current Sem Marksheet (optional)', required: false }
+  ];
+
+  hasDoc(field: string): boolean {
+    return !!this.employee?.[field];
+  }
+
+  getDocUrl(field: string): string {
+    return this.employee?.[field] || '';
+  }
+
   @ViewChild('attendancePaginator') attendancePaginator!: MatPaginator;
   @ViewChild('leavePaginator') leavePaginator!: MatPaginator;
   @ViewChild('projectPaginator') projectPaginator!: MatPaginator;

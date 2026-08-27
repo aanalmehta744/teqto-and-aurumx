@@ -9,7 +9,11 @@ async function requireAdminOrHR(req, res, next) {
     const token = header.startsWith('Bearer ') ? header.slice(7) : null;
     if (!token) return res.status(401).json({ message: 'Authentication required' });
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'defaultSecret');
-    const [[user]] = await db.query('SELECT role, department FROM employees WHERE id = ?', [decoded.userId]);
+    // The login token carries the user id as `id` (only the password-reset
+    // token uses `userId`), so read `id` here — otherwise the lookup finds no
+    // user and returns 401, which bounces the client back to the login page.
+    const userId = decoded.id ?? decoded.userId;
+    const [[user]] = await db.query('SELECT role, department FROM employees WHERE id = ?', [userId]);
     if (!user) return res.status(401).json({ message: 'User not found' });
     if (String(user.role).toLowerCase() !== 'admin' && String(user.department).toLowerCase() !== 'hr') {
       return res.status(403).json({ message: 'Only Admin and HR can manage departments' });

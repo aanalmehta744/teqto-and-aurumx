@@ -144,7 +144,9 @@ function isAdmin(req) {
 }
 
 function isHR(req) {
-  return getRole(req) === 'employee' && getDepartment(req) === 'hr';
+  // HR and HR Coordinator manage interviews with the same rights.
+  const dept = getDepartment(req);
+  return getRole(req) === 'employee' && (dept === 'hr' || dept === 'hr coordinator');
 }
 
 // Admin (view all) + HR (view + manage). Everyone else uses

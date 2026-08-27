@@ -5,6 +5,24 @@
       <app-breadcrumb [title]="'Employee Profile'" [items]="['Employees']" [active_item]="'Profile'"></app-breadcrumb>
     </div>
 
+    <!-- DOCUMENT REMINDER BANNER -->
+    <div *ngIf="showDocReminder"
+      class="flex items-start justify-between gap-4 mb-4 px-4 py-3 rounded-lg border border-amber-300 bg-amber-50 text-amber-800">
+      <div class="flex items-start gap-2">
+        <mat-icon class="text-amber-600">info</mat-icon>
+        <div class="text-sm">
+          <span class="font-semibold">Please complete your documents.</span>
+          You still need to upload:
+          <span class="font-medium">{{ missingRequiredDocs.join(', ') }}</span>.
+          Open the <span class="font-medium">Documents</span> tab below to upload them.
+        </div>
+      </div>
+      <button type="button" class="text-amber-700 hover:text-amber-900 shrink-0"
+        (click)="dismissDocReminder()" aria-label="Dismiss">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
 
     <div class="flex flex-wrap -mx-3">
 
@@ -132,6 +150,64 @@
 
     <div class="bg-white rounded-xl shadow-xl mt-6 w-full">
       <mat-tab-group mat-align-tabs="start">
+
+        <!-- Documents Tab -->
+        <mat-tab label="Documents">
+          <div class="p-6">
+            <h4 class="text-xl font-medium mb-4 text-[#00383F]">My Documents</h4>
+            <p class="text-sm text-gray-500 mb-4">
+              Upload clear scans or photos (image or PDF, up to 10&nbsp;MB each).
+              Items marked <span class="text-red-500">*</span> are required.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div *ngFor="let doc of documentDefs"
+                class="border border-gray-200 rounded-lg p-4 flex flex-col gap-3 bg-white">
+
+                <div class="flex items-center justify-between">
+                  <span class="font-medium text-gray-800">
+                    {{ doc.label }}
+                    <span *ngIf="doc.required" class="text-red-500">*</span>
+                  </span>
+                  <span *ngIf="hasDoc(doc.field)"
+                    class="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    Uploaded
+                  </span>
+                  <span *ngIf="!hasDoc(doc.field)"
+                    class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                    Pending
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-3 flex-wrap">
+                  <a *ngIf="hasDoc(doc.field)" [href]="getDocUrl(doc.field)" target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1 text-sm text-[#00383F] hover:underline">
+                    <mat-icon class="!text-base !w-4 !h-4">visibility</mat-icon> View
+                  </a>
+
+                  <label
+                    class="inline-flex items-center gap-1 text-sm px-3 py-1.5 rounded-md cursor-pointer bg-[#00383F] text-white hover:opacity-90"
+                    [class.opacity-60]="docUploading[doc.field]">
+                    <mat-icon class="!text-base !w-4 !h-4">upload</mat-icon>
+                    <span>
+                      {{ docUploading[doc.field]
+                        ? 'Uploading…'
+                        : (hasDoc(doc.field) ? 'Replace' : 'Upload') }}
+                    </span>
+                    <input type="file" class="hidden" accept="image/*,application/pdf"
+                      [disabled]="docUploading[doc.field]"
+                      (change)="onDocumentSelected(doc.field, $event)" />
+                  </label>
+                </div>
+
+                <div *ngIf="docError[doc.field]" class="text-red-500 text-xs">
+                  {{ docError[doc.field] }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
 
         <!-- Attendance Tab -->
         <mat-tab label="Attendance">

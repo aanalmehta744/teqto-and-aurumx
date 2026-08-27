@@ -67,7 +67,7 @@ const app = express();
   await db.query(`ALTER TABLE employees ADD COLUMN employee_level VARCHAR(20) NOT NULL DEFAULT 'Junior'`).catch(() => {});
   await db.query(`ALTER TABLE tasks ADD COLUMN assigned_by INT NULL`).catch(() => {});
 
-  for (const department of ['HR','BDE','Front Developer','Backend Developer','Fullstack Developer','Graphic']) {
+  for (const department of ['HR','HR Coordinator','BDE','Front Developer','Backend Developer','Fullstack Developer','Graphic']) {
     await db.query(`INSERT IGNORE INTO departments (name) VALUES (?)`, [department]).catch(() => {});
   }
 

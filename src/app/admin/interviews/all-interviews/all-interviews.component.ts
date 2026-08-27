@@ -8,8 +8,16 @@ import {
 
 import {
   CommonModule,
-  DatePipe
+  DatePipe,
+  formatDate
 } from '@angular/common';
+
+import * as XLSX from 'xlsx';
+
+import {
+  TableExportUtil,
+  TableElement
+} from '@shared';
 
 import {
   MatTableModule
@@ -58,6 +66,7 @@ import {
 
 import {
   BehaviorSubject,
+  from,
   fromEvent,
   merge,
   Observable,
@@ -65,7 +74,10 @@ import {
 } from 'rxjs';
 
 import {
-  map
+  catchError,
+  concatMap,
+  map,
+  toArray
 } from 'rxjs/operators';
 
 import {
@@ -260,6 +272,11 @@ export class AllInterviewsComponent
   filter!: ElementRef;
 
 
+  // Hidden <input type="file"> used for Excel import (HR only).
+  @ViewChild('importInput')
+  importInput!: ElementRef<HTMLInputElement>;
+
+
   // =====================================================
   // SORT / PAGINATION
   // =====================================================
@@ -396,9 +413,10 @@ export class AllInterviewsComponent
      * whose department is HR.
      */
 
+    // HR and HR Coordinator both manage interviews.
     this.isHR =
       role === 'employee' &&
-      department === 'hr';
+      (department === 'hr' || department === 'hr coordinator');
 
 
     /*
@@ -703,6 +721,407 @@ export class AllInterviewsComponent
   refresh(): void {
 
     this.loadInterviews();
+
+  }
+
+
+  // =====================================================
+  // EXPORT TO EXCEL (HR only)
+  // =====================================================
+
+  exportExcel(): void {
+
+    if (!this.canManage) {
+      this.showNotification(
+        'Only HR can export interviews.',
+        'bottom',
+        'center'
+      );
+      return;
+    }
+
+    // Export what the user is currently looking at (filtered + searched),
+    // falling back to the filtered list.
+    const rows =
+      (this.dataSource?.filteredData?.length
+        ? this.dataSource.filteredData
+        : this.interviews) || [];
+
+    if (!rows.length) {
+      this.showNotification(
+        'There are no interviews to export.',
+        'bottom',
+        'center'
+      );
+      return;
+    }
+
+    // Headers are kept identical to the HR sheet so an exported file can be
+    // edited and re-imported without renaming columns.
+    const exportData: Partial<TableElement>[] = rows.map((i, index) => ({
+      'Sr. No.': index + 1,
+      'HR Name': i.hr_name || '',
+      'Date(M/D/Y)': i.created_at
+        ? formatDate(i.created_at, 'M/d/yyyy', 'en')
+        : '',
+      'Candidate Name': i.candidate_name || '',
+      'Position Applied': i.profile || '',
+      'Contact No.': i.candidate_number || '',
+      'Email ID': i.candidate_email || '',
+      'Linkdin ID': i.linkedin_link || '',
+      'CV Link': i.resume || '',
+      'HR call Details': i.hr_call_details || '',
+      'HR Call status': this.getHrCallLabel(i.hr_call_status),
+      'Interview Date': i.interview_date
+        ? formatDate(i.interview_date, 'M/d/yyyy', 'en')
+        : '',
+      'Final Round': (i.rounds || [])
+        .map(r => `${r.assigned_to_name || 'Unassigned'} (${r.status})`)
+        .join('; '),
+      'Final Call note': i.final_call_notes || '',
+      'Final Call Status': this.getFinalLabel(i.final_call_status),
+      'Joining Status': this.getJoinedLabel(i.joined_status),
+      'Final Note': i.joining_note || ''
+    }));
+
+    TableExportUtil.exportToExcel(exportData, 'interviews');
+
+  }
+
+
+  // =====================================================
+  // IMPORT FROM EXCEL (HR only)
+  // =====================================================
+
+  triggerImport(): void {
+
+    if (!this.canManage) {
+      this.showNotification(
+        'Only HR can import interviews.',
+        'bottom',
+        'center'
+      );
+      return;
+    }
+
+    this.importInput?.nativeElement.click();
+
+  }
+
+
+  onImportFileChange(event: Event): void {
+
+    const input = event.target as HTMLInputElement;
+
+    if (!this.canManage) {
+      input.value = '';
+      return;
+    }
+
+    const file = input.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      try {
+
+        const data =
+          new Uint8Array(e.target?.result as ArrayBuffer);
+
+        const workbook =
+          XLSX.read(data, { type: 'array', cellDates: true });
+
+        const sheet =
+          workbook.Sheets[workbook.SheetNames[0]];
+
+        const rows =
+          XLSX.utils.sheet_to_json<any>(sheet, { defval: '' });
+
+        this.importRows(rows);
+
+      } catch (err) {
+
+        console.error('IMPORT PARSE ERROR:', err);
+
+        this.showNotification(
+          'Could not read the file. Please upload a valid Excel/CSV file.',
+          'bottom',
+          'center'
+        );
+
+      }
+    };
+
+    reader.readAsArrayBuffer(file);
+
+    // Reset so the same file can be selected again.
+    input.value = '';
+
+  }
+
+
+  private importRows(rows: any[]): void {
+
+    if (!rows || !rows.length) {
+      this.showNotification(
+        'The file has no rows to import.',
+        'bottom',
+        'center'
+      );
+      return;
+    }
+
+    // The backend requires a candidate name, contact number and interview
+    // date; rows missing name/number can't be created, so skip + report them.
+    const payloads = rows
+      .map(r => this.mapRowToInterview(r))
+      .filter(p => !!p.candidate_name && !!p.candidate_number);
+
+    const skipped = rows.length - payloads.length;
+
+    if (!payloads.length) {
+      this.showNotification(
+        'No valid rows found (each row needs a Candidate Name and Contact No.).',
+        'bottom',
+        'center'
+      );
+      return;
+    }
+
+    // Skip candidates that already exist (so re-importing the same sheet does
+    // not create duplicates). Match on the contact number reduced to digits,
+    // both against existing interviews and other rows in this same file.
+    const digits = (v: any) => String(v || '').replace(/\D/g, '');
+
+    const existingKeys = new Set(
+      this.allInterviews
+        .map(i => digits(i.candidate_number))
+        .filter(k => !!k)
+    );
+
+    const seen = new Set<string>();
+    const duplicates: string[] = [];
+
+    const toCreate = payloads.filter((p) => {
+      const key = digits(p.candidate_number);
+      if (key && (existingKeys.has(key) || seen.has(key))) {
+        duplicates.push(String(p.candidate_name));
+        return false;
+      }
+      if (key) {
+        seen.add(key);
+      }
+      return true;
+    });
+
+    if (duplicates.length) {
+      console.warn(
+        'INTERVIEW IMPORT — duplicates skipped (already exist):',
+        duplicates
+      );
+    }
+
+    if (!toCreate.length) {
+      this.showNotification(
+        `Nothing to import — all ${duplicates.length} row(s) already exist.`,
+        'bottom',
+        'center'
+      );
+      return;
+    }
+
+    this.loading = true;
+
+    // Send the rows ONE AT A TIME. Firing all requests at once overwhelms the
+    // tunnel/backend and silently drops some; sequential is slower but reliable
+    // and lets us capture a per-row result.
+    this.subs.sink =
+      from(toCreate)
+        .pipe(
+          concatMap((p) =>
+            this.interviewService.createInterview(p).pipe(
+              map(() => ({
+                ok: true,
+                name: String(p.candidate_name),
+                error: ''
+              })),
+              catchError((err) => of({
+                ok: false,
+                name: String(p.candidate_name),
+                error:
+                  err?.error?.message ||
+                  err?.message ||
+                  `HTTP ${err?.status || '?'}`
+              }))
+            )
+          ),
+          toArray()
+        )
+        .subscribe({
+
+          next: (results) => {
+
+            const success = results.filter(r => r.ok).length;
+            const failed = results.filter(r => !r.ok);
+
+            // Surface the exact failures so the cause is visible, not guessed.
+            if (failed.length) {
+              console.warn(
+                'INTERVIEW IMPORT — failed rows:',
+                failed.map(f => `${f.name}: ${f.error}`)
+              );
+            }
+
+            const parts = [
+              `Imported ${success} of ${toCreate.length}`
+            ];
+            if (failed.length) {
+              parts.push(`${failed.length} failed (see console)`);
+            }
+            if (duplicates.length) {
+              parts.push(`${duplicates.length} duplicate(s) skipped`);
+            }
+            if (skipped) {
+              parts.push(`${skipped} skipped (missing name/number)`);
+            }
+
+            this.showNotification(
+              parts.join(', ') + '.',
+              'bottom',
+              'center'
+            );
+
+            this.loadInterviews();
+
+          },
+
+          error: () => {
+
+            this.loading = false;
+
+            this.showNotification(
+              'Unable to import interviews.',
+              'bottom',
+              'center'
+            );
+
+          }
+
+        });
+
+  }
+
+
+  // Map one spreadsheet row to an interview payload. Header names are
+  // matched case-insensitively so exported files can be re-imported.
+  private mapRowToInterview(row: any): Partial<Interview> {
+
+    const pick = (...keys: string[]): string => {
+      for (const key of Object.keys(row || {})) {
+        const norm = key.trim().toLowerCase();
+        if (keys.some(k => k.toLowerCase() === norm)) {
+          const value = row[key];
+          return value === null || value === undefined
+            ? ''
+            : String(value).trim();
+        }
+      }
+      return '';
+    };
+
+    const today = () => formatDate(new Date(), 'yyyy-MM-dd', 'en');
+
+    const toDate = (value: string): string => {
+      const raw = String(value || '').trim();
+      if (!raw) {
+        return today();
+      }
+      // DD-MM-YYYY or DD/MM/YYYY (e.g. 01-07-2026) — JS Date misreads these,
+      // so parse explicitly.
+      const m = raw.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+      if (m) {
+        const day = +m[1], month = +m[2], year = +m[3];
+        if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+          const d = new Date(year, month - 1, day);
+          if (!isNaN(d.getTime())) {
+            return formatDate(d, 'yyyy-MM-dd', 'en');
+          }
+        }
+      }
+      const d = new Date(raw);
+      // Never return an unparseable string — MySQL would reject the whole row.
+      return isNaN(d.getTime()) ? today() : formatDate(d, 'yyyy-MM-dd', 'en');
+    };
+
+    // Normalise human-readable status labels back to the internal codes the
+    // app uses, so an exported (labelled) sheet re-imports correctly.
+    const normFinal = (v: string): string => {
+      const s = v.toLowerCase();
+      if (s.includes('select')) return 'select';
+      if (s.includes('hold')) return 'hold';
+      if (s.includes('reject')) return 'reject';
+      return 'pending';
+    };
+
+    const normJoined = (v: string): string => {
+      const s = v.toLowerCase();
+      if (s.includes('not')) return 'not_joined';
+      if (s.includes('joined')) return 'joined';
+      return 'pending';
+    };
+
+    const normHrCall = (v: string): string => {
+      const s = v.toLowerCase();
+      if (!s || s === 'pending') return 'pending';
+      if (s === 'done') return 'done';
+      if (s.includes('no response') || s === 'no_response') return 'no_response';
+      // Otherwise keep the custom option exactly as typed.
+      return v;
+    };
+
+    return {
+      hr_name:
+        pick('HR Name', 'hr_name') || this.currentUserName,
+      candidate_name:
+        pick('Candidate Name', 'candidate_name', 'Candidate'),
+      candidate_number:
+        pick('Contact No.', 'Contact No', 'Contact Number', 'Candidate Number',
+          'candidate_number', 'Number', 'Mobile', 'Contact', 'Phone'),
+      candidate_email:
+        pick('Email ID', 'Candidate Email', 'candidate_email', 'Email') || null,
+      profile:
+        pick('Position Applied', 'Position', 'Profile', 'profile') || null,
+      linkedin_link:
+        pick('Linkdin ID', 'LinkedIn ID', 'Linkedin', 'LinkedIn',
+          'linkedin_link', 'LinkedIn Link') || null,
+      resume:
+        pick('CV Link', 'CV', 'Resume', 'resume', 'Resume Link') || null,
+      interview_date:
+        toDate(
+          pick('Interview Date', 'interview_date') ||
+          pick('Date(M/D/Y)', 'Date', 'date')
+        ),
+      hr_call_status:
+        normHrCall(pick('HR Call status', 'HR Call Status', 'hr_call_status')),
+      hr_call_details:
+        pick('HR call Details', 'HR Call Details', 'HR Call Notes', 'hr_call_details') || null,
+      final_call_status:
+        normFinal(pick('Final Call Status', 'final_call_status')),
+      final_call_notes:
+        pick('Final Call note', 'Final Call Note', 'Final Call Notes', 'final_call_notes') || null,
+      joined_status:
+        normJoined(pick('Joining Status', 'joined_status', 'Joining')),
+      joining_note:
+        pick('Final Note', 'Joining Note', 'joining_note') || null,
+      status:
+        (pick('Status', 'status').toLowerCase() === 'complete'
+          ? 'complete'
+          : 'upcoming') as InterviewStatus
+    };
 
   }
 

@@ -47,7 +47,7 @@ function requireAdminOrHR(req, res, next) {
     const user = jwt.verify(token, process.env.JWT_SECRET || 'defaultSecret');
     const role = String(user?.role || '').trim().toLowerCase();
     const dept = String(user?.department || '').trim().toLowerCase();
-    if (role !== 'admin' && dept !== 'hr') {
+    if (role !== 'admin' && dept !== 'hr' && dept !== 'hr coordinator') {
       return res.status(403).json({ message: 'Only Admin and HR can manage HR call options.' });
     }
     next();
