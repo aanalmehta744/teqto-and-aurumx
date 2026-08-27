@@ -202,9 +202,6 @@
               <mat-form-field class="w-full" appearance="outline">
                 <mat-label>Aadhar Card Number</mat-label>
                 <input matInput formControlName="aadharCard" maxlength="12">
-                <mat-error *ngIf="docForm.get('aadharCard')?.hasError('required')">
-                  Aadhar number is required
-                </mat-error>
                 <mat-error *ngIf="docForm.get('aadharCard')?.hasError('pattern')">
                   Please enter a valid 12-digit Aadhar number
                 </mat-error>
