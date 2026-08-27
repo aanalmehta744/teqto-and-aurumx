@@ -4,8 +4,8 @@ export const environment = {
     'https://yoga-agent-qualifying-paper.trycloudflare.com/api',
 
   apiUrl: 
-  // 'http://localhost:5001/api'
-  'https://remained-uses-reporter-blocking.trycloudflare.com/api'
+  'http://localhost:5001/api'
+  // 'https://remained-uses-reporter-blocking.trycloudflare.com/api'
 };
 
 console.log(
