@@ -199,6 +199,15 @@ export class InterviewFormDialogComponent implements OnInit {
     if (!this.model.interview_date?.trim()) {
       this.errors['interview_date'] = 'Interview date is required.';
     }
+    if (!this.model.candidate_email?.trim()) {
+      this.errors['candidate_email'] = 'Email is required.';
+    }
+    if (!this.model.linkedin_link?.trim()) {
+      this.errors['linkedin_link'] = 'LinkedIn is required.';
+    }
+    if (!this.model.resume?.trim()) {
+      this.errors['resume'] = 'Resume is required.';
+    }
 
     return Object.keys(this.errors).length === 0;
   }

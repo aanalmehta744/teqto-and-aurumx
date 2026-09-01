@@ -38,8 +38,9 @@
 
     <!-- EMAIL -->
     <div class="form-field">
-      <label>Email</label>
+      <label>Email <span class="req">*</span></label>
       <input type="email" [(ngModel)]="model.candidate_email" placeholder="Candidate email" />
+      <small class="error" *ngIf="errors['candidate_email']">{{ errors['candidate_email'] }}</small>
     </div>
 
     <!-- INTERVIEW DATE -->
@@ -51,14 +52,16 @@
 
     <!-- LINKEDIN -->
     <div class="form-field">
-      <label>LinkedIn</label>
+      <label>LinkedIn <span class="req">*</span></label>
       <input type="text" [(ngModel)]="model.linkedin_link" placeholder="LinkedIn profile URL" />
+      <small class="error" *ngIf="errors['linkedin_link']">{{ errors['linkedin_link'] }}</small>
     </div>
 
     <!-- RESUME -->
     <div class="form-field">
-      <label>Resume</label>
+      <label>Resume <span class="req">*</span></label>
       <input type="text" [(ngModel)]="model.resume" placeholder="Resume link / URL" />
+      <small class="error" *ngIf="errors['resume']">{{ errors['resume'] }}</small>
     </div>
 
     <!-- STATUS -->
