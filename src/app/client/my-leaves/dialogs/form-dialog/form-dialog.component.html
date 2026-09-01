@@ -21,15 +21,21 @@
           @if (myLeavesForm.get('start_date')?.hasError('required')) {
           <mat-error>Please select date</mat-error>
           }
+          @if (myLeavesForm.get('start_date')?.hasError('matDatepickerMin')) {
+          <mat-error>Past dates are not allowed</mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>To date</mat-label>
-          <input matInput [matDatepicker]="picker3" formControlName="end_date" required [min]="minDate">
+          <input matInput [matDatepicker]="picker3" formControlName="end_date" required [min]="endMinDate">
           <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
           <mat-datepicker #picker3></mat-datepicker>
           @if (myLeavesForm.get('end_date')?.hasError('required')) {
           <mat-error>Please select date</mat-error>
+          }
+          @if (myLeavesForm.get('end_date')?.hasError('matDatepickerMin')) {
+          <mat-error>Past dates are not allowed</mat-error>
           }
         </mat-form-field>
       </div>

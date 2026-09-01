@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { NgScrollbar } from 'ngx-scrollbar';
 import {ChatService,ChatUser,ChatMessage,Conversation,ChatRequest,} from './chat.service';
 import { AuthService } from '@core/service/auth.service';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -66,7 +67,21 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   private socketSub!: Subscription;
   private shouldScroll = false;
 
-  constructor(private chatService: ChatService,private authService: AuthService) {}
+  constructor(private chatService: ChatService,private authService: AuthService,private router: Router) {}
+
+  /** Navigate this tab back to the logged-in user's dashboard (role/department based). */
+  goToDashboard(): void {
+    const user: any = this.authService.currentUserValue;
+    const role = (user?.role || '').toLowerCase().trim();
+    const dept = (user?.department || '').toLowerCase().trim();
+
+    let route = '/employee/dashboard';
+    if (role === 'admin') route = '/admin/dashboard/main';
+    else if (dept === 'bde') route = '/client/dashboard';
+    else if (dept === 'ba') route = '/ba/dashboard';
+
+    this.router.navigate([route]);
+  }
 
   ngOnInit(): void {
     const user = this.authService.getLoggedUser();

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../connection');
 const { createUpload } = require('../cloudinary');
+const { getIO } = require('../socket');
 const upload = createUpload('announcements');
 
 // GET all active announcements (all logged-in users)
@@ -34,6 +35,11 @@ router.post('/', upload.single('image'), async (req, res) => {
        VALUES (?, ?, ?, ?, 1, NOW())`,
       [title || null, text, imagePath, created_by || null]
     );
+    // 🔔 Broadcast the new announcement to everyone in real-time.
+    try {
+      getIO().emit('announcement_created', { id: result.insertId, title: title || null, text });
+    } catch (e) { console.error('announcement_created emit failed:', e.message); }
+
     res.status(201).json({ id: result.insertId, message: 'Announcement created' });
   } catch (err) {
     console.error('Error creating announcement:', err);

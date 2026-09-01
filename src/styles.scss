@@ -28,3 +28,26 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+
+/* Chat notification snackbar */
+.chat-snackbar {
+  --mdc-snackbar-container-color: #070aa7;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #7dd3c0;
+
+  .mdc-snackbar__surface {
+    border-radius: 12px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25) !important;
+    min-width: 320px;
+  }
+
+  .mdc-snackbar__label {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+
+  .mat-mdc-snack-bar-action {
+    font-weight: 600;
+  }
+}

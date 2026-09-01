@@ -20,6 +20,7 @@
     a.status,
     a.break,
     a.pause_start,
+    a.is_paused,
     e.role,
 
     CASE
@@ -33,7 +34,7 @@
           AND l.status = 'Approved'
       ) THEN 'Leave'
 
-      WHEN DAYOFWEEK(a.date) IN (1, 7) THEN 'Paid Holiday'
+      WHEN DAYOFWEEK(a.date) IN (1, 7) THEN 'Weekend'
 
       ELSE a.status
     END AS final_status

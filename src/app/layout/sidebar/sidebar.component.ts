@@ -244,6 +244,7 @@ export class SidebarComponent
   if (item.path === '/employee/my-interviews') {
     return (
       userRole === 'employee' &&
+      userDepartment !== 'hr' &&
       user.employee_level?.toLowerCase().trim() === 'senior'
     );
   }

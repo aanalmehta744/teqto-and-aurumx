@@ -1,0 +1,50 @@
+<div class="bg-white rounded-xl w-full max-w-md mx-auto">
+  <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+    <div class="text-lg font-medium text-[#053C43]">Edit Leave Balance</div>
+    <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div mat-dialog-content class="p-6">
+    <p class="text-sm text-gray-500 mb-4">
+      Employee: <span class="font-medium text-gray-800">{{ data.fullName }}</span>
+    </p>
+
+    <form [formGroup]="form" (ngSubmit)="save()" class="space-y-4">
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Total Leaves</mat-label>
+        <input matInput type="number" min="0" formControlName="total_leave" required />
+        <mat-error *ngIf="form.get('total_leave')?.hasError('required')">Required</mat-error>
+        <mat-error *ngIf="form.get('total_leave')?.hasError('min')">Cannot be negative</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Remaining Leaves</mat-label>
+        <input matInput type="number" min="0" formControlName="leave_balance" required />
+        <mat-error *ngIf="form.get('leave_balance')?.hasError('required')">Required</mat-error>
+        <mat-error *ngIf="form.get('leave_balance')?.hasError('min')">Cannot be negative</mat-error>
+      </mat-form-field>
+
+      <!-- Used auto-updates = Total − Remaining -->
+      <div class="flex items-center justify-between rounded-lg bg-gray-50 border border-gray-200 px-4 py-3">
+        <span class="text-sm font-medium text-gray-600">Used Leaves</span>
+        <span class="text-base font-semibold"
+          [ngClass]="usedLeaves < 0 ? 'text-red-600' : 'text-[#053C43]'">{{ usedLeaves }}</span>
+      </div>
+      <p *ngIf="usedLeaves < 0" class="text-red-600 text-sm">
+        Remaining cannot be greater than Total.
+      </p>
+
+      <div class="flex justify-end gap-3 pt-2">
+        <button mat-raised-button color="primary" type="submit" [disabled]="isLoading || form.invalid || usedLeaves < 0">
+          <mat-spinner *ngIf="isLoading" [diameter]="20" class="mr-2 inline-block align-middle"></mat-spinner>
+          <span *ngIf="!isLoading">Save</span>
+        </button>
+        <button mat-raised-button color="warn" type="button" (click)="dialogRef.close()" [disabled]="isLoading">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -51,7 +51,7 @@
           <mat-select formControlName="role" required>
             <mat-option value="Admin">Admin</mat-option>
             <mat-option value="Employee">Employee</mat-option>
-            <mat-option value="BDE">BDE</mat-option>
+            <!-- <mat-option value="BDE">BDE</mat-option> -->
           </mat-select>
           <mat-error *ngIf="employeesForm.get('role')?.hasError('required')">
             Role is required

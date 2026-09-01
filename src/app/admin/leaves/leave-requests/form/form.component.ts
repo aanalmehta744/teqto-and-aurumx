@@ -99,7 +99,14 @@ export class FormComponent implements OnInit {
   sandwicherror = '';
   holidayWarning = false;
   isLoading: boolean = false;
-  // minDate: Date = new Date();
+  minDate: Date = new Date();
+
+  /** To-date cannot be earlier than the selected From-date (prevents reverse ranges),
+   *  and never earlier than today. Returns the raw control value so the date adapter
+   *  (Moment) compares natively; falls back to today when no From-date is chosen yet. */
+  get endMinDate(): any {
+    return this.leavesForm?.get('start_date')?.value || this.minDate;
+  }
 
   isSandwichLeave = false;
   isBdeOrBa = false;
@@ -192,8 +199,8 @@ export class FormComponent implements OnInit {
       leaveTypeControl?.setErrors(null);
       leaveTypeControl?.updateValueAndValidity({ onlySelf: true, emitEvent: false });
 
-      // ✅ HALF DAY VALIDATION
-      if (halfDay && start_date && end_date) {
+      // ✅ HALF DAY VALIDATION — only "Half Day" is restricted to a single day
+      if (halfDay === 'Half Day' && start_date && end_date) {
         const start = new Date(start_date);
         const end = new Date(end_date);
         if (start.toDateString() !== end.toDateString()) {

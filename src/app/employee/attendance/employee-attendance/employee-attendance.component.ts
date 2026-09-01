@@ -332,7 +332,7 @@ export class EmployeeAttendanceComponent extends UnsubscribeOnDestroyAdapter
 
 
   refresh() {
-    this.paginator._changePageSize(this.paginator.pageSize);
+    this.loadData();
   }
 
   isAllSelected() {

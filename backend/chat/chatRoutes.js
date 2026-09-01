@@ -141,6 +141,13 @@ router.post("/request", async (req, res) => {
       return res.status(400).json({error: "Valid sender_id and receiver_id are required"});
     }
 
+    // Sender's name for a friendlier notification on the receiver's side.
+    const [senderRows] = await db.query(
+      "SELECT fullName FROM employees WHERE id = ? LIMIT 1",
+      [sender_id]
+    );
+    const sender_name = senderRows[0]?.fullName || "Someone";
+
     const [existingConvo] = await db.query(
       "SELECT c.id " +
       "FROM conversations c " +
@@ -178,7 +185,7 @@ router.post("/request", async (req, res) => {
       );
 
       const io = getIO();
-      io.to(`user_${receiver_id}`).emit("chat_request_received", {id: existing.id,sender_id,receiver_id});
+      io.to(`user_${receiver_id}`).emit("chat_request_received", {id: existing.id,sender_id,receiver_id,sender_name});
       return res.status(201).json({status: "pending", requestId: existing.id});
     }
 
@@ -188,7 +195,7 @@ router.post("/request", async (req, res) => {
     );
 
     const io = getIO();
-    io.to(`user_${receiver_id}`).emit("chat_request_received", {id: result.insertId,sender_id,receiver_id});
+    io.to(`user_${receiver_id}`).emit("chat_request_received", {id: result.insertId,sender_id,receiver_id,sender_name});
     res.status(201).json({status: "pending",requestId: result.insertId});
 
   } 
@@ -381,11 +388,21 @@ router.post("/message", (req, res, next) => {
     const createdAt = new Date();
     const io = getIO();
 
+    // Sender's name/avatar for the message payload (used by chat UI and notifications).
+    const [senderRows] = await db.query(
+      "SELECT fullName, uploadImg FROM employees WHERE id = ? LIMIT 1",
+      [sender_id]
+    );
+    const sender_name = senderRows[0]?.fullName || "Someone";
+    const sender_avatar = senderRows[0]?.uploadImg || null;
+
     io.to(`conversation_${conversation_id}`)
     .emit("receive_message", {
       id: result.insertId,
       conversation_id,
       sender_id,
+      sender_name,
+      sender_avatar,
       message: trimmedMessage,
       attachment_url: attachmentUrl,
       attachment_type: attachmentType,

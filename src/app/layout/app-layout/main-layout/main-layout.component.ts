@@ -8,6 +8,9 @@ import { RightSidebarComponent } from '../../right-sidebar/right-sidebar.compone
 import { SidebarComponent } from '../../sidebar/sidebar.component';
 import { HeaderComponent } from '../../header/header.component';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { AuthService } from '@core';
+import { ChatService } from '../../../apps/chat/chat.service';
 
 @Component({
   selector: 'app-main-layout',
@@ -21,7 +24,8 @@ import { UnsubscribeOnDestroyAdapter } from '@shared';
     BidiModule,
     RouterOutlet,
     NgClass,
-    NgIf
+    NgIf,
+    MatSnackBarModule
   ],
   providers: [RightSidebarService]
 })
@@ -80,6 +84,95 @@ export class MainLayoutComponent
     window.addEventListener('resize', () => {
       this.isMobile = window.innerWidth < 1024;
     });
+
+    this.initChatNotifications();
+  }
+
+  /** Global chat notifications (shown on the dashboard, even while the chat tab is closed). */
+  private initChatNotifications(): void {
+    const user = this.authService.currentUserValue;
+    const currentUserId = user?.id;
+    if (!currentUserId) return;
+
+    // Ask for OS-level (web push) notification permission once.
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission().catch(() => {});
+    }
+
+    // Register this socket so the server can route chat-request / message events here.
+    this.chatService.identify(currentUserId);
+
+    // Notify when someone sends a chat request.
+    this.subs.sink = this.chatService.onChatRequestReceived().subscribe((req: any) => {
+      const name = req?.sender_name || 'Someone';
+      this.notify('New chat request', `${name} sent you a chat request`, true);
+    });
+
+    // Notify when a new message arrives (skip messages you sent yourself).
+    this.subs.sink = this.chatService.onMessage().subscribe((msg) => {
+      if (!msg || msg.sender_id === currentUserId) return;
+      const preview = (msg.message || '').trim();
+      const shortPreview = preview.length > 60 ? preview.slice(0, 60) + '…' : preview;
+      this.notify(`New message from ${msg.sender_name || 'Someone'}`, shortPreview || 'Sent an attachment', true);
+    });
+
+    const role = (user?.role || '').toLowerCase().trim();
+    const dept = ((user as any)?.department || '').toLowerCase().trim();
+    const isHrOrAdmin = role === 'admin' || dept === 'hr';
+
+    // Leave request submitted → notify HR/Admin only.
+    this.subs.sink = this.chatService.onLeaveRequestCreated().subscribe((d: any) => {
+      if (!isHrOrAdmin) return;
+      if (d?.employee_id === currentUserId) return;
+      this.notify('New leave request', `${d?.employee_name || 'An employee'} applied for ${d?.leave_type || ''} leave`.trim(), false);
+    });
+
+    // The user's own leave was approved/rejected → notify that user (server targets them).
+    this.subs.sink = this.chatService.onLeaveStatusChanged().subscribe((d: any) => {
+      const status = d?.status || 'updated';
+      this.notify('Leave request ' + status, `Your ${d?.leave_type || ''} leave request was ${String(status).toLowerCase()}`.replace('  ', ' ').trim(), false);
+    });
+
+    // New announcement → notify everyone.
+    this.subs.sink = this.chatService.onAnnouncementCreated().subscribe((d: any) => {
+      const preview = (d?.text || '').trim();
+      const shortPreview = preview.length > 80 ? preview.slice(0, 80) + '…' : preview;
+      this.notify(d?.title ? `Announcement: ${d.title}` : 'New announcement', shortPreview, false);
+    });
+  }
+
+  /**
+   * Show an OS-level web notification when the dashboard tab is not focused
+   * (user on another tab or app); fall back to an in-app snackbar when it is.
+   * `isChat` decides whether an "Open Chat" action/click is offered (only for chat).
+   */
+  private notify(title: string, body: string, isChat = false): void {
+    const isVisible = this.document.visibilityState === 'visible' && this.document.hasFocus();
+
+    if (!isVisible && 'Notification' in window && Notification.permission === 'granted') {
+      const n = new Notification(title, {
+        body,
+        icon: 'favicon.ico',
+        tag: isChat ? 'team-chat' : 'portal-notice',
+        renotify: true,
+      } as any);
+      n.onclick = () => {
+        window.focus();
+        if (isChat) window.open('/chat-window', 'chatWindow');
+        n.close();
+      };
+      return;
+    }
+
+    // Tab is focused (or notifications not permitted) → in-app snackbar.
+    // Only chat notifications get the "Open Chat" action button.
+    const ref = this.snackBar.open(body ? `${title} — ${body}` : title, isChat ? 'Open Chat' : '', {
+      duration: 6000,
+      horizontalPosition: 'right',
+      verticalPosition: 'top',
+      panelClass: 'chat-snackbar',
+    });
+    if (isChat) ref.onAction().subscribe(() => window.open('/chat-window', 'chatWindow'));
   }
 
 
@@ -88,7 +181,10 @@ export class MainLayoutComponent
     private configService: ConfigService,
     private router: Router,
     @Inject(DOCUMENT) private document: Document,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private snackBar: MatSnackBar,
+    private authService: AuthService,
+    private chatService: ChatService
   ) {
     super();
     this.config = this.configService.configData;

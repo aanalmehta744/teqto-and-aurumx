@@ -22,6 +22,7 @@ import { EmployeeAttendanceComponent } from '../admin/attendance/employee-attend
 import { LeaveRequestsComponent } from '../admin/leaves/leave-requests/leave-requests.component';
 import { AllInterviewsComponent } from '../admin/interviews/all-interviews/all-interviews.component';
 import { MyInterviewsComponent } from './my-interviews/my-interviews.component';
+import { LeaveBalanceComponent as EmployeesLeaveBalanceComponent } from '../admin/leaves/leave-balance/leave-balance.component';
 export const EMPLOYEE_ROUTE: Route[] = [
   {
     path: 'dashboard',
@@ -59,6 +60,11 @@ export const EMPLOYEE_ROUTE: Route[] = [
   {
     path: 'hr-leaves/leave-requests',
     component: LeaveRequestsComponent,
+  },
+  {
+    // All-employees leave balance (editable) — HR management view.
+    path: 'hr-leaves/employee-leave-balance',
+    component: EmployeesLeaveBalanceComponent,
   },
   {
     path: 'hr-interviews',

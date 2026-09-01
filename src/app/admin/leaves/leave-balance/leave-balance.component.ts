@@ -18,6 +18,10 @@ import { NgClass } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { EditBalanceDialogComponent } from './edit-balance-dialog/edit-balance-dialog.component';
+import { LeaveHistoryDialogComponent } from './leave-history-dialog/leave-history-dialog.component';
 
 @Component({
   selector: 'app-leave-balance',
@@ -32,7 +36,9 @@ import { MatIconModule } from '@angular/material/icon';
     MatRippleModule,
     MatProgressSpinnerModule,
     MatPaginatorModule,
-    MatIconModule
+    MatIconModule,
+    MatButtonModule,
+    MatTooltipModule
   ],
 })
 export class LeaveBalanceComponent
@@ -42,10 +48,9 @@ export class LeaveBalanceComponent
   displayedColumns = [
     'name',
     'total',
-    // 'used',
-    'current_balance',
-    'used_balance',
-    'remaining_paid_leave'
+    'used',
+    'remaining',
+    'actions'
   ];
 
   exampleDatabase?: LeaveBalanceService;
@@ -78,6 +83,36 @@ export class LeaveBalanceComponent
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
     this.dataSource.filter = filterValue;
+  }
+
+  editCall(row: any) {
+    const dialogRef = this.dialog.open(EditBalanceDialogComponent, {
+      width: '440px',
+      maxWidth: '95vw',
+      data: {
+        employee_id: row.employee_id,
+        fullName: row.fullName,
+        total_leave: Number(row.total),      // Total allotted
+        leave_balance: Number(row.remaining), // Remaining (used = total - remaining)
+      },
+    });
+    this.subs.sink = dialogRef.afterClosed().subscribe((updated) => {
+      if (updated) {
+        // Re-fetch balances so Used/Remaining reflect the new values.
+        this.leavesService.getAllLeavess();
+      }
+    });
+  }
+
+  viewLeaves(row: any) {
+    this.dialog.open(LeaveHistoryDialogComponent, {
+      width: '640px',
+      maxWidth: '95vw',
+      data: {
+        employee_id: row.employee_id,
+        fullName: row.fullName,
+      },
+    });
   }
 
   public loadData() {

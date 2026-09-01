@@ -1,0 +1,60 @@
+<div class="bg-white rounded-xl w-full max-w-2xl mx-auto">
+  <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+    <div>
+      <div class="text-lg font-medium text-[#053C43]">Leaves Taken</div>
+      <div class="text-sm text-gray-500">{{ data.fullName }}</div>
+    </div>
+    <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div mat-dialog-content class="p-6">
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="py-8 text-center">
+      <mat-spinner [diameter]="32" class="mx-auto"></mat-spinner>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!isLoading && error" class="py-6 text-center text-red-600 text-sm">
+      {{ error }}
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!isLoading && !error && leaves.length === 0"
+      class="py-8 text-center text-gray-400 text-sm">
+      No leaves taken yet.
+    </div>
+
+    <!-- List -->
+    <div *ngIf="!isLoading && !error && leaves.length > 0" class="overflow-auto">
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="text-left text-gray-500 border-b border-gray-100">
+            <th class="py-2 pr-4 font-medium">From</th>
+            <th class="py-2 pr-4 font-medium">To</th>
+            <th class="py-2 pr-4 font-medium">Type</th>
+            <th class="py-2 pr-4 font-medium">Days</th>
+            <th class="py-2 pr-4 font-medium">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let l of leaves" class="border-b border-gray-50">
+            <td class="py-2 pr-4">{{ l.start_date | date: 'MMM d, y' }}</td>
+            <td class="py-2 pr-4">{{ l.end_date | date: 'MMM d, y' }}</td>
+            <td class="py-2 pr-4">{{ l.leave_type }}</td>
+            <td class="py-2 pr-4">{{ l.no_of_days }}</td>
+            <td class="py-2 pr-4">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-medium"
+                [ngClass]="{
+                  'bg-green-100 text-green-700': l.status === 'Approved',
+                  'bg-yellow-100 text-yellow-700': l.status === 'Pending',
+                  'bg-red-100 text-red-700': l.status === 'Rejected'
+                }">{{ l.status }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

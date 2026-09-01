@@ -29,11 +29,14 @@
           </mat-form-field>
           <mat-form-field class="w-full" appearance="outline">
             <mat-label>Leave From</mat-label>
-            <input matInput [matDatepicker]="picker2" formControlName="start_date" required />
+            <input matInput [matDatepicker]="picker2" formControlName="start_date" required [min]="minDate" />
             <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
             <mat-datepicker #picker2></mat-datepicker>
             <mat-error *ngIf="leavesForm.get('start_date')?.hasError('required')">
               Please select a start date
+            </mat-error>
+            <mat-error *ngIf="leavesForm.get('start_date')?.hasError('matDatepickerMin')">
+              Past dates are not allowed
             </mat-error>
           </mat-form-field>
         </div>
@@ -44,11 +47,14 @@
 
           <mat-form-field class="w-full" appearance="outline">
             <mat-label>Leave To</mat-label>
-            <input matInput [matDatepicker]="picker" formControlName="end_date" required />
+            <input matInput [matDatepicker]="picker" formControlName="end_date" required [min]="endMinDate" />
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
             <mat-error *ngIf="leavesForm.get('end_date')?.hasError('required')">
               Please select an end date
+            </mat-error>
+            <mat-error *ngIf="leavesForm.get('end_date')?.hasError('matDatepickerMin')">
+              Past dates are not allowed
             </mat-error>
           </mat-form-field>
           <mat-form-field class="w-full" appearance="outline">

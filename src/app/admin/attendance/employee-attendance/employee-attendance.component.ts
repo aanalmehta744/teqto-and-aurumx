@@ -43,6 +43,7 @@ export interface EmployeeAttendance {
   status: string; // Present, Absent, On Leave
   role?: string;
   pause_history?: any[];
+  is_paused?: number; // 1 = currently on break, 0 = active/resumed
 }
 
 @Component({
@@ -174,6 +175,7 @@ openPauseHistory(row: EmployeeAttendance) {
         status: item.status,
         final_status: item.final_status,
         break: item.break,
+        is_paused: item.is_paused,
         role: item.role,
         termination_date: item.termination_date // 👈 important
       }));
@@ -307,7 +309,7 @@ openPauseHistory(row: EmployeeAttendance) {
 
 
   refresh() {
-    this.paginator._changePageSize(this.paginator.pageSize);
+    this.loadData();
   }
 
   isAllSelected() {

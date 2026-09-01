@@ -72,13 +72,19 @@
           <ng-container matColumnDef="status">
             <mat-header-cell *matHeaderCellDef mat-sort-header>Status</mat-header-cell>
             <mat-cell *matCellDef="let row">
-              <span *ngIf="row.status === 'Present'" class="bg-green-100 text-green-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
-              <span *ngIf="row.status === 'Absent'" class="bg-red-100 text-red-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
-              <span *ngIf="row.status === 'Half Day'" class="bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
-              <span *ngIf="row.status === 'Leave'" class="bg-yellow-100 text-yellow-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
-              <span *ngIf="row.final_status === 'Leave'" class="bg-yellow-100 text-yellow-700 px-2.5 py-0.5 ml-1 rounded-full text-xs font-medium">{{ row.final_status }}</span>
-              <span *ngIf="row.status !== 'Present' && row.status !== 'Absent' && row.status !== 'Leave' && row.status !== 'Half Day'"
-                class="bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
+              <span *ngIf="row.is_paused" class="bg-purple-100 text-purple-700 px-2.5 py-0.5 rounded-full text-xs font-medium">On Break</span>
+              <ng-container *ngIf="!row.is_paused">
+                <span *ngIf="row.final_status === 'Weekend'" class="bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full text-xs font-medium">Weekend</span>
+                <ng-container *ngIf="row.final_status !== 'Weekend'">
+                  <span *ngIf="row.status === 'Present'" class="bg-green-100 text-green-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
+                  <span *ngIf="row.status === 'Absent'" class="bg-red-100 text-red-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
+                  <span *ngIf="row.status === 'Half Day'" class="bg-orange-100 text-orange-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
+                  <span *ngIf="row.status === 'Leave'" class="bg-yellow-100 text-yellow-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
+                  <span *ngIf="row.final_status === 'Leave'" class="bg-yellow-100 text-yellow-700 px-2.5 py-0.5 ml-1 rounded-full text-xs font-medium">{{ row.final_status }}</span>
+                  <span *ngIf="row.status !== 'Present' && row.status !== 'Absent' && row.status !== 'Leave' && row.status !== 'Half Day' && row.status !== 'Weekend'"
+                    class="bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
+                </ng-container>
+              </ng-container>
             </mat-cell>
           </ng-container>
 

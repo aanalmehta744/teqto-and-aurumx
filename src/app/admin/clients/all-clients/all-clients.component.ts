@@ -105,7 +105,7 @@ export class AllclientComponent extends UnsubscribeOnDestroyAdapter implements O
     this.setView(false); // Load All Clients by default
   }
   refresh() {
-
+    this.loadData();
   }
   setView(group: boolean): void {
     this.groupByBDE = group;

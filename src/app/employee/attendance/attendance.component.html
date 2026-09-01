@@ -159,40 +159,47 @@
                 Status
               </mat-header-cell>
               <mat-cell *matCellDef="let row" class="px-4 py-2 flex flex-wrap gap-2">
-                <!-- Present -->
-                <span *ngIf="row.final_status === 'Present'"
-                  class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-                  {{ row.final_status }}
+                <!-- On Break (currently paused) -->
+                <span *ngIf="row.is_paused"
+                  class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
+                  On Break
                 </span>
+                <ng-container *ngIf="!row.is_paused">
+                  <!-- Present -->
+                  <span *ngIf="row.final_status === 'Present'"
+                    class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                    {{ row.final_status }}
+                  </span>
 
-                <!-- Absent -->
-                <span *ngIf="row.final_status === 'Absent'"
-                  class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
-                  {{ row.final_status }}
-                </span>
-                <!-- Half Day -->
-                <span *ngIf="row.status === 'Half Day'"
-                  class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap">
-                  {{ row.final_status }}
-                </span>
-                <!-- Leave -->
-                <!-- <span *ngIf="row.final_status === 'Leave'"
-                  class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
-                  {{ row.final_status }}
-                </span> -->
+                  <!-- Absent -->
+                  <span *ngIf="row.final_status === 'Absent'"
+                    class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
+                    {{ row.final_status }}
+                  </span>
+                  <!-- Half Day -->
+                  <span *ngIf="row.status === 'Half Day'"
+                    class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap">
+                    {{ row.final_status }}
+                  </span>
+                  <!-- Leave -->
+                  <!-- <span *ngIf="row.final_status === 'Leave'"
+                    class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                    {{ row.final_status }}
+                  </span> -->
 
-                <!-- Leave label -->
-                <span *ngIf="row.leave_status"
-                  class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
-                  {{ row.leave_status }}
-                </span>
+                  <!-- Leave label -->
+                  <span *ngIf="row.leave_status"
+                    class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                    {{ row.leave_status }}
+                  </span>
 
-                <!-- Fallback for any other status -->
-                <span
-                  *ngIf="row.final_status !== 'Present' && row.final_status !== 'Absent' && row.final_status !== 'Leave' && row.final_status !== 'Half Day'"
-                  class=" bg-blue-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
-                  {{ row.final_status }}
-                </span>
+                  <!-- Fallback for any other status -->
+                  <span
+                    *ngIf="row.final_status !== 'Present' && row.final_status !== 'Absent' && row.final_status !== 'Leave' && row.final_status !== 'Half Day'"
+                    class=" bg-blue-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+                    {{ row.final_status }}
+                  </span>
+                </ng-container>
               </mat-cell>
             </ng-container>
 

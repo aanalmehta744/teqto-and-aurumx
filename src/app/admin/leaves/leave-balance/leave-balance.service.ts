@@ -41,4 +41,15 @@ export class LeaveBalanceService extends UnsubscribeOnDestroyAdapter {
         },
       });
   }
+
+  /** Admin/HR: update an employee's leave balance and/or total leave. */
+  updateLeaveBalance(
+    employeeId: number,
+    payload: { leave_balance?: number; total_leave?: number }
+  ) {
+    return this.httpClient.put(
+      `${this.API_URL}/leave-balance/${employeeId}`,
+      payload
+    );
+  }
 }

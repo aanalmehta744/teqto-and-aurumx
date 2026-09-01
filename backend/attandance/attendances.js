@@ -118,6 +118,7 @@ router.get('/employee-attendance', async (req, res) => {
         a.hours,
         a.break,
         a.status,
+        a.is_paused,
         e.role,
         e.termination_date,
         e.fullName AS employee_name,
@@ -172,7 +173,7 @@ router.get('/employee-attendance', async (req, res) => {
           THEN 'Leave'
 
           -- Saturday/Sunday → Paid Holiday
-          WHEN DAYOFWEEK(a.date) IN (1, 7) THEN 'Paid Holiday'
+          WHEN DAYOFWEEK(a.date) IN (1, 7) THEN 'Weekend'
 
           -- Default → whatever is stored (Absent, etc.)
           ELSE a.status
@@ -464,7 +465,7 @@ router.get('/:employeeId', async (req, res) => {
     //           ) THEN 'Leave'
 
     //           -- If Saturday (7) or Sunday (1) → Paid Holiday
-    //           WHEN DAYOFWEEK(a.date) IN (1, 7) THEN 'Paid Holiday'
+    //           WHEN DAYOFWEEK(a.date) IN (1, 7) THEN 'Weekend'
 
     //           ELSE a.status
     //         END AS final_status
@@ -511,7 +512,7 @@ router.get('/:employeeId', async (req, res) => {
         WHEN a.status = 'Present' THEN 'Present'
 
         -- If Saturday or Sunday → Paid Holiday
-        WHEN DAYOFWEEK(a.date) IN (1, 7) THEN 'Paid Holiday'
+        WHEN DAYOFWEEK(a.date) IN (1, 7) THEN 'Weekend'
 
         ELSE a.status
       END AS final_status

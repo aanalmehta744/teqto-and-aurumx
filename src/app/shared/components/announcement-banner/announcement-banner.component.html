@@ -19,13 +19,13 @@
       <div class="space-y-3">
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1">Title <span class="text-gray-400">(optional)</span></label>
-          <input type="text" [(ngModel)]="newTitle" placeholder="e.g. Office Closed on Monday"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+          <input type="text" [(ngModel)]="newTitle" placeholder="e.g. Hello Team, New Policy Update"
+            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-black focus:outline-none focus:ring-2 focus:ring-indigo-300" />
         </div>
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1">Message <span class="text-red-400">*</span></label>
           <textarea [(ngModel)]="newText" rows="5" placeholder="Write your announcement here..."
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300"></textarea>
+            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300 text-black"></textarea>
         </div>
       </div>
       <!-- Right: image upload -->
@@ -74,8 +74,8 @@
             <mat-icon class="!text-base">delete_outline</mat-icon>
           </button>
         </div>
-        <h4 *ngIf="ann.title" class="text-gray-800 font-semibold text-base mb-1">{{ ann.title }}</h4>
-        <p class="text-gray-600 text-sm leading-relaxed whitespace-pre-line">{{ ann.text }}</p>
+        <h4 *ngIf="ann.title" class="text-black font-semibold text-base mb-1">{{ ann.title }}</h4>
+        <p class="text-black text-sm leading-relaxed whitespace-pre-line">{{ ann.text }}</p>
         <p class="text-xs text-gray-300 mt-3">
           Posted by {{ ann.created_by_name || 'Admin' }} &nbsp;·&nbsp;
           {{ ann.created_at | date:'dd MMM yyyy, h:mm a' }}

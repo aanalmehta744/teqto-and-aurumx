@@ -56,6 +56,7 @@ export class Today {
   shift: string;
   role: string;
   pause_start?: string;
+  is_paused?: number; // 1 = currently on break, 0 = active/resumed
   pause_history: PauseHistory[];
 
   constructor(today: Today) {

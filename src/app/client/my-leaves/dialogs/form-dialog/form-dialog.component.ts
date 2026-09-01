@@ -91,6 +91,13 @@ export class FormDialogComponent implements OnInit {
   holidayWarning = false;
   isLoading: boolean = false;
   minDate: Date = new Date();
+
+  /** To-date cannot be earlier than the selected From-date (prevents reverse ranges),
+   *  and never earlier than today. Returns the raw control value so the date adapter
+   *  (Moment) compares natively; falls back to today when no From-date is chosen yet. */
+  get endMinDate(): any {
+    return this.myLeavesForm?.get('start_date')?.value || this.minDate;
+  }
   halfdayError = '';
   leaveOverlapError = '';
   leaveError = '';
@@ -226,25 +233,7 @@ export class FormDialogComponent implements OnInit {
     const start_date = form.get('start_date')?.value;
     const end_date = form.get('end_date')?.value;
     const halfDay = form.get('halfDay')?.value;
-    console.log('halfDay value:', form.get('halfDay')?.value);
-    this.myLeavesForm.valueChanges.subscribe(formValue => {
-      const { leave_type, start_date, end_date, halfDay } = formValue;
-      // ✅ HALF DAY VALIDATION — only restrict single-day when "Half Day" is specifically selected
-      if (halfDay === 'Half Day' && start_date && end_date) {
-        const start = new Date(start_date);
-        const end = new Date(end_date);
-        if (start.toDateString() !== end.toDateString()) {
-          this.halfdayError = "Half Day leave can only be for a single day.";
-          this.isSubmitDisabled = true;
-        } else {
-          this.halfdayError = '';
-          this.isSubmitDisabled = false;
-        }
-      } else {
-        this.halfdayError = '';
-        // this.isSubmitDisabled = false;
-      }
-    });
+    // (Half Day single-day validation is applied below, after the error reset.)
 
     // Reset errors/warnings
     this.paidLeaveError = '';
@@ -261,6 +250,12 @@ export class FormDialogComponent implements OnInit {
     const end = new Date(end_date);
     start.setHours(0, 0, 0, 0);
     end.setHours(0, 0, 0, 0);
+
+    // 🔹 Half Day must be a single day; Full Day may span multiple days
+    if (halfDay === 'Half Day' && start.toDateString() !== end.toDateString()) {
+      this.halfdayError = 'Half Day leave can only be for a single day.';
+      this.isSubmitDisabled = true;
+    }
 
 
 

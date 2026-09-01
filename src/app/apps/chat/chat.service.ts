@@ -345,5 +345,29 @@ onChatRequestRejected(): Observable<any> {
   }
 
 
+  /** A new leave request was submitted (broadcast; filter for HR/Admin on the client). */
+  onLeaveRequestCreated(): Observable<any> {
+    return new Observable((observer) => {
+      this.socket.on('leave_request_created', (d) => observer.next(d));
+      return () => this.socket.off('leave_request_created');
+    });
+  }
+
+  /** The logged-in user's leave was Approved/Rejected. */
+  onLeaveStatusChanged(): Observable<any> {
+    return new Observable((observer) => {
+      this.socket.on('leave_status_changed', (d) => observer.next(d));
+      return () => this.socket.off('leave_status_changed');
+    });
+  }
+
+  /** A new announcement was posted (broadcast to everyone). */
+  onAnnouncementCreated(): Observable<any> {
+    return new Observable((observer) => {
+      this.socket.on('announcement_created', (d) => observer.next(d));
+      return () => this.socket.off('announcement_created');
+    });
+  }
+
   ngOnDestroy(): void {this.socket.disconnect();}
 }

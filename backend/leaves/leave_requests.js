@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../connection'); // Assume a database connection file
 const { sendLeaveNotification } = require('./emailService');
+const { getIO } = require('../socket');
 
 // 1. Submit Leave Request
 router.post('/', async (req, res) => {
@@ -73,10 +74,24 @@ const formattedEndDate = formatMySQL(endDate);
             `;
             await db.query(updateBalanceQuery, [numberOfDays, employee_id]);
         }
-        // ✅ Send notification
-        await sendLeaveNotification(employee_id, leave_type, formattedStartDate, formattedEndDate, numberOfDays, reason, status);
+        // 🔔 Notify HR/Admin (real-time) that a new leave request was submitted.
+        try {
+            const [empRows] = await db.query('SELECT fullName FROM employees WHERE id = ? LIMIT 1', [employee_id]);
+            getIO().emit('leave_request_created', {
+                employee_id,
+                employee_name: empRows[0]?.fullName || 'An employee',
+                leave_type,
+                start_date: formattedStartDate,
+                end_date: formattedEndDate,
+            });
+        } catch (e) { console.error('leave_request_created emit failed:', e.message); }
 
+        // Respond immediately — don't make the user wait on the email.
         res.status(201).json({ message: 'Leave request submitted', requestId: result.insertId });
+
+        // ✅ Send the email notification in the background (non-blocking).
+        sendLeaveNotification(employee_id, leave_type, formattedStartDate, formattedEndDate, numberOfDays, reason, status)
+            .catch((e) => console.error('sendLeaveNotification failed:', e.message));
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -98,60 +113,63 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/leave-balance', async (req, res) => {
+    // Clean, self-consistent model:
+    //   total     = total_leave (allotted)
+    //   remaining = leave_balance (decrements as leaves are used)
+    //   used      = total - remaining
     const query = `
-        SELECT 
+        SELECT
             e.id AS employee_id,
             e.fullName,
             e.role,
             e.total_leave AS total,
-            e.leave_balance AS used,
-
-            -- Used Paid Leave (current year only)
-        IFNULL(SUM(CASE 
-            WHEN r.leave_type = 'Paid' 
-            AND r.status = 'Approved'
-            AND YEAR(r.start_date) = YEAR(CURDATE())
-            THEN r.no_of_days
-            ELSE 0
-        END), 0) AS used_balance,
-
-        -- Current Balance = leave_balance + used approved leaves (current year)
-        (
-        e.leave_balance + IFNULL(SUM(CASE 
-            WHEN r.status = 'Approved'
-            AND YEAR(r.start_date) = YEAR(CURDATE())
-            THEN r.no_of_days
-            ELSE 0
-        END), 0)
-        ) AS current_balance,
-
-        -- Remaining Paid Leave (current year only)
-        (
-        (e.leave_balance + IFNULL(SUM(CASE 
-            WHEN r.status = 'Approved'
-            AND YEAR(r.start_date) = YEAR(CURDATE())
-            THEN r.no_of_days
-            ELSE 0
-        END), 0))
-        -
-        IFNULL(SUM(CASE 
-            WHEN r.leave_type = 'Paid'
-            AND r.status = 'Approved'
-            AND YEAR(r.start_date) = YEAR(CURDATE())
-            THEN r.no_of_days
-            ELSE 0
-        END), 0)
-        ) AS remaining_paid_leave
-
+            (e.total_leave - e.leave_balance) AS used,
+            e.leave_balance AS remaining
         FROM employees e
-        LEFT JOIN leave_requests r ON e.id = r.employee_id
-        GROUP BY e.id, e.fullName, e.role, e.total_leave, e.leave_balance
         ORDER BY e.fullName ASC;
     `;
 
     try {
         const [rows] = await db.query(query);
         res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Update an employee's leave balance / total leave (Admin & HR).
+router.put('/leave-balance/:id', async (req, res) => {
+    const employeeId = parseInt(req.params.id, 10);
+    const { leave_balance, total_leave } = req.body;
+
+    if (isNaN(employeeId)) {
+        return res.status(400).json({ error: 'Invalid employee id' });
+    }
+
+    const fields = [];
+    const values = [];
+    if (leave_balance !== undefined && leave_balance !== null && leave_balance !== '') {
+        fields.push('leave_balance = ?');
+        values.push(Number(leave_balance));
+    }
+    if (total_leave !== undefined && total_leave !== null && total_leave !== '') {
+        fields.push('total_leave = ?');
+        values.push(Number(total_leave));
+    }
+    if (!fields.length) {
+        return res.status(400).json({ error: 'Nothing to update' });
+    }
+    values.push(employeeId);
+
+    try {
+        const [result] = await db.query(
+            `UPDATE employees SET ${fields.join(', ')} WHERE id = ?`,
+            values
+        );
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Employee not found' });
+        }
+        res.json({ success: true, message: 'Leave balance updated successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -602,6 +620,19 @@ router.put('/:id', async (req, res) => {
         }
 
         console.log("UPDATE SUCCESS");
+
+        // 🔔 Notify the employee in real-time when their leave is Approved/Rejected.
+        try {
+            const normalized = String(status || '').trim().toLowerCase();
+            if (employee_id && (normalized === 'approved' || normalized === 'rejected')) {
+                getIO().to(`user_${employee_id}`).emit('leave_status_changed', {
+                    status,
+                    leave_type,
+                    start_date,
+                    end_date,
+                });
+            }
+        } catch (e) { console.error('leave_status_changed emit failed:', e.message); }
 
         return res.status(200).json({
             success: true,

@@ -6,6 +6,7 @@ export class LeaveBalance {
   current: string;
   total: string;
   used: string;
+  remaining?: string;
   accepted: string;
   rejected: string;
   expired: string;
