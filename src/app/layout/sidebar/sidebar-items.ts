@@ -1539,7 +1539,7 @@ export const ROUTES: RouteInfo[] = [
     badge: '',
     badgeClass: '',
     role: ['Admin', 'Employee'],
-    department: ['HR', 'BDE', 'BA', 'Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
+    department: ['HR', 'HR Coordinator', 'BDE', 'BA', 'Backend Developer', 'Frontend Developer', 'Fullstack Developer', 'Graphic'],
     submenu: [],
     newTab: true,
   },
