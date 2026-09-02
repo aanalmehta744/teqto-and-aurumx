@@ -13,9 +13,11 @@ export class TaskService {
 
   constructor(private http: HttpClient) {}
 
-  // Get all tasks
+  // Get all tasks (scoped on the backend by the viewer's role/department)
   getTasks(): Observable<Task[]> {
-    return this.http.get<Task[]>(this.API_URL);
+    const viewerId = JSON.parse(localStorage.getItem('currentUser') || 'null')?.id;
+    const url = viewerId ? `${this.API_URL}?viewerId=${viewerId}` : this.API_URL;
+    return this.http.get<Task[]>(url);
   }
 
   // Get a single task by ID

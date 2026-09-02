@@ -69,32 +69,50 @@ async function validateAssignment(assignedBy, employeeId) {
 router.get('/', async (req, res) => {
   try {
     const viewerId = req.query.viewerId;
-    let where = '';
+    const conditions = [];
     const params = [];
 
     if (viewerId) {
       const [[viewer]] = await db.query(
-        'SELECT department, employee_level FROM employees WHERE id = ?',
+        'SELECT role, department, employee_level FROM employees WHERE id = ?',
         [viewerId]
       );
+      const vRole = String(viewer?.role || '').trim().toLowerCase();
       const vDept = String(viewer?.department || '').trim().toLowerCase();
       const vLevel = String(viewer?.employee_level || '').trim().toLowerCase();
 
       if (vDept === 'bde') {
-        where = `
-          WHERE tasks.project_id IN (
+        conditions.push(`tasks.project_id IN (
             SELECT p2.id
             FROM projects p2
             JOIN clients c2 ON p2.client = c2.id
             WHERE c2.employee_id = ?
-          )`;
+          )`);
         params.push(viewerId);
       } else if (vDept === 'ba' && vLevel === 'intern') {
         // BA Intern → only tasks they created or that are assigned to them.
-        where = ` WHERE (tasks.assigned_by = ? OR tasks.employee_id = ?)`;
+        conditions.push(`(tasks.assigned_by = ? OR tasks.employee_id = ?)`);
+        params.push(viewerId, viewerId);
+      } else if (vRole === 'employee' && vLevel === 'senior') {
+        // Senior employee → only tasks assigned TO him or assigned BY him
+        // (to his juniors/interns). Not tasks HR/admin gave to others.
+        conditions.push(`(tasks.employee_id = ? OR tasks.assigned_by = ?)`);
+        params.push(viewerId, viewerId);
+      }
+
+      // A task assigned by an Admin or HR is private: visible ONLY to the
+      // assignee or the assigner. Admin viewers still see everything.
+      if (vRole !== 'admin') {
+        conditions.push(`(
+          NOT (LOWER(TRIM(ab.role)) = 'admin' OR LOWER(TRIM(ab.department)) IN ('hr', 'hr coordinator'))
+          OR tasks.employee_id = ?
+          OR tasks.assigned_by = ?
+        )`);
         params.push(viewerId, viewerId);
       }
     }
+
+    const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
     const [rows] = await db.query(`
        SELECT
@@ -107,6 +125,8 @@ FROM
     projects ON tasks.project_id = projects.id
 JOIN
     employees ON tasks.employee_id = employees.id
+ LEFT JOIN
+    employees ab ON tasks.assigned_by = ab.id
 ${where}
 ORDER BY
     tasks.id DESC;
