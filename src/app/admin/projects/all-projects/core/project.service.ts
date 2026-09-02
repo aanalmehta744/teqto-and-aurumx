@@ -25,7 +25,11 @@ export class ProjectService extends UnsubscribeOnDestroyAdapter {
 
   /** CRUD METHODS */
   getAllProjects(): Observable<Project[]> {
-    return this.httpClient.get<Project[]>(this.API_URL);
+    // Pass viewerId so the backend can scope projects for a BA Intern
+    // (who should only see the projects they belong to).
+    const viewerId = JSON.parse(localStorage.getItem('currentUser') || 'null')?.id;
+    const url = viewerId ? `${this.API_URL}?viewerId=${viewerId}` : this.API_URL;
+    return this.httpClient.get<Project[]>(url);
   }
 
   createProject(project: Project | FormData): Observable<Project> {

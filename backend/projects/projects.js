@@ -177,17 +177,37 @@ router.put('/:id', async (req, res) => {
 // Fetch all projects
 router.get('/', async (req, res) => {
   try {
+    const viewerId = req.query.viewerId;
+    let where = '';
+    const params = [];
+
+    // BA Intern → only projects they belong to (their team). Projects have no
+    // "creator" column, so team membership is the "their own" signal.
+    if (viewerId) {
+      const [[viewer]] = await db.query(
+        'SELECT department, employee_level FROM employees WHERE id = ?',
+        [viewerId]
+      );
+      const vDept = String(viewer?.department || '').trim().toLowerCase();
+      const vLevel = String(viewer?.employee_level || '').trim().toLowerCase();
+      if (vDept === 'ba' && vLevel === 'intern') {
+        where = ` WHERE FIND_IN_SET(?, p.team) > 0`;
+        params.push(viewerId);
+      }
+    }
+
     const sqlQuery = `
-           SELECT p.*, 
+           SELECT p.*,
        c.fullName AS clientName,
        GROUP_CONCAT(e.fullName ORDER BY e.fullName ASC) AS teamName
 FROM projects p
 LEFT JOIN clients c ON p.client = c.id
 LEFT JOIN employees e ON FIND_IN_SET(e.id, p.team) > 0
+${where}
 GROUP BY p.id, c.fullName;
 
         `;
-    const [results] = await db.query(sqlQuery);
+    const [results] = await db.query(sqlQuery, params);
     res.status(200).json(results);
   } catch (err) {
     console.error('Database query failed:', err);

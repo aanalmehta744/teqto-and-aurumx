@@ -74,10 +74,13 @@ router.get('/', async (req, res) => {
 
     if (viewerId) {
       const [[viewer]] = await db.query(
-        'SELECT department FROM employees WHERE id = ?',
+        'SELECT department, employee_level FROM employees WHERE id = ?',
         [viewerId]
       );
-      if (String(viewer?.department || '').trim().toLowerCase() === 'bde') {
+      const vDept = String(viewer?.department || '').trim().toLowerCase();
+      const vLevel = String(viewer?.employee_level || '').trim().toLowerCase();
+
+      if (vDept === 'bde') {
         where = `
           WHERE tasks.project_id IN (
             SELECT p2.id
@@ -86,6 +89,10 @@ router.get('/', async (req, res) => {
             WHERE c2.employee_id = ?
           )`;
         params.push(viewerId);
+      } else if (vDept === 'ba' && vLevel === 'intern') {
+        // BA Intern → only tasks they created or that are assigned to them.
+        where = ` WHERE (tasks.assigned_by = ? OR tasks.employee_id = ?)`;
+        params.push(viewerId, viewerId);
       }
     }
 
