@@ -56,6 +56,10 @@ export class EmployeeDailyUpdateComponent implements OnInit, AfterViewInit {
   userData: any;
   groupedData: { date: string, updates: any[], dataSource: MatTableDataSource<any> }[] = [];
   filteredGroupedData: { date: string, updates: any[], dataSource: MatTableDataSource<any> }[] = [];
+  // For a Senior employee the page is split into two labelled sections:
+  //   "My Updates" and "Junior / Intern Updates". For everyone else there is a
+  //   single unlabelled section holding all the date-grouped tables.
+  displaySections: { label: string, groups: { date: string, updates: any[], dataSource: MatTableDataSource<any> }[] }[] = [];
 
   ishr: string = ''; // you may get this from auth service or localStorage
 
@@ -76,11 +80,36 @@ export class EmployeeDailyUpdateComponent implements OnInit, AfterViewInit {
   }
 
   assignPaginators() {
+    // Paginators appear in the DOM in the same order as the flattened sections,
+    // so assign them against that flattened list.
+    const flat: { dataSource: MatTableDataSource<any> }[] = [];
+    this.displaySections.forEach(s => s.groups.forEach(g => flat.push(g)));
     this.paginators.forEach((paginator, index) => {
-      if (this.filteredGroupedData[index]) {
-        this.filteredGroupedData[index].dataSource.paginator = paginator;
+      if (flat[index]) {
+        flat[index].dataSource.paginator = paginator;
       }
     });
+  }
+
+  /** Build the sections shown in the template from filteredGroupedData. */
+  rebuildSections(): void {
+    if (this.isSeniorEmployee()) {
+      const myId = this.userData?.id;
+      const split = (mine: boolean) => this.filteredGroupedData
+        .map(g => {
+          const updates = g.updates.filter((u: any) =>
+            mine ? u.employee_id === myId : u.employee_id !== myId);
+          return { date: g.date, updates, dataSource: new MatTableDataSource(updates) };
+        })
+        .filter(g => g.updates.length > 0);
+
+      this.displaySections = [
+        { label: 'My Updates', groups: split(true) },
+        { label: 'Junior / Intern Updates', groups: split(false) },
+      ];
+    } else {
+      this.displaySections = [{ label: '', groups: this.filteredGroupedData }];
+    }
   }
 
   isAssignerRole(): boolean {
@@ -226,6 +255,7 @@ isSeniorEmployee(): boolean {
 
       // Initially filteredGroupedData = all groupedData
       this.filteredGroupedData = [...this.groupedData];
+      this.rebuildSections();
 
       // Assign paginators to data sources after data is set
       setTimeout(() => {
@@ -271,6 +301,8 @@ isSeniorEmployee(): boolean {
         };
       })
       .filter(group => group.updates.length > 0);
+
+    this.rebuildSections();
 
     // Re-assign paginators for the filtered data sources
     setTimeout(() => {

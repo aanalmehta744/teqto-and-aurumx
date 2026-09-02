@@ -122,23 +122,6 @@
           </div>
           <span class="text-xs text-gray-400">clients target</span>
         </div>
-
-        <!-- Divider -->
-        <hr class="border-gray-200 my-2" />
-
-        <!-- Amount — last mandatory field -->
-        <div class="flex items-center gap-4">
-          <label class="w-44 text-sm font-semibold text-gray-700 flex-shrink-0">
-            Amount ($) <span class="text-red-500">*</span>
-          </label>
-          <div class="flex-1 max-w-xs">
-            <input [(ngModel)]="form.amount" type="number" min="0" required
-              placeholder="Enter target amount"
-              class="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm text-red-500 font-medium
-                     focus:border-indigo-400 focus:outline-none placeholder:text-red-300" />
-          </div>
-          <span class="text-xs text-gray-400">revenue target ($)</span>
-        </div>
       </div>
 
       <div class="border-t bg-gray-50 px-6 py-4 flex justify-end">
@@ -166,7 +149,6 @@
               <th class="px-4 py-3 text-center">Part Time<br><span class="font-normal text-xs text-gray-400">Target / Done</span></th>
               <th class="px-4 py-3 text-center">Hourly<br><span class="font-normal text-xs text-gray-400">Target / Done</span></th>
               <th class="px-4 py-3 text-center">Project Based<br><span class="font-normal text-xs text-gray-400">Target / Done</span></th>
-              <th class="px-4 py-3 text-center">Amount ($)<br><span class="font-normal text-xs text-gray-400">Target / Done</span></th>
               <th class="px-4 py-3 text-center">Overall</th>
             </tr>
           </thead>
@@ -203,14 +185,6 @@
                 <p class="text-xs">{{ r.project_base }} / <span class="text-green-600 font-semibold">{{ r.project_base_achieved }}</span></p>
                 <div class="h-1.5 bg-gray-200 rounded-full mt-1 w-20 mx-auto">
                   <div [class]="'h-full rounded-full ' + bar(r.pbPct)" [style.width.%]="r.pbPct"></div>
-                </div>
-              </td>
-
-              <!-- Amount -->
-              <td class="px-4 py-3 text-center">
-                <p class="text-xs text-blue-500">${{ r.amount | number }} / <span class="text-green-600 font-semibold">${{ r.amount_achieved | number }}</span></p>
-                <div class="h-1.5 bg-gray-200 rounded-full mt-1 w-20 mx-auto">
-                  <div [class]="'h-full rounded-full ' + bar(r.amtPct)" [style.width.%]="r.amtPct"></div>
                 </div>
               </td>
 
@@ -305,23 +279,6 @@
             </div>
             <span class="text-xs text-gray-400">clients target</span>
           </div>
-
-          <!-- Divider -->
-          <hr class="border-gray-200 my-2" />
-
-          <!-- Amount — last mandatory field -->
-          <div class="flex items-center gap-4">
-            <label class="w-44 text-sm font-semibold text-gray-700 flex-shrink-0">
-              Amount ($) <span class="text-red-500">*</span>
-            </label>
-            <div class="flex-1 max-w-xs">
-              <input [(ngModel)]="form.amount" type="number" min="0" required
-                placeholder="Enter target amount"
-                class="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm text-red-500 font-medium
-                       focus:border-indigo-400 focus:outline-none placeholder:text-red-300" />
-            </div>
-            <span class="text-xs text-gray-400">revenue target ($)</span>
-          </div>
         </div>
 
         <div class="border-t bg-gray-50 px-6 py-4 flex justify-end">
@@ -390,20 +347,6 @@
             <p class="text-gray-500 text-xs">Achieved: <span class="font-bold text-green-600">{{ singleAchievement.project_base_achieved }}</span></p>
             <div class="mt-2 h-2 bg-gray-100 rounded-full">
               <div [class]="'h-full rounded-full ' + bar(singleAchievement.pbPct)" [style.width.%]="singleAchievement.pbPct"></div>
-            </div>
-          </div>
-
-          <!-- Amount -->
-          <div class="border rounded-xl p-4 sm:col-span-2">
-            <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-indigo-600 uppercase tracking-wide">Revenue Amount ($)</span>
-              <span [class]="'text-xs font-bold px-2 py-0.5 rounded-full ' + badge(singleAchievement.amtPct)">{{ singleAchievement.amtPct }}%</span>
-            </div>
-            <p class="text-gray-500 text-xs">Target: <span class="font-bold text-gray-800">${{ singleAchievement.amount | number }}</span></p>
-            <p class="text-gray-500 text-xs">Achieved: <span class="font-bold text-green-600">${{ singleAchievement.amount_achieved | number }}</span></p>
-            <p class="text-gray-500 text-xs">Remaining: <span class="font-bold text-red-500">${{ (singleAchievement.amount - singleAchievement.amount_achieved < 0 ? 0 : singleAchievement.amount - singleAchievement.amount_achieved) | number }}</span></p>
-            <div class="mt-2 h-2 bg-gray-100 rounded-full">
-              <div [class]="'h-full rounded-full ' + bar(singleAchievement.amtPct)" [style.width.%]="singleAchievement.amtPct"></div>
             </div>
           </div>
 

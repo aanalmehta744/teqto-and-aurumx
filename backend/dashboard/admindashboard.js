@@ -94,7 +94,7 @@ router.get('/bde-kpi-achievement', async (req, res) => {
 
   try {
     const [bdes] = await db.query(
-      `SELECT id, fullName FROM employees WHERE role='BDE' AND status=1 ORDER BY fullName`
+      `SELECT id, fullName FROM employees WHERE LOWER(TRIM(department))='bde' AND status=1 ORDER BY fullName`
     );
 
     const results = await Promise.all(bdes.map(async (bde) => {
@@ -164,7 +164,7 @@ router.get('/bde-performance-summary', async (req, res) => {
 
   try {
     const [bdes] = await db.query(
-      `SELECT id, fullName FROM employees WHERE role='BDE' AND status=1 ORDER BY fullName`
+      `SELECT id, fullName FROM employees WHERE LOWER(TRIM(department))='bde' AND status=1 ORDER BY fullName`
     );
 
     const results = await Promise.all(bdes.map(async (bde) => {

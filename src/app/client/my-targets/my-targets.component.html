@@ -144,29 +144,6 @@
             </span>
           </div>
 
-          <!-- Amount (last row) -->
-          <div class="flex items-center gap-4 px-6 py-4 bg-gray-50 hover:bg-gray-100">
-            <div class="w-36 flex-shrink-0">
-              <p class="text-sm font-semibold text-gray-700">Amount ($)</p>
-              <p class="text-xs text-gray-400">Revenue target</p>
-            </div>
-            <div class="flex-1">
-              <div class="flex justify-between text-xs text-gray-500 mb-1">
-                <span>Achieved: <strong class="text-green-600">${{ target.amount_achieved | number }}</strong></span>
-                <span>Target: <strong class="text-gray-700">${{ target.amount | number }}</strong></span>
-              </div>
-              <div class="h-2.5 bg-gray-200 rounded-full">
-                <div [class]="'h-full rounded-full transition-all ' + bar(target.amtPct)" [style.width.%]="target.amtPct"></div>
-              </div>
-              <p class="text-xs text-red-500 mt-1">
-                Remaining: ${{ (target.amount - target.amount_achieved < 0 ? 0 : target.amount - target.amount_achieved) | number }}
-              </p>
-            </div>
-            <span [class]="'w-14 text-center text-xs font-bold px-2 py-1 rounded-full ' + badge(target.amtPct)">
-              {{ target.amtPct }}%
-            </span>
-          </div>
-
         </div>
 
         <!-- Overall footer bar -->

@@ -1224,20 +1224,6 @@ export const ROUTES: RouteInfo[] = [
   },
 
   {
-    path: '/client/performance',
-    title: 'My Performance',
-    iconType: 'feather',
-    icon: 'bar-chart-2',
-    class: '',
-    groupTitle: false,
-    badge: '',
-    badgeClass: '',
-    role: ['Employee'],
-    department: ['BDE'],
-    submenu: [],
-  },
-
-  {
     path: '/client/my-targets',
     title: 'My Targets',
     iconType: 'feather',

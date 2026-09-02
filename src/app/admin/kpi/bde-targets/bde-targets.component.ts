@@ -185,7 +185,7 @@ export class BdeTargetsComponent implements OnInit {
 
   formValid(): boolean {
     const f = this.form;
-    if (f.full_time == null || f.part_time == null || f.hourly == null || f.project_base == null || f.amount == null) {
+    if (f.full_time == null || f.part_time == null || f.hourly == null || f.project_base == null) {
       this.errorMsg = 'All fields are mandatory. Please fill in every field.';
       return false;
     }
@@ -194,9 +194,8 @@ export class BdeTargetsComponent implements OnInit {
   }
 
   bar(pct: number): string {
-    if (pct >= 100) return 'bg-green-500';
-    if (pct >= 70) return 'bg-yellow-400';
-    return 'bg-red-400';
+    // Green progress line: fills proportionally (50% → half, 100% → full).
+    return pct > 0 ? 'bg-green-500' : 'bg-gray-300';
   }
 
   badge(pct: number): string {

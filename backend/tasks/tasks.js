@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../connection'); // <-- use promise interface
+const { getIO } = require('../socket');
 
 async function validateAssignment(assignedBy, employeeId) {
   // if (!assignedBy || !employeeId) return null;
@@ -14,72 +15,96 @@ async function validateAssignment(assignedBy, employeeId) {
   // return null;
   if (!assignedBy || !employeeId) return null;
 
-const [[assigner]] = await db.query(
-  'SELECT role, department, employee_level FROM employees WHERE id = ?',
-  [assignedBy]
-);
+  const [[assigner]] = await db.query(
+    'SELECT role, department, employee_level FROM employees WHERE id = ?',
+    [assignedBy]
+  );
 
-const [[assignee]] = await db.query(
-  'SELECT role, department, employee_level FROM employees WHERE id = ?',
-  [employeeId]
-);
+  const [[assignee]] = await db.query(
+    'SELECT role, department, employee_level FROM employees WHERE id = ?',
+    [employeeId]
+  );
 
-const isSenior =
-  String(assigner.employee_level || '').toLowerCase().trim() === 'senior' &&
-  String(assigner.role || '').toLowerCase().trim() === 'employee';
+  if (!assigner || !assignee) return 'Invalid assigning or assigned employee';
 
-if (isSenior) {
-  const assigneeLevel = String(
-    assignee.employee_level || ''
-  ).toLowerCase().trim();
+  const assignerDept = String(assigner.department || '').toLowerCase().trim();
+  const assigneeDept = String(assignee.department || '').toLowerCase().trim();
+  const assigneeRole = String(assignee.role || '').toLowerCase().trim();
+  const assigneeLevel = String(assignee.employee_level || '').toLowerCase().trim();
 
-  const assignerDepartment = String(
-    assigner.department || ''
-  ).toLowerCase().trim();
-
-  const assigneeDepartment = String(
-    assignee.department || ''
-  ).toLowerCase().trim();
-
-  // Senior can assign ONLY to Junior or Intern
-  if (!['junior', 'intern'].includes(assigneeLevel)) {
-    return res.status(403).json({
-      message:
-        'Senior employees can assign tasks only to Junior and Intern employees.'
-    });
+  // BDE (identified by department) → may assign to anyone EXCEPT Admin, HR, HR Coordinator.
+  if (assignerDept === 'bde') {
+    if (assigneeRole === 'admin' || assigneeDept === 'hr' || assigneeDept === 'hr coordinator') {
+      return 'BDE cannot assign tasks to Admin, HR or HR Coordinator.';
+    }
+    return null;
   }
 
-  // Senior can assign ONLY within the same department
-  if (assignerDepartment !== assigneeDepartment) {
-    return res.status(403).json({
-      message:
-        'Senior employees can assign tasks only within their own department.'
-    });
+  // HR / HR Coordinator → may assign to anyone EXCEPT Admin.
+  if (assignerDept === 'hr' || assignerDept === 'hr coordinator') {
+    if (assigneeRole === 'admin') {
+      return 'HR cannot assign tasks to Admin.';
+    }
+    return null;
   }
+
+  // Senior EMPLOYEE (not BDE) → only Junior/Intern, and only within the same department.
+  const isSeniorEmployee =
+    String(assigner.employee_level || '').toLowerCase().trim() === 'senior' &&
+    String(assigner.role || '').toLowerCase().trim() === 'employee';
+
+  if (isSeniorEmployee) {
+    if (!['junior', 'intern'].includes(assigneeLevel)) {
+      return 'Senior employees can assign tasks only to Junior and Intern employees.';
+    }
+    if (assignerDept !== assigneeDept) {
+      return 'Senior employees can assign tasks only within their own department.';
+    }
+  }
+
+  return null;
 }
 
-return null;
-}
-
-// Fetch all tasks
+// Fetch all tasks (scoped for BDE: only tasks that belong to the BDE's own clients' projects)
 router.get('/', async (req, res) => {
   try {
-    // const [rows] = await db.query('SELECT * FROM tasks ORDER BY create_date DESC');
+    const viewerId = req.query.viewerId;
+    let where = '';
+    const params = [];
+
+    if (viewerId) {
+      const [[viewer]] = await db.query(
+        'SELECT department FROM employees WHERE id = ?',
+        [viewerId]
+      );
+      if (String(viewer?.department || '').trim().toLowerCase() === 'bde') {
+        where = `
+          WHERE tasks.project_id IN (
+            SELECT p2.id
+            FROM projects p2
+            JOIN clients c2 ON p2.client = c2.id
+            WHERE c2.employee_id = ?
+          )`;
+        params.push(viewerId);
+      }
+    }
+
     const [rows] = await db.query(`
-       SELECT 
-    tasks.*, 
+       SELECT
+    tasks.*,
     projects.projectTitle,
     employees.fullName AS employee_name
-FROM 
+FROM
     tasks
- LEFT JOIN 
+ LEFT JOIN
     projects ON tasks.project_id = projects.id
 JOIN
     employees ON tasks.employee_id = employees.id
-ORDER BY 
+${where}
+ORDER BY
     tasks.id DESC;
 `,
-      [req.params.userId]
+      params
     );
     res.json(rows);
   } catch (err) {
@@ -158,10 +183,19 @@ router.post('/', async (req, res) => {
 
     // Notify the assigned employee
     if (employee_id) {
+      const message = `A new task has been assigned to you: "${title}"`;
       await db.query(
         `INSERT INTO notifications (type, message, recipient_id, recipient_role) VALUES (?, ?, ?, ?)`,
-        ['task_assigned', `A new task has been assigned to you: "${title}"`, employee_id, 'Employee']
+        ['task_assigned', message, employee_id, 'Employee']
       ).catch(() => {});
+
+      // Push a live notification to the assigned employee's socket room.
+      try {
+        getIO().to(`user_${employee_id}`).emit('notification', {
+          type: 'task_assigned',
+          message
+        });
+      } catch (e) { /* socket not ready — DB row still persists */ }
     }
 
     res.json({ message: 'Task created successfully' });

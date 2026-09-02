@@ -89,9 +89,31 @@ export class FormDialogComponent implements OnInit {
 
   getAssignableEmployees(data: any[]): any[] {
     const user = this.data?.currentUser || JSON.parse(localStorage.getItem('currentUser') || 'null');
-    const isSenior = user?.role?.toLowerCase() === 'employee' && user?.employee_level === 'Senior';
-    if (!isSenior) return data.filter(e => (e.role || '').toLowerCase() !== 'admin');
-    return data.filter(e => e.employee_level === 'Junior' || e.employee_level === 'Intern');
+    const role = (user?.role || '').toLowerCase().trim();
+    const userDept = (user?.department || '').toLowerCase().trim();
+
+    // BDE (identified by DEPARTMENT, not role) → can assign to anyone
+    // EXCEPT Admin, HR, HR Coordinator, and himself.
+    if (userDept === 'bde') {
+      return data.filter(e => {
+        const r = (e.role || '').toLowerCase().trim();
+        const d = (e.department || '').toLowerCase().trim();
+        return e.id !== user?.id && r !== 'admin' && d !== 'hr' && d !== 'hr coordinator';
+      });
+    }
+
+    // HR / HR Coordinator (by DEPARTMENT) → can assign to everyone except Admin.
+    if (userDept === 'hr' || userDept === 'hr coordinator') {
+      return data.filter(e => (e.role || '').toLowerCase().trim() !== 'admin' && e.id !== user?.id);
+    }
+
+    // Senior employee → can assign only to Junior / Intern.
+    if (role === 'employee' && user?.employee_level === 'Senior') {
+      return data.filter(e => e.employee_level === 'Junior' || e.employee_level === 'Intern');
+    }
+
+    // Everyone else (BA / Admin) → all non-admin employees.
+    return data.filter(e => (e.role || '').toLowerCase() !== 'admin');
   }
 
   createTaskForm(): UntypedFormGroup {

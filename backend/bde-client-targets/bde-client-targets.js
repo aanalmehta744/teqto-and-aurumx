@@ -58,7 +58,7 @@ router.get('/achievement', async (req, res) => {
         c.user_id = e.id AND
         MONTH(c.conversion_date) = ? AND
         YEAR(c.conversion_date) = ?
-      WHERE e.role = 'BDE' AND e.status = 1
+      WHERE LOWER(TRIM(e.department)) = 'bde' AND e.status = 1
     `;
     const params = [m, y, m, y];
     if (bde_id) { sql += ` AND e.id = ?`; params.push(bde_id); }
@@ -66,13 +66,21 @@ router.get('/achievement', async (req, res) => {
 
     const [rows] = await db.query(sql, params);
 
+    // Percentage helper: proportional when a target is set; if there's no target
+    // but something was achieved, treat it as fully achieved (100% green bar).
+    const pct = (achieved, target) => {
+      if (target > 0) return Math.min(Math.round((achieved / target) * 100), 100);
+      return achieved > 0 ? 100 : 0;
+    };
+
     const result = rows.map(r => {
-      const ftPct  = r.full_time    > 0 ? Math.min(Math.round((r.full_time_achieved    / r.full_time)    * 100), 100) : 0;
-      const ptPct  = r.part_time    > 0 ? Math.min(Math.round((r.part_time_achieved    / r.part_time)    * 100), 100) : 0;
-      const hPct   = r.hourly       > 0 ? Math.min(Math.round((r.hourly_achieved       / r.hourly)       * 100), 100) : 0;
-      const pbPct  = r.project_base > 0 ? Math.min(Math.round((r.project_base_achieved / r.project_base) * 100), 100) : 0;
-      const amtPct = r.amount       > 0 ? Math.min(Math.round((r.amount_achieved       / r.amount)       * 100), 100) : 0;
-      const overall = Math.round((ftPct + ptPct + hPct + pbPct + amtPct) / 5);
+      const ftPct  = pct(r.full_time_achieved,    r.full_time);
+      const ptPct  = pct(r.part_time_achieved,    r.part_time);
+      const hPct   = pct(r.hourly_achieved,       r.hourly);
+      const pbPct  = pct(r.project_base_achieved, r.project_base);
+      const amtPct = pct(r.amount_achieved,       r.amount);
+      // Amount is no longer shown in the UI, so overall averages the 4 client targets.
+      const overall = Math.round((ftPct + ptPct + hPct + pbPct) / 4);
       return { ...r, ftPct, ptPct, hPct, pbPct, amtPct, overall };
     });
     res.json(result);
@@ -126,7 +134,7 @@ router.post('/save-all', async (req, res) => {
   if (!month || !year) return res.status(400).json({ error: 'month and year are required' });
 
   try {
-    const [bdes] = await db.query(`SELECT id FROM employees WHERE role='BDE' AND status=1`);
+    const [bdes] = await db.query(`SELECT id FROM employees WHERE LOWER(TRIM(department))='bde' AND status=1`);
     for (const bde of bdes) {
     
 

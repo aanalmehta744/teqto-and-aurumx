@@ -50,8 +50,20 @@
                                 No results
                             </div>
 
+                            <!-- Sections: Senior sees "My Updates" + "Junior / Intern Updates";
+                                 everyone else sees a single unlabelled section. -->
+                            <div *ngFor="let section of displaySections" class="mb-8">
+                                <h5 *ngIf="section.label"
+                                    class="text-xl font-semibold text-[#00383F] mb-3 border-b pb-1">
+                                    {{ section.label }}
+                                </h5>
+                                <div *ngIf="section.label && section.groups.length === 0"
+                                    class="text-gray-400 text-sm mb-4">
+                                    No updates
+                                </div>
+
                             <!-- Grouped Tables -->
-                            <div *ngFor="let group of filteredGroupedData" class="mb-6">
+                            <div *ngFor="let group of section.groups" class="mb-6">
                                 <!-- Group Date Header -->
                                 <h6 class="text-lg font-medium text-[#009F9F] mb-2">
                                     {{ group.date | date: "MMM d, y '('EEE')'" }}
@@ -176,6 +188,7 @@
                                 <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons></mat-paginator>
 
                                 <hr class="my-4 border-gray-300" />
+                            </div>
                             </div>
                         </div>
                     </ng-scrollbar>

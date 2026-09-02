@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../connection');
+const { getIO } = require('../socket');
 
 // GET all daily updates (no filters)
 // router.get('/all', async (req, res) => {
@@ -292,11 +293,20 @@ router.post('/', async (req, res) => {
         const [empRow] = await db.query('SELECT fullName FROM employees WHERE id = ?', [employee_id]).catch(() => [[]]);
         const empName = empRow[0]?.fullName || 'An employee';
         const [bdebaUsers] = await db.query("SELECT id, role FROM employees WHERE role IN ('BDE', 'BA')").catch(() => [[]]);
+        const message = `${empName} added a daily update`;
         for (const user of bdebaUsers) {
             await db.query(
                 `INSERT INTO notifications (type, message, recipient_id, recipient_role) VALUES (?, ?, ?, ?)`,
-                ['daily_update', `${empName} added a daily update`, user.id, user.role]
+                ['daily_update', message, user.id, user.role]
             ).catch(() => {});
+
+            // Push a live notification to each BDE/BA socket room.
+            try {
+                getIO().to(`user_${user.id}`).emit('notification', {
+                    type: 'daily_update',
+                    message
+                });
+            } catch (e) { /* socket not ready — DB row still persists */ }
         }
 
         res.status(201).send({ id: result.insertId, message: "Daily update created" });

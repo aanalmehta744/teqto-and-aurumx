@@ -83,7 +83,12 @@ export class FormDialogComponent {
 
       // Normalize project fields based on type
       if (task.employee_type === 'regular') {
-        task.trainer_project_name = null;
+        if (task.project_id === 'other') {
+          // "Other" → no linked project, store the typed name instead.
+          task.project_id = null;
+        } else {
+          task.trainer_project_name = null;
+        }
       } else {
         task.project_id = null;
       }

@@ -163,9 +163,28 @@ export class TaskComponent implements OnInit {
     .toLowerCase()
     .trim();
 
+  const currentUserId = currentUser?.id;
+
   // Admin can assign to everyone
   if (currentRole === 'admin') {
     this.assignableEmployees = data;
+    return;
+  }
+
+  // BDE (by department) → everyone EXCEPT Admin, HR, HR Coordinator, and self
+  if (currentDepartment === 'bde') {
+    this.assignableEmployees = data.filter((emp: any) => {
+      const r = String(emp.role || '').toLowerCase().trim();
+      const d = String(emp.department || '').toLowerCase().trim();
+      return emp.id !== currentUserId && r !== 'admin' && d !== 'hr' && d !== 'hr coordinator';
+    });
+    return;
+  }
+
+  // HR / HR Coordinator (by department) → everyone EXCEPT Admin (and self)
+  if (currentDepartment === 'hr' || currentDepartment === 'hr coordinator') {
+    this.assignableEmployees = data.filter((emp: any) =>
+      String(emp.role || '').toLowerCase().trim() !== 'admin' && emp.id !== currentUserId);
     return;
   }
 
@@ -222,6 +241,25 @@ export class TaskComponent implements OnInit {
 
   return project?.projectTitle || 'Unknown Project';
 }
+
+  /**
+   * Project column display:
+   *  - Regular task  → the project's title
+   *  - Trainer task (no project) → "<trainer project name> (Trainer)"
+   *  - Neither → "No Project"
+   */
+  getProjectDisplay(task: any): string {
+    if (task?.project_id !== null && task?.project_id !== undefined) {
+      const project = this.projects.find((p: any) => p.id === task.project_id);
+      return project?.projectTitle || 'Unknown Project';
+    }
+    if (task?.trainer_project_name) {
+      // Trainer tasks are tagged "(Trainer)"; a regular "Other" project shows the name as-is.
+      const isTrainer = String(task?.employee_type || '').toLowerCase() === 'trainer';
+      return isTrainer ? `${task.trainer_project_name} (Trainer)` : task.trainer_project_name;
+    }
+    return 'No Project';
+  }
   getemployeeName(employeeId: number): string {
     const employee = this.employees.find(p => p.id == employeeId);
     return employee ? employee.fullName : 'Unknown employee';

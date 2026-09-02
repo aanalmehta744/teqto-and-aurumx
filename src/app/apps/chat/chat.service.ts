@@ -56,8 +56,10 @@ export class ChatService implements OnDestroy {
   constructor(private http: HttpClient) {
     const socketUrl = environment.apiUrl.replace('/api', '');
 
-    this.socket = io(socketUrl, {
-      transports: ['websocket'],
+    // When apiUrl is relative ('/api'), socketUrl becomes '' — passing undefined
+    // makes socket.io connect to the SAME origin (nginx then proxies /socket.io/).
+    this.socket = io(socketUrl || undefined, {
+      transports: ['websocket', 'polling'],
     });
   }
 
@@ -366,6 +368,14 @@ onChatRequestRejected(): Observable<any> {
     return new Observable((observer) => {
       this.socket.on('announcement_created', (d) => observer.next(d));
       return () => this.socket.off('announcement_created');
+    });
+  }
+
+  /** A live bell notification (task assigned, daily update, etc.) for the logged-in user. */
+  onNotification(): Observable<any> {
+    return new Observable((observer) => {
+      this.socket.on('notification', (d) => observer.next(d));
+      return () => this.socket.off('notification');
     });
   }
 

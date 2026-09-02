@@ -29,7 +29,16 @@
             <mat-option *ngFor="let project of data.projects" [value]="project.id">
                 {{ project.projectTitle }}
             </mat-option>
+            <mat-option [value]="'other'">Other</mat-option>
         </mat-select>
+    </mat-form-field>
+
+    <!-- Regular + "Other" → manual project name input -->
+    <mat-form-field
+        *ngIf="form.get('employee_type')?.value === 'regular' && form.get('project_id')?.value === 'other'"
+        class="w-full" appearance="outline">
+        <mat-label>Project Name</mat-label>
+        <input matInput formControlName="trainer_project_name" />
     </mat-form-field>
 
     <!-- If Trainer → Show manual project name input -->

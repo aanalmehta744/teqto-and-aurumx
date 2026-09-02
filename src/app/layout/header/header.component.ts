@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'environments/environment';
+import { ChatService } from 'app/apps/chat/chat.service';
 import Swal from 'sweetalert2';
 
 interface Notifications {
@@ -69,7 +70,8 @@ export class HeaderComponent
     private authService: AuthService,
     private router: Router,
     public languageService: LanguageService,
-    private http: HttpClient
+    private http: HttpClient,
+    private chatService: ChatService
   ) {
     super();
   }
@@ -95,7 +97,20 @@ export class HeaderComponent
       // Display user's first and last name
       this.userName = `${user.fullName}`;
 
-   
+      // Live notification badge: load initial count, join the socket room,
+      // and refresh the count whenever a push arrives (task assigned / daily update).
+      const uid = (user as any).id;
+      if (uid) {
+        this.currentUserId = uid;
+        this.loadUserNotifCount(uid);
+        this.chatService.identify(uid);
+        this.subs.sink = this.chatService.onNotification().subscribe(() => {
+          this.loadUserNotifCount(uid);
+          if (this.showNotifPanel) this.loadUserNotifications(uid);
+        });
+      }
+
+
 
 if (userRole === 'Admin') {
 

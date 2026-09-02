@@ -27,7 +27,11 @@ export class AllTasksService extends UnsubscribeOnDestroyAdapter {
   }
   /** CRUD METHODS */
   getAllMyTaskss(): Observable<MyTasks[]> {
-    return this.httpClient.get<MyTasks[]>(this.API_URL).pipe(
+    // Pass the logged-in user's id so the backend can scope tasks for BDE
+    // (a BDE only sees tasks belonging to his own clients' projects).
+    const viewerId = JSON.parse(localStorage.getItem('currentUser') || 'null')?.id;
+    const url = viewerId ? `${this.API_URL}?viewerId=${viewerId}` : this.API_URL;
+    return this.httpClient.get<MyTasks[]>(url).pipe(
       catchError((error: HttpErrorResponse) => {
         console.error('Error fetching tasks:', error.message);
         return of([]); // Return empty array on error

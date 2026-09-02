@@ -92,9 +92,7 @@
                       }}</span>
                   </td>
                   <td>
-                    {{ getProjectTitle(task.project_id) !== 'Unknown Project'
-                    ? getProjectTitle(task.project_id)
-                    : (task.trainer_project_name || 'Not Assigned') }}
+                    {{ getProjectDisplay(task) }}
                   </td>
                   <td>{{ getemployeeName(task.employee_id) }}</td>
                   <td>
@@ -157,9 +155,7 @@
                       }}</span>
                   </td>
                   <td>
-                    {{ getProjectTitle(task.project_id) !== 'Unknown Project'
-                    ? getProjectTitle(task.project_id)
-                    : (task.trainer_project_name || 'Not Assigned') }}
+                    {{ getProjectDisplay(task) }}
                   </td>
 
                   <td>{{ getemployeeName(task.employee_id) }}</td>
