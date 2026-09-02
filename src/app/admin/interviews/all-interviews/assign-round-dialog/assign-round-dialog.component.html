@@ -105,7 +105,7 @@
 </mat-dialog-content>
 
 <mat-dialog-actions class="dialog-actions">
-  <button mat-flat-button color="primary" type="button" (click)="close()">
+  <button mat-flat-button color="primary" type="button" [disabled]="saving" (click)="done()">
     Done
   </button>
 </mat-dialog-actions>

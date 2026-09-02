@@ -89,6 +89,7 @@ export class AssignRoundDialogComponent {
   }
 
 
+  // "Add New Round" → save the current round and keep the dialog open for another.
   addRound(): void {
     this.error = '';
 
@@ -97,6 +98,35 @@ export class AssignRoundDialogComponent {
       return;
     }
 
+    this.saveNewRound();
+  }
+
+  // "Done" → save the current round (if the form has been filled), then close.
+  done(): void {
+    this.error = '';
+
+    const hasInput =
+      !!this.newRound.assigned_to_id ||
+      !!this.newRound.scheduled_date ||
+      !!this.newRound.notes?.trim();
+
+    // Nothing entered → just close (rounds already saved via "Add New Round" persist).
+    if (!hasInput) {
+      this.close();
+      return;
+    }
+
+    // Something was entered → a developer is required before saving.
+    if (!this.newRound.assigned_to_id) {
+      this.error = 'Please select a senior developer.';
+      return;
+    }
+
+    this.saveNewRound(() => this.close());
+  }
+
+  // Shared save logic for both "Add New Round" and "Done".
+  private saveNewRound(onSuccess?: () => void): void {
     this.saving = true;
 
     const payload: Partial<InterviewRound> = {
@@ -128,6 +158,8 @@ export class AssignRoundDialogComponent {
           this.changed = true;
           this.saving = false;
           this.notify('Round assigned.');
+
+          if (onSuccess) onSuccess();
         },
         error: (err) => {
           this.saving = false;
