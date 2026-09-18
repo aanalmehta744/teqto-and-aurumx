@@ -1,3 +1,7 @@
+
+
+
+
 <section *ngIf="employeeSalary?.employeeId; else noDataTemplate">
   <div class="mx-auto max-w-3xl px-4 py-6">
     <app-breadcrumb [title]="'Payslip'" [items]="['Payroll']" [active_item]="'Payslip'"></app-breadcrumb>
@@ -7,9 +11,14 @@
       <!-- ── Header ── -->
       <div class="bg-[#312e81] px-6 py-5 flex justify-between items-start">
         <div>
-          <img src="../../../../assets/images/Teqto(bg).png" class="h-10 brightness-0 invert mb-3">
+          <!-- White half-oval badge (rounded right end only) wrapping the colored logo -->
+          <div class="bg-white -ml-6 pl-6 pr-8 py-2.5 inline-flex items-center mb-3 shadow-sm"
+               style="border-top-right-radius: 9999px; border-bottom-right-radius: 9999px;">
+            <img [src]="companyLogo"
+                 class="h-14 w-auto object-contain" alt="Company Logo">
+          </div>
           <p class="text-[#a8d5d5] text-xs leading-5">
-            "RK Prime" 6th Floor, Office No.619<br>
+            "1 RK Prime" 6th Floor, Office No.619<br>
             Nana Mava Circle, 150 Ring Road, Rajkot 360004
           </p>
         </div>

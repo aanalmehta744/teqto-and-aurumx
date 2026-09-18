@@ -12,6 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { COMPANY_LOGO_DATA_URL } from 'app/shared/company-logo.data';
 
 @Component({
   selector: 'app-payslip',
@@ -28,6 +29,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   ],
 })
 export class PayslipComponent implements OnInit {
+  companyLogo = COMPANY_LOGO_DATA_URL;
   employeeSalary: EmployeeSalary | null = null;
   selectedEmployee: any = null;
   payslipID: any;
@@ -200,7 +202,29 @@ export class PayslipComponent implements OnInit {
     if (printBtn) printBtn.classList.add('hidden-in-pdf');
     editBtns.forEach(btn => (btn as HTMLElement).style.display = 'none');
 
-    html2canvas(element, { scale: 2 }).then(canvas => {
+    // Wait for all images (e.g. the logo) to finish loading before capturing,
+    // otherwise html2canvas may render them as blank in the downloaded PDF.
+    const images = Array.from(element.querySelectorAll('img'));
+    const waitForImages = Promise.all(
+      images.map(img =>
+        img.complete && img.naturalWidth > 0
+          ? Promise.resolve()
+          : new Promise<void>(resolve => {
+              img.onload = () => resolve();
+              img.onerror = () => resolve();
+            })
+      )
+    );
+
+    // Capture where the logo <img> sits, relative to the payslip, so we can
+    // redraw it directly into the PDF (html2canvas fails to rasterize it).
+    const logoImg = element.querySelector('img') as HTMLImageElement | null;
+    const elRect = element.getBoundingClientRect();
+    const logoRect = logoImg ? logoImg.getBoundingClientRect() : null;
+
+    waitForImages.then(() =>
+      html2canvas(element, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff' })
+    ).then(canvas => {
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const imgProps = pdf.getImageProperties(imgData);
@@ -208,6 +232,16 @@ export class PayslipComponent implements OnInit {
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+      // Draw the company logo directly with jsPDF (reliable for base64 images).
+      if (logoRect) {
+        const x = ((logoRect.left - elRect.left) / elRect.width) * pdfWidth;
+        const y = ((logoRect.top - elRect.top) / elRect.height) * pdfHeight;
+        const w = (logoRect.width / elRect.width) * pdfWidth;
+        const h = (logoRect.height / elRect.height) * pdfHeight;
+        pdf.addImage(this.companyLogo, 'PNG', x, y, w, h);
+      }
+
       pdf.save(`Payslip-${this.selectedEmployee?.fullName || 'employee'}.pdf`);
     }).finally(() => {
       // Show buttons again after generating PDF

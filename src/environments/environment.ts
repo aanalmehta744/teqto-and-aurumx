@@ -5,7 +5,7 @@ export const environment = {
 
   apiUrl: 
   'http://localhost:5001/api'
-  // 'https://remained-uses-reporter-blocking.trycloudflare.com/api'
+  // ' https://singer-inventory-benefits-recovered.trycloudflare.com/api'
 };
 
 console.log(
