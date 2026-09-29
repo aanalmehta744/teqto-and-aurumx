@@ -15,6 +15,8 @@ import { CommonModule } from '@angular/common';
 import { MatDialogModule } from '@angular/material/dialog';
 import Swal from 'sweetalert2';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'environments/environment';
 
 export interface DialogData {
   id: number;
@@ -49,11 +51,13 @@ export class FormDialogComponent implements OnInit {
   employeesForm: UntypedFormGroup;
   employees: Employees;
   hidePassword: boolean = true;
+  departments: any[] = [];
   constructor(
     public dialogRef: MatDialogRef<FormDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     public employeesService: EmployeesService,
-    private fb: UntypedFormBuilder
+    private fb: UntypedFormBuilder,
+    private http: HttpClient
   ) {
     // Set the defaults
     this.action = data.action;
@@ -109,6 +113,9 @@ export class FormDialogComponent implements OnInit {
       ],
       address: [this.employees.address || ''],
       department: [this.employees.department || '', Validators.required],
+      employee_level: [this.employees.employee_level === 'Junior' ? 'Intern' : (this.employees.employee_level || 'Intern'), Validators.required],
+      password: ['', Validators.minLength(6)],
+      conformPassword: [''],
       panCard: [
         this.employees.panCard || '',
         [Validators.pattern('^[A-Z]{5}[0-9]{4}[A-Z]{1}$')],
@@ -124,10 +131,17 @@ export class FormDialogComponent implements OnInit {
           ? formatDate(this.employees.termination_date, 'yyyy-MM-dd', 'en')
           : null
       ]
-    });
+    }, { validators: this.passwordMatchValidator });
 
   }
+  private passwordMatchValidator(form: UntypedFormGroup) {
+    const password = String(form.get('password')?.value || '');
+    const confirmation = String(form.get('conformPassword')?.value || '');
+    if (!password && !confirmation) return null;
+    return password === confirmation ? null : { passwordMismatch: true };
+  }
   ngOnInit() {
+    this.http.get<any[]>(`${environment.apiUrl}/departments`).subscribe({ next: data => this.departments = data, error: () => this.departments = [] });
     this.employeesForm.get('status')?.valueChanges.subscribe(status => {
       const terminationControl = this.employeesForm.get('termination_date');
       if (status === 0) {
@@ -151,6 +165,7 @@ export class FormDialogComponent implements OnInit {
     formData.dob = this.formatDateForDB(formData.dob);
     formData.joining_date = this.formatDateForDB(formData.joining_date);
     formData.termination_date = this.formatDateForDB(formData.termination_date);
+    delete formData.conformPassword;
     console.log("submited value", formData);
     if (this.action === 'edit') {
       this.employeesService.updateEmployees(this.employees.id, formData).subscribe(

@@ -136,7 +136,8 @@ export class FormDialogComponent implements OnInit {
 
     this.employeeId = user.id || 0;
     this.availablePaidLeave = user.leave_balance || 0;
-    this.leaveTypes = user.gender === 'Female' ? ['Paid', 'Unpaid', 'Sick'] : ['Paid', 'Unpaid'];
+    // Sick leave is available to every employee; it must not depend on gender.
+    this.leaveTypes = ['Paid', 'Unpaid', 'Sick'];
     const role = (user.role || '').toUpperCase();
     this.isBdeOrBa = role === 'BDE' || role === 'BA';
     this.myLeavesForm.patchValue({ employee_id: this.employeeId });

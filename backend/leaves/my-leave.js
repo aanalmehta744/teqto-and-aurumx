@@ -1,33 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../connection');
-const cron = require('node-cron');
 
 // Helper to format JavaScript Date into MySQL DATETIME
 function formatDateForMySQL(date) {
     return date.toISOString().slice(0, 19).replace('T', ' ');
 }
 
-
-cron.schedule('0 0 1 1 *', async () => {
-    try {
-        console.log('🎉 New Year Leave Balance Reset Started');
-
-        const query = `
-            UPDATE employees
-            SET leave_balance = 12,
-                total_leave = 12,
-                updated_at = NOW()
-            WHERE status = 1
-        `;
-
-        const [result] = await db.query(query);
-
-        console.log(`✅ Leave balance reset for ${result.affectedRows} employees`);
-    } catch (error) {
-        console.error('❌ Error resetting leave balance:', error);
-    }
-});
 
 // ✅ 1. Create — Submit Leave Request
 router.post('/', async (req, res) => {
@@ -40,6 +19,16 @@ router.post('/', async (req, res) => {
     }
 
     try {
+        // Do not accept requests from a deleted/deactivated account, even if
+        // that account still has an old token or local-storage session.
+        const [employees] = await db.query(
+            'SELECT id FROM employees WHERE id = ? AND status = 1 LIMIT 1',
+            [employee_id]
+        );
+        if (!employees.length) {
+            return res.status(404).json({ error: 'Employee not found or is no longer active.' });
+        }
+
         const startDate = new Date(start_date);
         const endDate = new Date(end_date);
 

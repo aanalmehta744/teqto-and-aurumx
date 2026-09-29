@@ -41,7 +41,7 @@ const app = express();
 
 (async () => {
   const coreTables = [
-    `CREATE TABLE IF NOT EXISTS employees (id INT AUTO_INCREMENT PRIMARY KEY, fullName VARCHAR(255), gender VARCHAR(50), mobile VARCHAR(20), password VARCHAR(255), department VARCHAR(100), employee_level VARCHAR(20) DEFAULT 'Junior', address TEXT, email VARCHAR(255) UNIQUE, dob DATE, salary DECIMAL(10,2), uploadImg VARCHAR(255), joining_date DATE, role VARCHAR(50), panCard VARCHAR(50), aadharCard VARCHAR(50), total_leave INT DEFAULT 12, leave_balance DECIMAL(10,2) DEFAULT 12.00, status TINYINT DEFAULT 1, termination_date DATE, employment_type TINYINT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)`,
+    `CREATE TABLE IF NOT EXISTS employees (id INT AUTO_INCREMENT PRIMARY KEY, fullName VARCHAR(255), gender VARCHAR(50), mobile VARCHAR(20), password VARCHAR(255), department VARCHAR(100), employee_level VARCHAR(20) DEFAULT 'Intern', address TEXT, email VARCHAR(255) UNIQUE, dob DATE, salary DECIMAL(10,2), uploadImg VARCHAR(255), joining_date DATE, role VARCHAR(50), panCard VARCHAR(50), aadharCard VARCHAR(50), total_leave INT DEFAULT 12, leave_balance DECIMAL(10,2) DEFAULT 12.00, status TINYINT DEFAULT 1, termination_date DATE, employment_type TINYINT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)`,
     `CREATE TABLE IF NOT EXISTS attendance (id INT AUTO_INCREMENT PRIMARY KEY, employee_id INT, date DATE, status VARCHAR(50), check_in DATETIME, check_out DATETIME, hours VARCHAR(50), break VARCHAR(50), is_paused TINYINT DEFAULT 0, elapsed_time INT DEFAULT 0, pause_start DATETIME, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, UNIQUE KEY unique_employee_date (employee_id, date))`,
     `CREATE TABLE IF NOT EXISTS projects (id INT AUTO_INCREMENT PRIMARY KEY, projectNO VARCHAR(50), projectTitle VARCHAR(255), department VARCHAR(100), priority VARCHAR(50), client INT, startDate DATETIME, endDate DATETIME, team TEXT, status VARCHAR(50), description TEXT, tags TEXT, progress INT DEFAULT 0)`,
     `CREATE TABLE IF NOT EXISTS clients (id INT AUTO_INCREMENT PRIMARY KEY, fullName VARCHAR(255), mobile VARCHAR(20), email VARCHAR(255), linkedin_id VARCHAR(255), website_link VARCHAR(255), client_note TEXT, country VARCHAR(100), address TEXT, client_type VARCHAR(50), client_Connect_Type VARCHAR(50), bde_account_id VARCHAR(100), bde_account_email VARCHAR(255), date DATE, platform VARCHAR(100), technology VARCHAR(100), prize_tag VARCHAR(50), prize_amount DECIMAL(10,2), employee_id INT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`,
@@ -64,7 +64,9 @@ const app = express();
   console.log('Core tables verified');
 
   await db.query(`CREATE TABLE IF NOT EXISTS departments (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100) NOT NULL UNIQUE, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)`).catch(() => {});
-  await db.query(`ALTER TABLE employees ADD COLUMN employee_level VARCHAR(20) NOT NULL DEFAULT 'Junior'`).catch(() => {});
+  await db.query(`ALTER TABLE employees ADD COLUMN employee_level VARCHAR(20) NOT NULL DEFAULT 'Intern'`).catch(() => {});
+  await db.query(`ALTER TABLE employees MODIFY COLUMN employee_level VARCHAR(20) NOT NULL DEFAULT 'Intern'`).catch(() => {});
+  await db.query(`UPDATE employees SET employee_level = 'Intern' WHERE LOWER(TRIM(employee_level)) = 'junior'`).catch(() => {});
   await db.query(`ALTER TABLE tasks ADD COLUMN assigned_by INT NULL`).catch(() => {});
 
   for (const department of ['HR','HR Coordinator','BDE','Frontend Developer','Backend Developer','Fullstack Developer','Graphic']) {
@@ -400,3 +402,4 @@ app.use((err, req, res, next) => {
 server.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
+

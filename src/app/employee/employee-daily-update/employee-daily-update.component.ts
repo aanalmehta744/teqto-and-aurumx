@@ -56,9 +56,8 @@ export class EmployeeDailyUpdateComponent implements OnInit, AfterViewInit {
   userData: any;
   groupedData: { date: string, updates: any[], dataSource: MatTableDataSource<any> }[] = [];
   filteredGroupedData: { date: string, updates: any[], dataSource: MatTableDataSource<any> }[] = [];
-  // For a Senior employee the page is split into two labelled sections:
-  //   "My Updates" and "Junior / Intern Updates". For everyone else there is a
-  //   single unlabelled section holding all the date-grouped tables.
+  // For a Senior employee the page separates personal updates from updates on
+  // tasks they assigned.
   displaySections: { label: string, groups: { date: string, updates: any[], dataSource: MatTableDataSource<any> }[] }[] = [];
 
   ishr: string = ''; // you may get this from auth service or localStorage
@@ -98,14 +97,14 @@ export class EmployeeDailyUpdateComponent implements OnInit, AfterViewInit {
       const split = (mine: boolean) => this.filteredGroupedData
         .map(g => {
           const updates = g.updates.filter((u: any) =>
-            mine ? u.employee_id === myId : u.employee_id !== myId);
+            mine ? u.employee_id === myId : Number(u.task_assigned_by || u.assigned_by) === Number(myId));
           return { date: g.date, updates, dataSource: new MatTableDataSource(updates) };
         })
         .filter(g => g.updates.length > 0);
 
       this.displaySections = [
         { label: 'My Updates', groups: split(true) },
-        { label: 'Junior / Intern Updates', groups: split(false) },
+        { label: 'Assigned Task Updates', groups: split(false) },
       ];
     } else {
       this.displaySections = [{ label: '', groups: this.filteredGroupedData }];
@@ -231,7 +230,7 @@ isSeniorEmployee(): boolean {
     // CHANGED: added `|| this.userData?.department === 'HR'` so HR also fetches all employees' updates.
     // Previously HR fell into getUpdates(id) and only saw their own daily update entry.
     // OLD: const fetch$ = this.isAssignerRole()
-    const fetch$ = (this.isAssignerRole() || this.userData?.department === 'HR')
+    const fetch$ = this.userData?.department === 'HR'
       ? this.dailyUpdateService.getAllUpdates()
       : this.dailyUpdateService.getUpdates(this.userData.id);
 

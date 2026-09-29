@@ -39,7 +39,18 @@ export class DepartmentsComponent implements OnInit {
       if (!r.isConfirmed) return;
       this.service.delete(dept.id).subscribe({
         next: () => { this.departments = this.departments.filter(d => d.id !== dept.id); Swal.fire({icon:'success', title:'Deleted', text:'Department deleted successfully.', timer:1200, showConfirmButton:false}); },
-        error: err => Swal.fire({icon:'error', title:'Cannot Delete', text: err?.error?.message || 'Please try again.'})
+        error: err => Swal.fire({icon:'error', title:'Cannot Delete', text: typeof err === 'string' ? err : err?.error?.message || 'Please try again.'})
+      });
+    });
+  }
+  edit(dept: Department) {
+    Swal.fire({ title: 'Edit department name', input: 'text', inputValue: dept.name, showCancelButton: true,
+      inputValidator: value => !String(value || '').trim() ? 'Enter a department name.' : undefined
+    }).then(result => {
+      if (!result.isConfirmed) return;
+      this.service.update(dept.id, String(result.value).trim()).subscribe({
+        next: updated => { this.departments = this.departments.map(d => d.id === dept.id ? updated : d).sort((a,b) => a.name.localeCompare(b.name)); Swal.fire({ icon: 'success', title: 'Department Updated', text: 'Department name and employee assignments updated.' }); },
+        error: err => Swal.fire({ icon: 'error', title: 'Cannot Update', text: err?.error?.message || 'Please try again.' })
       });
     });
   }

@@ -27,6 +27,7 @@ import {
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'environments/environment';
+import { EmployeeSheetActionsComponent } from '@shared/components/employee-sheet-actions/employee-sheet-actions.component';
 
 @Component({
   selector: 'app-add-employee',
@@ -46,7 +47,8 @@ import { environment } from 'environments/environment';
     FileUploadComponent,
     MatButtonModule,
     MatIconModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    EmployeeSheetActionsComponent
   ],
   providers: [
     {
@@ -86,7 +88,7 @@ export class AddEmployeeComponent {
       password: ['', [Validators.required, Validators.minLength(6)]], // ✅ At least 6 chars
       conformPassword: ['', Validators.required], // ✅ Needs confirmation check
       department: ['', Validators.required],
-      employee_level: ['Junior', Validators.required],
+      employee_level: ['Intern', Validators.required],
       address: [''],
       joining_date: ['', Validators.required],
       salary: ['', [Validators.required, Validators.min(1)]], // ✅ Salary must be > 0

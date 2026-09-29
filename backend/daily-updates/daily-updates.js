@@ -35,7 +35,8 @@ router.get('/', async (req, res) => {
             e.employee_level,
             p.projectTitle,
             t.title AS task_title,
-            t.note
+            t.note,
+            t.assigned_by AS task_assigned_by
         FROM daily_updates du
         LEFT JOIN employees e ON du.employee_id = e.id
         LEFT JOIN projects p ON du.project_id = p.id
@@ -66,30 +67,10 @@ router.get('/', async (req, res) => {
 
             if (vRole === 'admin' || vDept === 'hr') {
                 where = '';
-            } else if (vDept === 'bde') {
-                // Updates whose project belongs to a client owned by this BDE.
-                where = `
-                    WHERE du.project_id IN (
-                        SELECT p2.id
-                        FROM projects p2
-                        JOIN clients c2 ON p2.client = c2.id
-                        WHERE c2.employee_id = ?
-                    )
-                `;
-                params = [viewerId];
-            } else if (vDept === 'ba' && vLevel === 'senior') {
-                where = `
-                    WHERE (
-                        LOWER(TRIM(e.department)) IN ('bde', 'ba')
-                        OR LOWER(TRIM(e.employee_level)) IN ('junior', 'senior')
-                    )
-                `;
-            } else if (vDept === 'ba') {
-                where = `WHERE LOWER(TRIM(e.department)) = 'ba'`;
             } else {
-                // Any other viewer → only their own updates.
-                where = `WHERE du.employee_id = ?`;
-                params = [viewerId];
+                // Employees see their own updates and updates on tasks they assigned.
+                where = `WHERE (du.employee_id = ? OR t.assigned_by = ?)`;
+                params = [viewerId, viewerId];
             }
 
             const [rows] = await db.query(
@@ -142,12 +123,7 @@ router.get('/', async (req, res) => {
         let query;
         let params;
 
-        // SENIOR EMPLOYEE
-        // Own + Junior + Intern from same department
-        if (
-            role === 'employee' &&
-            employeeLevel === 'senior'
-        ) {
+        if (role === 'employee' && employeeLevel === 'senior') {
             query = `
                 SELECT
                     du.*,
@@ -157,7 +133,8 @@ router.get('/', async (req, res) => {
                     e.employee_level,
                     p.projectTitle,
                     t.title,
-                    t.note
+                    t.note,
+                    t.assigned_by AS task_assigned_by
                 FROM daily_updates du
                 LEFT JOIN employees e
                     ON du.employee_id = e.id
@@ -166,18 +143,13 @@ router.get('/', async (req, res) => {
                 LEFT JOIN tasks t
                     ON du.task_id = t.id
                 WHERE
-                    du.employee_id = ?
-                    OR (
-                        LOWER(TRIM(e.department)) = LOWER(TRIM(?))
-                        AND LOWER(TRIM(e.employee_level))
-                            IN ('junior', 'intern')
-                    )
+                    du.employee_id = ? OR t.assigned_by = ?
                 ORDER BY du.update_date DESC
             `;
 
             params = [
                 employeeId,
-                department
+                employeeId
             ];
 
         } else {
@@ -193,7 +165,8 @@ router.get('/', async (req, res) => {
                     e.employee_level,
                     p.projectTitle,
                     t.title,
-                    t.note
+                    t.note,
+                    t.assigned_by AS task_assigned_by
                 FROM daily_updates du
                 LEFT JOIN employees e
                     ON du.employee_id = e.id
@@ -233,7 +206,8 @@ router.get('/', async (req, res) => {
         SELECT du.*, 
              p.projectTitle, 
              t.title, 
-             t.note
+      t.note,
+      t.assigned_by AS task_assigned_by
       FROM daily_updates du
       LEFT JOIN projects p ON du.project_id = p.id
       LEFT JOIN tasks t ON du.task_id = t.id
@@ -287,25 +261,28 @@ router.post('/', async (req, res) => {
     const sql = `INSERT INTO daily_updates (${columns.join(', ')}) VALUES (${placeholders})`;
 
     try {
+        let taskAssignerId = null;
+        if (task_id) {
+            const [[task]] = await db.query(
+                'SELECT employee_id, assigned_by FROM tasks WHERE id = ?', [task_id]
+            );
+            if (!task || Number(task.employee_id) !== Number(employee_id)) {
+                return res.status(403).send({ error: 'You can only update a task assigned to you.' });
+            }
+            taskAssignerId = task.assigned_by;
+        }
         const [result] = await db.query(sql, values);
 
-        // Notify all BDE and BA users about the new daily update
-        const [empRow] = await db.query('SELECT fullName FROM employees WHERE id = ?', [employee_id]).catch(() => [[]]);
-        const empName = empRow[0]?.fullName || 'An employee';
-        const [bdebaUsers] = await db.query("SELECT id, role FROM employees WHERE role IN ('BDE', 'BA')").catch(() => [[]]);
-        const message = `${empName} added a daily update`;
-        for (const user of bdebaUsers) {
+        // Only notify the person who assigned the task.
+        if (taskAssignerId) {
+            const [[employee]] = await db.query('SELECT fullName FROM employees WHERE id = ?', [employee_id]).catch(() => [[]]);
+            const message = `${employee?.fullName || 'An employee'} added a daily update to your task`;
             await db.query(
                 `INSERT INTO notifications (type, message, recipient_id, recipient_role) VALUES (?, ?, ?, ?)`,
-                ['daily_update', message, user.id, user.role]
+                ['daily_update', message, taskAssignerId, 'Employee']
             ).catch(() => {});
-
-            // Push a live notification to each BDE/BA socket room.
             try {
-                getIO().to(`user_${user.id}`).emit('notification', {
-                    type: 'daily_update',
-                    message
-                });
+                getIO().to(`user_${taskAssignerId}`).emit('notification', { type: 'daily_update', message });
             } catch (e) { /* socket not ready — DB row still persists */ }
         }
 
@@ -384,3 +361,4 @@ router.put('/updateProgress/:id', async (req, res) => {
 
 
 module.exports = router;
+

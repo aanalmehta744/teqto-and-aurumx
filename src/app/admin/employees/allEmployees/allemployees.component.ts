@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 // import { EmployeesService } from './employees.service'
 import { EmployeesService } from './employees.service';
 import { HttpClient } from '@angular/common/http';
@@ -33,6 +33,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { environment } from 'environments/environment';
 import { Router } from '@angular/router';
+import { EmployeeSheetActionsComponent } from '@shared/components/employee-sheet-actions/employee-sheet-actions.component';
 
 @Component({
   selector: 'app-allemployees',
@@ -54,6 +55,7 @@ import { Router } from '@angular/router';
     MatMenuModule,
     MatPaginatorModule,
     DatePipe,
+    EmployeeSheetActionsComponent,
   ],
 })
 export class AllemployeesComponent
@@ -97,6 +99,8 @@ export class AllemployeesComponent
   refresh() {
     this.loadData();
   }
+  @HostListener('window:employee-sheet-imported')
+  onEmployeeSheetImported() { this.refresh(); }
   addNew() {
     let tempDirection: Direction;
     if (localStorage.getItem('isRtl') === 'true') {

@@ -241,12 +241,18 @@ export class SidebarComponent
   }
 
   // Interviews (senior developer) → only Senior-level employees.
-  if (item.path === '/employee/my-interviews') {
+      if (item.path === '/employee/my-interviews') {
     return (
       userRole === 'employee' &&
       userDepartment !== 'hr' &&
       user.employee_level?.toLowerCase().trim() === 'senior'
-    );
+      );
+  }
+
+  // Self-service leave access is available to every employee department,
+  // including departments added after this sidebar's original static lists.
+  if (userRole === 'employee' && item.submenu?.some(sub => sub.path === '/employee/myleaves')) {
+    return true;
   }
 
   // Admin can only see Admin menus
@@ -256,6 +262,16 @@ export class SidebarComponent
 
   // All non-admin users must have Employee role
   if (userRole === 'employee') {
+    const standardEmployeePaths = new Set([
+      '/employee/dashboard', '/employee/attendance', '/employee/myleaves',
+      '/employee/holidays/all-holidays', '/employee/payroll/employee-salary',
+      '/employee/myteam', '/employee/myprojects', '/employee/mytasks',
+      '/employee/daily-update', '/chat-window'
+    ]);
+    const builtInDepartments = ['hr', 'hr coordinator', 'bde', 'ba', 'backend developer', 'frontend developer', 'fullstack developer', 'graphic'];
+    if (!builtInDepartments.includes(userDepartment) && standardEmployeePaths.has(item.path)) {
+      return true;
+    }
     // HR employee
     if (userDepartment === 'hr') {
       return (
@@ -288,6 +304,9 @@ export class SidebarComponent
   }
 
   return false;
+}).filter((item, index, items) => {
+  if (!item.path) return true;
+  return items.findIndex(candidate => candidate.path === item.path) === index;
 });
       this.sidebarItems.forEach(item => {
         item.isOpen = false;

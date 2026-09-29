@@ -38,7 +38,6 @@
           <mat-label>Employee Level</mat-label>
           <mat-select formControlName="employee_level" required>
             <mat-option value="Senior">Senior</mat-option>
-            <mat-option value="Junior">Junior</mat-option>
             <mat-option value="Intern">Intern</mat-option>
           </mat-select>
         </mat-form-field>
@@ -67,6 +66,24 @@
           <mat-error *ngIf="employeesForm.get('gender')?.hasError('required')">
             Gender is required
           </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Optional account password update -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>New Password (optional)</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" autocomplete="new-password" />
+          <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-hint>Leave blank to keep the current password.</mat-hint>
+          <mat-error *ngIf="employeesForm.get('password')?.hasError('minlength')">Password must be at least 6 characters.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Confirm New Password</mat-label>
+          <input matInput type="password" formControlName="conformPassword" autocomplete="new-password" />
+          <mat-error *ngIf="employeesForm.hasError('passwordMismatch')">Passwords do not match.</mat-error>
         </mat-form-field>
       </div>
 

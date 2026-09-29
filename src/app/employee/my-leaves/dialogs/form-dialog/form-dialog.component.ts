@@ -136,7 +136,8 @@ export class FormDialogComponent implements OnInit {
 
     this.employeeId = user.id || 0;
     this.availablePaidLeave = user.leave_balance || 0;
-    this.leaveTypes = user.gender === 'Female' ? ['Paid', 'Unpaid', 'Sick'] : ['Paid', 'Unpaid'];
+    // Sick leave is available to every employee; it must not depend on gender.
+    this.leaveTypes = ['Paid', 'Unpaid', 'Sick'];
     const role = (user.role || '').toUpperCase();
     this.isBdeOrBa = role === 'BDE' || role === 'BA';
     this.myLeavesForm.patchValue({ employee_id: this.employeeId });
@@ -259,6 +260,19 @@ export class FormDialogComponent implements OnInit {
 
     // 🔹 Paid leave validation
     const diffDays = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    if (diffDays > 3) {
+      this.leaveError = 'You can request a maximum of 3 consecutive leave days.';
+      this.isSubmitDisabled = true;
+    }
+    const cursor = new Date(start);
+    while (cursor <= end) {
+      if (cursor.getDay() === 0 || cursor.getDay() === 6) {
+        this.leaveError = 'Employees cannot add leave on Saturday or Sunday.';
+        this.isSubmitDisabled = true;
+        break;
+      }
+      cursor.setDate(cursor.getDate() + 1);
+    }
     if (leaveTypeControl?.value === 'Paid' && diffDays > this.availablePaidLeave) {
       this.paidLeaveError = `You only have ${this.availablePaidLeave} paid leave(s) left.`;
       leaveTypeControl?.setErrors({ ...(leaveTypeControl.errors || {}), noPaidLeave: true });

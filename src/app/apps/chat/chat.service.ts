@@ -371,6 +371,14 @@ onChatRequestRejected(): Observable<any> {
     });
   }
 
+  /** The logged-in employee's account was deleted by an administrator. */
+  onAccountDeleted(): Observable<{ employee_id: number }> {
+    return new Observable((observer) => {
+      this.socket.on('account_deleted', (data) => observer.next(data));
+      return () => this.socket.off('account_deleted');
+    });
+  }
+
   /** A live bell notification (task assigned, daily update, etc.) for the logged-in user. */
   onNotification(): Observable<any> {
     return new Observable((observer) => {

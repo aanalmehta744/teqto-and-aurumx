@@ -171,25 +171,7 @@ export class TaskComponent implements OnInit {
     return;
   }
 
-  // BDE (by department) → everyone EXCEPT Admin, HR, HR Coordinator, and self
-  if (currentDepartment === 'bde') {
-    this.assignableEmployees = data.filter((emp: any) => {
-      const r = String(emp.role || '').toLowerCase().trim();
-      const d = String(emp.department || '').toLowerCase().trim();
-      return emp.id !== currentUserId && r !== 'admin' && d !== 'hr' && d !== 'hr coordinator';
-    });
-    return;
-  }
-
-  // HR / HR Coordinator (by department) → everyone EXCEPT Admin (and self)
-  if (currentDepartment === 'hr' || currentDepartment === 'hr coordinator') {
-    this.assignableEmployees = data.filter((emp: any) =>
-      String(emp.role || '').toLowerCase().trim() !== 'admin' && emp.id !== currentUserId);
-    return;
-  }
-
-  // Senior can assign ONLY to Junior and Intern
-  // in the SAME department
+  // Seniors can assign to any teammate in the same department.
   if (
     currentRole === 'employee' &&
     currentLevel === 'senior'
@@ -204,7 +186,8 @@ export class TaskComponent implements OnInit {
         .trim();
 
       return (
-        ['junior', 'intern'].includes(employeeLevel) &&
+        emp.id !== currentUserId &&
+        employeeLevel !== '' &&
         employeeDepartment === currentDepartment
       );
     });
@@ -212,8 +195,8 @@ export class TaskComponent implements OnInit {
     return;
   }
 
-  // Existing/default behavior for other users
-  this.assignableEmployees = data;
+  // Interns and other non-senior employees cannot assign tasks.
+  this.assignableEmployees = [];
 });
   }
   loadProjects() {
@@ -414,3 +397,4 @@ export class TaskComponent implements OnInit {
     return formatDate(date, 'yyyy-MM-dd', 'en'); // Format using Angular's formatDate
   }
 }
+

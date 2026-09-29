@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const cron = require('node-cron');
 const { sendWelcomeEmail } = require('./sendEmail');
 const { createUpload } = require('../cloudinary');
+const { getIO } = require('../socket');
 
 // Middleware to parse JSON bodies
 router.use(express.json());
@@ -645,6 +646,19 @@ router.post('/', upload.single('uploadImg'), async (req, res) => {
 
   try {
 
+    const normalizedEmail = String(employeeData.email || '').trim().toLowerCase();
+    if (normalizedEmail) {
+      const [duplicates] = await db.query(
+        `SELECT id FROM employees
+         WHERE LOWER(TRIM(email)) = ?
+         LIMIT 1`,
+        [normalizedEmail]
+      );
+      if (duplicates.length) {
+        return res.status(409).json({ message: 'An employee with this email already exists.' });
+      }
+    }
+
     const hashedPassword = await bcrypt.hash(
       employeeData.password,
       10
@@ -837,13 +851,12 @@ router.post('/', upload.single('uploadImg'), async (req, res) => {
 
       [
         'Senior',
-        'Junior',
         'Intern'
       ].includes(
         employeeData.employee_level
       )
         ? employeeData.employee_level
-        : 'Junior',
+        : 'Intern',
 
 
       // EMPLOYEE ONLY
@@ -942,6 +955,10 @@ router.post('/', upload.single('uploadImg'), async (req, res) => {
       'Error adding employee:',
       err
     );
+
+    if (err.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ message: 'An employee with this email already exists.' });
+    }
 
     res.status(500).json({
       message: err.message,
@@ -1216,54 +1233,19 @@ router.put('/:id', async (req, res) => {
       : null;
 
 
-  // --------------------------------------------------------
-  // LEAVE CALCULATION
-  // --------------------------------------------------------
-
-  const today =
-    new Date();
-
-  const currentYear =
-    today.getFullYear();
-
-
-  const joiningDate =
-    formattedJoiningDate
-      ? new Date(formattedJoiningDate)
-      : new Date();
-
-
-  const joiningYear =
-    joiningDate.getFullYear();
-
-
-  const joiningMonth =
-    joiningDate.getMonth() + 1;
-
-
-  let paidLeaves;
-
-
-  if (joiningYear === currentYear) {
-
-    const remainingMonths =
-      12 - joiningMonth + 1;
-
-    paidLeaves =
-      remainingMonths;
-
-  } else if (joiningYear < currentYear) {
-
-    paidLeaves = 12;
-
-  } else {
-
-    paidLeaves = 0;
-
-  }
-
-
   try {
+
+    const normalizedEmail = String(employeeData.email || '').trim().toLowerCase();
+    const [duplicateEmails] = await db.query(
+      'SELECT id FROM employees WHERE LOWER(TRIM(email)) = ? AND id <> ? LIMIT 1',
+      [normalizedEmail, employeeId]
+    );
+    if (duplicateEmails.length) {
+      return res.status(409).json({ message: 'An employee with this email already exists.' });
+    }
+    const passwordHash = String(employeeData.password || '').trim()
+      ? await bcrypt.hash(employeeData.password, 10)
+      : null;
 
     const sql = `
       UPDATE employees
@@ -1273,6 +1255,8 @@ router.put('/:id', async (req, res) => {
         mobile = ?,
         department = ?,
         employee_level = ?,
+        role = ?,
+        password = COALESCE(?, password),
         address = ?,
         email = ?,
         dob = ?,
@@ -1280,8 +1264,6 @@ router.put('/:id', async (req, res) => {
         joining_date = ?,
         panCard = ?,
         aadharCard = ?,
-        total_leave = ?,
-        leave_balance = ?,
         status = ?,
         employment_type = ?,
         termination_date = ?
@@ -1301,13 +1283,16 @@ router.put('/:id', async (req, res) => {
 
       [
         'Senior',
-        'Junior',
         'Intern'
       ].includes(
-        employeeData.employee_level
+      employeeData.employee_level
       )
         ? employeeData.employee_level
-        : 'Junior',
+        : 'Intern',
+
+      employeeData.role,
+
+      passwordHash,
 
       employeeData.address,
 
@@ -1322,10 +1307,6 @@ router.put('/:id', async (req, res) => {
       employeeData.panCard,
 
       employeeData.aadharCard,
-
-      paidLeaves,
-
-      paidLeaves,
 
       employeeData.status ?? 1,
 
@@ -1376,6 +1357,10 @@ router.put('/:id', async (req, res) => {
       err
     );
 
+    if (err.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ message: 'An employee with this email already exists.' });
+    }
+
     res.status(500).json({
 
       error:
@@ -1399,25 +1384,33 @@ router.delete('/:id', async (req, res) => {
     req.params.id;
 
 
+  let connection;
   try {
-
-    const sql =
-      'DELETE FROM employees WHERE id = ?';
-
-
-    const [result] =
-      await db.query(
-        sql,
-        [employeeId]
-      );
+    // Leave records must not survive an employee deletion. Otherwise an old
+    // browser session could still address those records through the leave API.
+    connection = await db.getConnection();
+    await connection.beginTransaction();
+    await connection.query('DELETE FROM leave_requests WHERE employee_id = ?', [employeeId]);
+    const [result] = await connection.query('DELETE FROM employees WHERE id = ?', [employeeId]);
 
 
     if (result.affectedRows === 0) {
+      await connection.rollback();
 
       return res.status(404).json({
         error: 'Employee not found'
       });
 
+    }
+
+    await connection.commit();
+
+    // Tell any active sessions belonging to this employee to clear their
+    // credentials and return to the login screen.
+    try {
+      getIO().to(`user_${employeeId}`).emit('account_deleted', { employee_id: Number(employeeId) });
+    } catch (socketError) {
+      console.error('Could not notify deleted employee session:', socketError);
     }
 
 
@@ -1433,6 +1426,8 @@ router.delete('/:id', async (req, res) => {
 
   } catch (err) {
 
+    if (connection) await connection.rollback();
+
     console.error(
       'Error deleting employee:',
       err
@@ -1445,6 +1440,8 @@ router.delete('/:id', async (req, res) => {
 
     });
 
+  } finally {
+    if (connection) connection.release();
   }
 
 });

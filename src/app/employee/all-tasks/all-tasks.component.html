@@ -79,7 +79,7 @@
           <!-- Project -->
           <ng-container matColumnDef="project">
             <th mat-header-cell *matHeaderCellDef mat-sort-header class="p-2 border-b font-semibold">Project</th>
-            <td mat-cell *matCellDef="let row" class="p-2 border-b">{{ row.projectTitle}}</td>
+            <td mat-cell *matCellDef="let row" class="p-2 border-b">{{ row.projectTitle || (row.trainer_project_name ? row.trainer_project_name + ' (Trainer)' : 'No Project') }}</td>
           </ng-container>
 
           <!-- Status -->

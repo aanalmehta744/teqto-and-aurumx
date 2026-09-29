@@ -30,36 +30,20 @@ async function validateAssignment(assignedBy, employeeId) {
   const assignerDept = String(assigner.department || '').toLowerCase().trim();
   const assigneeDept = String(assignee.department || '').toLowerCase().trim();
   const assigneeRole = String(assignee.role || '').toLowerCase().trim();
-  const assigneeLevel = String(assignee.employee_level || '').toLowerCase().trim();
+  const assignerLevel = String(assigner.employee_level || '').toLowerCase().trim();
 
-  // BDE (identified by department) → may assign to anyone EXCEPT Admin, HR, HR Coordinator.
-  if (assignerDept === 'bde') {
-    if (assigneeRole === 'admin' || assigneeDept === 'hr' || assigneeDept === 'hr coordinator') {
-      return 'BDE cannot assign tasks to Admin, HR or HR Coordinator.';
-    }
-    return null;
+  if (String(assigner.role || '').toLowerCase().trim() === 'employee' && assignerLevel === 'intern') {
+    return 'Interns cannot assign tasks.';
   }
 
-  // HR / HR Coordinator → may assign to anyone EXCEPT Admin.
-  if (assignerDept === 'hr' || assignerDept === 'hr coordinator') {
-    if (assigneeRole === 'admin') {
-      return 'HR cannot assign tasks to Admin.';
-    }
-    return null;
+  if (String(assigner.role || '').toLowerCase().trim() === 'admin') return null;
+
+  // Only senior employees can assign tasks, and only within their department.
+  if (String(assigner.role || '').toLowerCase().trim() !== 'employee' || assignerLevel !== 'senior') {
+    return 'Only senior employees can assign tasks.';
   }
-
-  // Senior EMPLOYEE (not BDE) → only Junior/Intern, and only within the same department.
-  const isSeniorEmployee =
-    String(assigner.employee_level || '').toLowerCase().trim() === 'senior' &&
-    String(assigner.role || '').toLowerCase().trim() === 'employee';
-
-  if (isSeniorEmployee) {
-    if (!['junior', 'intern'].includes(assigneeLevel)) {
-      return 'Senior employees can assign tasks only to Junior and Intern employees.';
-    }
-    if (assignerDept !== assigneeDept) {
-      return 'Senior employees can assign tasks only within their own department.';
-    }
+  if (assigneeRole === 'admin' || assignerDept !== assigneeDept) {
+    return 'Senior employees can assign tasks only within their own department.';
   }
 
   return null;
@@ -89,13 +73,10 @@ router.get('/', async (req, res) => {
             WHERE c2.employee_id = ?
           )`);
         params.push(viewerId);
-      } else if (vDept === 'ba' && vLevel === 'intern') {
-        // BA Intern → only tasks they created or that are assigned to them.
-        conditions.push(`(tasks.assigned_by = ? OR tasks.employee_id = ?)`);
-        params.push(viewerId, viewerId);
+      } else if (vRole === 'employee' && vLevel === 'intern') {
+        conditions.push(`tasks.employee_id = ?`);
+        params.push(viewerId);
       } else if (vRole === 'employee' && vLevel === 'senior') {
-        // Senior employee → only tasks assigned TO him or assigned BY him
-        // (to his juniors/interns). Not tasks HR/admin gave to others.
         conditions.push(`(tasks.employee_id = ? OR tasks.assigned_by = ?)`);
         params.push(viewerId, viewerId);
       }
@@ -264,3 +245,4 @@ router.delete('/:id', async (req, res) => {
 
 
 module.exports = router;
+

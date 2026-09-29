@@ -15,8 +15,13 @@
       </div>
       <div *ngIf="!departments.length" class="py-10 text-center text-gray-500">No departments found.</div>
       <div *ngFor="let dept of departments" class="flex items-center justify-between border rounded-lg px-4 py-3 mb-2">
-        <div class="font-medium text-gray-800">{{ dept.name }}</div>
-        <button *ngIf="canManage" mat-icon-button color="warn" (click)="remove(dept)" matTooltip="Delete department"><mat-icon>delete</mat-icon></button>
+        <div class="font-medium text-gray-800" [attr.title]="(dept.employee_count || 0) + ' employees: ' + (dept.employee_names || 'None')">
+          {{ dept.name }} <span class="ml-2 text-xs text-gray-500">({{ dept.employee_count || 0 }} employees)</span>
+        </div>
+        <div *ngIf="canManage" class="flex items-center">
+          <button mat-icon-button (click)="edit(dept)" title="Edit department"><mat-icon>edit</mat-icon></button>
+          <button mat-icon-button color="warn" (click)="remove(dept)" title="Delete department"><mat-icon>delete</mat-icon></button>
+        </div>
       </div>
     </div>
   </div>

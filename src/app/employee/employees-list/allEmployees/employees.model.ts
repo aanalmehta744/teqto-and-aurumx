@@ -35,7 +35,7 @@ export class Employees {
       this.role = employees.role || '';
       this.mobile = employees.mobile || '';
       this.department = employees.department || '';
-      this.employee_level = employees.employee_level || 'Junior';
+      this.employee_level = employees.employee_level === 'Junior' ? 'Intern' : (employees.employee_level || 'Intern');
       this.degree = employees.degree || '';
       this.gender = employees.gender || '';
       this.address = employees.address || '';
