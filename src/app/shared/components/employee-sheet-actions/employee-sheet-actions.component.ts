@@ -208,7 +208,7 @@ export class EmployeeSheetActionsComponent {
       gender: String(row['gender'] || '').trim(),
       department: String(row['department'] || '').trim(),
       role: String(row['role'] || 'Employee').trim(),
-      employee_level: ['Senior', 'Intern'].includes(String(row['employee_level'] || '').trim()) ? String(row['employee_level']).trim() : 'Intern',
+      employee_level: ['Senior', 'Intern', 'Junior'].includes(String(row['employee_level'] || '').trim()) ? String(row['employee_level']).trim() : 'Junior',
       dob: this.toDateString(row['dob']),
       joining_date: this.toDateString(row['joining_date']),
       termination_date: this.toDateString(row['termination_date']),

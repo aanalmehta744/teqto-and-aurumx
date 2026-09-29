@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { EmployeesService } from './employees.service';
 import { AttendancesService } from 'app/employee/attendance/attendance.service';
 import { MyLeavesService } from 'app/employee/my-leaves/my-leaves.service';
@@ -41,6 +42,7 @@ import { AuthService } from '@core';
     MatButtonModule,
     MatCheckboxModule,
     CommonModule,
+    FormsModule,
     MatProgressSpinnerModule,
     NgScrollbarModule,
     MatPaginatorModule,
@@ -84,6 +86,12 @@ export class EmployeeProfileComponent implements OnInit, AfterViewInit {
 
   photoUploading = false;
   photoUploadError = '';
+
+  // Inline address editing (employee self-service).
+  editingAddress = false;
+  addressDraft = '';
+  addressSaving = false;
+  addressError = '';
 
   private authService = inject(AuthService);
 
@@ -190,6 +198,35 @@ export class EmployeeProfileComponent implements OnInit, AfterViewInit {
       },
       error: (error) => {
         console.error('Error loading monthly targets:', error);
+      }
+    });
+  }
+
+  startEditAddress(): void {
+    this.addressDraft = this.employee?.address || '';
+    this.addressError = '';
+    this.editingAddress = true;
+  }
+
+  cancelEditAddress(): void {
+    this.editingAddress = false;
+    this.addressError = '';
+  }
+
+  saveAddress(): void {
+    this.addressSaving = true;
+    this.addressError = '';
+    const address = this.addressDraft.trim();
+    this.employeesService.updateBasicInfo(this.employeeId, { address }).subscribe({
+      next: () => {
+        this.employee.address = address;
+        this.addressSaving = false;
+        this.editingAddress = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.addressError = err?.error?.error || 'Failed to save. Please try again.';
+        this.addressSaving = false;
       }
     });
   }

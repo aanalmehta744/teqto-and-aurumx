@@ -55,7 +55,32 @@
 
               <!-- Info Section -->
               <div class="p-5">
-                <p class="text-gray-600">{{ employee.address || 'No address provided' }}</p>
+                <!-- Address (inline editable) -->
+                <div *ngIf="!editingAddress" class="flex items-center justify-center gap-1 text-gray-600">
+                  <span>{{ employee.address || 'No address provided' }}</span>
+                  <button type="button" class="text-gray-400 hover:text-gray-700 shrink-0"
+                    (click)="startEditAddress()" aria-label="Edit address">
+                    <mat-icon class="!text-[16px] !w-[16px] !h-[16px]">edit</mat-icon>
+                  </button>
+                </div>
+
+                <div *ngIf="editingAddress" class="text-left">
+                  <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Address</mat-label>
+                    <textarea matInput rows="2" [(ngModel)]="addressDraft" [disabled]="addressSaving"
+                      placeholder="Enter your address"></textarea>
+                  </mat-form-field>
+                  <div *ngIf="addressError" class="text-red-500 text-xs mb-1">{{ addressError }}</div>
+                  <div class="flex items-center justify-end gap-2">
+                    <button type="button" class="text-xs px-3 py-1.5 rounded-full text-gray-600 hover:bg-gray-100"
+                      [disabled]="addressSaving" (click)="cancelEditAddress()">Cancel</button>
+                    <button type="button"
+                      class="text-xs px-3 py-1.5 rounded-full bg-[#d6d5ea] text-[#00383F] hover:bg-[#c3c2de] font-medium"
+                      [disabled]="addressSaving" (click)="saveAddress()">
+                      {{ addressSaving ? 'Saving…' : 'Save' }}
+                    </button>
+                  </div>
+                </div>
 
                 <div class="mt-4 flex items-center justify-center text-gray-600">
                   <mat-icon class="text-gray-500 mr-2">phone</mat-icon>

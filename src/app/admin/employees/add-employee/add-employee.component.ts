@@ -88,7 +88,7 @@ export class AddEmployeeComponent {
       password: ['', [Validators.required, Validators.minLength(6)]], // ✅ At least 6 chars
       conformPassword: ['', Validators.required], // ✅ Needs confirmation check
       department: ['', Validators.required],
-      employee_level: ['Intern', Validators.required],
+      employee_level: ['Junior'],
       address: [''],
       joining_date: ['', Validators.required],
       salary: ['', [Validators.required, Validators.min(1)]], // ✅ Salary must be > 0

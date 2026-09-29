@@ -91,6 +91,12 @@ deleteMonthlyTarget(targetId: number) {
   return this.httpClient.delete(`${this.API_URL}/${targetId}/targets`);
 }
 
+// Employee self-service update of non-sensitive basic info (e.g. address).
+// Only the provided fields are sent; the backend updates just those.
+updateBasicInfo(employeeId: number, data: { [field: string]: any }): Observable<any> {
+  return this.httpClient.patch(`${this.API_URL}/${employeeId}/basic-info`, data);
+}
+
 uploadPhoto(employeeId: number, file: File): Observable<any> {
   const formData = new FormData();
   formData.append('photo', file);

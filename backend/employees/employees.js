@@ -851,16 +851,17 @@ router.post('/', upload.single('uploadImg'), async (req, res) => {
 
       [
         'Senior',
-        'Intern'
+        'Intern',
+        'Junior'
       ].includes(
         employeeData.employee_level
       )
         ? employeeData.employee_level
-        : 'Intern',
+        : 'Junior',
 
 
-      // EMPLOYEE ONLY
-      null,
+      // address (saved if provided at creation, otherwise employee fills later)
+      employeeData.address || null,
 
       employeeData.email,
 
@@ -1236,6 +1237,14 @@ router.put('/:id', async (req, res) => {
   try {
 
     const normalizedEmail = String(employeeData.email || '').trim().toLowerCase();
+    const employmentType = employeeData.employment_type === true ||
+      employeeData.employment_type === 1 ||
+      String(employeeData.employment_type).toLowerCase() === 'true' ||
+      String(employeeData.employment_type) === '1' ? 1 : 0;
+    const status = employeeData.status === true ||
+      employeeData.status === 1 ||
+      String(employeeData.status).toLowerCase() === 'true' ||
+      String(employeeData.status) === '1' ? 1 : 0;
     const [duplicateEmails] = await db.query(
       'SELECT id FROM employees WHERE LOWER(TRIM(email)) = ? AND id <> ? LIMIT 1',
       [normalizedEmail, employeeId]
@@ -1283,12 +1292,13 @@ router.put('/:id', async (req, res) => {
 
       [
         'Senior',
-        'Intern'
+        'Intern',
+        'Junior'
       ].includes(
       employeeData.employee_level
       )
         ? employeeData.employee_level
-        : 'Intern',
+        : 'Junior',
 
       employeeData.role,
 
@@ -1308,11 +1318,11 @@ router.put('/:id', async (req, res) => {
 
       employeeData.aadharCard,
 
-      employeeData.status ?? 1,
+      status,
 
-      employeeData.employment_type,
+      employmentType,
 
-      employeeData.status == 0
+      status === 0
         ? (
             employeeData.termination_date ||
             new Date().toLocaleDateString('en-CA')
@@ -1364,7 +1374,8 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({
 
       error:
-        'An error occurred while updating employee data'
+        'An error occurred while updating employee data',
+      message: err.message
 
     });
 
@@ -1990,6 +2001,53 @@ router.patch(
 
   }
 );
+
+
+// ============================================================
+// EMPLOYEE SELF BASIC-INFO UPDATE (by id)
+//
+// Employees may update only their own non-sensitive fields
+// (address, PAN, Aadhaar, 10th/12th marks). Contact fields
+// like email / mobile are intentionally NOT editable here.
+// Only the fields actually sent are updated.
+// ============================================================
+router.patch('/:id/basic-info', async (req, res) => {
+
+  const { id } = req.params;
+
+  const ALLOWED = ['address', 'panCard', 'aadharCard', 'tenth_marks', 'twelfth_marks'];
+
+  try {
+
+    const setParts = [];
+    const values = [];
+
+    ALLOWED.forEach((field) => {
+      if (Object.prototype.hasOwnProperty.call(req.body, field)) {
+        setParts.push(`${field} = ?`);
+        values.push(req.body[field] === '' ? null : req.body[field]);
+      }
+    });
+
+    if (setParts.length === 0) {
+      return res.status(400).json({ error: 'No editable fields provided' });
+    }
+
+    const [existing] = await db.query('SELECT id FROM employees WHERE id = ?', [id]);
+    if (existing.length === 0) {
+      return res.status(404).json({ error: 'Employee not found' });
+    }
+
+    values.push(id);
+    await db.query(`UPDATE employees SET ${setParts.join(', ')} WHERE id = ?`, values);
+
+    res.json({ message: 'Profile updated successfully' });
+
+  } catch (err) {
+    console.error('Error updating employee basic info:', err);
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
+});
 
 
 module.exports = router;

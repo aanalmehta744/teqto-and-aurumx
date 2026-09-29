@@ -36,11 +36,11 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Employee Level</mat-label>
-          <mat-select formControlName="employee_level" required>
+          <mat-select formControlName="employee_level">
             <mat-option value="Senior">Senior</mat-option>
+            <mat-option value="Junior">Junior</mat-option>
             <mat-option value="Intern">Intern</mat-option>
           </mat-select>
-          <mat-error *ngIf="employeesForm.get('employee_level')?.hasError('required')">Employee Level is required.</mat-error>
         </mat-form-field>
       </div>
 

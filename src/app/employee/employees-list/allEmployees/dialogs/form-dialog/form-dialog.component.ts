@@ -113,7 +113,7 @@ export class FormDialogComponent implements OnInit {
       ],
       address: [this.employees.address || ''],
       department: [this.employees.department || '', Validators.required],
-      employee_level: [this.employees.employee_level === 'Junior' ? 'Intern' : (this.employees.employee_level || 'Intern'), Validators.required],
+      employee_level: [this.employees.employee_level || 'Junior'],
       password: ['', Validators.minLength(6)],
       conformPassword: [''],
       panCard: [
@@ -183,7 +183,7 @@ export class FormDialogComponent implements OnInit {
         (error) => {
           Swal.fire({
             title: 'Error!',
-            text: 'Failed to update employee',
+            text: error?.error?.message || error?.error?.error || 'Failed to update employee',
             icon: 'error',
             confirmButtonText: 'OK'
           });

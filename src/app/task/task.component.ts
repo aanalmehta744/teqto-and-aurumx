@@ -195,7 +195,17 @@ export class TaskComponent implements OnInit {
     return;
   }
 
-  // Interns and other non-senior employees cannot assign tasks.
+  // Mid-level employees (neither senior nor intern) can assign only to interns in their department.
+  if (currentRole === 'employee' && currentLevel !== 'intern') {
+    this.assignableEmployees = data.filter((emp: any) =>
+      emp.id !== currentUserId &&
+      String(emp.employee_level || '').toLowerCase().trim() === 'intern' &&
+      String(emp.department || '').toLowerCase().trim() === currentDepartment
+    );
+    return;
+  }
+
+  // Interns cannot assign tasks.
   this.assignableEmployees = [];
 });
   }

@@ -38,12 +38,17 @@ async function validateAssignment(assignedBy, employeeId) {
 
   if (String(assigner.role || '').toLowerCase().trim() === 'admin') return null;
 
-  // Only senior employees can assign tasks, and only within their department.
-  if (String(assigner.role || '').toLowerCase().trim() !== 'employee' || assignerLevel !== 'senior') {
-    return 'Only senior employees can assign tasks.';
+  // Only employees (senior or mid-level) can assign tasks, and only within their department.
+  if (String(assigner.role || '').toLowerCase().trim() !== 'employee') {
+    return 'Only employees can assign tasks.';
   }
   if (assigneeRole === 'admin' || assignerDept !== assigneeDept) {
-    return 'Senior employees can assign tasks only within their own department.';
+    return 'Employees can assign tasks only within their own department.';
+  }
+  // Mid-level employees (neither senior nor intern) can assign only to interns.
+  if (assignerLevel !== 'senior' &&
+      String(assignee.employee_level || '').toLowerCase().trim() !== 'intern') {
+    return 'Only senior employees can assign tasks to non-interns.';
   }
 
   return null;
@@ -76,7 +81,8 @@ router.get('/', async (req, res) => {
       } else if (vRole === 'employee' && vLevel === 'intern') {
         conditions.push(`tasks.employee_id = ?`);
         params.push(viewerId);
-      } else if (vRole === 'employee' && vLevel === 'senior') {
+      } else if (vRole === 'employee') {
+        // Senior and mid-level employees see their own tasks and tasks they assigned.
         conditions.push(`(tasks.employee_id = ? OR tasks.assigned_by = ?)`);
         params.push(viewerId, viewerId);
       }

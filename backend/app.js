@@ -65,8 +65,7 @@ const app = express();
 
   await db.query(`CREATE TABLE IF NOT EXISTS departments (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100) NOT NULL UNIQUE, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)`).catch(() => {});
   await db.query(`ALTER TABLE employees ADD COLUMN employee_level VARCHAR(20) NOT NULL DEFAULT 'Intern'`).catch(() => {});
-  await db.query(`ALTER TABLE employees MODIFY COLUMN employee_level VARCHAR(20) NOT NULL DEFAULT 'Intern'`).catch(() => {});
-  await db.query(`UPDATE employees SET employee_level = 'Intern' WHERE LOWER(TRIM(employee_level)) = 'junior'`).catch(() => {});
+  await db.query(`ALTER TABLE employees MODIFY COLUMN employee_level VARCHAR(20) NOT NULL DEFAULT 'Junior'`).catch(() => {});
   await db.query(`ALTER TABLE tasks ADD COLUMN assigned_by INT NULL`).catch(() => {});
 
   for (const department of ['HR','HR Coordinator','BDE','Frontend Developer','Backend Developer','Fullstack Developer','Graphic']) {
