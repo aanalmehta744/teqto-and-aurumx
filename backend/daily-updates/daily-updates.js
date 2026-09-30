@@ -67,6 +67,25 @@ router.get('/', async (req, res) => {
 
             if (vRole === 'admin' || vDept === 'hr') {
                 where = '';
+            } else if (['bde', 'ba'].includes(vDept) || ['bde', 'ba'].includes(vRole)) {
+                where = `WHERE du.project_id IN (
+                    SELECT p.id
+                    FROM projects p
+                    JOIN clients c ON p.client = c.id
+                    WHERE c.employee_id = ?
+                )`;
+                params = [viewerId];
+                if (vDept === 'ba' || vRole === 'ba') {
+                    where = `WHERE du.project_id IN (
+                        SELECT p.id
+                        FROM projects p
+                        LEFT JOIN clients c ON p.client = c.id
+                        WHERE FIND_IN_SET(?, p.team) > 0
+                           OR p.created_by = ?
+                           OR c.employee_id = ?
+                    )`;
+                    params = [viewerId, viewerId, viewerId];
+                }
             } else {
                 // Employees see their own updates and updates on tasks they assigned.
                 where = `WHERE (du.employee_id = ? OR t.assigned_by = ?)`;
@@ -123,7 +142,7 @@ router.get('/', async (req, res) => {
         let query;
         let params;
 
-        if (role === 'employee' && employeeLevel === 'senior') {
+        if (role === 'employee' && ['senior', 'junior'].includes(employeeLevel)) {
             query = `
                 SELECT
                     du.*,
@@ -154,8 +173,7 @@ router.get('/', async (req, res) => {
 
         } else {
 
-            // JUNIOR / INTERN / OTHER EMPLOYEE
-            // Only their own updates
+            // Interns / other employees see only their own updates.
             query = `
                 SELECT
                     du.*,

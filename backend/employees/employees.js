@@ -1055,7 +1055,6 @@ router.put('/me/profile', async (req, res) => {
 
     }
 
-
     res.status(200).json({
 
       success: true,
@@ -1347,6 +1346,14 @@ router.put('/:id', async (req, res) => {
         error: 'Employee not found'
       });
 
+    }
+
+    if (status === 0) {
+      try {
+        getIO().to(`user_${employeeId}`).emit('account_inactive', { employee_id: Number(employeeId) });
+      } catch (socketError) {
+        console.error('Could not notify inactive employee session:', socketError);
+      }
     }
 
 

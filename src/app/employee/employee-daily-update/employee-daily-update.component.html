@@ -50,7 +50,8 @@
                                 No results
                             </div>
 
-                            <!-- Sections: Senior sees "My Updates" + "Junior / Intern Updates";
+                            <!-- Junior and Senior see their own updates separately from updates
+                                 posted by employees on tasks they assigned;
                                  everyone else sees a single unlabelled section. -->
                             <div *ngFor="let section of displaySections" class="mb-8">
                                 <h5 *ngIf="section.label"

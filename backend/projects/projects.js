@@ -34,7 +34,7 @@ router.get('/myproject/:userId', async (req, res) => {
 // API route to add a new project
 router.post('/', async (req, res) => {
   try {
-    const { projectTitle, department, priority, client, startDate, endDate, team, status, description, tags } = req.body;
+    const { projectTitle, department, priority, client, startDate, endDate, team, status, description, tags, created_by } = req.body;
 
     if (!projectTitle || !department || !priority || !startDate || !endDate || !status) {
       return res.status(400).json({ message: 'All required fields must be filled out' });
@@ -55,11 +55,11 @@ router.post('/', async (req, res) => {
     const tagsString = Array.isArray(tags) ? tags.join(',') : (tags || '');
     const descriptionStr = typeof description === 'string' ? description : JSON.stringify(description || '');
 
-    const sqlQuery = `INSERT INTO projects (projectTitle, department, priority, client, startDate, endDate, team, status, description, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sqlQuery = `INSERT INTO projects (projectTitle, department, priority, client, startDate, endDate, team, status, description, tags, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     const [result] = await db.query(sqlQuery, [
       projectTitle, department, priority, client || null,
-      formattedStartDate, formattedEndDate, teamString, status, descriptionStr, tagsString
+      formattedStartDate, formattedEndDate, teamString, status, descriptionStr, tagsString, created_by || null
     ]);
 
     res.status(201).json({ message: 'Project added successfully', projectId: result.insertId });

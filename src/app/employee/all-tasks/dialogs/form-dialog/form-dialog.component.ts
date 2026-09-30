@@ -94,15 +94,23 @@ export class FormDialogComponent implements OnInit {
 
     const level = String(user?.employee_level || '').toLowerCase().trim();
 
+    // BDE and BA users can assign to any Senior, Junior, or Intern.
+    if (['bde', 'ba'].includes(role) || (role === 'employee' && ['bde', 'ba'].includes(userDept))) {
+      return data.filter(e =>
+        String(e.role || '').toLowerCase().trim() === 'employee' &&
+        ['senior', 'junior', 'intern'].includes(String(e.employee_level || '').toLowerCase().trim())
+      );
+    }
+
     // Senior employees can assign to any teammate in their department.
     if (role === 'employee' && level === 'senior') {
       return data.filter(e => e.id !== user.id && String(e.department || '').toLowerCase().trim() === userDept);
     }
 
-    // Mid-level employees (neither senior nor intern) can assign only to interns in their department.
-    if (role === 'employee' && level !== 'intern') {
+    // Junior employees can assign to interns and other juniors in their department.
+    if (role === 'employee' && level === 'junior') {
       return data.filter(e => e.id !== user.id &&
-        String(e.employee_level || '').toLowerCase().trim() === 'intern' &&
+        ['junior', 'intern'].includes(String(e.employee_level || '').toLowerCase().trim()) &&
         String(e.department || '').toLowerCase().trim() === userDept);
     }
 

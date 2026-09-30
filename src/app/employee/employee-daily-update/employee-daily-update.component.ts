@@ -56,8 +56,8 @@ export class EmployeeDailyUpdateComponent implements OnInit, AfterViewInit {
   userData: any;
   groupedData: { date: string, updates: any[], dataSource: MatTableDataSource<any> }[] = [];
   filteredGroupedData: { date: string, updates: any[], dataSource: MatTableDataSource<any> }[] = [];
-  // For a Senior employee the page separates personal updates from updates on
-  // tasks they assigned.
+  // Junior and Senior employees see personal updates separately from updates
+  // on tasks they assigned.
   displaySections: { label: string, groups: { date: string, updates: any[], dataSource: MatTableDataSource<any> }[] }[] = [];
 
   ishr: string = ''; // you may get this from auth service or localStorage
@@ -92,19 +92,21 @@ export class EmployeeDailyUpdateComponent implements OnInit, AfterViewInit {
 
   /** Build the sections shown in the template from filteredGroupedData. */
   rebuildSections(): void {
-    if (this.isSeniorEmployee()) {
+    if (this.canSeeAssignedTaskUpdates()) {
       const myId = this.userData?.id;
       const split = (mine: boolean) => this.filteredGroupedData
         .map(g => {
           const updates = g.updates.filter((u: any) =>
-            mine ? u.employee_id === myId : Number(u.task_assigned_by || u.assigned_by) === Number(myId));
+            mine
+              ? Number(u.employee_id) === Number(myId)
+              : Number(u.task_assigned_by || u.assigned_by) === Number(myId));
           return { date: g.date, updates, dataSource: new MatTableDataSource(updates) };
         })
         .filter(g => g.updates.length > 0);
 
       this.displaySections = [
         { label: 'My Updates', groups: split(true) },
-        { label: 'Assigned Task Updates', groups: split(false) },
+        { label: 'Daily Updates for Tasks You Assigned', groups: split(false) },
       ];
     } else {
       this.displaySections = [{ label: '', groups: this.filteredGroupedData }];
@@ -114,11 +116,9 @@ export class EmployeeDailyUpdateComponent implements OnInit, AfterViewInit {
   isAssignerRole(): boolean {
     return ['Admin', 'BDE', 'BA'].includes(this.userData?.role || '');
   }
-isSeniorEmployee(): boolean {
-  return (
-    String(this.userData?.role || '').toLowerCase() === 'employee' &&
-    String(this.userData?.employee_level || '').toLowerCase() === 'senior'
-  );
+canSeeAssignedTaskUpdates(): boolean {
+  return String(this.userData?.role || '').toLowerCase().trim() === 'employee' &&
+    ['junior', 'senior'].includes(String(this.userData?.employee_level || '').toLowerCase().trim());
 }
   // loadUserDataFromLocalStorage(): void {
   //   const userJson = localStorage.getItem('currentUser');
@@ -181,11 +181,8 @@ isSeniorEmployee(): boolean {
         'actions'
       ];
 
-    } else if (this.isSeniorEmployee()) {
-      // Senior employee
-      // Senior can see employee name because
-      // backend will return Junior + Intern
-      // from the same department.
+    } else if (this.canSeeAssignedTaskUpdates()) {
+      // Junior and Senior employees can see updates from assignees.
       this.ishr = 'false';
 
       this.displayedColumns = [

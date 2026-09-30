@@ -174,6 +174,7 @@ export class FormDialogComponent implements OnInit {
           }
         });
       } else {
+        formData.created_by = JSON.parse(localStorage.getItem('currentUser') || 'null')?.id || null;
         this.projectService.createProject(formData).subscribe({
           next: () => {
             Swal.fire({

@@ -99,9 +99,6 @@ export class MainLayoutComponent
       Notification.requestPermission().catch(() => {});
     }
 
-    // Register this socket so the server can route chat-request / message events here.
-    this.chatService.identify(currentUserId);
-
     // If HR/Admin deletes this account, immediately invalidate this browser's
     // local session and return the user to the login page.
     this.subs.sink = this.chatService.onAccountDeleted().subscribe((event) => {
@@ -115,6 +112,22 @@ export class MainLayoutComponent
         verticalPosition: 'top',
       });
     });
+
+    this.subs.sink = this.chatService.onAccountInactive().subscribe((event) => {
+      if (Number(event?.employee_id) !== Number(currentUserId)) return;
+
+      this.authService.logout();
+      this.router.navigate(['/authentication/login']);
+      this.snackBar.open('Your account was deactivated. You have been logged out.', 'Close', {
+        duration: 6000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+      });
+    });
+
+    // Register after subscribing so an inactive/deleted account is caught
+    // immediately when the server validates this socket's identity.
+    this.chatService.identify(currentUserId);
 
     // Notify when someone sends a chat request.
     this.subs.sink = this.chatService.onChatRequestReceived().subscribe((req: any) => {

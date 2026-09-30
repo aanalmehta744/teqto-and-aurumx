@@ -52,6 +52,7 @@ export interface ChatRequest {
 export class ChatService implements OnDestroy {
   private apiUrl = `${environment.apiUrl}/chat`;
   private socket: Socket;
+  private identifiedEmployeeId: number | null = null;
 
   constructor(private http: HttpClient) {
     const socketUrl = environment.apiUrl.replace('/api', '');
@@ -60,6 +61,11 @@ export class ChatService implements OnDestroy {
     // makes socket.io connect to the SAME origin (nginx then proxies /socket.io/).
     this.socket = io(socketUrl || undefined, {
       transports: ['websocket', 'polling'],
+    });
+    this.socket.on('connect', () => {
+      if (this.identifiedEmployeeId !== null) {
+        this.socket.emit('identify', this.identifiedEmployeeId);
+      }
     });
   }
 
@@ -313,6 +319,7 @@ onChatRequestRejected(): Observable<any> {
   identify(
     employeeId: number
   ): void {
+    this.identifiedEmployeeId = employeeId;
     this.socket.emit(
       'identify',
       employeeId
@@ -376,6 +383,14 @@ onChatRequestRejected(): Observable<any> {
     return new Observable((observer) => {
       this.socket.on('account_deleted', (data) => observer.next(data));
       return () => this.socket.off('account_deleted');
+    });
+  }
+
+  /** The logged-in employee's account was deactivated by an administrator. */
+  onAccountInactive(): Observable<{ employee_id: number }> {
+    return new Observable((observer) => {
+      this.socket.on('account_inactive', (data) => observer.next(data));
+      return () => this.socket.off('account_inactive');
     });
   }
 

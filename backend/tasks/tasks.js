@@ -30,25 +30,39 @@ async function validateAssignment(assignedBy, employeeId) {
   const assignerDept = String(assigner.department || '').toLowerCase().trim();
   const assigneeDept = String(assignee.department || '').toLowerCase().trim();
   const assigneeRole = String(assignee.role || '').toLowerCase().trim();
+  const assignerRole = String(assigner.role || '').toLowerCase().trim();
   const assignerLevel = String(assigner.employee_level || '').toLowerCase().trim();
 
   if (String(assigner.role || '').toLowerCase().trim() === 'employee' && assignerLevel === 'intern') {
     return 'Interns cannot assign tasks.';
   }
 
-  if (String(assigner.role || '').toLowerCase().trim() === 'admin') return null;
+  if (assignerRole === 'admin') return null;
+
+  // BDE and BA users may assign to any employee level.
+  if (['bde', 'ba'].includes(assignerRole) ||
+      (assignerRole === 'employee' && ['bde', 'ba'].includes(assignerDept))) {
+    if (assigneeRole !== 'employee' ||
+        !['senior', 'junior', 'intern'].includes(String(assignee.employee_level || '').toLowerCase().trim())) {
+      return 'BDE and BA users can assign tasks to Senior, Junior, or Intern employees.';
+    }
+    return null;
+  }
 
   // Only employees (senior or mid-level) can assign tasks, and only within their department.
-  if (String(assigner.role || '').toLowerCase().trim() !== 'employee') {
+  if (assignerRole !== 'employee') {
     return 'Only employees can assign tasks.';
   }
   if (assigneeRole === 'admin' || assignerDept !== assigneeDept) {
     return 'Employees can assign tasks only within their own department.';
   }
-  // Mid-level employees (neither senior nor intern) can assign only to interns.
-  if (assignerLevel !== 'senior' &&
-      String(assignee.employee_level || '').toLowerCase().trim() !== 'intern') {
-    return 'Only senior employees can assign tasks to non-interns.';
+  // Junior employees can assign to Juniors and Interns, but not Seniors.
+  if (assignerLevel === 'junior' &&
+      !['junior', 'intern'].includes(String(assignee.employee_level || '').toLowerCase().trim())) {
+    return 'Junior employees can assign tasks only to Junior or Intern employees.';
+  }
+  if (!['senior', 'junior'].includes(assignerLevel)) {
+    return 'Only Senior and Junior employees can assign tasks.';
   }
 
   return null;
@@ -251,4 +265,3 @@ router.delete('/:id', async (req, res) => {
 
 
 module.exports = router;
-

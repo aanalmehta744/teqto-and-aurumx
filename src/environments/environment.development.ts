@@ -7,8 +7,8 @@ export const environment = {
     'https://yoga-agent-qualifying-paper.trycloudflare.com/api',
 
   apiUrl:
-    // 'http://localhost:5001/api'
-    'https://richmond-press-logistics-dryer.trycloudflare.com/api'
+    'http://localhost:5001/api'
+    // 'https://richmond-press-logistics-dryer.trycloudflare.com/api'
 
 };
 

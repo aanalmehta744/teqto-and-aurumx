@@ -1,5 +1,5 @@
 import { DOCUMENT, NgClass, NgIf, CommonModule } from '@angular/common';
-import { Component, Inject, ElementRef, OnInit, OnDestroy, Renderer2, Output, EventEmitter, Input } from '@angular/core';
+import { Component, Inject, ElementRef, OnInit, OnDestroy, Renderer2, Output, EventEmitter, Input, HostListener } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ConfigService } from '@config';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
@@ -173,6 +173,16 @@ if (userRole === 'Admin') {
       } else {
         this.loadNotifications();
       }
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  closeNotifPanelOnOutsideClick(event: MouseEvent): void {
+    if (!this.showNotifPanel) return;
+
+    const notificationArea = this.elementRef.nativeElement.querySelector('.notification-container');
+    if (notificationArea && !notificationArea.contains(event.target as Node)) {
+      this.showNotifPanel = false;
     }
   }
 

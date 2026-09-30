@@ -231,12 +231,16 @@ export class SidebarComponent
   const roles = (item.role ?? []).map(r => r.toLowerCase().trim());
   const depts = (item.department ?? []).map(d => d.toLowerCase().trim());
 
-  // Task → only Admin, HR, or Senior
+  // Task assignment is available to Admin, HR, BDE/BA, Senior, and Junior employees.
   if (item.path === 'task') {
     return (
       userRole === 'admin' ||
       userDepartment === 'hr' ||
-      user.employee_level?.toLowerCase().trim() === 'senior'
+      ['bde', 'ba'].includes(userRole) ||
+      (userRole === 'employee' && ['bde', 'ba'].includes(userDepartment)) ||
+      ['senior', 'junior'].includes(
+        String(user.employee_level || '').toLowerCase().trim()
+      )
     );
   }
 
@@ -251,7 +255,11 @@ export class SidebarComponent
 
   // Self-service leave access is available to every employee department,
   // including departments added after this sidebar's original static lists.
-  if (userRole === 'employee' && item.submenu?.some(sub => sub.path === '/employee/myleaves')) {
+  if (
+    userRole === 'employee' &&
+    !['bde', 'ba'].includes(userDepartment) &&
+    item.submenu?.some(sub => sub.path === '/employee/myleaves')
+  ) {
     return true;
   }
 
@@ -262,6 +270,16 @@ export class SidebarComponent
 
   // All non-admin users must have Employee role
   if (userRole === 'employee') {
+    // Self-service attendance is available to employees in every department.
+    // Keep the HR attendance menu below on its existing HR-only visibility.
+    if (
+      item.submenu?.some(sub => sub.path === '/employee/attendance') &&
+      !['bde', 'ba'].includes(userDepartment) &&
+      !item.submenu?.some(sub => sub.path?.startsWith('/employee/hr-attendance/'))
+    ) {
+      return true;
+    }
+
     const standardEmployeePaths = new Set([
       '/employee/dashboard', '/employee/attendance', '/employee/myleaves',
       '/employee/holidays/all-holidays', '/employee/payroll/employee-salary',

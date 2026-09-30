@@ -199,6 +199,7 @@ export class AddprojectsComponent implements OnInit, OnDestroy {
     }
 
     const formData = { ...this.projectForm.value };
+    formData.created_by = JSON.parse(localStorage.getItem('currentUser') || 'null')?.id || null;
 
     formData.startDate = this.formatDateDefault(formData.startDate);
     formData.endDate = this.formatDateDefault(formData.endDate);

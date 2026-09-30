@@ -165,6 +165,20 @@ export class TaskComponent implements OnInit {
 
   const currentUserId = currentUser?.id;
 
+  // BDE and BA users can assign to any Senior, Junior, or Intern.
+  if (
+    ['bde', 'ba'].includes(currentRole) ||
+    (currentRole === 'employee' && ['bde', 'ba'].includes(currentDepartment))
+  ) {
+    this.assignableEmployees = data.filter((emp: any) =>
+      String(emp.role || '').toLowerCase().trim() === 'employee' &&
+      ['senior', 'junior', 'intern'].includes(
+        String(emp.employee_level || '').toLowerCase().trim()
+      )
+    );
+    return;
+  }
+
   // Admin can assign to everyone
   if (currentRole === 'admin') {
     this.assignableEmployees = data;
@@ -195,11 +209,13 @@ export class TaskComponent implements OnInit {
     return;
   }
 
-  // Mid-level employees (neither senior nor intern) can assign only to interns in their department.
-  if (currentRole === 'employee' && currentLevel !== 'intern') {
+  // Junior employees can assign to interns and other juniors in their department.
+  if (currentRole === 'employee' && currentLevel === 'junior') {
     this.assignableEmployees = data.filter((emp: any) =>
       emp.id !== currentUserId &&
-      String(emp.employee_level || '').toLowerCase().trim() === 'intern' &&
+      ['junior', 'intern'].includes(
+        String(emp.employee_level || '').toLowerCase().trim()
+      ) &&
       String(emp.department || '').toLowerCase().trim() === currentDepartment
     );
     return;
@@ -407,4 +423,3 @@ export class TaskComponent implements OnInit {
     return formatDate(date, 'yyyy-MM-dd', 'en'); // Format using Angular's formatDate
   }
 }
-

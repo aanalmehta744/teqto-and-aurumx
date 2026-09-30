@@ -20,7 +20,7 @@
   <div class="flex items-center justify-end space-x-3 h-full" [ngClass]="isNavbarCollapsed ? '' : 'show'">
 
     <!-- Notification bell -->
-    <div *ngIf="userRole === 'Admin' || userRole === 'Employee'" class="relative">
+    <div *ngIf="userRole === 'Admin' || userRole === 'Employee'" class="relative notification-container">
       <button (click)="toggleNotifPanel()"
         class="relative p-2 rounded-xl text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors">
         <mat-icon class="text-indigo-600">notifications</mat-icon>
