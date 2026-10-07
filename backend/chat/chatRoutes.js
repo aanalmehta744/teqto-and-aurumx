@@ -1,3 +1,5 @@
+
+
 const express = require("express");
 const router = express.Router();
 const db = require("../connection");
@@ -100,10 +102,22 @@ router.post("/conversation/direct", async (req, res) => {
     const { user1, user2 } = req.body;
 
     if (!user1 || !user2) {
-      return res.status(400).json({error: "Both users are required"});
+      return res.status(400).json({
+        error: "Both users are required"
+      });
     }
 
-    const [rows] = await db.query(
+    if (Number(user1) === Number(user2)) {
+      return res.status(400).json({
+        error: "Users must be different"
+      });
+    }
+
+    // --------------------------------------------------------
+    // 1. Check if conversation already exists
+    // --------------------------------------------------------
+
+    const [existingConversation] = await db.query(
       "SELECT c.id " +
       "FROM conversations c " +
       "JOIN conversation_members cm1 ON c.id = cm1.conversation_id " +
@@ -113,22 +127,110 @@ router.post("/conversation/direct", async (req, res) => {
       "(cm1.employee_id = ? AND cm2.employee_id = ?) " +
       "OR " +
       "(cm1.employee_id = ? AND cm2.employee_id = ?) " +
-      ")",
+      ") " +
+      "LIMIT 1",
       [user1, user2, user2, user1]
     );
 
-    if (rows.length > 0) {
-      return res.status(200).json({conversationId: rows[0].id});
+    if (existingConversation.length > 0) {
+      return res.status(200).json({
+        conversationId: existingConversation[0].id
+      });
     }
+
+    // --------------------------------------------------------
+    // 2. Check the role of the user starting the conversation
+    // --------------------------------------------------------
+
+
+const [[sender]] = await db.query(
+  "SELECT id, role FROM employees WHERE id = ? LIMIT 1",
+  [user1]
+);
+
+    if (!sender) {
+      return res.status(404).json({
+        error: "User not found"
+      });
+    }
+
+    // --------------------------------------------------------
+    // 3. Admin / Super Admin can directly start a conversation
+    // --------------------------------------------------------
+
+   const adminRoles = [
+  "admin",
+  "super admin",
+  "superadmin"
+];
+
+const senderRole = String(sender.role || "").toLowerCase().trim();
+
+const isAdmin = adminRoles.includes(senderRole);
+
+    if (isAdmin) {
+      const connection = await db.getConnection();
+
+      try {
+        await connection.beginTransaction();
+
+        const [conversation] = await connection.query(
+          "INSERT INTO conversations (type, created_by) VALUES ('direct', ?)",
+          [user1]
+        );
+
+        const conversationId = conversation.insertId;
+
+        await connection.query(
+          "INSERT INTO conversation_members " +
+          "(conversation_id, employee_id) " +
+          "VALUES (?, ?), (?, ?)",
+          [
+            conversationId,
+            user1,
+            conversationId,
+            user2
+          ]
+        );
+
+        await connection.commit();
+
+        const io = getIO();
+
+        io.in(`user_${user1}`)
+          .socketsJoin(`conversation_${conversationId}`);
+
+        io.in(`user_${user2}`)
+          .socketsJoin(`conversation_${conversationId}`);
+
+        return res.status(201).json({
+          conversationId,
+          directCreated: true
+        });
+
+      } catch (error) {
+        await connection.rollback();
+        throw error;
+      } finally {
+        connection.release();
+      }
+    }
+
+    // --------------------------------------------------------
+    // 4. Normal users still require a chat request
+    // --------------------------------------------------------
 
     return res.status(404).json({
       error: "No conversation exists yet. Send a chat request first.",
       requiresRequest: true
     });
-  } 
-  catch (error) {
+
+  } catch (error) {
     console.error("Direct Conversation Error:", error);
-    res.status(500).json({error: "Internal server error"});
+
+    res.status(500).json({
+      error: "Internal server error"
+    });
   }
 });
 
@@ -529,6 +631,40 @@ router.get("/conversations/:employeeId", async (req, res) => {
   catch (error) {
     console.error("Conversation List Error:", error);
     res.status(500).json({error: "Internal server error"});
+  }
+});
+
+router.get("/admin/chat-partners/:employeeId", async (req, res) => {
+  try {
+    const { employeeId } = req.params;
+
+    const [rows] = await db.query(
+  "SELECT " +
+  "  c.id AS conversation_id, " +
+  "  e.id, " +
+  "  e.fullName AS fullName, " +
+  "  e.role " +
+  "FROM conversations c " +
+  "JOIN conversation_members cm1 " +
+  "  ON c.id = cm1.conversation_id " +
+  "JOIN conversation_members cm2 " +
+  "  ON c.id = cm2.conversation_id " +
+  "JOIN employees e " +
+  "  ON e.id = cm2.employee_id " +
+  "WHERE c.type = 'direct' " +
+  "AND cm1.employee_id = ? " +
+  "AND cm2.employee_id != ? " +
+  "ORDER BY e.fullName ASC",
+  [employeeId, employeeId]
+);
+
+    res.status(200).json(rows);
+
+  } catch (error) {
+    console.error("Admin Chat Partners Error:", error);
+    res.status(500).json({
+      error: "Internal server error"
+    });
   }
 });
 

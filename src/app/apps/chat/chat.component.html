@@ -118,8 +118,46 @@
         [(ngModel)]="searchText"
         (input)="filterUsers()"
         placeholder="Search chats or find people..."
-        class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-900"
+        class="w-full px-3 py-2 text-m text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-900"
       />
+<!-- ADD THIS -->
+<div *ngIf="isAdminUser()" class="mt-3 space-y-2">
+
+  <!-- First Person -->
+  <select
+    [(ngModel)]="adminSelectedUserId"
+    (change)="onAdminFirstUserChange()"
+    class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-900"
+  >
+    <option [ngValue]="null" class="text-sm">Select first person</option>
+
+    <option
+      *ngFor="let user of adminChatUsers"
+      [ngValue]="user.id"
+    >
+      {{ user.fullName }}
+    </option>
+  </select>
+
+  <!-- Second Person -->
+  <select
+    [(ngModel)]="adminSelectedChatUserId"
+    (change)="openAdminSelectedChat()"
+    [disabled]="!adminSelectedUserId || adminChatPartners.length === 0"
+    class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-900 disabled:bg-gray-50 disabled:text-gray-400"
+  >
+    <option [ngValue]="null" class="text-sm">Select person they chatted with</option>
+
+    <option
+      *ngFor="let user of adminChatPartners"
+      [ngValue]="user.id"
+    >
+      {{ user.fullName }}
+    </option>
+  </select>
+
+</div>
+<!-- END ADD -->
     </div>
 
     <ng-scrollbar class="flex-1" visibility="hover">
@@ -278,13 +316,13 @@
             <button
               type="button"
               (click)="sendRequestToUser(user)"
-              [disabled]="isPendingRequest(user)"
+              [disabled]="!isAdminUser() && isPendingRequest(user)"
               class="text-[11px] px-2 py-1 rounded flex-shrink-0"
               [ngClass]="isPendingRequest(user)
                 ? 'border border-gray-200 text-gray-400 cursor-default'
                 : 'bg-indigo-900 text-white hover:bg-indigo-800'"
             >
-              {{ isPendingRequest(user) ? 'Pending' : 'Send Request' }}
+              {{ isAdminUser() ? 'Chat' : (isPendingRequest(user) ? 'Pending' : 'Send Request') }}
             </button>
           </div>
         </ng-container>
@@ -497,7 +535,7 @@
                          rounded-2xl rounded-tr-sm text-sm shadow-sm
                          flex items-end gap-1"
                 >
-                  <span>{{ msg.message }}</span>
+                  <span class="whitespace-pre-wrap break-words">{{ msg.message }}</span>
 
                                     <!-- Single tick: sent, not yet seen -->
 
@@ -647,11 +685,12 @@
                 class="group flex items-end gap-2"
               >
                 <div
-                  class="bg-gray-100 text-gray-800 px-4 py-2
-                         rounded-2xl rounded-tl-sm text-sm shadow-sm"
-                >
-                  {{ msg.message }}
-                </div>
+  class="bg-gray-100 text-gray-800 px-4 py-2
+         rounded-2xl rounded-tl-sm text-sm shadow-sm
+         whitespace-pre-wrap break-words"
+>
+  {{ msg.message }}
+</div>
 
                 <span
                   class="text-[10px] text-gray-400 whitespace-nowrap
@@ -669,7 +708,10 @@
       <!-- MESSAGE INPUT -->
       <!-- ================================================= -->
 
-      <div class="px-4 py-3 border-t border-gray-100 bg-white flex-shrink-0">
+      <div
+  *ngIf="!isAdminViewingOtherChat()"
+  class="px-4 py-3 border-t border-gray-100 bg-white flex-shrink-0"
+>
         <!-- Attachment preview -->
 
         <div

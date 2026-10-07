@@ -64,6 +64,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   loading = false;
   sending = false;
 
+  adminSelectedUserId: number | null = null;
+adminSelectedChatUserId: number | null = null;
+
+adminChatUsers: ChatUser[] = [];
+adminChatPartners: ChatUser[] = [];
+
   private socketSub!: Subscription;
   private shouldScroll = false;
 
@@ -87,13 +93,21 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     const user = this.authService.getLoggedUser();
     this.currentUserId = user?.id ?? 0;
     this.currentUserName = user?.fullName ?? '';
+
+    console.log('CHAT LOGGED USER:', user);
+console.log('CHAT USER ROLE:', user?.role);
     this.chatService.identify( this.currentUserId);
 
-    this.chatService.getUsers().subscribe({
-      next: (users) => {
-        this.users = users.filter((u) => u.id !== this.currentUserId);
-        this.filterUsers();
-      },
+   this.chatService.getUsers().subscribe({
+  next: (users) => {
+    this.users = users.filter((u) => u.id !== this.currentUserId);
+
+    if (this.isAdminUser()) {
+      this.adminChatUsers = this.users;
+    }
+
+    this.filterUsers();
+  },
 
       error: (err) =>console.error('Failed to load users',err),
     })
@@ -308,13 +322,132 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     return !!this.pendingOutgoingRequests[user.id];
   }
 
+  isAdminUser(): boolean {
+  const user = this.authService.getLoggedUser();
+  const role = (user?.role || '').toLowerCase().trim();
+
+  return (
+    role === 'admin' ||
+    role === 'super admin' ||
+    role === 'superadmin'
+  );
+}
+
+isAdminViewingOtherChat(): boolean {
+  return (
+    this.isAdminUser() &&
+    this.adminSelectedUserId === null &&
+    this.adminSelectedChatUserId === null &&
+    this.activeConversationId !== null &&
+    !!this.selectedUser &&
+    this.selectedUser.id !== this.currentUserId
+  );
+}
+
+onAdminFirstUserChange(): void {
+  this.adminSelectedChatUserId = null;
+  this.adminChatPartners = [];
+
+  if (!this.adminSelectedUserId) {
+    return;
+  }
+
+  this.chatService
+    .getAdminChatPartners(this.adminSelectedUserId)
+    .subscribe({
+      next: (partners) => {
+  console.log('ADMIN CHAT PARTNERS:', partners);
+  this.adminChatPartners = partners;
+},
+      error: (err) => {
+        console.error('Failed to load admin chat partners', err);
+      },
+    });
+}
+openAdminSelectedChat(): void {
+  if (!this.adminSelectedUserId || !this.adminSelectedChatUserId) {
+    return;
+  }
+
+  const partner = this.adminChatPartners.find(
+    (user) => user.id === this.adminSelectedChatUserId
+  );
+
+  if (!partner) {
+    return;
+  }
+
+  const conversationId = (partner as any).conversation_id;
+
+  if (!conversationId) {
+    console.error('Conversation ID not found');
+    return;
+  }
+
+  this.selectedUser = partner;
+  this.selectedGroup = null;
+  this.activeConversationId = conversationId;
+  this.messages = [];
+  this.loading = true;
+
+ this.chatService
+  .getMessages(conversationId)
+  .subscribe({
+    next: (messages) => {
+      this.messages = messages;
+      this.loading = false;
+
+      // Clear Admin chat selection after opening the conversation
+      this.adminSelectedUserId = null;
+      this.adminSelectedChatUserId = null;
+      this.adminChatPartners = [];
+
+      setTimeout(() => {
+        this.scrollToBottom();
+      });
+    },
+      error: (err) => {
+        console.error('Failed to load admin chat messages', err);
+        this.loading = false;
+      },
+    });
+}
+
   sendRequestToUser(user: ChatUser): void {
-    if (this.pendingOutgoingRequests[user.id]) {
-      return;
-    }
+  const currentUser = this.authService.getLoggedUser();
+  const role = (currentUser?.role || '').toLowerCase().trim();
 
-    this.chatService .sendChatRequest(this.currentUserId, user.id)
+  // Admin / Super Admin can start a chat directly
+  const isAdmin =
+    role === 'admin' ||
+    role === 'super admin' ||
+    role === 'superadmin';
 
+  if (isAdmin) {
+    this.chatService
+      .openDirectConversation(this.currentUserId, user.id)
+      .subscribe({
+        next: ({ conversationId }) => {
+          this.directConversationByUserId[user.id] = conversationId;
+          this.loadConversations();
+          this.selectUser(user);
+        },
+
+        error: (err) => {
+          console.error('Failed to open direct conversation', err);
+        },
+      });
+
+    return;
+  }
+
+  // Normal users continue using the existing request system
+  if (this.pendingOutgoingRequests[user.id]) {
+    return;
+  }
+
+  this.chatService
+    .sendChatRequest(this.currentUserId, user.id)
     .subscribe({
       next: (res) => {
         if (res.status === 'already_conversation' && res.conversationId) {
@@ -326,7 +459,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         if (res.requestId) {
           this.pendingOutgoingRequests[user.id] = res.requestId;
 
-          if ( !this.pendingContacts.some((u) => u.id === user.id)) {
+          if (!this.pendingContacts.some((u) => u.id === user.id)) {
             this.pendingContacts.push(user);
           }
 
@@ -334,10 +467,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
       },
 
-      error: (err) => console.error('Send chat request failed',err),
+      error: (err) => {
+        console.error('Send chat request failed', err);
+      },
     });
-  }
-
+}
   toggleRequestsDropdown(): void {
     this.showRequestsDropdown = !this.showRequestsDropdown;
   }

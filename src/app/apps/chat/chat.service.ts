@@ -166,6 +166,15 @@ onChatRequestRejected(): Observable<any> {
     );
   }
 
+  getAdminChatPartners(employeeId: number): Observable<any[]> {
+  return this.http.get<any[]>(
+    `${this.apiUrl}/admin/chat-partners/${employeeId}`,
+    {
+      headers: this.getHeaders(),
+    }
+  );
+}
+
   createGroup(
     name: string,
     createdBy: number,
