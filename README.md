@@ -25,3 +25,13 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+## Attendance / Leave configuration
+
+The backend uses `APP_TIMEZONE` for Node.js scheduled attendance jobs. For an India-based deployment, use:
+
+```env
+APP_TIMEZONE=Asia/Kolkata
+```
+
+No new npm dependency is required for the attendance/leave changes. The existing `node-cron` dependency is used for the backend-controlled 7:30 PM fallback checkout and its recovery job.

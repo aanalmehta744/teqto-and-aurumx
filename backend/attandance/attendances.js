@@ -3,6 +3,51 @@ const router = express.Router();
 const db = require('../connection'); // Ensure the path is correct
 const cron = require('node-cron');
 
+const AUTO_CHECKOUT_HOUR = 19;
+const AUTO_CHECKOUT_MINUTE = 30;
+
+/**
+ * Close any open attendance record from a completed calendar day.
+ * The 7:30 PM timestamp is only a fallback: an earlier/later manual
+ * checkout is never overwritten because we only touch rows with NULL check_out.
+ */
+async function autoCloseOpenAttendance(targetDate) {
+  const [rows] = await db.query(
+    `SELECT id, employee_id, date, check_in, break
+     FROM attendance
+     WHERE date = ?
+       AND check_in IS NOT NULL
+       AND check_out IS NULL`,
+    [targetDate]
+  );
+
+  for (const row of rows) {
+    const fallbackCheckout = `${targetDate} 19:30:00`;
+    const checkInMs = new Date(row.check_in).getTime();
+    const checkoutMs = new Date(fallbackCheckout).getTime();
+    let breakSeconds = 0;
+
+    if (row.break) {
+      const [h, m, sec] = String(row.break).split(':').map(Number);
+      breakSeconds = (h || 0) * 3600 + (m || 0) * 60 + (sec || 0);
+    }
+
+    const netSeconds = Math.max(0, Math.floor((checkoutMs - checkInMs) / 1000) - breakSeconds);
+    const hours = String(Math.floor(netSeconds / 3600)).padStart(2, '0');
+    const minutes = String(Math.floor((netSeconds % 3600) / 60)).padStart(2, '0');
+    const seconds = String(netSeconds % 60).padStart(2, '0');
+
+    await db.query(
+      `UPDATE attendance
+       SET check_out = ?, hours = ?, is_paused = 0, elapsed_time = 0, pause_start = NULL
+       WHERE id = ? AND check_out IS NULL`,
+      [fallbackCheckout, `${hours}:${minutes}:${seconds}`, row.id]
+    );
+  }
+
+  return rows.length;
+}
+
 router.get('/check/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
   const { date } = req.query;
@@ -38,71 +83,32 @@ router.get('/pause-status/:employeeId', async (req, res) => {
   }
 });
 
-// Schedule cron job at midnight
-cron.schedule('32 11 * * *', async () => {
+// Attendance initialization + reliable automatic checkout.
+// A previous-day open record is closed at 7:30 PM as a fallback once the
+// calendar day rolls over. The recovery schedule also handles restarts or
+// missed cron ticks, so the browser is never required for auto checkout.
+cron.schedule('1 0 * * *', async () => {
   try {
-    const today = new Date().toISOString().split('T')[0];
-    console.log(`Cron job started at midnight for date: ${today}`);
-
-    const [employees] = await db.query('SELECT id FROM employees');  // Use .promise()
-
-    if (employees.length === 0) {
-      console.log('No employees found.');
-    }
-
-    for (const employee of employees) {
-      try {
-        await db.query( // Use .promise() here too
-          `INSERT INTO attendance (employee_id, date, status) VALUES (?, ?, 'Absent')
-                     ON DUPLICATE KEY UPDATE status = 'Absent', check_in = NULL, check_out = NULL, hours = 0.00`,
-          [employee.id, today]
-        );
-      } catch (error) {
-        console.error(`Error processing employee ID ${employee.id}:`, error);
-      }
-    }
-
-    console.log(`All employees marked as absent for ${today}`);
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const targetDate = yesterday.toISOString().split('T')[0];
+    const closed = await autoCloseOpenAttendance(targetDate);
+    console.log(`Auto punch-out completed for ${targetDate}. Updated ${closed} records.`);
   } catch (error) {
-    console.error('Error initializing attendance:', error);
+    console.error('Auto punch-out cron error:', error);
   }
 });
 
-// Auto punch-out cron (11:00 PM)
-cron.schedule('0 23 * * *', async () => {
+// Recovery guard: if the server was down at midnight, close any previous-day
+// attendance on the next scheduler tick. This never modifies today's rows.
+cron.schedule('*/5 * * * *', async () => {
   try {
-    const today = moment().format('YYYY-MM-DD');
-    const autoCheckoutTime = moment(`${today} 23:00:00`);
-
-    console.log(`Auto punch-out cron started for ${today}`);
-
-    const [rows] = await db.query(`
-      SELECT id, check_in
-      FROM attendance
-      WHERE date = ?
-        AND status = 'Present'
-        AND check_in IS NOT NULL
-        AND check_out IS NULL
-    `, [today]);
-
-    for (const row of rows) {
-      const checkIn = moment(row.check_in);
-      const hoursWorked = autoCheckoutTime.diff(checkIn, 'minutes') / 60;
-
-      await db.query(`
-        UPDATE attendance
-        SET check_out = ?, hours = ?
-        WHERE id = ?
-      `, [
-        autoCheckoutTime.format('YYYY-MM-DD HH:mm:ss'),
-        Math.max(hoursWorked, 0).toFixed(2),
-        row.id
-      ]);
-    }
-
-    console.log(`Auto punch-out completed. Updated ${rows.length} records`);
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const targetDate = yesterday.toISOString().split('T')[0];
+    await autoCloseOpenAttendance(targetDate);
   } catch (error) {
-    console.error('Auto punch-out cron error:', error);
+    console.error('Attendance recovery cron error:', error);
   }
 });
 
@@ -270,76 +276,102 @@ router.put('/updateTimer/:id', async (req, res) => {
 
 router.post('/start-timer', async (req, res) => {
   const { employee_id } = req.body;
+
+  if (!employee_id) {
+    return res.status(400).json({ success: false, message: 'Employee ID is required.' });
+  }
+
   const check_in = new Date();
 
   try {
-    // 1. Check if today's attendance record exists
-    // const [rows] = await db.query(
-    //   `SELECT id FROM attendance WHERE employee_id = ? AND date = CURDATE()`,
-    //   [employee_id]
-    // );
-
-    // if (rows.length === 0) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     status: 400,
-    //     message: "You can't start the timer because no attendance record exists for today."
-    //   });
-    // }
-const [rows] = await db.query(
-  `SELECT id
-   FROM attendance
-   WHERE employee_id = ?
-   AND date = CURDATE()`,
-  [employee_id]
-);
-
-if (rows.length === 0) {
-  await db.query(
-    `INSERT INTO attendance
-     (employee_id, date, status)
-     VALUES (?, CURDATE(), 'Present')`,
-    [employee_id]
-  );
-}
-
-
-    // 2. Check if check-in time is after 10:15 AM
-    // const lateLimit = new Date();
-    // lateLimit.setHours(10, 20, 0, 0); // 10:15 AM
-
-    const lateLimit = new Date();
-    lateLimit.setHours(10, 16, 0, 0); // 10:16 AM
-
-    let status = "Present";
-    if (check_in > lateLimit) {
-      status = "Half Day";  // ✅ Mark half day if late
-    }
-
-    // 3. Update row
-    await db.execute(
-      `UPDATE attendance 
-       SET check_in = ?, status = ?
-       WHERE employee_id = ? AND date = CURDATE()`,
-      [check_in, status, employee_id]
+    // The unique(employee_id, date) index protects the rule at DB level.
+    // We additionally reject an existing check-in here so a second request
+    // can never overwrite the original punch-in timestamp.
+    const [existing] = await db.query(
+      `SELECT id, check_in, check_out, status
+       FROM attendance
+       WHERE employee_id = ? AND date = CURDATE()
+       LIMIT 1`,
+      [employee_id]
     );
 
-    // 4. Fetch the updated row
+    if (existing.length && existing[0].check_in) {
+      return res.status(409).json({
+        success: false,
+        code: existing[0].check_out ? 'ATTENDANCE_COMPLETED' : 'ALREADY_CHECKED_IN',
+        message: existing[0].check_out
+          ? 'Attendance has already been completed for today.'
+          : 'You have already checked in today.',
+        data: existing[0]
+      });
+    }
+
+    const lateLimit = new Date();
+    lateLimit.setHours(10, 16, 0, 0);
+    const status = check_in > lateLimit ? 'Half Day' : 'Present';
+
+    if (!existing.length) {
+      try {
+        await db.query(
+          `INSERT INTO attendance (employee_id, date, status, check_in)
+           VALUES (?, CURDATE(), ?, ?)`,
+          [employee_id, status, check_in]
+        );
+      } catch (insertError) {
+        // A concurrent request can win the unique key between SELECT and INSERT.
+        if (insertError.code === 'ER_DUP_ENTRY') {
+          return res.status(409).json({
+            success: false,
+            code: 'ALREADY_CHECKED_IN',
+            message: 'You have already checked in today.'
+          });
+        }
+        throw insertError;
+      }
+    } else {
+      await db.query(
+        `UPDATE attendance
+         SET check_in = ?, status = ?, check_out = NULL
+         WHERE id = ? AND check_in IS NULL`,
+        [check_in, status, existing[0].id]
+      );
+    }
+
     const [updated] = await db.query(
-      `SELECT id, employee_id, date, check_in, check_out, status 
-       FROM attendance 
+      `SELECT id, employee_id, date, check_in, check_out, status, hours, break, is_paused, elapsed_time, pause_start
+       FROM attendance
        WHERE employee_id = ? AND date = CURDATE()`,
       [employee_id]
     );
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Timer started successfully.',
       data: updated[0]
     });
   } catch (error) {
-    console.error('Error executing query:', error);
-    res.status(500).json({ error: 'Failed to start timer.' });
+    console.error('Error executing start timer:', error);
+    return res.status(500).json({ success: false, error: 'Failed to start timer.' });
+  }
+});
+
+// Fetch today's complete attendance state. This is the source of truth used
+// by the employee UI after refresh, navigation, logout/login, or browser reopen.
+router.get('/today/:employeeId', async (req, res) => {
+  try {
+    const { employeeId } = req.params;
+    const [rows] = await db.query(
+      `SELECT id, employee_id, date, status, check_in, check_out, hours, break, is_paused, elapsed_time, pause_start
+       FROM attendance
+       WHERE employee_id = ? AND date = CURDATE()
+       LIMIT 1`,
+      [employeeId]
+    );
+
+    res.json({ success: true, data: rows[0] || null });
+  } catch (error) {
+    console.error('Error fetching today attendance:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch today attendance.' });
   }
 });
 
@@ -347,19 +379,35 @@ router.post('/stop-timer', async (req, res) => {
   const { employee_id, date } = req.body;
   const targetDate = date
     ? new Date(date).toISOString().split('T')[0]
-    : new Date().toISOString().split('T')[0]; // default today
+    : new Date().toISOString().split('T')[0];
   const now = new Date();
 
   try {
     const [rows] = await db.query(
-      `SELECT check_in, elapsed_time, is_paused, break 
-       FROM attendance 
+      `SELECT check_in, check_out, elapsed_time, is_paused, break
+       FROM attendance
        WHERE employee_id = ? AND date = ?`,
       [employee_id, targetDate]
     );
 
-    if (rows.length === 0) {
+    if (rows.length === 0 || !rows[0].check_in) {
       return res.status(404).json({ error: `No attendance record found for ${targetDate}.` });
+    }
+
+    if (rows[0].check_out) {
+      return res.status(409).json({
+        success: false,
+        code: 'ALREADY_CHECKED_OUT',
+        message: 'You have already checked out for this attendance day.'
+      });
+    }
+
+    if (Number(rows[0].is_paused) === 1) {
+      return res.status(409).json({
+        success: false,
+        code: 'ATTENDANCE_PAUSED',
+        message: 'Resume the timer before checking out.'
+      });
     }
 
     let totalSeconds = rows[0].elapsed_time || 0;

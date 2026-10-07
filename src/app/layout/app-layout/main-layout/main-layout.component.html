@@ -22,7 +22,7 @@
          so it adapts to any width. pb clears the fixed bottom nav on mobile. -->
     <div [dir]="direction"
       id="main-content"
-      class="h-full flex-1 min-w-0 overflow-auto hide-scrollbar py-4 px-3 md:px-4 rounded-tl-2xl transition-all duration-300"
+      class="hr-page-enter h-full flex-1 min-w-0 overflow-auto hide-scrollbar py-4 px-3 md:px-4 rounded-tl-2xl transition-all duration-300"
       [style.padding-bottom]="isMobile ? 'calc(4rem + env(safe-area-inset-bottom) + 1rem)' : null">
       <router-outlet></router-outlet>
     </div>

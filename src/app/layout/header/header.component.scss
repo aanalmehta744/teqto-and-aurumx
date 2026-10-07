@@ -1,15 +1,29 @@
-// .navbar-brand {
-//     display: flex;
-//     align-items: center;
-//     justify-content: center;
-// }
+/* Header interaction polish. Existing header behavior and dropdown logic remain unchanged. */
+:host {
+  display: block;
+}
 
-// .navbar-brand img {
-//     width: 100%;
-// }
+nav {
+  transition: box-shadow 200ms ease, border-color 200ms ease;
+}
 
-// @media (max-width: 768px) {
-//     .navbar-brand img {
-//         width: 80%;
-//     }
-// }
+nav button:hover {
+  transform: translateY(-1px);
+}
+
+.notification-container > div:last-child {
+  animation: header-panel-in 160ms ease-out both;
+  transform-origin: top right;
+}
+
+@keyframes header-panel-in {
+  from { opacity: 0; transform: translateY(-6px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  nav, nav button, .notification-container > div:last-child {
+    animation: none !important;
+    transition: none !important;
+  }
+}

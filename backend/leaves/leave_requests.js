@@ -5,8 +5,10 @@ const { sendLeaveNotification } = require('./emailService');
 const { getIO } = require('../socket');
 const jwt = require('jsonwebtoken');
 
+const PAID_LEAVE_TYPES = new Set(['paid', 'sick']);
+
 const isApprovedPaidLeave = (leave) =>
-    String(leave?.leave_type || '').trim().toLowerCase() === 'paid' &&
+    PAID_LEAVE_TYPES.has(String(leave?.leave_type || '').trim().toLowerCase()) &&
     String(leave?.status || '').trim().toLowerCase() === 'approved';
 
 const getLeaveDays = (startDate, endDate, halfDay) => {
@@ -168,8 +170,8 @@ router.get('/leave-balance', async (req, res) => {
             e.fullName,
             e.role,
             e.total_leave AS total,
-            /* Sick leave is displayed as used leave too; only Paid leave
-               changes the paid-leave balance. */
+            /* Sick Leave is a paid leave type and therefore participates in the
+               same paid-leave balance as Paid Leave. */
             ((e.total_leave - e.leave_balance) + IFNULL((
                 SELECT SUM(lr.no_of_days)
                 FROM leave_requests lr

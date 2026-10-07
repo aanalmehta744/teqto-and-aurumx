@@ -54,6 +54,17 @@
                   <mat-cell *matCellDef="let row">{{ (+row.total || 0) - (+row.remaining || 0) }}</mat-cell>
                 </ng-container>
 
+                <!-- Unpaid leave is tracked separately and does not reduce paid balance. -->
+                <ng-container matColumnDef="unpaid">
+                  <mat-header-cell *matHeaderCellDef>Unpaid Leave (Days)</mat-header-cell>
+                  <mat-cell *matCellDef="let row">
+                    <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
+                      [ngClass]="getUnpaidLeaveDays(row.employee_id) > 0 ? 'bg-amber-50 text-amber-700' : 'bg-slate-50 text-slate-500'">
+                      {{ getUnpaidLeaveDays(row.employee_id) }}
+                    </span>
+                  </mat-cell>
+                </ng-container>
+
                 <!-- Remaining -->
                 <ng-container matColumnDef="remaining">
                   <mat-header-cell *matHeaderCellDef mat-sort-header>Remaining Leaves</mat-header-cell>

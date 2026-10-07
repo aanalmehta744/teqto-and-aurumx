@@ -1,3 +1,50 @@
-ul a {
-    transition: background-color 0.2s ease-in-out;
+/* Premium navigation motion while keeping existing permission/routing logic intact. */
+aside {
+  transition: width 240ms cubic-bezier(.2,.8,.2,1), box-shadow 200ms ease, background-color 200ms ease;
+}
+
+aside ul a {
+  position: relative;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+aside ul a:hover {
+  transform: translateX(2px);
+}
+
+aside ul a i-feather {
+  transition: transform 160ms ease, color 160ms ease;
+}
+
+aside ul a:hover i-feather {
+  transform: scale(1.06);
+}
+
+/* Active menu items receive a subtle leading indicator without changing markup. */
+aside ul a.bg-gradient-to-r::before,
+aside ul a.bg-indigo-100::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 25%;
+  width: 3px;
+  height: 50%;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: .9;
+}
+
+nav a {
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+nav a:active {
+  transform: scale(.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  aside, aside ul a, aside ul a i-feather, nav a {
+    transition: none !important;
+  }
 }

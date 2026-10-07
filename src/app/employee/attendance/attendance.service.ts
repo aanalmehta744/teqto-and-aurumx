@@ -137,6 +137,13 @@ export class AttendancesService extends UnsubscribeOnDestroyAdapter {
     );
   }
 
+  /** Fetch the complete attendance record for the current calendar day. */
+  getTodayAttendance(employeeId: number): Observable<{ success: boolean; data: Attendances | null }> {
+    return this.httpClient.get<{ success: boolean; data: Attendances | null }>(
+      `${this.API_URL}/today/${employeeId}`
+    );
+  }
+
   // Add break
   addBreak(employeeId: number, breakDuration: string, startDate: string) {
     return this.httpClient.post<{ message: string }>(

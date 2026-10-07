@@ -33,6 +33,10 @@ export class LeaveHistoryDialogComponent implements OnInit {
   isLoading = true;
   error = '';
 
+  isUnpaidLeave(leaveType: string): boolean {
+    return String(leaveType || '').trim().toLowerCase() === 'unpaid';
+  }
+
   constructor(
     private http: HttpClient,
     public dialogRef: MatDialogRef<LeaveHistoryDialogComponent>,

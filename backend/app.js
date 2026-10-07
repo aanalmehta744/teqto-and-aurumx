@@ -1,3 +1,4 @@
+process.env.TZ = process.env.APP_TIMEZONE || 'Asia/Kolkata';
 const http = require("http");
 const express = require('express');
 const cors = require('cors');

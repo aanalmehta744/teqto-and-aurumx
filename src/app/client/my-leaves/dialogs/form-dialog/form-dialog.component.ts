@@ -142,16 +142,19 @@ export class FormDialogComponent implements OnInit {
     this.isBdeOrBa = role === 'BDE' || role === 'BA';
     this.myLeavesForm.patchValue({ employee_id: this.employeeId });
 
-    this.myLeavesForm.get('halfDay')?.valueChanges.subscribe((value) => {
-      const leaveTypeControl = this.myLeavesForm.get('leave_type');
+   this.myLeavesForm.get('halfDay')?.valueChanges.subscribe((value) => {
+  const leaveTypeControl = this.myLeavesForm.get('leave_type');
 
-      if (value === 'Half Day') {
-        leaveTypeControl?.setValue('Unpaid');
-        leaveTypeControl?.disable();
-      } else {
-        leaveTypeControl?.enable();
-      }
-    });
+  if (value === 'Half Day') {
+    // Half Day must still allow Paid / Sick / Unpaid selection
+    leaveTypeControl?.enable({ emitEvent: false });
+  } else {
+    // Normal leave type handling
+    leaveTypeControl?.enable({ emitEvent: false });
+  }
+
+  this.runAllChecks();
+});
 
     // Fetch holidays
     this.holidayService.getAllHolidays().subscribe({
@@ -284,32 +287,53 @@ export class FormDialogComponent implements OnInit {
     const sandwichResult = this.applySandwichRule(start, end, this.employeeLeaves || []);
     const leaveTypeCtrl = form.get('leave_type');
 
-    if (adjacentToHoliday || sandwichResult.applies) {
-      this.isSandwichLeave = true;
-      this.sandwichWarning = true;
+if (adjacentToHoliday || sandwichResult.applies) {
 
-      if (this.isBdeOrBa) {
-        // BDE/BA: force Paid, disable field, no checkbox needed
-        leaveTypeCtrl?.setValue('Paid', { emitEvent: false });
-        leaveTypeCtrl?.disable({ emitEvent: false });
-        form.get('sandwich_confirm')?.clearValidators();
-      } else {
-        // Others: force Unpaid, lock, require confirmation
-        leaveTypeCtrl?.setValue('Unpaid', { emitEvent: false });
-        leaveTypeCtrl?.disable({ emitEvent: false });
-        form.get('sandwich_confirm')?.setValidators([Validators.requiredTrue]);
-      }
-    } else {
-      this.isSandwichLeave = false;
-      this.sandwichWarning = false;
-      form.get('sandwich_confirm')?.clearValidators();
-      // Re-enable leave type (unless Half Day locks it)
-      if (form.get('halfDay')?.value !== 'Half Day') {
-        leaveTypeCtrl?.enable({ emitEvent: false });
-      }
-    }
-    form.get('sandwich_confirm')?.updateValueAndValidity({ emitEvent: false });
+  this.isSandwichLeave = true;
+  this.sandwichWarning = true;
 
+  // IMPORTANT:
+  // Half Day must ALWAYS allow the employee to choose
+  // Paid / Sick / Unpaid.
+  if (halfDay === 'Half Day') {
+
+    leaveTypeCtrl?.enable({ emitEvent: false });
+
+    form.get('sandwich_confirm')?.clearValidators();
+
+  } else if (this.isBdeOrBa) {
+
+    // Existing BDE/BA Full Day rule
+    leaveTypeCtrl?.setValue('Paid', { emitEvent: false });
+    leaveTypeCtrl?.disable({ emitEvent: false });
+
+    form.get('sandwich_confirm')?.clearValidators();
+
+  } else {
+
+    // Existing Full Day sandwich rule for other employees
+    leaveTypeCtrl?.setValue('Unpaid', { emitEvent: false });
+    leaveTypeCtrl?.disable({ emitEvent: false });
+
+    form.get('sandwich_confirm')?.setValidators([
+      Validators.requiredTrue
+    ]);
+  }
+
+} else {
+
+  this.isSandwichLeave = false;
+  this.sandwichWarning = false;
+
+  form.get('sandwich_confirm')?.clearValidators();
+
+  // Half Day ALWAYS stays enabled.
+  leaveTypeCtrl?.enable({ emitEvent: false });
+}
+
+form.get('sandwich_confirm')?.updateValueAndValidity({
+  emitEvent: false
+});
     // 🔹 Leave overlap check (with backend)
     const leaveId = this.action === 'edit' ? form.get('id')?.value : null;
     const formattedStart = this.formatDateForDB(start);

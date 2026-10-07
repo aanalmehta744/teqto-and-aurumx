@@ -51,3 +51,347 @@ input[type="number"] {
     font-weight: 600;
   }
 }
+
+/* ================================================================
+   Premium HR SaaS visual system
+   Shared styles only: existing module markup and permissions remain intact.
+   ================================================================ */
+:root {
+  --hr-primary: #4f46e5;
+  --hr-primary-soft: #eef2ff;
+  --hr-text: #0f172a;
+  --hr-muted: #64748b;
+  --hr-border: #e2e8f0;
+  --hr-surface: #ffffff;
+  --hr-page: #f8fafc;
+  --hr-radius: 16px;
+  --hr-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+}
+
+html, body {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--hr-page);
+  color: var(--hr-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button, a, input, textarea, select, [role='button'] {
+  transition: color 160ms ease, background-color 160ms ease,
+    border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease,
+    opacity 160ms ease;
+}
+
+button:not([disabled]):hover,
+[role='button']:not([aria-disabled='true']):hover {
+  transform: translateY(-1px);
+}
+
+button:not([disabled]):active,
+[role='button']:active {
+  transform: translateY(0);
+}
+
+/* Shared cards: intentionally limited to Material cards and common Tailwind card surfaces. */
+.mat-mdc-card,
+.mat-card {
+  border: 1px solid var(--hr-border) !important;
+  border-radius: var(--hr-radius) !important;
+  box-shadow: var(--hr-shadow) !important;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease !important;
+}
+
+.mat-mdc-card:hover,
+.mat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 42px rgba(15, 23, 42, 0.09) !important;
+  border-color: #cbd5e1 !important;
+}
+
+.mat-mdc-button,
+.mat-mdc-raised-button,
+.mat-mdc-outlined-button,
+.mat-mdc-unelevated-button {
+  border-radius: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+}
+
+.mat-mdc-form-field .mdc-text-field--outlined {
+  border-radius: 12px !important;
+}
+
+.mat-mdc-form-field .mdc-notched-outline__leading,
+.mat-mdc-form-field .mdc-notched-outline__notch,
+.mat-mdc-form-field .mdc-notched-outline__trailing {
+  border-color: #dbe3ee !important;
+}
+
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--hr-primary) !important;
+}
+
+.mat-mdc-menu-panel,
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  border-radius: 16px !important;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.16) !important;
+}
+
+.mat-mdc-menu-panel {
+  animation: hr-menu-in 140ms ease-out both;
+  transform-origin: top right;
+}
+
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  animation: hr-dialog-in 180ms ease-out both;
+}
+
+.mat-mdc-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.mat-mdc-header-cell {
+  background: #f8fafc !important;
+  color: #475569 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.mat-mdc-row {
+  transition: background-color 140ms ease, transform 140ms ease;
+}
+
+.mat-mdc-row:hover {
+  background: #f8faff !important;
+}
+
+/* Reusable motion classes for module templates that opt in. */
+.hr-page-enter {
+  animation: hr-page-in 260ms cubic-bezier(.2,.8,.2,1) both;
+}
+
+.hr-stagger > * {
+  animation: hr-page-in 300ms cubic-bezier(.2,.8,.2,1) both;
+}
+
+.hr-stagger > *:nth-child(2) { animation-delay: 35ms; }
+.hr-stagger > *:nth-child(3) { animation-delay: 70ms; }
+.hr-stagger > *:nth-child(4) { animation-delay: 105ms; }
+.hr-stagger > *:nth-child(5) { animation-delay: 140ms; }
+
+.hr-skeleton {
+  background: linear-gradient(90deg, #eef2f7 25%, #f8fafc 37%, #eef2f7 63%);
+  background-size: 400% 100%;
+  animation: hr-shimmer 1.4s ease infinite;
+  border-radius: 10px;
+}
+
+@keyframes hr-page-in {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hr-menu-in {
+  from { opacity: 0; transform: translateY(-5px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes hr-dialog-in {
+  from { opacity: 0; transform: translateY(8px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes hr-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+/* Portal-wide finish: a quieter canvas lets the working surfaces stand out. */
+body {
+  background:
+    radial-gradient(ellipse at 88% 0%, rgba(99, 102, 241, .075), transparent 34rem),
+    radial-gradient(ellipse at 0% 55%, rgba(14, 165, 233, .045), transparent 30rem),
+    #f6f8fc;
+}
+
+#main-content {
+  background: linear-gradient(145deg, rgba(255,255,255,.58), rgba(246,248,252,.82));
+  overscroll-behavior: contain;
+}
+
+/* Legacy Bootstrap cards and newer Material/Tailwind cards share one visual language. */
+.card {
+  border: 1px solid rgba(226, 232, 240, .88) !important;
+  border-radius: 16px !important;
+  background: rgba(255,255,255,.96) !important;
+  box-shadow: 0 8px 28px rgba(30, 41, 59, .055) !important;
+  transition: transform 200ms cubic-bezier(.2,.8,.2,1), box-shadow 200ms ease, border-color 200ms ease !important;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: #d7def0 !important;
+  box-shadow: 0 16px 36px rgba(30, 41, 59, .085) !important;
+}
+
+.card .card-header {
+  background: linear-gradient(180deg, #fff, #fbfcff) !important;
+  border-bottom: 1px solid #edf0f6 !important;
+  border-radius: 16px 16px 0 0 !important;
+}
+
+/* Consistent focus feedback for native and framework form controls. */
+input:not([type='checkbox']):not([type='radio']):focus,
+textarea:focus,
+select:focus,
+.form-control:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #818cf8 !important;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, .12) !important;
+}
+
+/* Animate each routed screen as Angular inserts it beside the router outlet. */
+router-outlet + * {
+  display: block;
+  animation: hr-route-in 320ms cubic-bezier(.2,.75,.25,1) both;
+}
+
+@keyframes hr-route-in {
+  from { opacity: 0; transform: translateY(9px); filter: blur(2px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* Slim, unobtrusive scrollbars across long tables and side panels. */
+* {
+  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar { width: 7px; height: 7px; }
+*::-webkit-scrollbar-thumb { background: #cbd5e1; border: 2px solid transparent; border-radius: 999px; background-clip: padding-box; }
+*::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
+
+@media (prefers-reduced-motion: reduce) {
+  router-outlet + * { animation: none !important; }
+}
+
+/* Additional finish for the portal's shared tables, controls and overlays. */
+.block-header,
+.page-header,
+.breadcrumb-main {
+  margin-bottom: 1.25rem;
+}
+
+.block-header h1,
+.block-header h2,
+.block-header h3,
+.page-title {
+  color: #172554;
+  font-weight: 700;
+  letter-spacing: -.025em;
+}
+
+.mat-mdc-table,
+table.table {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+table.table thead th {
+  background: #f7f8ff;
+  color: #475569;
+  border-bottom: 1px solid #e8eaf3;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+table.table tbody tr {
+  transition: background-color 150ms ease;
+}
+
+table.table tbody tr:hover {
+  background-color: #f7f8ff;
+}
+
+table.table td,
+table.table th {
+  border-color: #edf0f6;
+  vertical-align: middle;
+}
+
+.btn,
+button.mat-mdc-button-base {
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease !important;
+}
+
+.btn-primary,
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-unelevated-button.mat-primary {
+  box-shadow: 0 5px 14px rgba(79, 70, 229, .18);
+}
+
+.btn-primary:hover,
+.mat-mdc-raised-button.mat-primary:hover,
+.mat-mdc-unelevated-button.mat-primary:hover {
+  box-shadow: 0 8px 20px rgba(79, 70, 229, .25);
+}
+
+.form-control,
+.form-select,
+input:not([type='checkbox']):not([type='radio']):not([type='range']),
+textarea,
+select {
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.form-control,
+.form-select {
+  border-color: #dfe4ee;
+  border-radius: 10px;
+}
+
+.mat-mdc-tab-group .mdc-tab-indicator__content--underline {
+  border-radius: 999px 999px 0 0;
+  border-top-width: 3px;
+}
+
+.mat-mdc-tab,
+.mat-mdc-chip {
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.mat-mdc-progress-bar {
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  overflow: hidden;
+}
+
+::selection {
+  color: #312e81;
+  background: rgba(165, 180, 252, .42);
+}

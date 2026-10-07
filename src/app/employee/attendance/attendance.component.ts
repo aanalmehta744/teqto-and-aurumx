@@ -81,6 +81,8 @@ export class AttendancesComponent
   isTiming = false;   // true when timer is running
   isPaused = false;   // true when timer is paused
   hasCheckedInToday = false;
+  attendanceCompletedToday = false;
+  todayAttendance: any | null = null;
   showResumeButton = false;
   showPauseButton = false;
   pollingSubscription?: Subscription;
@@ -111,7 +113,7 @@ export class AttendancesComponent
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     const employeeId = currentUser.id;
     console.log(employeeId);
-    this.getActiveAttendance();
+    this.loadTodayAttendance();
     this.loadData();
     this.checkIfUserHasCheckedIn();
     if (employeeId) {
@@ -168,42 +170,62 @@ export class AttendancesComponent
     const userId = currentUser.id;
     if (!userId) return;
 
-    const pollInterval = 5001; // 5 seconds
+    // Keep the UI synchronized with the backend source of truth. This also
+    // recovers cleanly after refresh/navigation without relying on localStorage.
+    this.loadTodayAttendance();
+    this.pollingSubscription = interval(30000).subscribe(() => this.loadTodayAttendance());
+  }
 
-    const checkStatus = () => {
-      const today = new Date().toISOString().split('T')[0];
-      this.attendancesService.checkUserCheckedIn(userId, today).subscribe({
-        next: (res) => {
-          this.hasCheckedInToday = res.hasCheckedIn;
+  loadTodayAttendance() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const employeeId = currentUser.id;
+    if (!employeeId) return;
 
-          if (this.hasCheckedInToday) {
-            this.getActiveAttendance();
-          }
+    this.attendancesService.getTodayAttendance(employeeId).subscribe({
+      next: (res) => {
+        const attendance = res?.data || null;
+        this.todayAttendance = attendance;
+        this.hasCheckedInToday = !!attendance?.check_in;
+        this.attendanceCompletedToday = !!attendance?.check_in && !!attendance?.check_out;
 
-          // this.snackBar.open(
-          //   this.hasCheckedInToday
-          //     ? 'You have already checked in today.'
-          //     : 'You have not checked in yet.',
-          //   'Close',
-          //   {
-          //     panelClass: this.hasCheckedInToday ? 'snackbar-error' : 'snackbar-success'
-          //   }
-          // );
-        },
-        error: (err) => {
-          console.error('Error checking attendance status', err);
-
+        if (attendance?.check_in && !attendance?.check_out) {
+          this.isTiming = true;
+          this.startTime = new Date(attendance.check_in).getTime();
+          this.breakDuration = this.parseBreakMilliseconds(attendance.break);
+          this.isPaused = Number(attendance.is_paused) === 1;
+          this.pauseStart = this.isPaused && attendance.pause_start
+            ? new Date(attendance.pause_start).getTime()
+            : 0;
+          this.recalculateElapsed();
+          if (!this.isPaused) this.startTimerLoop();
+        } else {
+          clearInterval(this.timer);
+          this.isTiming = false;
+          this.isPaused = false;
+          this.pauseStart = 0;
+          this.timerDisplay = attendance?.hours || '00:00:00';
+          this.attendancesService.updateTimer(this.timerDisplay);
         }
-      });
-    };
-    // Run once immediately
-    checkStatus();
-
-    // Use RxJS interval for polling
-    this.pollingSubscription = interval(pollInterval).subscribe(() => {
-      checkStatus();
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error loading today attendance:', err)
     });
   }
+
+  private parseBreakMilliseconds(breakTime: string | null | undefined): number {
+    if (!breakTime) return 0;
+    const [h, m, s] = String(breakTime).split(':').map(Number);
+    return ((h || 0) * 3600 + (m || 0) * 60 + (s || 0)) * 1000;
+  }
+
+  private recalculateElapsed() {
+    if (!this.startTime) return;
+    let effectiveBreak = this.breakDuration;
+    if (this.isPaused && this.pauseStart) effectiveBreak += Date.now() - this.pauseStart;
+    this.elapsedTime = Math.max(0, Date.now() - this.startTime - effectiveBreak);
+    this.updateTimerDisplay();
+  }
+
   override ngOnDestroy() {
     this.pollingSubscription?.unsubscribe();
     super.ngOnDestroy(); // call base class cleanup
@@ -301,7 +323,11 @@ export class AttendancesComponent
       return;
     }
     if (this.hasCheckedInToday) {
-      this.snackBar.open('Already checked in today.', 'Close', { duration: 2000 });
+      this.snackBar.open(
+        this.attendanceCompletedToday ? 'Attendance is already completed today.' : 'Already checked in today.',
+        'Close',
+        { duration: 2000 }
+      );
       return;
     }
 
@@ -388,6 +414,7 @@ export class AttendancesComponent
             // localStorage.removeItem('attendanceStartDate');
 
             this.loadData();
+            this.loadTodayAttendance();
           },
           error: (err) => {
             this.isLoading = false;
@@ -403,6 +430,7 @@ export class AttendancesComponent
   startTimerLoop() {
     clearInterval(this.timer);
     this.timer = setInterval(() => {
+      if (!this.isTiming || this.attendanceCompletedToday) return;
       let now = Date.now();
       let effectiveBreak = this.breakDuration;
 
@@ -696,42 +724,7 @@ private pauseWithReason(
   }
 
   getActiveAttendance() {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    const employeeId = currentUser.id;
-    if (!employeeId) return;
-
-    this.attendancesService.getActiveAttendance(employeeId).subscribe(res => {
-      if (res.success && res.data.length > 0 && res.data[0].check_in) {
-        const attendance = res.data[0];
-
-        this.isTiming = true;
-        this.startTime = new Date(attendance.check_in).getTime();
-
-        // set break duration
-        this.breakDuration = 0;
-        if (attendance.break) {
-          const [h, m, s] = attendance.break.split(':').map(Number);
-          this.breakDuration = ((h * 3600) + (m * 60) + s) * 1000;
-        }
-
-        this.isPaused = !!attendance.is_paused;
-
-        if (this.isPaused && attendance.pause_start) {
-          this.pauseStart = new Date(attendance.pause_start).getTime();
-        } else {
-          this.pauseStart = 0;
-          this.startTimerLoop(); // only run loop when active
-        }
-        // calculate elapsed time immediately
-        let effectiveBreak = this.breakDuration;
-        if (this.isPaused && this.pauseStart) {
-          effectiveBreak += (Date.now() - this.pauseStart);
-        }
-        this.elapsedTime = Date.now() - this.startTime - effectiveBreak;
-        this.updateTimerDisplay();
-        this.cdr.detectChanges();
-      }
-    });
+    this.loadTodayAttendance();
   }
 
   updateTimerDisplay() {

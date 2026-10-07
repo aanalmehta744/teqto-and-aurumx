@@ -22,6 +22,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { EditBalanceDialogComponent } from './edit-balance-dialog/edit-balance-dialog.component';
 import { LeaveHistoryDialogComponent } from './leave-history-dialog/leave-history-dialog.component';
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-leave-balance',
@@ -49,6 +50,7 @@ export class LeaveBalanceComponent
     'name',
     'total',
     'used',
+    'unpaid',
     'remaining',
     'actions'
   ];
@@ -58,6 +60,7 @@ export class LeaveBalanceComponent
   selection = new SelectionModel<LeaveBalance>(true, []);
   id?: number;
   leaves?: LeaveBalance;
+  unpaidLeaveDaysByEmployee: Record<number, number> = {};
   constructor(
     public httpClient: HttpClient,
     public dialog: MatDialog,
@@ -75,6 +78,38 @@ export class LeaveBalanceComponent
 
   ngOnInit() {
     this.loadData();
+    this.loadUnpaidLeaveTotals();
+  }
+
+  /** Show approved unpaid days separately from the employee's paid balance. */
+  private loadUnpaidLeaveTotals(): void {
+    this.httpClient.get<any[]>(`${environment.apiUrl}/myleave`).subscribe({
+      next: (rows) => {
+        const currentYear = new Date().getFullYear();
+        const totals: Record<number, number> = {};
+
+        for (const leave of rows || []) {
+          const employeeId = Number(leave.employee_id);
+          const type = String(leave.leave_type || '').trim().toLowerCase();
+          const status = String(leave.status || '').trim().toLowerCase();
+          const leaveYear = String(leave.start_date || '').slice(0, 4);
+
+          if (employeeId && type === 'unpaid' && status === 'approved' && Number(leaveYear) === currentYear) {
+            totals[employeeId] = (totals[employeeId] || 0) + (Number(leave.no_of_days) || 0);
+          }
+        }
+
+        this.unpaidLeaveDaysByEmployee = totals;
+      },
+      // Keep the balance table usable if the separate history endpoint is unavailable.
+      error: () => {
+        this.unpaidLeaveDaysByEmployee = {};
+      },
+    });
+  }
+
+  getUnpaidLeaveDays(employeeId: number): number {
+    return this.unpaidLeaveDaysByEmployee[employeeId] || 0;
   }
   toggleStar(row: LeaveBalance) {
     console.log(row);
