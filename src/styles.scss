@@ -395,3 +395,125 @@ select {
   color: #312e81;
   background: rgba(165, 180, 252, .42);
 }
+
+/* A little more life across routed pages, with motion limited to useful UI feedback. */
+router-outlet + * .mat-mdc-card,
+router-outlet + * .card,
+router-outlet + * .panel,
+router-outlet + * .stat-card {
+  animation: hr-surface-arrive 420ms cubic-bezier(.2,.8,.2,1) both;
+}
+
+router-outlet + * .mat-mdc-card:nth-child(2),
+router-outlet + * .card:nth-child(2),
+router-outlet + * .panel:nth-child(2),
+router-outlet + * .stat-card:nth-child(2) { animation-delay: 45ms; }
+router-outlet + * .mat-mdc-card:nth-child(3),
+router-outlet + * .card:nth-child(3),
+router-outlet + * .panel:nth-child(3),
+router-outlet + * .stat-card:nth-child(3) { animation-delay: 90ms; }
+router-outlet + * .mat-mdc-card:nth-child(4),
+router-outlet + * .card:nth-child(4),
+router-outlet + * .panel:nth-child(4),
+router-outlet + * .stat-card:nth-child(4) { animation-delay: 135ms; }
+
+@keyframes hr-surface-arrive {
+  from { opacity: 0; transform: translateY(12px) scale(.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Sidebar hover feedback and a quick pop for notification counts. */
+app-sidebar aside a i-feather,
+app-sidebar aside a .feather {
+  transition: transform 220ms cubic-bezier(.2,.8,.2,1), color 180ms ease;
+}
+app-sidebar aside a:hover i-feather,
+app-sidebar aside a:hover .feather { transform: translateX(2px) scale(1.06); }
+app-sidebar aside a[class*='from-indigo-600'] { position: relative; overflow: hidden; }
+app-sidebar aside a[class*='from-indigo-600']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 25%, rgba(255,255,255,.17) 48%, transparent 70%);
+  transform: translateX(-120%);
+  animation: hr-nav-sheen 5s ease-in-out 1.2s infinite;
+  pointer-events: none;
+}
+@keyframes hr-nav-sheen {
+  0%, 72%, 100% { transform: translateX(-120%); }
+  88% { transform: translateX(120%); }
+}
+
+app-header .notification-container button span {
+  animation: hr-notification-pop 2.8s ease-in-out infinite;
+}
+@keyframes hr-notification-pop {
+  0%, 84%, 100% { transform: scale(1); }
+  90% { transform: scale(1.13); }
+  96% { transform: scale(.98); }
+}
+
+/* Charts draw in softly; table rows and tabs respond without shifting layout. */
+apx-chart, ngx-charts-advanced-pie-chart, ngx-charts-bar-vertical,
+ngx-charts-line-chart, canvas {
+  animation: hr-chart-arrive 520ms ease-out both;
+}
+@keyframes hr-chart-arrive {
+  from { opacity: .45; }
+  to { opacity: 1; }
+}
+.mat-mdc-row:hover { box-shadow: inset 3px 0 0 rgba(99,102,241,.6); }
+.mat-mdc-tab:hover .mdc-tab__text-label { color: #4f46e5; }
+button:not([disabled]):active,
+.mat-mdc-button-base:not([disabled]):active { transform: scale(.98); }
+
+@media (prefers-reduced-motion: reduce) {
+  router-outlet + * .mat-mdc-card,
+  router-outlet + * .card,
+  router-outlet + * .panel,
+  router-outlet + * .stat-card,
+  app-sidebar aside a[class*='from-indigo-600']::after,
+  app-header .notification-container button span,
+  apx-chart, ngx-charts-advanced-pie-chart, ngx-charts-bar-vertical,
+  ngx-charts-line-chart, canvas { animation: none !important; }
+}
+
+/* Welcome moment after credentials are accepted. The existing confirmation
+   still controls when routing starts; these styles only polish that moment. */
+.portal-login-success.swal2-show {
+  animation: portal-welcome-in 520ms cubic-bezier(.16,1,.3,1) both !important;
+}
+.portal-login-success .swal2-icon.swal2-success {
+  animation: portal-success-icon 560ms cubic-bezier(.16,1,.3,1) 120ms both;
+}
+.portal-login-success .swal2-title { animation: portal-welcome-copy 420ms ease-out 120ms both; }
+.portal-login-success .swal2-html-container { animation: portal-welcome-copy 420ms ease-out 190ms both; }
+.portal-login-success-confirm {
+  border-radius: 11px !important;
+  background: linear-gradient(115deg, #4f46e5, #0f9f9a) !important;
+  box-shadow: 0 7px 18px rgba(79,70,229,.23) !important;
+  transition: transform 180ms ease, box-shadow 180ms ease !important;
+}
+.portal-login-success-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(79,70,229,.3) !important;
+}
+@keyframes portal-welcome-in {
+  from { opacity: 0; transform: translateY(18px) scale(.94); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+@keyframes portal-success-icon {
+  0% { opacity: 0; transform: scale(.55) rotate(-18deg); }
+  72% { opacity: 1; transform: scale(1.12) rotate(4deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+@keyframes portal-welcome-copy {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portal-login-success.swal2-show,
+  .portal-login-success .swal2-icon.swal2-success,
+  .portal-login-success .swal2-title,
+  .portal-login-success .swal2-html-container { animation: none !important; }
+}

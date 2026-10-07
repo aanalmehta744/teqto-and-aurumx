@@ -324,6 +324,10 @@ onSubmit(event: Event): void {
         text: `Welcome back, ${username}!`,
         confirmButtonText: 'Okay',
         confirmButtonColor: '#3085d6',
+        customClass: {
+          popup: 'portal-login-success',
+          confirmButton: 'portal-login-success-confirm'
+        },
         allowOutsideClick: false
       }).then(() => {
 

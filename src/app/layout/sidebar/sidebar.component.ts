@@ -257,6 +257,7 @@ export class SidebarComponent
   // including departments added after this sidebar's original static lists.
   if (
     userRole === 'employee' &&
+    userDepartment !== 'hr' &&
     !['bde', 'ba'].includes(userDepartment) &&
     item.submenu?.some(sub => sub.path === '/employee/myleaves')
   ) {
@@ -270,6 +271,17 @@ export class SidebarComponent
 
   // All non-admin users must have Employee role
   if (userRole === 'employee') {
+    // HR already has dedicated attendance and leave-management sections with
+    // HR tools. Hide the generic self-service sections here to avoid showing
+    // two top-level menus with the same names.
+    if (
+      userDepartment === 'hr' &&
+      (item.submenu?.some(sub => sub.path === '/employee/attendance') ||
+        item.submenu?.some(sub => sub.path === '/employee/myleaves'))
+    ) {
+      return false;
+    }
+
     // Self-service attendance is available to employees in every department.
     // Keep the HR attendance menu below on its existing HR-only visibility.
     if (
