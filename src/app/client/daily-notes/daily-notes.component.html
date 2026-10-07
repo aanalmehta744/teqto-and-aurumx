@@ -17,7 +17,7 @@
       <p class="text-xs text-gray-500 mt-1">Hot Leads</p>
     </div>
     <div class="bg-white rounded-xl shadow-sm border p-4 text-center">
-      <p class="text-2xl font-bold text-blue-500">{{ stats.cold }}</p>
+      <p class="text-2xl font-bold text-fuchsia-500">{{ stats.cold }}</p>
       <p class="text-xs text-gray-500 mt-1">Cold Leads</p>
     </div>
     <div class="bg-white rounded-xl shadow-sm border p-4 text-center">
@@ -127,7 +127,7 @@
                   {{ client.prize_tag }}
                 </span>
                 <span *ngIf="client.tag"
-                  class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">
+                  class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">
                   {{ client.tag }}
                 </span>
               </div>
@@ -269,7 +269,7 @@
                   </div>
                 </div>
                 <div class="flex gap-1 flex-shrink-0">
-                  <button (click)="startEdit(note)" class="p-1 text-gray-400 hover:text-blue-500 transition-colors">
+                  <button (click)="startEdit(note)" class="p-1 text-gray-400 hover:text-fuchsia-500 transition-colors">
                     <mat-icon class="!text-[16px]">edit</mat-icon>
                   </button>
                   <button (click)="deleteNote(note.id)" class="p-1 text-gray-400 hover:text-red-500 transition-colors">

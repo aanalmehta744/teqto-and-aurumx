@@ -67,7 +67,7 @@
             <mat-cell *matCellDef="let row">
               <span [ngClass]="{
                 'bg-red-100 text-red-700': row.priority === 'High',
-                'bg-blue-100 text-blue-700': row.priority === 'Medium',
+                'bg-fuchsia-100 text-fuchsia-700': row.priority === 'Medium',
                 'bg-green-100 text-green-700': row.priority === 'Low'
               }" class="px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.priority }}</span>
             </mat-cell>
@@ -90,7 +90,7 @@
             <mat-cell *matCellDef="let row">
               <span [ngClass]="{
                 'bg-green-100 text-green-700': row.status === 'Active',
-                'bg-blue-100 text-blue-700': row.status === 'Completed',
+                'bg-fuchsia-100 text-fuchsia-700': row.status === 'Completed',
                 'bg-purple-100 text-purple-700': row.status === 'Running',
                 'bg-yellow-100 text-yellow-700': row.status === 'Pending',
                 'bg-gray-100 text-gray-600': row.status === 'Not Started',

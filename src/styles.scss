@@ -57,8 +57,8 @@ input[type="number"] {
    Shared styles only: existing module markup and permissions remain intact.
    ================================================================ */
 :root {
-  --hr-primary: #4f46e5;
-  --hr-primary-soft: #eef2ff;
+  --hr-primary: #7c3aed;
+  --hr-primary-soft: #f5f3ff;
   --hr-text: #0f172a;
   --hr-muted: #64748b;
   --hr-border: #e2e8f0;
@@ -226,7 +226,7 @@ button:not([disabled]):active,
 /* Portal-wide finish: a quieter canvas lets the working surfaces stand out. */
 body {
   background:
-    radial-gradient(ellipse at 88% 0%, rgba(99, 102, 241, .075), transparent 34rem),
+    radial-gradient(ellipse at 88% 0%, rgba(139, 92, 246, .075), transparent 34rem),
     radial-gradient(ellipse at 0% 55%, rgba(14, 165, 233, .045), transparent 30rem),
     #f6f8fc;
 }
@@ -265,7 +265,7 @@ select:focus,
 .form-select:focus {
   outline: none;
   border-color: #818cf8 !important;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, .12) !important;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, .12) !important;
 }
 
 /* Animate each routed screen as Angular inserts it beside the router outlet. */
@@ -349,13 +349,13 @@ button.mat-mdc-button-base {
 .btn-primary,
 .mat-mdc-raised-button.mat-primary,
 .mat-mdc-unelevated-button.mat-primary {
-  box-shadow: 0 5px 14px rgba(79, 70, 229, .18);
+  box-shadow: 0 5px 14px rgba(124, 58, 237, .18);
 }
 
 .btn-primary:hover,
 .mat-mdc-raised-button.mat-primary:hover,
 .mat-mdc-unelevated-button.mat-primary:hover {
-  box-shadow: 0 8px 20px rgba(79, 70, 229, .25);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, .25);
 }
 
 .form-control,
@@ -392,8 +392,8 @@ select {
 }
 
 ::selection {
-  color: #312e81;
-  background: rgba(165, 180, 252, .42);
+  color: #4c1d95;
+  background: rgba(196, 181, 253, .42);
 }
 
 /* A little more life across routed pages, with motion limited to useful UI feedback. */
@@ -429,20 +429,7 @@ app-sidebar aside a .feather {
 }
 app-sidebar aside a:hover i-feather,
 app-sidebar aside a:hover .feather { transform: translateX(2px) scale(1.06); }
-app-sidebar aside a[class*='from-indigo-600'] { position: relative; overflow: hidden; }
-app-sidebar aside a[class*='from-indigo-600']::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(105deg, transparent 25%, rgba(255,255,255,.17) 48%, transparent 70%);
-  transform: translateX(-120%);
-  animation: hr-nav-sheen 5s ease-in-out 1.2s infinite;
-  pointer-events: none;
-}
-@keyframes hr-nav-sheen {
-  0%, 72%, 100% { transform: translateX(-120%); }
-  88% { transform: translateX(120%); }
-}
+/* (removed the periodic white "sheen" stripe on the active sidebar item) */
 
 app-header .notification-container button span {
   animation: hr-notification-pop 2.8s ease-in-out infinite;
@@ -462,8 +449,8 @@ ngx-charts-line-chart, canvas {
   from { opacity: .45; }
   to { opacity: 1; }
 }
-.mat-mdc-row:hover { box-shadow: inset 3px 0 0 rgba(99,102,241,.6); }
-.mat-mdc-tab:hover .mdc-tab__text-label { color: #4f46e5; }
+.mat-mdc-row:hover { box-shadow: inset 3px 0 0 rgba(139, 92, 246,.6); }
+.mat-mdc-tab:hover .mdc-tab__text-label { color: #7c3aed; }
 button:not([disabled]):active,
 .mat-mdc-button-base:not([disabled]):active { transform: scale(.98); }
 
@@ -472,7 +459,6 @@ button:not([disabled]):active,
   router-outlet + * .card,
   router-outlet + * .panel,
   router-outlet + * .stat-card,
-  app-sidebar aside a[class*='from-indigo-600']::after,
   app-header .notification-container button span,
   apx-chart, ngx-charts-advanced-pie-chart, ngx-charts-bar-vertical,
   ngx-charts-line-chart, canvas { animation: none !important; }
@@ -490,13 +476,13 @@ button:not([disabled]):active,
 .portal-login-success .swal2-html-container { animation: portal-welcome-copy 420ms ease-out 190ms both; }
 .portal-login-success-confirm {
   border-radius: 11px !important;
-  background: linear-gradient(115deg, #4f46e5, #0f9f9a) !important;
-  box-shadow: 0 7px 18px rgba(79,70,229,.23) !important;
+  background: linear-gradient(115deg, #7c3aed, #6d28d9) !important;
+  box-shadow: 0 7px 18px rgba(124, 58, 237,.23) !important;
   transition: transform 180ms ease, box-shadow 180ms ease !important;
 }
 .portal-login-success-confirm:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(79,70,229,.3) !important;
+  box-shadow: 0 10px 24px rgba(124, 58, 237,.3) !important;
 }
 @keyframes portal-welcome-in {
   from { opacity: 0; transform: translateY(18px) scale(.94); filter: blur(4px); }
@@ -516,4 +502,183 @@ button:not([disabled]):active,
   .portal-login-success .swal2-icon.swal2-success,
   .portal-login-success .swal2-title,
   .portal-login-success .swal2-html-container { animation: none !important; }
+}
+
+/* =================================================================
+   DASHBOARD POLISH — violet design + motion refresh (applies app-wide)
+   Loaded last so it refines the shared visual language above.
+   ================================================================= */
+:root {
+  --hr-primary: #7c3aed;
+  --hr-primary-2: #a855f7;
+  --hr-primary-soft: #f5f3ff;
+  --hr-violet-ring: rgba(124, 58, 237, .14);
+  --hr-grad: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 55%, #6d28d9 100%);
+}
+
+/* Softer, violet-tinted page canvas */
+body {
+  background:
+    radial-gradient(ellipse at 88% -4%, rgba(139, 92, 246, .12), transparent 36rem),
+    radial-gradient(ellipse at -4% 60%, rgba(168, 85, 247, .08), transparent 32rem),
+    #f6f4fe;
+}
+
+/* Cards: violet depth, colored hover lift */
+.mat-mdc-card,
+.mat-card,
+.card {
+  border-color: rgba(124, 58, 237, .10) !important;
+  box-shadow: 0 10px 30px -14px rgba(124, 58, 237, .12) !important;
+}
+.mat-mdc-card:hover,
+.mat-card:hover,
+.card:hover {
+  transform: translateY(-3px) !important;
+  border-color: rgba(124, 58, 237, .26) !important;
+  box-shadow: 0 22px 48px -20px rgba(124, 58, 237, .30) !important;
+}
+
+/* Primary buttons: violet gradient + glow */
+.btn-primary,
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-unelevated-button.mat-primary {
+  background: var(--hr-grad) !important;
+  color: #fff !important;
+  border: 0 !important;
+  box-shadow: 0 12px 24px -12px rgba(124, 58, 237, .55) !important;
+}
+.btn-primary:hover,
+.mat-mdc-raised-button.mat-primary:hover,
+.mat-mdc-unelevated-button.mat-primary:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 18px 34px -14px rgba(124, 58, 237, .6) !important;
+}
+
+/* Tables: violet-tinted headers + row hover */
+.mat-mdc-header-cell { background: #f5f3ff !important; color: #6d28d9 !important; }
+.mat-mdc-row:hover { background: #faf8ff !important; box-shadow: inset 3px 0 0 var(--hr-primary); }
+table.table thead th { background: #f5f3ff; color: #6d28d9; border-bottom-color: #ece7fb; }
+table.table tbody tr:hover { background-color: #faf8ff; }
+
+/* Section headings in deep violet ink */
+.block-header h1, .block-header h2, .block-header h3, .page-title { color: #4c1d95; }
+
+/* Focus rings → violet */
+input:not([type='checkbox']):not([type='radio']):focus,
+textarea:focus, select:focus,
+.form-control:focus, .form-select:focus {
+  border-color: #a78bfa !important;
+  box-shadow: 0 0 0 4px var(--hr-violet-ring) !important;
+}
+
+/* Scrollbars → violet */
+* { scrollbar-color: #c4b5fd transparent; }
+*::-webkit-scrollbar-thumb { background: #c4b5fd; }
+*::-webkit-scrollbar-thumb:hover { background-color: #a78bfa; }
+
+/* Dialog / menu panels → slightly deeper violet shadow */
+.mat-mdc-menu-panel,
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  box-shadow: 0 26px 72px -24px rgba(76, 29, 149, .32) !important;
+}
+
+/* Dashboard hero banners: just a soft violet shadow (no moving stripe) */
+div[class*="from-violet-600"][class*="rounded-2xl"] {
+  position: relative;
+  box-shadow: 0 18px 40px -20px rgba(124, 58, 237, .5) !important;
+}
+
+/* Dashboard KPI / stat cards — tinted background + violet depth
+   (left colour accent border is preserved) */
+.hr-grid-in > * {
+  background: linear-gradient(160deg, #ffffff 0%, #f6f3ff 100%) !important;
+  border-color: rgba(124, 58, 237, .10);
+  box-shadow: 0 10px 26px -16px rgba(124, 58, 237, .26) !important;
+  transition: transform 200ms cubic-bezier(.2,.8,.2,1), box-shadow 200ms ease !important;
+}
+.hr-grid-in > *:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px -18px rgba(124, 58, 237, .34) !important;
+}
+
+/* Other stat tiles across the app */
+.stat-card {
+  transition: transform 200ms cubic-bezier(.2,.8,.2,1), box-shadow 200ms ease !important;
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 38px -20px rgba(124, 58, 237, .32) !important;
+}
+
+/* Count-up / value emphasis already handled per page; add a gentle rise to grids */
+.hr-grid-in > * { animation: hr-page-in 360ms cubic-bezier(.2,.8,.2,1) both; }
+.hr-grid-in > *:nth-child(2) { animation-delay: 45ms; }
+.hr-grid-in > *:nth-child(3) { animation-delay: 90ms; }
+.hr-grid-in > *:nth-child(4) { animation-delay: 135ms; }
+.hr-grid-in > *:nth-child(5) { animation-delay: 180ms; }
+.hr-grid-in > *:nth-child(6) { animation-delay: 225ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hr-grid-in > * { animation: none !important; }
+}
+
+/* =================================================================
+   TABLES — always white + gray (never dark), every state
+   Covers Angular Material, ngx-datatable and native tables.
+   ================================================================= */
+
+/* Base surface: rows white, headers soft violet-gray */
+body .mat-mdc-table,
+body .mat-mdc-row,
+body .mat-mdc-footer-row,
+body .datatable-body-row,
+body .datatable-row-group,
+body table.table,
+body table.table tbody tr {
+  background-color: #ffffff !important;
+}
+body .mat-mdc-header-row,
+body .mat-mdc-header-cell {
+  background-color: #f5f3ff !important;
+}
+body .mat-mdc-cell { background-color: transparent !important; }
+
+/* Readable dark text in every cell (status badges keep their own colors) */
+body .mat-mdc-cell,
+body .datatable-body-cell,
+body table.table tbody td {
+  color: #374151 !important;
+}
+
+/* Hover / focus / selected / active → soft gray, NOT dark */
+body .mat-mdc-row:hover,
+body .mat-mdc-row:focus,
+body .mat-mdc-row.cdk-focused,
+body .mat-mdc-row.cdk-mouse-focused,
+body .mat-mdc-row.cdk-keyboard-focused,
+body .mat-mdc-row[aria-selected="true"],
+body .mat-mdc-row.selected,
+body .mat-mdc-row.active,
+body .mat-mdc-table tr.mat-mdc-row:hover,
+body .datatable-body-row:hover,
+body .datatable-body-row:hover .datatable-row-group,
+body .datatable-body-row.active,
+body .datatable-body-row.active .datatable-row-group,
+body table.table tbody tr:hover {
+  background-color: #f3f0fb !important;   /* light violet-gray */
+}
+
+/* Keep cell text dark on those same states (overrides any white-on-dark) */
+body .mat-mdc-row:hover .mat-mdc-cell,
+body .mat-mdc-row:focus .mat-mdc-cell,
+body .mat-mdc-row.cdk-focused .mat-mdc-cell,
+body .mat-mdc-row.cdk-mouse-focused .mat-mdc-cell,
+body .mat-mdc-row[aria-selected="true"] .mat-mdc-cell,
+body .mat-mdc-row.selected .mat-mdc-cell,
+body .mat-mdc-row.active .mat-mdc-cell,
+body .datatable-body-row:hover .datatable-body-cell,
+body .datatable-body-row.active .datatable-body-cell,
+body table.table tbody tr:hover td {
+  color: #374151 !important;
 }

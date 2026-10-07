@@ -10,7 +10,7 @@
           <button
             type="button"
             (click)="goToDashboard()"
-            class="flex items-center gap-1 px-2 h-8 rounded-lg text-indigo-900 hover:bg-indigo-50 transition-colors text-xs font-medium"
+            class="flex items-center gap-1 px-2 h-8 rounded-lg text-violet-900 hover:bg-violet-50 transition-colors text-xs font-medium"
             title="Back to Dashboard"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none"
@@ -24,7 +24,7 @@
             <button
               type="button"
               (click)="toggleRequestsDropdown()"
-              class="w-8 h-8 rounded-lg flex items-center justify-center text-indigo-900 hover:bg-indigo-50 transition-colors relative"
+              class="w-8 h-8 rounded-lg flex items-center justify-center text-violet-900 hover:bg-violet-50 transition-colors relative"
               title="Chat Requests"
             >
               <svg
@@ -60,7 +60,7 @@
                 *ngFor="let req of incomingRequests"
                 class="flex items-center gap-3 px-4 py-3 border-b border-gray-50 last:border-0"
               >
-                <div class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                <div class="w-9 h-9 rounded-full bg-violet-900 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                   {{ getInitials(req.sender_name) }}
                 </div>
                 <div class="min-w-0 flex-1">
@@ -71,7 +71,7 @@
                   <button
                     type="button"
                     (click)="respondToRequest(req, 'accept')"
-                    class="text-[11px] px-3 py-1.5 rounded bg-indigo-900 text-white hover:bg-indigo-800"
+                    class="text-[11px] px-3 py-1.5 rounded bg-violet-900 text-white hover:bg-violet-800"
                   >
                     Accept
                   </button>
@@ -94,7 +94,7 @@
           <button
             type="button"
             (click)="openCreateGroupModal()"
-            class="w-8 h-8 rounded-lg flex items-center justify-center text-indigo-900 hover:bg-indigo-50 transition-colors"
+            class="w-8 h-8 rounded-lg flex items-center justify-center text-violet-900 hover:bg-violet-50 transition-colors"
             title="Create Group"
           >
             <svg
@@ -118,7 +118,7 @@
         [(ngModel)]="searchText"
         (input)="filterUsers()"
         placeholder="Search chats or find people..."
-        class="w-full px-3 py-2 text-m text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-900"
+        class="w-full px-3 py-2 text-m text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-900"
       />
 <!-- ADD THIS -->
 <div *ngIf="isAdminUser()" class="mt-3 space-y-2">
@@ -127,7 +127,7 @@
   <select
     [(ngModel)]="adminSelectedUserId"
     (change)="onAdminFirstUserChange()"
-    class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-900"
+    class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-900"
   >
     <option [ngValue]="null" class="text-sm">Select first person</option>
 
@@ -144,7 +144,7 @@
     [(ngModel)]="adminSelectedChatUserId"
     (change)="openAdminSelectedChat()"
     [disabled]="!adminSelectedUserId || adminChatPartners.length === 0"
-    class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-900 disabled:bg-gray-50 disabled:text-gray-400"
+    class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-900 disabled:bg-gray-50 disabled:text-gray-400"
   >
     <option [ngValue]="null" class="text-sm">Select person they chatted with</option>
 
@@ -173,7 +173,7 @@
         >
 
           <div class="relative flex-shrink-0">
-            <div class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center text-white">
+            <div class="w-9 h-9 rounded-full bg-violet-900 flex items-center justify-center text-white">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="h-4 w-4"
@@ -222,7 +222,7 @@
             />
             <div
               *ngIf="!getAvatarUrl(user.uploadImg)"
-              class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center text-white text-xs font-bold"
+              class="w-9 h-9 rounded-full bg-violet-900 flex items-center justify-center text-white text-xs font-bold"
             >
               {{ getInitials(user.fullName) }}
             </div>
@@ -262,7 +262,7 @@
             />
             <div
               *ngIf="!getAvatarUrl(user.uploadImg)"
-              class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center text-white text-xs font-bold"
+              class="w-9 h-9 rounded-full bg-violet-900 flex items-center justify-center text-white text-xs font-bold"
             >
               {{ getInitials(user.fullName) }}
             </div>
@@ -320,7 +320,7 @@
               class="text-[11px] px-2 py-1 rounded flex-shrink-0"
               [ngClass]="isPendingRequest(user)
                 ? 'border border-gray-200 text-gray-400 cursor-default'
-                : 'bg-indigo-900 text-white hover:bg-indigo-800'"
+                : 'bg-violet-900 text-white hover:bg-violet-800'"
             >
               {{ isAdminUser() ? 'Chat' : (isPendingRequest(user) ? 'Pending' : 'Send Request') }}
             </button>
@@ -384,7 +384,7 @@
           />
           <div
             *ngIf="!getAvatarUrl(selectedUser.uploadImg)"
-            class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center text-white text-xs font-bold"
+            class="w-9 h-9 rounded-full bg-violet-900 flex items-center justify-center text-white text-xs font-bold"
           >
             {{ getInitials(selectedUser.fullName) }}
           </div>
@@ -422,7 +422,7 @@
           </svg>
         </button>
 
-        <div class="w-9 h-9 rounded-full bg-indigo-900 flex items-center justify-center text-white flex-shrink-0">
+        <div class="w-9 h-9 rounded-full bg-violet-900 flex items-center justify-center text-white flex-shrink-0">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-4 w-4"
@@ -447,7 +447,7 @@
 
       <ng-scrollbar #messageScroll class="flex-1 min-h-0 px-5 py-4" visibility="hover">
         <div *ngIf="loading" class="flex justify-center py-8">
-          <div class="w-6 h-6 border-2 border-indigo-900 border-t-transparent rounded-full animate-spin"></div>
+          <div class="w-6 h-6 border-2 border-violet-900 border-t-transparent rounded-full animate-spin"></div>
         </div>
 
         <div *ngIf="!loading && messages.length === 0" class="text-center text-sm text-gray-400 py-8">
@@ -477,7 +477,7 @@
                 [href]="getDownloadUrl(msg)"
                 [attr.download]="msg.attachment_name || null"
                 title="Download video"
-                class="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1.5 transition-colors"
+                class="absolute top-2 right-2 bg-violet-900/60 hover:bg-violet-900/80 text-white rounded-full p-1.5 transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -494,7 +494,7 @@
                 "
                 [href]="getDownloadUrl(msg)"
                 [attr.download]="msg.attachment_name || null"
-                class="flex items-center gap-2 mb-1 px-3 py-2 rounded-xl bg-indigo-50 text-indigo-900 text-xs font-medium hover:bg-indigo-100 transition-colors"
+                class="flex items-center gap-2 mb-1 px-3 py-2 rounded-xl bg-violet-50 text-violet-900 text-xs font-medium hover:bg-violet-100 transition-colors"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -531,7 +531,7 @@
                 </span>
 
                 <div
-                  class="bg-indigo-900 text-white px-4 py-2
+                  class="bg-violet-900 text-white px-4 py-2
                          rounded-2xl rounded-tr-sm text-sm shadow-sm
                          flex items-end gap-1"
                 >
@@ -542,7 +542,7 @@
                   <svg
                     *ngIf="getTickStatus(msg) === 'sent'"
                     xmlns="http://www.w3.org/2000/svg"
-                    class="h-4 w-4 text-indigo-200 flex-shrink-0"
+                    class="h-4 w-4 text-violet-200 flex-shrink-0"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -635,7 +635,7 @@
                   [href]="getDownloadUrl(msg)"
                   [attr.download]="msg.attachment_name || null"
                   title="Download video"
-                  class="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1.5 transition-colors"
+                  class="absolute top-2 right-2 bg-violet-900/60 hover:bg-violet-900/80 text-white rounded-full p-1.5 transition-colors"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -716,7 +716,7 @@
 
         <div
           *ngIf="selectedFile"
-          class="flex items-center gap-2 mb-2 px-3 py-2 rounded-lg bg-indigo-50 text-indigo-900 text-xs w-fit max-w-full"
+          class="flex items-center gap-2 mb-2 px-3 py-2 rounded-lg bg-violet-50 text-violet-900 text-xs w-fit max-w-full"
         >
           <img
             *ngIf="filePreviewUrl"
@@ -748,7 +748,7 @@
             {{ selectedFile.name }}
           </span>
 
-          <span *ngIf="sending" class="flex items-center gap-1 text-indigo-500 flex-shrink-0">
+          <span *ngIf="sending" class="flex items-center gap-1 text-violet-500 flex-shrink-0">
             <svg class="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
@@ -760,7 +760,7 @@
             *ngIf="!sending"
             type="button"
             (click)="removeSelectedFile()"
-            class="ml-1 text-indigo-400 hover:text-indigo-700"
+            class="ml-1 text-violet-400 hover:text-violet-700"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -801,7 +801,7 @@
   class="no-scrollbar flex-1 px-4 py-2 text-sm text-gray-900 bg-white
          border border-gray-200 rounded-2xl resize-none
          overflow-y-auto max-h-[120px] leading-5
-         focus:outline-none focus:ring-2 focus:ring-indigo-900"
+         focus:outline-none focus:ring-2 focus:ring-violet-900"
 ></textarea>
 
           <!-- Attach -->
@@ -838,7 +838,7 @@
             type="button"
             (click)="send()"
             [disabled]="(!newMessage.trim() && !selectedFile) || sending"
-            class="w-10 h-10 rounded-full bg-indigo-900 hover:bg-indigo-800 disabled:opacity-40 flex items-center justify-center transition-colors flex-shrink-0"
+            class="w-10 h-10 rounded-full bg-violet-900 hover:bg-violet-800 disabled:opacity-40 flex items-center justify-center transition-colors flex-shrink-0"
           >
             <svg
               *ngIf="!sending"
@@ -865,7 +865,7 @@
 
 <div
   *ngIf="showCreateGroupModal"
-  class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-violet-950/40 px-4"
 >
   <div
     class="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden"
@@ -912,7 +912,7 @@
         type="text"
         [(ngModel)]="groupName"
         placeholder="e.g. Development Team"
-        class="w-full px-3 py-2.5 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-900"
+        class="w-full px-3 py-2.5 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-900"
       />
 
       <!-- SELECT MEMBERS -->
@@ -934,7 +934,7 @@
         type="text"
         [(ngModel)]="groupSearchText"
         placeholder="Search employees..."
-        class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-900 mb-2"
+        class="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-900 mb-2"
       />
 
       <!-- MEMBERS -->
@@ -951,7 +951,7 @@
           <div
             class="w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0"
             [ngClass]="{
-              'bg-indigo-900 border-indigo-900': isGroupMember(user.id),
+              'bg-violet-900 border-violet-900': isGroupMember(user.id),
               'border-gray-300': !isGroupMember(user.id),
             }"
           >
@@ -973,7 +973,7 @@
           <!-- Avatar -->
 
           <div
-            class="w-8 h-8 rounded-full bg-indigo-900 text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0"
+            class="w-8 h-8 rounded-full bg-violet-900 text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0"
           >
             {{ getInitials(user.fullName) }}
           </div>
@@ -1018,7 +1018,7 @@
         type="button"
         (click)="createGroup()"
         [disabled]="!groupName.trim() || creatingGroup"
-        class="px-4 py-2 text-sm font-medium text-white bg-indigo-900 rounded-lg hover:bg-indigo-800 disabled:opacity-40 flex items-center gap-2"
+        class="px-4 py-2 text-sm font-medium text-white bg-violet-900 rounded-lg hover:bg-violet-800 disabled:opacity-40 flex items-center gap-2"
       >
         <!-- Spinner -->
 

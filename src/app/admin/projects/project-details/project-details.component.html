@@ -26,7 +26,7 @@
                   <dt class="font-medium text-[#0E264A] mr-2">Status:</dt>
                   <dd>
                     <span
-                      class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                      class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-fuchsia-100 text-fuchsia-800">
                       {{ projectDetails?.status }}
                     </span>
                   </dd>
@@ -47,7 +47,7 @@
                     <dt class="font-medium text-[#0E264A] mb-1">Project Status :</dt>
                     <dd>
                       <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
-                        <div class="bg-blue-600 h-2 rounded-full" [style.width.%]="projectDetails?.progress || 0"></div>
+                        <div class="bg-fuchsia-600 h-2 rounded-full" [style.width.%]="projectDetails?.progress || 0"></div>
                       </div>
                       <small class="text-[#7C6D84] text-[14px]"><strong class="text-[#0E264A]">{{
                           projectDetails?.progress }}%</strong> Project

@@ -599,7 +599,7 @@ form.get('sandwich_confirm')?.updateValueAndValidity({
               icon: 'success',
               title: 'Leave Updated',
               text: 'Your leave request has been successfully updated!',
-              confirmButtonColor: '#3085d6'
+              confirmButtonColor: '#7c3aed'
             }).then(() => {
               this.dialogRef.close(leaveData);
               window.location.reload();
@@ -627,7 +627,7 @@ form.get('sandwich_confirm')?.updateValueAndValidity({
               icon: 'success',
               title: 'Leave Requested',
               text: 'Your leave request has been submitted!',
-              confirmButtonColor: '#3085d6'
+              confirmButtonColor: '#7c3aed'
             }).then(() => {
               this.dialogRef.close(leaveData);
               window.location.reload();

@@ -5,7 +5,7 @@
   margin: 0;
   font-size: 24px;
   font-weight: 700;
-  background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+  background: linear-gradient(135deg, #7c3aed, #8b5cf6);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -25,7 +25,7 @@
   cursor: pointer;
 
   mat-icon { font-size: 18px; width: 18px; height: 18px; }
-  &:hover { border-color: #6366f1; color: #4f46e5; }
+  &:hover { border-color: #8b5cf6; color: #7c3aed; }
 }
 
 .card {
@@ -85,8 +85,8 @@ td {
   display: inline-block;
   padding: 3px 10px;
   border-radius: 999px;
-  background: #eef2ff;
-  color: #4338ca;
+  background: #f5f3ff;
+  color: #6d28d9;
   font-size: 11px;
   font-weight: 600;
 }
@@ -110,7 +110,7 @@ td {
 .badge-green { background: #ecfdf5; color: #059669; }
 .badge-red   { background: #fef2f2; color: #dc2626; }
 .badge-amber { background: #fffbeb; color: #b45309; }
-.badge-blue  { background: #eff6ff; color: #2563eb; }
+.badge-blue  { background: #eff6ff; color: #9333ea; }
 .badge-gray  { background: #f3f4f6; color: #6b7280; }
 
 .cell-input {
@@ -123,7 +123,7 @@ td {
   background: #fff;
   color: #374151;
 
-  &:focus { border-color: #6366f1; }
+  &:focus { border-color: #8b5cf6; }
 
   &.notes {
     width: 220px;
@@ -138,7 +138,7 @@ td {
   padding: 7px 14px;
   border: none;
   border-radius: 8px;
-  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  background: linear-gradient(135deg, #7c3aed, #8b5cf6);
   color: #fff;
   font-size: 13px;
   font-weight: 500;
@@ -150,7 +150,7 @@ td {
 }
 
 .plain-link {
-  color: #4f46e5;
+  color: #7c3aed;
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
@@ -170,7 +170,7 @@ td {
   border-radius: 6px;
   background: #fafbff;
 
-  &:hover { border-color: #6366f1; background: #eef2ff; }
+  &:hover { border-color: #8b5cf6; background: #f5f3ff; }
 }
 
 .text-muted { color: #9ca3af; }

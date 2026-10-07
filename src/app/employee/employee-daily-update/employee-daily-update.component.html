@@ -113,7 +113,7 @@
                                                 <!-- More/Less Button -->
                                                 <div *ngIf="row.note?.length > 100" class="mt-2 text-right">
                                                     <button (click)="toggleTaskDetails(row.id)"
-                                                        class="text-blue-600 hover:underline text-xs">
+                                                        class="text-fuchsia-600 hover:underline text-xs">
                                                         {{ expandedTaskDetails[row.id] ? 'Less' : 'More' }}
                                                     </button>
                                                 </div>
@@ -140,7 +140,7 @@
                                                 <!-- More/Less Button -->
                                                 <div *ngIf="row.update_details?.length > 100" class="mt-2 text-right">
                                                     <button (click)="toggleExpand(row.id)"
-                                                        class="text-blue-600 hover:underline text-xs">
+                                                        class="text-fuchsia-600 hover:underline text-xs">
                                                         {{ expandedRows[row.id] ? 'Less' : 'More' }}
                                                     </button>
                                                 </div>

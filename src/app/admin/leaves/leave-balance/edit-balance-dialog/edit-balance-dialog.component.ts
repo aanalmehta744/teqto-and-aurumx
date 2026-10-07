@@ -92,7 +92,7 @@ export class EditBalanceDialogComponent {
             icon: 'success',
             title: 'Updated',
             text: 'Leave balance updated successfully!',
-            confirmButtonColor: '#3085d6',
+            confirmButtonColor: '#7c3aed',
           }).then(() => this.dialogRef.close(true));
         },
         error: (err) => {

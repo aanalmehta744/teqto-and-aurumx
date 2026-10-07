@@ -16,14 +16,14 @@
           <!-- Start Date -->
           <div class="font-medium text-gray-600">Project Start Date:</div>
           <div class="flex items-center gap-2 text-gray-800">
-            <span class="material-icons-outlined text-base text-blue-500">date_range</span>
+            <span class="material-icons-outlined text-base text-fuchsia-500">date_range</span>
             {{ myProjects.startDate ? (myProjects.startDate | date: 'MM/dd/yyyy') : '--' }}
           </div>
 
           <!-- End Date -->
           <div class="font-medium text-gray-600">Project DeadLine:</div>
           <div class="flex items-center gap-2 text-gray-800">
-            <span class="material-icons-outlined text-base text-blue-500">date_range</span>
+            <span class="material-icons-outlined text-base text-fuchsia-500">date_range</span>
             {{ myProjects.endDate | date }}
           </div>
           <!-- Team -->
@@ -47,7 +47,7 @@
             <span class="bg-red-500 text-white text-sm px-2 py-1 rounded">High</span>
             }
             @if (myProjects.priority === 'Medium') {
-            <span class="bg-blue-500 text-white text-sm px-2 py-1 rounded">Medium</span>
+            <span class="bg-fuchsia-500 text-white text-sm px-2 py-1 rounded">Medium</span>
             }
             @if (myProjects.priority === 'Low') {
             <span class="bg-green-500 text-white text-sm px-2 py-1 rounded">Low</span>
@@ -65,7 +65,7 @@
           <div>
             <span [ngSwitch]="myProjects.status" [ngClass]="{
                   'bg-green-500': myProjects.status === 'Active',
-                  'bg-blue-600': myProjects.status === 'Completed',
+                  'bg-fuchsia-600': myProjects.status === 'Completed',
                   'bg-purple-500': myProjects.status === 'Running',
                   'bg-orange-500': myProjects.status === 'Pending',
                   'bg-gray-600': myProjects.status === 'Not Started',

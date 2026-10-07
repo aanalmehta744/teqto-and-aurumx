@@ -204,7 +204,7 @@ export class FormDialogComponent implements OnInit {
               icon: 'success',
               title: 'Updated!',
               text: 'Client details updated successfully!',
-              confirmButtonColor: '#3085d6',
+              confirmButtonColor: '#7c3aed',
             }).then(() => {
               this.dialogRef.close({ updated: true });
               location.reload(); // reloads the page
@@ -227,7 +227,7 @@ export class FormDialogComponent implements OnInit {
               icon: 'success',
               title: 'Success!',
               text: 'Client added successfully!',
-              confirmButtonColor: '#3085d6',
+              confirmButtonColor: '#7c3aed',
             }).then(() => {
               this.dialogRef.close();
               location.reload(); // reloads the page

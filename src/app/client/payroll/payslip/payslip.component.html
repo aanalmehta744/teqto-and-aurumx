@@ -5,7 +5,7 @@
     <div id="payslip" class="bg-white border border-gray-200 shadow-sm overflow-hidden mt-4">
 
       <!-- Header -->
-      <div class="bg-[#312e81] px-6 py-5 flex justify-between items-start">
+      <div class="bg-[#4c1d95] px-6 py-5 flex justify-between items-start">
         <div>
           <img src="../../../assets/images/Teqto(bg).png" class="h-10 brightness-0 invert mb-3">
           <p class="text-[#a8d5d5] text-xs leading-5">
@@ -61,7 +61,7 @@
 
             <div class="flex justify-between items-center text-sm">
               <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
+                <span class="w-2 h-2 rounded-full bg-fuchsia-500 inline-block"></span>
                 <span class="text-gray-700">Present Days</span>
               </div>
               <span class="text-gray-600">{{ employeeSalary?.presentDays }} days</span>
@@ -89,7 +89,7 @@
               <div class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-#0b0b88 inline-block"></span>
                 <span class="text-gray-700">Paid Leave</span>
-                <span class="text-xs px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded-full">
+                <span class="text-xs px-1.5 py-0.5 bg-violet-50 text-violet-600 rounded-full">
                   {{ employeeSalary?.paidLeaveDays }} of 1 allowed
                 </span>
               </div>
@@ -230,7 +230,7 @@
       <!-- Actions -->
       <div class="px-6 py-4 border-t border-gray-100 flex justify-end print_btn">
         <button (click)="printPayslip()"
-          class="flex items-center gap-2 bg-[#312e81] hover:bg-[#005060] text-white text-sm px-5 py-2.5 rounded-lg transition-colors">
+          class="flex items-center gap-2 bg-[#4c1d95] hover:bg-[#005060] text-white text-sm px-5 py-2.5 rounded-lg transition-colors">
           <i class="fa fa-download"></i>
           Download PDF
         </button>

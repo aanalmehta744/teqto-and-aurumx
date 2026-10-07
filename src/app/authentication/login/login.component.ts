@@ -32,6 +32,7 @@ export class LoginComponent extends UnsubscribeOnDestroyAdapter
     authForm!: UntypedFormGroup;
     submitted = false;
     loading = false;
+    isEnteringPortal = false;
     error = '';
     hide = true;
     isDarkTheme = false;
@@ -198,7 +199,7 @@ toggleFlip(): void {
 //           title: 'Login Successful',
 //           text: `Welcome back, ${username}!`,
 //           confirmButtonText: 'Okay',
-//           confirmButtonColor: '#3085d6',
+//           confirmButtonColor: '#7c3aed',
 //           allowOutsideClick: false
 //         }).then(() => {
 
@@ -323,48 +324,30 @@ onSubmit(event: Event): void {
         title: 'Login Successful',
         text: `Welcome back, ${username}!`,
         confirmButtonText: 'Okay',
-        confirmButtonColor: '#3085d6',
+        confirmButtonColor: '#7c3aed',
         customClass: {
           popup: 'portal-login-success',
           confirmButton: 'portal-login-success-confirm'
         },
         allowOutsideClick: false
       }).then(() => {
+        this.isEnteringPortal = true;
+        this.changeDetector.detectChanges();
 
+        let destination = '/authentication/login';
         if (userRole === Role.Admin) {
-
-          this.router.navigate([
-            '/admin/dashboard/main'
-          ]);
-
+          destination = '/admin/dashboard/main';
         } else if (userRole === Role.Employee) {
-
-          if (userDepartment === 'bde') {
-
-            this.router.navigate([
-              '/client/dashboard'
-            ]);
-
-          } else if (userDepartment === 'ba') {
-
-            this.router.navigate([
-              '/ba/dashboard'
-            ]);
-
-          } else {
-
-            this.router.navigate([
-              '/employee/dashboard'
-            ]);
-          }
-
-        } else {
-
-          this.router.navigate([
-            '/authentication/login'
-          ]);
+          destination = userDepartment === 'bde'
+            ? '/client/dashboard'
+            : userDepartment === 'ba'
+              ? '/ba/dashboard'
+              : '/employee/dashboard';
         }
 
+        window.setTimeout(() => {
+          void this.router.navigate([destination]);
+        }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 460);
       });
 
       this.loading = false;

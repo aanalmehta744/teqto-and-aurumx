@@ -15,7 +15,7 @@
   font-size: 24px;
   font-weight: 700;
 
-  background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+  background: linear-gradient(135deg, #7c3aed, #8b5cf6);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -116,10 +116,10 @@
 }
 
 .search-box:focus-within {
-  border-color: #6366f1;
+  border-color: #8b5cf6;
 
   box-shadow:
-    0 0 0 3px rgba(99, 102, 241, 0.08);
+    0 0 0 3px rgba(139, 92, 246, 0.08);
 }
 
 
@@ -177,7 +177,7 @@ table {
     color: #374151;
     outline: none;
 
-    &:focus { border-color: #6366f1; }
+    &:focus { border-color: #8b5cf6; }
   }
 }
 
@@ -240,8 +240,8 @@ table {
     transition: border-color 0.15s ease, background 0.15s ease;
 
     &:hover {
-      border-color: #6366f1;
-      background: #eef2ff;
+      border-color: #8b5cf6;
+      background: #f5f3ff;
     }
   }
 }
@@ -255,7 +255,7 @@ table {
 
 /* Plain text link (no icon) used in data cells. */
 .plain-link {
-  color: #4f46e5;
+  color: #7c3aed;
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
@@ -293,7 +293,7 @@ td.mat-mdc-cell {
 
 .interview-row:hover {
   background: #f6f8ff;
-  box-shadow: inset 3px 0 0 #6366f1;
+  box-shadow: inset 3px 0 0 #8b5cf6;
 }
 
 
@@ -327,15 +327,15 @@ td.mat-mdc-cell {
 
   border-radius: 50%;
 
-  background: #eef2ff;
-  color: #4f46e5;
+  background: #f5f3ff;
+  color: #7c3aed;
 
   font-size: 13px;
   font-weight: 600;
 
   text-transform: uppercase;
 
-  box-shadow: inset 0 0 0 1px rgba(79, 70, 229, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(124, 58, 237, 0.12);
 }
 
 .avatar-hr {
@@ -371,7 +371,7 @@ td.mat-mdc-cell {
 }
 
 .phone-link:hover {
-  color: #4f46e5;
+  color: #7c3aed;
 }
 
 
@@ -389,7 +389,7 @@ td.mat-mdc-cell {
 
   font-size: 12px !important;
 
-  color: #2563eb !important;
+  color: #9333ea !important;
   border-color: #bfdbfe !important;
 
   white-space: nowrap;
@@ -410,11 +410,11 @@ td.mat-mdc-cell {
    ========================================================= */
 
 td button[mat-icon-button] {
-  color: #4f46e5;
+  color: #7c3aed;
 }
 
 td button[mat-icon-button]:hover {
-  background: #eef2ff;
+  background: #f5f3ff;
 }
 
 
@@ -442,7 +442,7 @@ td button[mat-icon-button]:hover {
 
 .candidate-photo:hover {
   transform: scale(1.08);
-  box-shadow: 0 0 0 2px #6366f1;
+  box-shadow: 0 0 0 2px #8b5cf6;
 }
 
 /* Fallback initials avatar when a photo is missing or fails to load. */
@@ -456,7 +456,7 @@ td button[mat-icon-button]:hover {
 
   border-radius: 50%;
 
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: linear-gradient(135deg, #8b5cf6, #8b5cf6);
   color: #ffffff;
 
   font-size: 15px;
@@ -488,15 +488,15 @@ td button[mat-icon-button]:hover {
   display: inline-block;
   padding: 3px 10px;
   border-radius: 999px;
-  background: #eef2ff;
-  color: #4338ca;
+  background: #f5f3ff;
+  color: #6d28d9;
   font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
 }
 
 .email-link {
-  color: #4f46e5;
+  color: #7c3aed;
   text-decoration: none;
   white-space: nowrap;
 
@@ -524,7 +524,7 @@ td button[mat-icon-button]:hover {
 .badge-green { background: #ecfdf5; color: #059669; }
 .badge-red   { background: #fef2f2; color: #dc2626; }
 .badge-amber { background: #fffbeb; color: #b45309; }
-.badge-blue  { background: #eff6ff; color: #2563eb; }
+.badge-blue  { background: #eff6ff; color: #9333ea; }
 .badge-gray  { background: #f3f4f6; color: #6b7280; }
 
 
@@ -619,11 +619,11 @@ td button[mat-icon-button]:hover {
 
 .status-upcoming {
   background: #eff6ff;
-  color: #2563eb;
+  color: #9333ea;
 }
 
 .status-upcoming .status-dot {
-  background: #3b82f6;
+  background: #a855f7;
 }
 
 
@@ -657,7 +657,7 @@ td button[mat-icon-button]:hover {
 }
 
 .action-buttons button:first-child {
-  color: #4f46e5;
+  color: #7c3aed;
 }
 
 .action-buttons button:last-child {

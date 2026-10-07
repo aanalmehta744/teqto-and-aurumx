@@ -8,22 +8,22 @@
     <app-announcement-banner></app-announcement-banner>
 
     <!-- ── Dashboard Overview ── -->
-    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-500 px-6 py-7 md:px-8 md:py-8 shadow-lg shadow-indigo-200 my-4">
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-6 py-7 md:px-8 md:py-8 shadow-lg shadow-violet-200 my-4">
       <div class="pointer-events-none absolute -right-8 -top-12 h-44 w-44 rounded-full bg-white/10"></div>
       <div class="pointer-events-none absolute right-28 -bottom-10 h-28 w-28 rounded-full bg-white/10"></div>
       <div class="relative">
         <h1 class="text-xl md:text-2xl font-semibold text-white">Dashboard Overview</h1>
-        <p class="mt-1 text-sm text-indigo-100">A quick snapshot of today's activity.</p>
+        <p class="mt-1 text-sm text-violet-100">A quick snapshot of today's activity.</p>
       </div>
     </div>
 
     <!-- Widgets -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-4">
+    <div class="hr-grid-in grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-4">
 
       <!-- HR VIEW -->
       <ng-container *ngIf="isHR">
         <!-- Today Attendance -->
-        <div class="stat-card border-l-4 border-l-indigo-500">
+        <div class="stat-card border-l-4 border-l-violet-500">
           <div class="flex items-start justify-between">
             <div>
               <p class="stat-label">Today Attendance</p>
@@ -68,7 +68,7 @@
                 Present
               </p> -->
             </div>
-            <span class="stat-icon bg-indigo-50 text-indigo-600">
+            <span class="stat-icon bg-violet-50 text-violet-600">
               <i class="fas fa-user-check"></i>
             </span>
           </div>
@@ -107,7 +107,7 @@
               <p class="stat-label">Available Leaves</p>
               <p class="stat-value">{{ leaveBalance }}</p>
             </div>
-            <span class="stat-icon bg-indigo-50 text-indigo-600">
+            <span class="stat-icon bg-violet-50 text-violet-600">
               <i class="fas fa-umbrella-beach"></i>
             </span>
           </div>
@@ -117,7 +117,7 @@
       <!-- NON-HR VIEW -->
       <ng-container *ngIf="!isHR">
         <!-- Today Attendance -->
-        <div class="stat-card border-l-4 border-l-indigo-500">
+        <div class="stat-card border-l-4 border-l-violet-500">
           <div class="flex items-start justify-between">
             <div>
               <p class="stat-label">Today Attendance</p>
@@ -156,7 +156,7 @@
   Checked Out
 </p>
             </div>
-            <span class="stat-icon bg-indigo-50 text-indigo-600">
+            <span class="stat-icon bg-violet-50 text-violet-600">
               <i class="fas fa-user-check"></i>
             </span>
           </div>
@@ -195,7 +195,7 @@
               <p class="stat-label">Available Leaves</p>
               <p class="stat-value">{{ leaveBalance }}</p>
             </div>
-            <span class="stat-icon bg-indigo-50 text-indigo-600">
+            <span class="stat-icon bg-violet-50 text-violet-600">
               <i class="fas fa-umbrella-beach"></i>
             </span>
           </div>
@@ -207,7 +207,7 @@
     <div class="panel mt-6" *ngIf="!isHR">
       <div class="panel-header">
         <h6 class="panel-title">
-          <i class="far fa-check-circle text-indigo-600 mr-2"></i>My Tasks
+          <i class="far fa-check-circle text-violet-600 mr-2"></i>My Tasks
         </h6>
       </div>
       <div class="h-auto p-2 overflow-x-auto responsive_table">
@@ -254,7 +254,7 @@
     <div class="panel mt-6" *ngIf="!isHR">
       <div class="panel-header">
         <h6 class="panel-title">
-          <i class="fas fa-calendar-check text-indigo-600 mr-2"></i>Attendance Records
+          <i class="fas fa-calendar-check text-violet-600 mr-2"></i>Attendance Records
         </h6>
       </div>
       <div class="h-auto p-2 overflow-x-auto responsive_table">
@@ -324,7 +324,7 @@
     <div class="panel mt-6" *ngIf="isHR">
       <div class="panel-header">
         <h6 class="panel-title">
-          <i class="fas fa-calendar-check text-indigo-600 mr-2"></i>Today's Attendance
+          <i class="fas fa-calendar-check text-violet-600 mr-2"></i>Today's Attendance
         </h6>
       </div>
       <div class="h-auto p-2 overflow-x-auto responsive_table">
@@ -446,7 +446,7 @@
       <div class="panel mt-6">
         <div class="panel-header">
           <h6 class="panel-title">
-            <i class="fas fa-user-tie text-indigo-600 mr-2"></i>Upcoming Interviews
+            <i class="fas fa-user-tie text-violet-600 mr-2"></i>Upcoming Interviews
           </h6>
         </div>
         <div class="h-auto p-2 overflow-x-auto responsive_table">
@@ -490,7 +490,7 @@
       <div class="panel mt-6">
         <div class="panel-header">
           <h6 class="panel-title">
-            <i class="fas fa-user-check text-indigo-600 mr-2"></i>Interviews Assigned to Me
+            <i class="fas fa-user-check text-violet-600 mr-2"></i>Interviews Assigned to Me
           </h6>
         </div>
         <div class="h-auto p-2 overflow-x-auto responsive_table">
@@ -534,7 +534,7 @@
       <div class="panel mt-6">
         <div class="panel-header">
           <h6 class="panel-title">
-            <i class="fas fa-umbrella-beach text-indigo-600 mr-2"></i>Today's Leave Employees
+            <i class="fas fa-umbrella-beach text-violet-600 mr-2"></i>Today's Leave Employees
           </h6>
         </div>
         <div class="h-auto p-2 overflow-x-auto responsive_table">
@@ -585,7 +585,7 @@
       <div class="panel mt-6">
         <div class="panel-header">
           <h6 class="panel-title">
-            <i class="far fa-check-circle text-indigo-600 mr-2"></i>Today's Task List
+            <i class="far fa-check-circle text-violet-600 mr-2"></i>Today's Task List
           </h6>
         </div>
         <div class="h-auto p-2 overflow-x-auto responsive_table">

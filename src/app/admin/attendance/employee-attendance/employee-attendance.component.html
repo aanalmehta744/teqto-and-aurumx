@@ -102,7 +102,7 @@
                     <span *ngIf="row.leave_status" class="bg-yellow-100 text-yellow-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.leave_status }}</span>
                     <span *ngIf="row.final_status === 'Leave'" class="bg-yellow-100 text-yellow-700 px-2.5 py-0.5 ml-1 rounded-full text-xs font-medium">{{ row.final_status }}</span>
                     <span *ngIf="row.status !== 'Present' && row.status !== 'Absent' && row.status !== 'Leave' && row.status !== 'Half Day' && row.status !== 'Weekend'"
-                      class="bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
+                      class="bg-fuchsia-100 text-fuchsia-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
                   </ng-container>
                 </ng-container>
               </mat-cell>
@@ -124,7 +124,7 @@
     <button
       type="button"
       (click)="openPauseHistory(row); $event.stopPropagation()"
-      class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 text-sm font-medium hover:bg-blue-100 transition">
+      class="px-3 py-1.5 rounded-lg bg-fuchsia-50 text-fuchsia-600 text-sm font-medium hover:bg-fuchsia-100 transition">
 
       View
 
@@ -138,7 +138,7 @@
               <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
               <mat-cell *matCellDef="let row">
                 <button mat-icon-button (click)="editCall(row)" matTooltip="Edit">
-                  <app-feather-icons icon="edit" class="text-blue-500"></app-feather-icons>
+                  <app-feather-icons icon="edit" class="text-fuchsia-500"></app-feather-icons>
                 </button>
               </mat-cell>
             </ng-container>
@@ -196,7 +196,7 @@
                       <ng-container *ngIf="row.final_status !== 'Weekend'">
                         <span *ngIf="row.status === 'Present'" class="bg-green-100 text-green-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
                         <span *ngIf="row.status === 'Absent'" class="bg-red-100 text-red-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status }}</span>
-                        <span *ngIf="row.status !== 'Present' && row.status !== 'Absent'" class="bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status || '-' }}</span>
+                        <span *ngIf="row.status !== 'Present' && row.status !== 'Absent'" class="bg-fuchsia-100 text-fuchsia-700 px-2.5 py-0.5 rounded-full text-xs font-medium">{{ row.status || '-' }}</span>
                         <span *ngIf="row.final_status === 'Leave'" class="bg-yellow-100 text-yellow-700 px-2.5 py-0.5 ml-1 rounded-full text-xs font-medium">{{ row.final_status }}</span>
                       </ng-container>
                     </ng-container>
@@ -213,7 +213,7 @@
                   <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
                   <mat-cell *matCellDef="let row">
                     <button mat-icon-button (click)="editCall(row)" matTooltip="Edit">
-                      <app-feather-icons icon="edit" class="text-blue-500"></app-feather-icons>
+                      <app-feather-icons icon="edit" class="text-fuchsia-500"></app-feather-icons>
                     </button>
                   </mat-cell>
                 </ng-container>

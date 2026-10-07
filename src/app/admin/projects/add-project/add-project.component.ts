@@ -219,7 +219,7 @@ export class AddprojectsComponent implements OnInit, OnDestroy {
           icon: 'success',
           title: 'Success!',
           text: 'Project saved successfully!',
-          confirmButtonColor: '#3085d6',
+          confirmButtonColor: '#7c3aed',
         }).then(() => {
           this.projectForm.reset();
           // Navigate back to the projects list for whichever role is logged in

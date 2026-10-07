@@ -124,7 +124,7 @@
             <td mat-cell *matCellDef="let row" class="p-2 border-b">
               <span [ngClass]="{
                   'bg-green-100 text-green-700': row.priority === 'Low',
-                  'bg-blue-100 text-blue-700': row.priority === 'Normal',
+                  'bg-fuchsia-100 text-fuchsia-700': row.priority === 'Normal',
                   'bg-red-100 text-red-700': row.priority === 'High'
                 }" class="px-2 py-1 rounded-full text-xs font-medium">
                 {{ row.priority }}
@@ -162,7 +162,7 @@
                 <mat-icon>{{ row.done === 1 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
               </button> -->
               <button mat-icon-button color="accent" (click)="editCall(row)" matTooltip="Edit"
-                class="text-blue-600 hover:text-blue-800">
+                class="text-fuchsia-600 hover:text-fuchsia-800">
                 <mat-icon>edit</mat-icon>
               </button>
               <button mat-icon-button color="warn" (click)="deleteItem(i, row)" matTooltip="Delete"

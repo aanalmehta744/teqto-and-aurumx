@@ -6,14 +6,14 @@
     <div>
       <label class="block text-xs text-gray-500 mb-1">Month</label>
       <select [(ngModel)]="month" (change)="onFilterChange()"
-        class="border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 text-red-500">
+        class="border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300 text-red-500">
         <option *ngFor="let m of months" [value]="m.val">{{ m.label }}</option>
       </select>
     </div>
     <div>
       <label class="block text-xs text-gray-500 mb-1">Year</label>
       <input [(ngModel)]="year" (change)="onFilterChange()" type="number"
-        class="border rounded px-3 py-2 text-sm w-24 focus:outline-none focus:ring-2 focus:ring-indigo-300 text-red-500" />
+        class="border rounded px-3 py-2 text-sm w-24 focus:outline-none focus:ring-2 focus:ring-violet-300 text-red-500" />
     </div>
   </div>
 
@@ -23,12 +23,12 @@
     <div class="flex gap-8">
       <label class="flex items-center gap-2 cursor-pointer select-none">
         <input type="checkbox" [checked]="mode === 'all'" (change)="setMode('all')"
-          class="w-4 h-4 accent-indigo-600" />
+          class="w-4 h-4 accent-violet-600" />
         <span class="text-sm font-medium text-gray-700">All BDE</span>
       </label>
       <label class="flex items-center gap-2 cursor-pointer select-none">
         <input type="checkbox" [checked]="mode === 'single'" (change)="setMode('single')"
-          class="w-4 h-4 accent-indigo-600" />
+          class="w-4 h-4 accent-violet-600" />
         <span class="text-sm font-medium text-gray-700">Select Particular BDE</span>
       </label>
     </div>
@@ -61,7 +61,7 @@
 
     <!-- Target Input Form -->
     <div class="bg-white rounded-xl shadow mb-6 overflow-hidden">
-      <div class="bg-indigo-600 text-white px-5 py-3">
+      <div class="bg-violet-600 text-white px-5 py-3">
         <p class="font-semibold text-sm">Set Targets for All BDEs — {{ monthLabel }} {{ year }}</p>
         <p class="text-xs opacity-80 mt-0.5">These targets will be applied to every active BDE</p>
       </div>
@@ -76,7 +76,7 @@
             <input [(ngModel)]="form.full_time" type="number" min="0" required
               placeholder="Enter target number"
               class="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm text-red-500 font-medium
-                     focus:border-indigo-400 focus:outline-none placeholder:text-red-300" />
+                     focus:border-violet-400 focus:outline-none placeholder:text-red-300" />
           </div>
           <span class="text-xs text-gray-400">clients target</span>
         </div>
@@ -90,7 +90,7 @@
             <input [(ngModel)]="form.part_time" type="number" min="0" required
               placeholder="Enter target number"
               class="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm text-red-500 font-medium
-                     focus:border-indigo-400 focus:outline-none placeholder:text-red-300" />
+                     focus:border-violet-400 focus:outline-none placeholder:text-red-300" />
           </div>
           <span class="text-xs text-gray-400">clients target</span>
         </div>
@@ -104,7 +104,7 @@
             <input [(ngModel)]="form.hourly" type="number" min="0" required
               placeholder="Enter target number"
               class="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm text-red-500 font-medium
-                     focus:border-indigo-400 focus:outline-none placeholder:text-red-300" />
+                     focus:border-violet-400 focus:outline-none placeholder:text-red-300" />
           </div>
           <span class="text-xs text-gray-400">clients target</span>
         </div>
@@ -118,7 +118,7 @@
             <input [(ngModel)]="form.project_base" type="number" min="0" required
               placeholder="Enter target number"
               class="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm text-red-500 font-medium
-                     focus:border-indigo-400 focus:outline-none placeholder:text-red-300" />
+                     focus:border-violet-400 focus:outline-none placeholder:text-red-300" />
           </div>
           <span class="text-xs text-gray-400">clients target</span>
         </div>
@@ -126,8 +126,8 @@
 
       <div class="border-t bg-gray-50 px-6 py-4 flex justify-end">
         <button (click)="saveForAll()" [disabled]="saving"
-          class="bg-indigo-600 text-white px-6 py-2 rounded-lg text-sm font-semibold
-                 hover:bg-indigo-700 disabled:opacity-50 transition-colors">
+          class="bg-violet-600 text-white px-6 py-2 rounded-lg text-sm font-semibold
+                 hover:bg-violet-700 disabled:opacity-50 transition-colors">
           {{ saving ? 'Saving...' : 'Save for All BDEs' }}
         </button>
       </div>
@@ -137,7 +137,7 @@
     <div *ngIf="loading" class="text-center py-8 text-gray-400 text-sm">Loading...</div>
 
     <div *ngIf="!loading && allAchievements.length > 0" class="bg-white rounded-xl shadow overflow-hidden">
-      <div class="bg-indigo-600 text-white px-5 py-3">
+      <div class="bg-violet-600 text-white px-5 py-3">
         <span class="font-semibold text-sm">Achievement Overview — {{ monthLabel }} {{ year }}</span>
       </div>
       <div class="overflow-auto">
@@ -219,7 +219,7 @@
 
       <!-- Target Input Form -->
       <div class="bg-white rounded-xl shadow mb-6 overflow-hidden">
-        <div class="bg-indigo-600 text-white px-5 py-3">
+        <div class="bg-violet-600 text-white px-5 py-3">
           <p class="font-semibold text-sm">Set Targets for {{ selectedBdeName }} — {{ monthLabel }} {{ year }}</p>
         </div>
 
@@ -233,7 +233,7 @@
               <input [(ngModel)]="form.full_time" type="number" min="0" required
                 placeholder="Enter target number"
                 class="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm text-red-500 font-medium
-                       focus:border-indigo-400 focus:outline-none placeholder:text-red-300" />
+                       focus:border-violet-400 focus:outline-none placeholder:text-red-300" />
             </div>
             <span class="text-xs text-gray-400">clients target</span>
           </div>
@@ -247,7 +247,7 @@
               <input [(ngModel)]="form.part_time" type="number" min="0" required
                 placeholder="Enter target number"
                 class="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm text-red-500 font-medium
-                       focus:border-indigo-400 focus:outline-none placeholder:text-red-300" />
+                       focus:border-violet-400 focus:outline-none placeholder:text-red-300" />
             </div>
             <span class="text-xs text-gray-400">clients target</span>
           </div>
@@ -261,7 +261,7 @@
               <input [(ngModel)]="form.hourly" type="number" min="0" required
                 placeholder="Enter target number"
                 class="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm text-red-500 font-medium
-                       focus:border-indigo-400 focus:outline-none placeholder:text-red-300" />
+                       focus:border-violet-400 focus:outline-none placeholder:text-red-300" />
             </div>
             <span class="text-xs text-gray-400">clients target</span>
           </div>
@@ -275,7 +275,7 @@
               <input [(ngModel)]="form.project_base" type="number" min="0" required
                 placeholder="Enter target number"
                 class="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm text-red-500 font-medium
-                       focus:border-indigo-400 focus:outline-none placeholder:text-red-300" />
+                       focus:border-violet-400 focus:outline-none placeholder:text-red-300" />
             </div>
             <span class="text-xs text-gray-400">clients target</span>
           </div>
@@ -283,8 +283,8 @@
 
         <div class="border-t bg-gray-50 px-6 py-4 flex justify-end">
           <button (click)="saveForSingle()" [disabled]="saving"
-            class="bg-indigo-600 text-white px-6 py-2 rounded-lg text-sm font-semibold
-                   hover:bg-indigo-700 disabled:opacity-50 transition-colors">
+            class="bg-violet-600 text-white px-6 py-2 rounded-lg text-sm font-semibold
+                   hover:bg-violet-700 disabled:opacity-50 transition-colors">
             {{ saving ? 'Saving...' : 'Save Targets' }}
           </button>
         </div>
@@ -292,7 +292,7 @@
 
       <!-- Achievement Card for selected BDE -->
       <div *ngIf="singleAchievement" class="bg-white rounded-xl shadow overflow-hidden">
-        <div class="bg-indigo-600 text-white px-5 py-3">
+        <div class="bg-violet-600 text-white px-5 py-3">
           <span class="font-semibold text-sm">Achievement — {{ selectedBdeName }} — {{ monthLabel }} {{ year }}</span>
         </div>
 
@@ -301,7 +301,7 @@
           <!-- Full Time -->
           <div class="border rounded-xl p-4">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-indigo-600 uppercase tracking-wide">Full Time Client</span>
+              <span class="text-xs font-bold text-violet-600 uppercase tracking-wide">Full Time Client</span>
               <span [class]="'text-xs font-bold px-2 py-0.5 rounded-full ' + badge(singleAchievement.ftPct)">{{ singleAchievement.ftPct }}%</span>
             </div>
             <p class="text-gray-500 text-xs">Target: <span class="font-bold text-gray-800">{{ singleAchievement.full_time }}</span></p>
@@ -314,7 +314,7 @@
           <!-- Part Time -->
           <div class="border rounded-xl p-4">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-indigo-600 uppercase tracking-wide">Part Time Client</span>
+              <span class="text-xs font-bold text-violet-600 uppercase tracking-wide">Part Time Client</span>
               <span [class]="'text-xs font-bold px-2 py-0.5 rounded-full ' + badge(singleAchievement.ptPct)">{{ singleAchievement.ptPct }}%</span>
             </div>
             <p class="text-gray-500 text-xs">Target: <span class="font-bold text-gray-800">{{ singleAchievement.part_time }}</span></p>
@@ -327,7 +327,7 @@
           <!-- Hourly -->
           <div class="border rounded-xl p-4">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-indigo-600 uppercase tracking-wide">Hourly Client</span>
+              <span class="text-xs font-bold text-violet-600 uppercase tracking-wide">Hourly Client</span>
               <span [class]="'text-xs font-bold px-2 py-0.5 rounded-full ' + badge(singleAchievement.hPct)">{{ singleAchievement.hPct }}%</span>
             </div>
             <p class="text-gray-500 text-xs">Target: <span class="font-bold text-gray-800">{{ singleAchievement.hourly }}</span></p>
@@ -340,7 +340,7 @@
           <!-- Project Based -->
           <div class="border rounded-xl p-4">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-indigo-600 uppercase tracking-wide">Project Based</span>
+              <span class="text-xs font-bold text-violet-600 uppercase tracking-wide">Project Based</span>
               <span [class]="'text-xs font-bold px-2 py-0.5 rounded-full ' + badge(singleAchievement.pbPct)">{{ singleAchievement.pbPct }}%</span>
             </div>
             <p class="text-gray-500 text-xs">Target: <span class="font-bold text-gray-800">{{ singleAchievement.project_base }}</span></p>

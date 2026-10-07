@@ -6,14 +6,14 @@
     <div>
       <label class="block text-xs text-gray-500 mb-1">Month</label>
       <select [(ngModel)]="month" (change)="loadTarget()"
-        class="border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 text-red-500">
+        class="border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300 text-red-500">
         <option *ngFor="let m of months" [value]="m.val">{{ m.label }}</option>
       </select>
     </div>
     <div>
       <label class="block text-xs text-gray-500 mb-1">Year</label>
       <input [(ngModel)]="year" (change)="loadTarget()" type="number"
-        class="border rounded px-3 py-2 text-sm w-24 focus:outline-none focus:ring-2 focus:ring-indigo-300 text-red-500" />
+        class="border rounded px-3 py-2 text-sm w-24 focus:outline-none focus:ring-2 focus:ring-violet-300 text-red-500" />
     </div>
   </div>
 
@@ -34,9 +34,9 @@
 
       <!-- Overall summary cards -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white rounded-xl shadow p-4 text-center border-t-4 border-indigo-500">
+        <div class="bg-white rounded-xl shadow p-4 text-center border-t-4 border-violet-500">
           <p class="text-xs text-gray-500 mb-1">Full Time Client</p>
-          <p class="text-2xl font-bold text-indigo-600">{{ target.full_time_achieved }}<span class="text-gray-400 text-base font-normal"> / {{ target.full_time }}</span></p>
+          <p class="text-2xl font-bold text-violet-600">{{ target.full_time_achieved }}<span class="text-gray-400 text-base font-normal"> / {{ target.full_time }}</span></p>
           <div class="mt-2 h-1.5 bg-gray-100 rounded-full"><div [class]="'h-full rounded-full ' + bar(target.ftPct)" [style.width.%]="target.ftPct"></div></div>
         </div>
         <div class="bg-white rounded-xl shadow p-4 text-center border-t-4 border-purple-500">
@@ -46,7 +46,7 @@
         </div>
         <div class="bg-white rounded-xl shadow p-4 text-center border-t-4 border-#0b0b88">
           <p class="text-xs text-gray-500 mb-1">Hourly Client</p>
-          <p class="text-2xl font-bold text-indigo-600">{{ target.hourly_achieved }}<span class="text-gray-400 text-base font-normal"> / {{ target.hourly }}</span></p>
+          <p class="text-2xl font-bold text-violet-600">{{ target.hourly_achieved }}<span class="text-gray-400 text-base font-normal"> / {{ target.hourly }}</span></p>
           <div class="mt-2 h-1.5 bg-gray-100 rounded-full"><div [class]="'h-full rounded-full ' + bar(target.hPct)" [style.width.%]="target.hPct"></div></div>
         </div>
         <div class="bg-white rounded-xl shadow p-4 text-center border-t-4 border-orange-500">
@@ -58,7 +58,7 @@
 
       <!-- Detailed breakdown -->
       <div class="bg-white rounded-xl shadow overflow-hidden">
-        <div class="bg-indigo-600 text-white px-5 py-3 flex justify-between items-center">
+        <div class="bg-violet-600 text-white px-5 py-3 flex justify-between items-center">
           <span class="font-semibold text-sm">Target Details — {{ monthLabel }} {{ year }}</span>
           <span [class]="'text-xs font-bold px-3 py-1 rounded-full ' + badge(target.overall)">
             Overall {{ target.overall }}%

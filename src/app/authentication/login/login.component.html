@@ -1,91 +1,113 @@
 
-<div class="login_body" [ngClass]="{'login_theme-dark': isDarkTheme}">
+<div class="lv_body" [ngClass]="{'lv_theme-dark': isDarkTheme}">
 
-  <!-- Full-screen loader: covers the page until the company logo has fully loaded. -->
-  <div *ngIf="!logoLoaded"
-    style="position:fixed; inset:0; z-index:3000; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; background:#ffffff;">
-    <div style="width:56px; height:56px; border:5px solid #e0e7ff; border-top-color:#4f46e5; border-radius:9999px; animation:login_spin 0.8s linear infinite;"></div>
-    <div style="font-size:14px; font-weight:600; color:#4f46e5;">Loading…</div>
+  <!-- ===================== PORTAL ENTRY (success bridge) ===================== -->
+  <div *ngIf="isEnteringPortal" class="portal-entry-screen" role="status" aria-live="polite">
+    <div class="portal-entry-glow portal-entry-glow--one"></div>
+    <div class="portal-entry-glow portal-entry-glow--two"></div>
+    <div class="portal-entry-content">
+      <div class="portal-entry-mark">
+        <img src="/assets/images/Company_Log.png" alt="Teqto and AurumX">
+      </div>
+      <span class="portal-entry-check" aria-hidden="true">✓</span>
+      <p class="portal-entry-eyebrow">ACCESS GRANTED</p>
+      <h1>Welcome to your workspace</h1>
+      <p class="portal-entry-caption">Preparing your dashboard</p>
+      <div class="portal-entry-progress" aria-hidden="true"><span></span></div>
+    </div>
   </div>
 
-  <div class="login_backdrop" aria-hidden="true">
-    <span class="login_blob login_blob--teal"></span>
-    <span class="login_blob login_blob--violet"></span>
-    <span class="login_blob login_blob--sky"></span>
-    <span class="login_veil"></span>
+  <!-- ===================== FULL-SCREEN LOGO LOADER ===================== -->
+  <div *ngIf="!logoLoaded" class="lv_loader" aria-hidden="true">
+    <div class="lv_loader-orb">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="lv_loader-text">Loading…</div>
   </div>
- 
-  
- 
-  <main class="login_main">
-    <div class="login_shell">
-      <!-- <div class="login_card"> -->
-        <div class="login_card" [class.is-flipped]="isFlipped">
- 
-        <!-- ============ form side ============ -->
-        <section class="login_panel login_panel--form">
- 
-         <div class="login_brand">
-  <!-- <img
-    src="../../../assets/images/Company_Log.png"
-    alt="Teqto Infotech / AurumX Technologies"
-    class="login_brand-mark"> -->
-    <img
-  alt="logo"
-  class="login_brand-mark"
-  src="/assets/images/Company_Log.png"
-  (load)="onLogoLoaded()"
-  (error)="onLogoLoaded()">
-</div>
- 
+
+  <!-- ===================== ANIMATED BACKGROUND ===================== -->
+  <div class="lv_backdrop" aria-hidden="true">
+    <span class="lv_blob lv_blob--1"></span>
+    <span class="lv_blob lv_blob--2"></span>
+    <span class="lv_blob lv_blob--3"></span>
+    <span class="lv_grid"></span>
+    <span class="lv_spark lv_spark--a"></span>
+    <span class="lv_spark lv_spark--b"></span>
+    <span class="lv_spark lv_spark--c"></span>
+    <span class="lv_spark lv_spark--d"></span>
+  </div>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="lv_main">
+    <div class="lv_shell">
+      <div class="lv_card" [class.is-flipped]="isFlipped">
+
+        <!-- ============ FORM SIDE ============ -->
+        <section class="lv_panel lv_panel--form">
+
+          <div class="lv_brand">
+            <img
+              alt="logo"
+              class="lv_brand-mark"
+              src="/assets/images/Company_Log.png"
+              (load)="onLogoLoaded()"
+              (error)="onLogoLoaded()">
+          </div>
+
+          <div class="lv_welcome">
+            <h2 class="lv_welcome-title">Welcome back</h2>
+            <p class="lv_welcome-sub">Sign in to continue to your workspace</p>
+          </div>
+
           <form
-            class="login_form"
+            class="lv_form"
             [formGroup]="authForm"
             (submit)="onSubmit($event)"
             novalidate>
- 
-            <fieldset class="login_fieldset">
-              <legend class="login_legend">Sign in as</legend>
-              <div class="login_roles">
-                <label class="login_role">
-                  <input class="login_role-input" type="radio" formControlName="role" value="Admin">
-                  <span class="login_role-face">
+
+            <fieldset class="lv_fieldset">
+              <legend class="lv_legend">Sign in as</legend>
+              <div class="lv_roles">
+                <label class="lv_role">
+                  <input class="lv_role-input" type="radio" formControlName="role" value="Admin">
+                  <span class="lv_role-face">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.4-2.9 8.3-7 10-4.1-1.7-7-5.6-7-10V6l7-3z"/></svg>
                     Admin
                   </span>
                 </label>
-                <label class="login_role">
-                  <input class="login_role-input" type="radio" formControlName="role" value="Employee">
-                  <span class="login_role-face">
+                <label class="lv_role">
+                  <input class="lv_role-input" type="radio" formControlName="role" value="Employee">
+                  <span class="lv_role-face">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20a7.5 7.5 0 0115 0"/></svg>
                     Employee
                   </span>
                 </label>
+                <span class="lv_role-glider" aria-hidden="true"></span>
               </div>
             </fieldset>
- 
-            <div class="login_field">
-              <svg class="login_field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3.5 7.5l8.5 6 8.5-6"/></svg>
+
+            <div class="lv_field">
+              <svg class="lv_field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3.5 7.5l8.5 6 8.5-6"/></svg>
               <input
-                class="login_input"
+                class="lv_input"
                 formControlName="username"
                 type="text"
                 autocomplete="username"
                 placeholder="Work email"
                 aria-label="Work email">
             </div>
- 
-            <div class="login_field">
-              <svg class="login_field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="3"/><path d="M8 10V7.5a4 4 0 018 0V10"/></svg>
+
+            <div class="lv_field">
+              <svg class="lv_field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="3"/><path d="M8 10V7.5a4 4 0 018 0V10"/></svg>
               <input
-                class="login_input"
+                class="lv_input"
                 formControlName="password"
                 [type]="hide ? 'password' : 'text'"
                 autocomplete="current-password"
                 placeholder="Password"
                 aria-label="Password">
               <button
-                class="login_eye"
+                class="lv_eye"
                 type="button"
                 [attr.aria-pressed]="!hide"
                 [attr.aria-label]="hide ? 'Show password' : 'Hide password'"
@@ -94,59 +116,62 @@
                 <svg *ngIf="!hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12s3.6-7 9-7 9 7 9 7-3.6 7-9 7-9-7-9-7z"/><circle cx="12" cy="12" r="2.6"/></svg>
               </button>
             </div>
- 
-        
-            <p class="login_error" *ngIf="error" role="alert">{{ error }}</p>
- 
+
+            <p class="lv_error" *ngIf="error" role="alert">{{ error }}</p>
+
             <button
-              class="login_submit"
+              class="lv_submit"
               type="submit"
               [disabled]="!authForm.valid || loading">
-              {{ loading ? 'Signing in...' : 'Sign in' }}
+              <span class="lv_submit-label">{{ loading ? 'Signing in…' : 'Sign in' }}</span>
+              <span class="lv_submit-shine" aria-hidden="true"></span>
             </button>
+
             <button
-  type="button"
-  class="login_flip-btn login_flip-btn--to-brand"
-  (click)="toggleFlip()">
-  Highlights!!
-</button>
+              type="button"
+              class="lv_flip-btn lv_flip-btn--to-brand"
+              (click)="toggleFlip()">
+              ✨ Highlights
+            </button>
           </form>
         </section>
- 
-        <!-- ============ brand side ============ -->
-      <!-- ============ brand side ============ -->
-<section class="login_panel login_panel--brand">
 
-  <h1 class="login_title">
-    {{ loginHeading || defaultTitle }}
-  </h1>
+        <!-- ============ BRAND SIDE ============ -->
+        <section class="lv_panel lv_panel--brand">
 
-  <p class="login_lede">
-    {{ loginDescription || defaultLede }}
-  </p>
+          <div class="lv_brand-orbs" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
 
-  <!-- Static image - no upload/change option -->
-  <div class="login_media">
-    <img
-      class="login_media-img"
-      [src]="mediaImage"
-      alt="Workspace preview">
-  </div>
+          <h1 class="lv_title">
+            {{ loginHeading || defaultTitle }}
+          </h1>
 
-  <p class="login_note">
-    &copy; 2026 Teqto Infotech & Aurum X Technologies. All rights reserved
-  </p>
- <button
-    type="button"
-    class="login_flip-btn login_flip-btn--back"
-    (click)="toggleFlip()">
-    Back to Signin
-  </button>
-</section>
- 
+          <p class="lv_lede">
+            {{ loginDescription || defaultLede }}
+          </p>
+
+          <div class="lv_media">
+            <img
+              class="lv_media-img"
+              [src]="mediaImage"
+              alt="Workspace preview">
+          </div>
+
+          <p class="lv_note">
+            &copy; 2026 Teqto Infotech &amp; Aurum X Technologies. All rights reserved
+          </p>
+
+          <button
+            type="button"
+            class="lv_flip-btn lv_flip-btn--back"
+            (click)="toggleFlip()">
+            ← Back to Sign in
+          </button>
+        </section>
+
       </div>
     </div>
   </main>
- 
+
 </div>
- 

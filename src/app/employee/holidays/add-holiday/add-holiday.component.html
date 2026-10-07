@@ -20,7 +20,7 @@
         <input
           type="text"
           formControlName="hNo"
-          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500"
+          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-fuchsia-500"
           required />
         @if (holidayForm.get('hNo')?.hasError('required')) {
           <p class="text-red-500 text-sm mt-1">Holiday Number is required</p>
@@ -33,7 +33,7 @@
         <input
           type="text"
           formControlName="hName"
-          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500"
+          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-fuchsia-500"
           required />
         @if (holidayForm.get('hName')?.hasError('required')) {
           <p class="text-red-500 text-sm mt-1">Holiday Name is required</p>
@@ -47,7 +47,7 @@
           <input
             [matDatepicker]="picker"
             formControlName="date"
-            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500"
+            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-fuchsia-500"
             required />
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
@@ -63,7 +63,7 @@
         <input
           type="text"
           formControlName="location"
-          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500"
+          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-fuchsia-500"
           required />
         @if (holidayForm.get('location')?.hasError('required')) {
           <p class="text-red-500 text-sm mt-1">Location is required</p>
@@ -76,7 +76,7 @@
         <input
           type="text"
           formControlName="shift"
-          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500"
+          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-fuchsia-500"
           required />
         @if (holidayForm.get('shift')?.hasError('required')) {
           <p class="text-red-500 text-sm mt-1">Shift is required</p>
@@ -89,7 +89,7 @@
         <textarea
           formControlName="details"
           rows="3"
-          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500"
+          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-fuchsia-500"
         ></textarea>
       </div>
 
@@ -97,7 +97,7 @@
       <div class="flex gap-4">
         <button
           type="submit"
-          class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
+          class="bg-fuchsia-600 text-white px-6 py-2 rounded hover:bg-fuchsia-700 transition disabled:opacity-50"
           [disabled]="!holidayForm.valid">
           Submit
         </button>

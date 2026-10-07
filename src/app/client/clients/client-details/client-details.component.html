@@ -59,14 +59,14 @@
                         <dt class="w-40 font-medium text-[#0E264A]">Website:</dt>
                         <dd class="text-[#7C6D84]">
                           <a href="https://www.linkedin.com/in/{{ client?.website_link }}"
-                            class="text-blue-600 underline" target="_blank">{{ client?.website_link || 'N/A' }}</a>
+                            class="text-fuchsia-600 underline" target="_blank">{{ client?.website_link || 'N/A' }}</a>
                         </dd>
                       </div>
                       <div class="flex">
                         <dt class="w-40 font-medium text-[#0E264A]">LinkedIn:</dt>
                         <dd class="text-[#7C6D84]">
                           <a href="https://www.linkedin.com/in/{{ client?.linkedin_id }}"
-                            class="text-blue-600 underline" target="_blank">
+                            class="text-fuchsia-600 underline" target="_blank">
                             {{ client?.linkedin_id || 'N/A' }}
                           </a>
                         </dd>
@@ -198,7 +198,7 @@
 <!-- Platform Details Popup -->
 <div *ngIf="showPlatformPopup" class="fixed inset-0 z-50 flex items-center justify-center">
   <!-- Backdrop -->
-  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="closePlatformPopup()"></div>
+  <div class="absolute inset-0 bg-violet-950/40 backdrop-blur-sm" (click)="closePlatformPopup()"></div>
 
   <!-- Modal Card -->
   <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 z-10 overflow-hidden">

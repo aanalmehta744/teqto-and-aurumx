@@ -163,7 +163,7 @@ export class AddClientComponent implements OnInit {
           icon: 'success',
           title: 'Success!',
           text: 'Client added successfully!',
-          confirmButtonColor: '#3085d6',
+          confirmButtonColor: '#7c3aed',
           confirmButtonText: 'OK', // 👈 Added OK button
         }).then(() => {
           window.location.reload();

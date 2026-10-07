@@ -148,7 +148,7 @@ export class AddEmployeeComponent {
             icon: 'success',
             title: 'Success!',
             text: 'Employee saved successfully!',
-            confirmButtonColor: '#3085d6',
+            confirmButtonColor: '#7c3aed',
           }).then(() => {
             // window.location.reload();
             // Redirect based on role

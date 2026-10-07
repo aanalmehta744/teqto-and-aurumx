@@ -256,7 +256,7 @@ if (userRole === 'Admin') {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
+      cancelButtonColor: '#7c3aed',
       confirmButtonText: 'Yes, logout',
       cancelButtonText: 'Cancel'
     }).then((result) => {

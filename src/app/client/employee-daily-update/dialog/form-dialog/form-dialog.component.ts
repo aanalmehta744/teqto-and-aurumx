@@ -162,7 +162,7 @@ export class FormDialogComponent implements OnInit {
               text: 'Daily update has been updated successfully.',
               timer: 2000,
               confirmButtonText: 'OK',
-              confirmButtonColor: '#3085d6'
+              confirmButtonColor: '#7c3aed'
             });
             this.dialogRef.close(res);
           },
@@ -176,7 +176,7 @@ export class FormDialogComponent implements OnInit {
               title: 'Added!',
               text: 'Daily update has been added successfully.',
               confirmButtonText: 'OK',
-              confirmButtonColor: '#3085d6'
+              confirmButtonColor: '#7c3aed'
             });
             this.dialogRef.close(res);
           },

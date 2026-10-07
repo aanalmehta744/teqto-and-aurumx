@@ -113,7 +113,7 @@ export class BdeAnalyticsComponent implements OnInit {
       xaxis: { categories: names, labels: { style: { colors: '#6b7280', fontSize: '12px' } } },
       yaxis: { labels: { style: { colors: '#6b7280' } } },
       grid: { borderColor: '#f3f4f6' },
-      colors: ['#059669', '#ef4444', '#3b82f6'],
+      colors: ['#059669', '#ef4444', '#a855f7'],
       legend: { position: 'top' },
       tooltip: { y: { formatter: (v: number) => `${v} clients` } },
       fill: { opacity: 1 },

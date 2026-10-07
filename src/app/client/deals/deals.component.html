@@ -11,7 +11,7 @@
       <p class="text-sm font-medium">Deals Lost</p>
       <p class="text-2xl font-bold mt-1">{{ dealsLost }}</p>
     </div>
-    <div class="bg-blue-500 text-white p-4 rounded-xl shadow">
+    <div class="bg-fuchsia-500 text-white p-4 rounded-xl shadow">
       <p class="text-sm font-medium">Total Revenue</p>
       <p class="text-2xl font-bold mt-1">₹{{ totalRevenue() | number }}</p>
     </div>
@@ -84,7 +84,7 @@
       <ng-container matColumnDef="client_type">
         <th mat-header-cell *matHeaderCellDef class="bg-gray-100 p-3 font-semibold">Type</th>
         <td mat-cell *matCellDef="let d" class="p-3">
-          <span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full text-xs font-medium">
+          <span class="bg-fuchsia-50 text-fuchsia-700 px-2 py-0.5 rounded-full text-xs font-medium">
             {{ d.client_type ? labelForType(d.client_type) : '--' }}
           </span>
         </td>

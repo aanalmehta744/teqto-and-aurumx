@@ -208,7 +208,7 @@ export class AddClientComponent {
           icon: 'success',
           title: 'Success!',
           text: 'Client added successfully!',
-          confirmButtonColor: '#3085d6',
+          confirmButtonColor: '#7c3aed',
           confirmButtonText: 'OK',
         }).then(() => {
           this.router.navigate(['/client/clients/all-clients']);
