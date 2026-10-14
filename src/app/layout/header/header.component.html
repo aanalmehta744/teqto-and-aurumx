@@ -36,7 +36,7 @@
       <!-- Notification dropdown -->
       <div *ngIf="showNotifPanel"
         class="absolute right-0 top-12 w-80 bg-white shadow-2xl rounded-2xl z-50 border border-violet-100 overflow-hidden">
-        <div class="bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white px-4 py-3 flex justify-between items-center">
+        <div class="bg-gradient-to-r from-violet-600 to-violet-500 text-white px-4 py-3 flex justify-between items-center">
           <span class="text-sm font-semibold">Notifications</span>
           <button (click)="markAllRead()" class="text-xs text-violet-100 underline hover:text-white">Mark all read</button>
         </div>
@@ -66,7 +66,7 @@
     <mat-menu #profileMenu="matMenu" class="!p-0">
 
       <!-- Profile card with gradient banner -->
-      <div class="flex items-center gap-3 px-4 py-4 bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white cursor-pointer min-w-[240px]"
+      <div class="flex items-center gap-3 px-4 py-4 bg-gradient-to-r from-violet-600 to-violet-500 text-white cursor-pointer min-w-[240px]"
            (click)="goToProfile(); $event.stopPropagation()">
         <img [src]="getProfileImgUrl()" alt="Profile"
              class="w-11 h-11 rounded-full object-cover shrink-0 ring-2 ring-white/70" />

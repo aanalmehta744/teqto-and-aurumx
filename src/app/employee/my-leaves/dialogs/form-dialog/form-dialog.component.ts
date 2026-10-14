@@ -448,7 +448,7 @@ form.get('sandwich_confirm')?.updateValueAndValidity({
     return this.fb.group({
       id: [this.myLeaves.id],
       employee_id: [user ? user.id : null],
-      halfDay: [this.myLeaves.halfDay],
+      halfDay: [this.myLeaves.halfDay, Validators.required],
       start_date: [
         this.myLeaves.start_date ? formatDate(this.myLeaves.start_date, 'yyyy-MM-dd', 'en') : '',
         Validators.required
@@ -593,7 +593,7 @@ form.get('sandwich_confirm')?.updateValueAndValidity({
         // Update record
         this.myLeavesService.updateMyLeaves(leaveData).subscribe({
           next: (response) => {
-            this.isLoading = true;
+            this.isLoading = false;
 
             Swal.fire({
               icon: 'success',
@@ -602,7 +602,6 @@ form.get('sandwich_confirm')?.updateValueAndValidity({
               confirmButtonColor: '#7c3aed'
             }).then(() => {
               this.dialogRef.close(leaveData);
-              window.location.reload();
             });
           },
           error: (err) => {
@@ -630,7 +629,6 @@ form.get('sandwich_confirm')?.updateValueAndValidity({
               confirmButtonColor: '#7c3aed'
             }).then(() => {
               this.dialogRef.close(leaveData);
-              window.location.reload();
             });
           },
           error: (err) => {

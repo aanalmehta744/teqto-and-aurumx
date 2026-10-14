@@ -271,12 +271,15 @@ select:focus,
 /* Animate each routed screen as Angular inserts it beside the router outlet. */
 router-outlet + * {
   display: block;
-  animation: hr-route-in 320ms cubic-bezier(.2,.75,.25,1) both;
+  animation: hr-route-in 300ms cubic-bezier(.2,.8,.2,1) both;
+  will-change: opacity, transform;
 }
 
+/* Opacity + transform only — GPU-composited, no blur/filter, so it stays
+   smooth even on pages with large tables or charts. */
 @keyframes hr-route-in {
-  from { opacity: 0; transform: translateY(9px); filter: blur(2px); }
-  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Slim, unobtrusive scrollbars across long tables and side panels. */
@@ -396,30 +399,40 @@ select {
   background: rgba(196, 181, 253, .42);
 }
 
-/* A little more life across routed pages, with motion limited to useful UI feedback. */
-router-outlet + * .mat-mdc-card,
-router-outlet + * .card,
-router-outlet + * .panel,
-router-outlet + * .stat-card {
+/* Universal content cascade.
+   These pages are plain Tailwind markup — almost none use `.card`/`.mat-mdc-card`
+   as direct siblings — so instead of animating named surfaces (which rarely
+   matched), we stagger the TOP-LEVEL content blocks of every routed page.
+   Shapes observed across the app:
+       <app-x> <section> <div> …blocks… </div> </section>   (most pages)
+       <app-x> <div>      …blocks… </div>                   (layout/first load)
+   The page container itself already fades (`router-outlet + *`), so we only
+   cascade one level of children — no compounding nested transforms. */
+router-outlet + * > section > div > *,
+router-outlet + * > section > *,
+router-outlet + * > div > * {
   animation: hr-surface-arrive 420ms cubic-bezier(.2,.8,.2,1) both;
+  will-change: opacity, transform;
 }
 
-router-outlet + * .mat-mdc-card:nth-child(2),
-router-outlet + * .card:nth-child(2),
-router-outlet + * .panel:nth-child(2),
-router-outlet + * .stat-card:nth-child(2) { animation-delay: 45ms; }
-router-outlet + * .mat-mdc-card:nth-child(3),
-router-outlet + * .card:nth-child(3),
-router-outlet + * .panel:nth-child(3),
-router-outlet + * .stat-card:nth-child(3) { animation-delay: 90ms; }
-router-outlet + * .mat-mdc-card:nth-child(4),
-router-outlet + * .card:nth-child(4),
-router-outlet + * .panel:nth-child(4),
-router-outlet + * .stat-card:nth-child(4) { animation-delay: 135ms; }
+/* Per-child delay produces the cascade, up to 14 blocks (plenty per screen). */
+@for $i from 1 through 14 {
+  router-outlet + * > section > div > *:nth-child(#{$i}),
+  router-outlet + * > section > *:nth-child(#{$i}),
+  router-outlet + * > div > *:nth-child(#{$i}) {
+    animation-delay: #{($i - 1) * 40}ms;
+  }
+}
 
 @keyframes hr-surface-arrive {
-  from { opacity: 0; transform: translateY(12px) scale(.99); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  router-outlet + * > section > div > *,
+  router-outlet + * > section > *,
+  router-outlet + * > div > * { animation: none !important; }
 }
 
 /* Sidebar hover feedback and a quick pop for notification counts. */
@@ -485,8 +498,8 @@ button:not([disabled]):active,
   box-shadow: 0 10px 24px rgba(124, 58, 237,.3) !important;
 }
 @keyframes portal-welcome-in {
-  from { opacity: 0; transform: translateY(18px) scale(.94); filter: blur(4px); }
-  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  from { opacity: 0; transform: translateY(18px) scale(.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 @keyframes portal-success-icon {
   0% { opacity: 0; transform: scale(.55) rotate(-18deg); }
@@ -682,3 +695,179 @@ body .datatable-body-row.active .datatable-body-cell,
 body table.table tbody tr:hover td {
   color: #374151 !important;
 }
+
+/* =================================================================
+   PAGINATOR — white surface, never dark
+   ================================================================= */
+body .mat-mdc-paginator {
+  background: #ffffff !important;
+  color: #374151 !important;
+}
+body .mat-mdc-paginator .mat-mdc-select-value,
+body .mat-mdc-paginator .mat-mdc-select-value-text,
+body .mat-mdc-paginator .mat-mdc-paginator-range-label,
+body .mat-mdc-paginator .mat-mdc-paginator-page-size-label,
+body .mat-mdc-paginator .mat-mdc-icon-button {
+  color: #374151 !important;
+}
+body .mat-mdc-paginator .mat-mdc-paginator-icon { fill: #374151 !important; }
+body .mat-mdc-paginator .mat-mdc-icon-button[disabled] .mat-mdc-paginator-icon { fill: #c4b5fd !important; }
+
+/* =================================================================
+   FORM FIELDS — readable labels / inputs / errors (fixes faint text)
+   ================================================================= */
+.mat-mdc-form-field .mdc-floating-label,
+.mat-mdc-form-field .mat-mdc-floating-label {
+  color: #4b5563 !important;           /* gray-600 label */
+}
+.mat-mdc-form-field.mat-focused .mdc-floating-label {
+  color: var(--hr-primary) !important; /* violet on focus */
+}
+.mat-mdc-input-element,
+input.mat-mdc-input-element,
+textarea.mat-mdc-input-element,
+.mat-mdc-select-value,
+.mat-mdc-select-value-text {
+  color: #111827 !important;           /* near-black input text */
+}
+.mat-mdc-input-element::placeholder,
+textarea.mat-mdc-input-element::placeholder,
+.mat-mdc-select-placeholder {
+  color: #9ca3af !important;           /* gray-400 placeholder */
+  -webkit-text-fill-color: #9ca3af !important;
+}
+.mat-mdc-select-arrow { color: #6b7280 !important; }
+.mat-mdc-form-field-required-marker { color: #dc2626 !important; }
+.mat-mdc-form-field-error,
+mat-error { color: #dc2626 !important; }
+
+/* =================================================================
+   WARN BUTTONS (e.g. Cancel) — readable red, not black
+   ================================================================= */
+.mat-mdc-raised-button.mat-warn,
+.mat-mdc-unelevated-button.mat-warn {
+  background: #e11d48 !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 22px -12px rgba(225, 29, 72, .5) !important;
+}
+.mat-mdc-raised-button.mat-warn:hover,
+.mat-mdc-unelevated-button.mat-warn:hover {
+  background: #be123c !important;
+}
+.mat-mdc-outlined-button.mat-warn,
+.mat-mdc-button.mat-warn { color: #e11d48 !important; }
+
+/* =================================================================
+   REMOVE MAGENTA/PINK — remap Material "primary" tokens to violet
+   (the magenta-violet theme's primary is pink; accent is left alone)
+   ================================================================= */
+body {
+  /* Buttons */
+  --mdc-text-button-label-text-color: #7c3aed;
+  --mdc-outlined-button-label-text-color: #7c3aed;
+  --mdc-filled-button-container-color: #7c3aed;
+  --mdc-filled-button-label-text-color: #ffffff;
+  --mdc-protected-button-label-text-color: #7c3aed;
+  --mat-text-button-state-layer-color: #7c3aed;
+  --mat-outlined-button-state-layer-color: #7c3aed;
+  --mat-filled-button-state-layer-color: #ffffff;
+
+  /* FAB */
+  --mdc-fab-container-color: #7c3aed;
+  --mat-fab-foreground-color: #ffffff;
+  --mdc-fab-small-container-color: #7c3aed;
+
+  /* Checkbox */
+  --mdc-checkbox-selected-icon-color: #7c3aed;
+  --mdc-checkbox-selected-focus-icon-color: #6d28d9;
+  --mdc-checkbox-selected-hover-icon-color: #6d28d9;
+  --mdc-checkbox-selected-pressed-icon-color: #6d28d9;
+  --mdc-checkbox-selected-checkmark-color: #ffffff;
+  --mdc-checkbox-selected-focus-state-layer-color: #7c3aed;
+  --mdc-checkbox-selected-hover-state-layer-color: #7c3aed;
+
+  /* Radio */
+  --mdc-radio-selected-icon-color: #7c3aed;
+  --mdc-radio-selected-focus-icon-color: #6d28d9;
+  --mdc-radio-selected-hover-icon-color: #6d28d9;
+  --mdc-radio-selected-pressed-icon-color: #6d28d9;
+
+  /* Slide toggle */
+  --mdc-switch-selected-track-color: #c4b5fd;
+  --mdc-switch-selected-handle-color: #7c3aed;
+  --mdc-switch-selected-focus-handle-color: #6d28d9;
+  --mdc-switch-selected-hover-handle-color: #6d28d9;
+  --mdc-switch-selected-pressed-handle-color: #6d28d9;
+  --mdc-switch-selected-focus-track-color: #c4b5fd;
+  --mdc-switch-selected-hover-track-color: #c4b5fd;
+  --mdc-switch-selected-pressed-track-color: #c4b5fd;
+
+  /* Slider */
+  --mdc-slider-handle-color: #7c3aed;
+  --mdc-slider-focus-handle-color: #6d28d9;
+  --mdc-slider-active-track-color: #7c3aed;
+  --mdc-slider-inactive-track-color: #c4b5fd;
+
+  /* Progress bar / spinner */
+  --mdc-linear-progress-active-indicator-color: #7c3aed;
+  --mdc-circular-progress-active-indicator-color: #7c3aed;
+  --mat-progress-spinner-active-indicator-color: #7c3aed;
+
+  /* Tabs */
+  --mdc-tab-indicator-active-indicator-color: #7c3aed;
+  --mat-tab-header-active-label-text-color: #6d28d9;
+  --mat-tab-header-active-focus-label-text-color: #6d28d9;
+  --mat-tab-header-active-hover-label-text-color: #6d28d9;
+  --mat-tab-header-active-ripple-color: #7c3aed;
+  --mat-tab-header-inactive-ripple-color: #c4b5fd;
+
+  /* Selected options / chips */
+  --mat-option-selected-state-label-text-color: #6d28d9;
+  --mat-option-selected-state-layer-color: #f5f3ff;
+  --mdc-chip-elevated-selected-container-color: #7c3aed;
+
+  /* Datepicker */
+  --mat-datepicker-calendar-date-selected-state-background-color: #7c3aed;
+  --mat-datepicker-calendar-date-selected-state-text-color: #ffffff;
+  --mat-datepicker-calendar-date-today-outline-color: #7c3aed;
+  --mat-datepicker-toggle-active-state-icon-color: #7c3aed;
+
+  /* Form field (focus) */
+  --mdc-outlined-text-field-focus-outline-color: #7c3aed;
+  --mdc-outlined-text-field-caret-color: #7c3aed;
+  --mat-form-field-focus-select-arrow-color: #7c3aed;
+}
+
+/* Default (uncolored) text / outlined buttons — e.g. Import / Export sheet */
+.mat-mdc-button:not(.mat-primary):not(.mat-accent):not(.mat-warn),
+.mat-mdc-outlined-button:not(.mat-primary):not(.mat-accent):not(.mat-warn) {
+  color: #6d28d9 !important;
+}
+.mat-mdc-outlined-button:not(.mat-primary):not(.mat-accent):not(.mat-warn) {
+  border-color: rgba(124, 58, 237, .35) !important;
+}
+
+/* =================================================================
+   DIALOG & SELECT PANEL — always white surface + readable text
+   (fixes the black background / invisible text on edit forms)
+   ================================================================= */
+body .mat-mdc-dialog-container .mdc-dialog__surface,
+body .mat-mdc-dialog-container {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+}
+body .mat-mdc-dialog-container .mdc-dialog__title,
+body .mat-mdc-dialog-container h1,
+body .mat-mdc-dialog-container h2,
+body .mat-mdc-dialog-container h3,
+body .mat-mdc-dialog-container label,
+body .mat-mdc-dialog-container p {
+  color: #1f2937 !important;
+}
+body .mat-mdc-select-panel,
+body .mat-mdc-autocomplete-panel,
+body .mat-mdc-menu-panel {
+  background-color: #ffffff !important;
+}
+body .mat-mdc-option .mdc-list-item__primary-text { color: #1f2937 !important; }
+body .mat-mdc-option:hover:not(.mdc-list-item--disabled) { background-color: #f5f3ff !important; }

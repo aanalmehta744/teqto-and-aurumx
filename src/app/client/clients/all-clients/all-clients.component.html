@@ -166,7 +166,7 @@
             <td mat-cell *matCellDef="let row" class="px-4 py-2">
               <span [ngClass]="{
                 'bg-red-50 text-red-700': row.client_type === 'Hot',
-                'bg-fuchsia-50 text-fuchsia-700': row.client_type === 'Cold',
+                'bg-violet-50 text-violet-700': row.client_type === 'Cold',
                 'bg-emerald-50 text-emerald-700': row.client_type === 'Close' || row.client_type === 'Clause',
                 'bg-gray-100 text-gray-500': !row.client_type
               }" class="inline-block text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">
@@ -183,7 +183,7 @@
                 'bg-violet-50 text-violet-700': row.client_Connect_Type === 'Call',
                 'bg-emerald-50 text-emerald-700': row.client_Connect_Type === 'Whatsapp',
                 'bg-purple-50 text-purple-700': row.client_Connect_Type === 'Email',
-                'bg-fuchsia-50 text-fuchsia-700': row.client_Connect_Type === 'Linkedin',
+                'bg-violet-100 text-violet-800': row.client_Connect_Type === 'Linkedin',
                 'bg-orange-50 text-orange-700': row.client_Connect_Type === 'Other'
               }" class="inline-block text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">
                 {{ row.client_Connect_Type || '—' }}
@@ -202,7 +202,7 @@
             <th mat-header-cell *matHeaderCellDef class="px-4 py-2 font-medium">Actions</th>
             <td mat-cell *matCellDef="let row; let i = index;" class="px-4 py-2 space-x-2">
               <button mat-icon-button color="primary" (click)="$event.stopPropagation(); viewItem(row)" matTooltip="View">
-                <app-feather-icons icon="eye" class="text-fuchsia-600"></app-feather-icons>
+                <app-feather-icons icon="eye" class="text-violet-600"></app-feather-icons>
               </button>
               <button mat-icon-button color="accent" (click)="$event.stopPropagation(); editCall(row)" matTooltip="Edit">
                 <app-feather-icons icon="edit" class="text-green-600"></app-feather-icons>

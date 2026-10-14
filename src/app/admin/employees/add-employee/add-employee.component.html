@@ -5,21 +5,17 @@
       <app-breadcrumb [title]="'Add Employee'" [items]="['Employees']" [active_item]="'Add Employee'"></app-breadcrumb>
     </div>
 
-    <div class="flex justify-end mb-4">
-      <app-employee-sheet-actions [exportEnabled]="false"></app-employee-sheet-actions>
-    </div>
-
     <form [formGroup]="docForm" (ngSubmit)="onSubmit()"
       class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
 
       <!-- Header -->
-      <div class="flex items-center gap-3 px-6 py-5 bg-gradient-to-r from-[#070aa7] to-[#3730a3]">
-        <span class="flex items-center justify-center w-11 h-11 rounded-xl bg-white/15 text-white">
+      <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100 bg-white">
+        <span class="flex items-center justify-center w-11 h-11 rounded-xl bg-violet-50 text-violet-700">
           <mat-icon>person_add</mat-icon>
         </span>
         <div>
-          <h2 class="text-white text-lg font-semibold leading-tight">Add Employee</h2>
-          <p class="text-white/70 text-xs">Fill in the details to onboard a new team member</p>
+          <h2 class="text-[#1B1B2F] text-lg font-semibold leading-tight">Add Employee</h2>
+          <p class="text-gray-500 text-xs">Fill in the details to onboard a new team member</p>
         </div>
       </div>
 
@@ -27,8 +23,8 @@
 
         <!-- ── Basic Information ── -->
         <div>
-          <h3 class="text-sm font-semibold text-[#070aa7] mb-4 flex items-center gap-2">
-            <span class="h-1.5 w-1.5 rounded-full bg-[#070aa7]"></span> Basic Information
+          <h3 class="text-sm font-semibold text-[#7c3aed] mb-4 flex items-center gap-2">
+            <span class="h-1.5 w-1.5 rounded-full bg-[#7c3aed]"></span> Basic Information
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
             <!-- Full Name -->
@@ -85,8 +81,8 @@
 
         <!-- ── Role & Employment ── -->
         <div>
-          <h3 class="text-sm font-semibold text-[#070aa7] mb-4 flex items-center gap-2">
-            <span class="h-1.5 w-1.5 rounded-full bg-[#070aa7]"></span> Role &amp; Employment
+          <h3 class="text-sm font-semibold text-[#7c3aed] mb-4 flex items-center gap-2">
+            <span class="h-1.5 w-1.5 rounded-full bg-[#7c3aed]"></span> Role &amp; Employment
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
             <!-- Role -->
@@ -171,8 +167,8 @@
 
         <!-- ── Account Security ── -->
         <div>
-          <h3 class="text-sm font-semibold text-[#070aa7] mb-4 flex items-center gap-2">
-            <span class="h-1.5 w-1.5 rounded-full bg-[#070aa7]"></span> Account Security
+          <h3 class="text-sm font-semibold text-[#7c3aed] mb-4 flex items-center gap-2">
+            <span class="h-1.5 w-1.5 rounded-full bg-[#7c3aed]"></span> Account Security
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
             <!-- Password -->
@@ -208,8 +204,8 @@
 
         <!-- ── Documents ── -->
         <div>
-          <h3 class="text-sm font-semibold text-[#070aa7] mb-4 flex items-center gap-2">
-            <span class="h-1.5 w-1.5 rounded-full bg-[#070aa7]"></span> Documents
+          <h3 class="text-sm font-semibold text-[#7c3aed] mb-4 flex items-center gap-2">
+            <span class="h-1.5 w-1.5 rounded-full bg-[#7c3aed]"></span> Documents
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
             <!-- PAN Card -->

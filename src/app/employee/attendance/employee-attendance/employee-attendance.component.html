@@ -9,9 +9,9 @@
     <div class="bg-white rounded-xl shadow overflow-hidden">
 
       <!-- Table Header -->
-      <div class="flex flex-col md:flex-row justify-between items-center px-4 py-3 border-b bg-[#0b0b88]">
+      <div class="flex flex-col md:flex-row justify-between items-center px-4 py-3 border-b border-gray-100 bg-white">
         <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
-          <h2 class="text-white text-lg font-medium">Employee Attendance</h2>
+          <h2 class="text-[#1B1B2F] text-lg font-medium">Employee Attendance</h2>
 
           <div class="relative">
             <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">search</mat-icon>
@@ -132,7 +132,7 @@
                 <!-- Fallback for any other status -->
                 <span
                   *ngIf="row.status !== 'Present' && row.status !== 'Absent' && row.status !== 'Leave' && row.status !== 'Half Day'"
-                  class=" bg-fuchsia-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+                  class=" bg-violet-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
                   {{ row.status }}
                 </span>
               </mat-cell>
@@ -155,7 +155,7 @@
       matTooltip="Edit">
       <app-feather-icons
         icon="edit"
-        class="text-fuchsia-500">
+        class="text-violet-500">
       </app-feather-icons>
     </button>
   </mat-cell>
@@ -221,7 +221,7 @@
                     </span>
 
                     <span *ngIf="row.status !== 'Present' && row.status !== 'Absent'"
-                      class="bg-fuchsia-100 text-fuchsia-800 px-3 py-1 rounded-full text-xs font-medium">
+                      class="bg-violet-100 text-violet-800 px-3 py-1 rounded-full text-xs font-medium">
                       {{ row.status || '-' }}
                     </span>
 
@@ -251,7 +251,7 @@
       matTooltip="Edit">
       <app-feather-icons
         icon="edit"
-        class="text-fuchsia-500">
+        class="text-violet-500">
       </app-feather-icons>
     </button>
   </mat-cell>

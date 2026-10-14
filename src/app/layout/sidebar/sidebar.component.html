@@ -21,7 +21,7 @@
           <a *ngIf="!sidebarItem.groupTitle" (click)="navigateOrToggle(sidebarItem)"
             [routerLink]="(!sidebarItem.submenu?.length && !sidebarItem.newTab) ? [sidebarItem.path] : null"
             class="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 min-w-0 w-full"
-            [ngClass]="isRouteActive(sidebarItem.path) ? 'bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white shadow-md shadow-violet-200' : 'text-slate-600 hover:bg-violet-50 hover:text-violet-600'">
+            [ngClass]="isRouteActive(sidebarItem.path) ? 'bg-gradient-to-r from-violet-600 to-violet-500 text-white shadow-md shadow-violet-200' : 'text-slate-600 hover:bg-violet-50 hover:text-violet-600'">
             <i-feather [name]="sidebarItem.icon" class="h-[18px] w-[18px] shrink-0"
               [ngClass]="isRouteActive(sidebarItem.path) ? 'text-white' : 'text-slate-400 group-hover:text-violet-600'"></i-feather>
             <span class="text-sm font-medium truncate min-w-0" *ngIf="!isCollapsed || isHovered">{{ sidebarItem.title | translate }}</span>
@@ -72,7 +72,7 @@
   <!-- Footer: profile (above logout) -->
   <div class="border-t border-violet-100 p-3 space-y-1">
 
-    <div class="flex items-center gap-3 px-3 py-2.5 rounded-xl min-w-0 cursor-pointer bg-gradient-to-r from-violet-50 to-fuchsia-50 hover:from-violet-100 hover:to-fuchsia-100 transition-colors"
+    <div class="flex items-center gap-3 px-3 py-2.5 rounded-xl min-w-0 cursor-pointer bg-gradient-to-r from-violet-50 to-violet-50 hover:from-violet-100 hover:to-violet-100 transition-colors"
          (click)="goToProfile()" *ngIf="!isCollapsed || isHovered">
       <img [src]="getProfileImgUrl()" class="h-9 w-9 rounded-full object-contain shrink-0 ring-2 ring-white" alt="User Image" />
       <div class="min-w-0">
@@ -105,7 +105,7 @@
   <!-- Single hold-to-reveal label, centered above the bar (outside the scroll area
        so it is never clipped by the horizontal scroll container). -->
   <div *ngIf="pressedTitleKey"
-    class="absolute -top-9 left-1/2 -translate-x-1/2 bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white text-[11px] font-medium px-3 py-1 rounded-lg whitespace-nowrap shadow-lg z-10 pointer-events-none">
+    class="absolute -top-9 left-1/2 -translate-x-1/2 bg-gradient-to-r from-violet-600 to-violet-500 text-white text-[11px] font-medium px-3 py-1 rounded-lg whitespace-nowrap shadow-lg z-10 pointer-events-none">
     {{ pressedTitleKey | translate }}
   </div>
 

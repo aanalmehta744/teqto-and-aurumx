@@ -6,13 +6,13 @@
     </div>
     <div class="flex flex-wrap">
       <div class="w-full">
-        <div class="!bg-[#d6d5ea] rounded-lg shadow-xl overflow-hidden">
+        <div class="bg-white border border-gray-100 rounded-lg shadow-sm overflow-hidden">
           <!-- Table Header -->
-          <div class="flex flex-col md:flex-row justify-between items-center p-4 border-b bg-[#0b0b88]">
+          <div class="flex flex-col md:flex-row justify-between items-center p-4 border-b border-gray-100 bg-white">
             <div class="w-full md:w-auto mb-4 md:mb-0">
               <ul class="flex flex-col md:flex-row items-start md:items-center gap-4">
                 <li>
-                  <h2 class="text-lg text-white mr-2">Holidays</h2>
+                  <h2 class="text-lg text-[#1B1B2F] mr-2">Holidays</h2>
                 </li>
                 <div class="flex items-center justify-center">
                   <div
@@ -32,7 +32,7 @@
                 <li *ngIf="isHR">
                   <div matTooltip="ADD HOLIDAY">
                     <button mat-mini-fab class="!bg-white hover:!bg-gray-100" (click)="addNew()">
-                      <mat-icon class="!text-[#0b0b88]">add</mat-icon>
+                      <mat-icon class="!text-violet-700">add</mat-icon>
                     </button>
                   </div>
                 </li>
