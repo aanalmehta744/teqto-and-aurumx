@@ -16,7 +16,7 @@ table.mat-table {
     max-width: 200px;
 }
 .kpi-hero {
-  background: #4c1d95 !important;
+  background: #052073 !important;
 
   * {
     color: #ffffff;
@@ -24,7 +24,57 @@ table.mat-table {
 
   .kpi-hero-icon,
   .kpi-hero-icon * {
-    color: #4c1d95 !important;
+    color: #052073 !important;
   }
 }
+
+
+.attendance-card {
+  transition:
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.attendance-card:hover {
+  border-color: #ddd6fe;
+  box-shadow: 0 12px 32px rgba(76, 29, 149, 0.06);
+}
+
+.attendance-chart {
+  max-width: 100%;
+}
+
+.attendance-chart apx-chart {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.attendance-content {
+  min-height: 290px;
+}
+
+@media (max-width: 639px) {
+  .attendance-content {
+    padding: 1.25rem;
+    gap: 1.5rem;
+  }
+
+  .attendance-chart {
+    height: 190px;
+    width: 190px;
+  }
+
+  .attendance-legend {
+    width: 100%;
+    gap: 0.875rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .attendance-card {
+    transition: none;
+  }
+}
+
 

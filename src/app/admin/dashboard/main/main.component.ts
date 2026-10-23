@@ -15,12 +15,13 @@ import { CommonModule, formatDate } from '@angular/common';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { ProjectService } from 'app/admin/projects/all-projects/core/project.service';
 import { ClientsService } from 'app/admin/clients/all-clients/clients.service';
+import { HolidayService } from 'app/admin/holidays/all-holidays/all-holidays.service';
 import {
   ApexAxisChartSeries,
   ApexChart,
   ApexXAxis,
   ApexDataLabels,
-  ApexStroke,
+  ApexPlotOptions,
   ApexMarkers,
   ApexYAxis,
   ApexGrid,
@@ -86,6 +87,8 @@ export class MainComponent implements OnInit {
   @ViewChild('leavePaginator') leavePaginator!: MatPaginator;
   pendingLeaves: any[] = [];
   paginatedPendingLeaves: any[] = [];
+  upcomingHolidays: any[] = [];
+  projectsExpanded = true;
 
 
   userRole: string = '';
@@ -101,6 +104,7 @@ export class MainComponent implements OnInit {
     private ieavesService: LeavesService,
     private authService: AuthService,
     private http: HttpClient,
+    private holidayService: HolidayService,
   ) {
     this.userRole = this.authService.currentUserValue?.role?.toLowerCase() ?? '';
   }
@@ -185,6 +189,28 @@ export class MainComponent implements OnInit {
     }
   };
 
+    // Attendance status donut (Today's Attendance card)
+  presentCount = 0;
+  absentCount = 0;
+  halfDayCount = 0;
+  leaveCount = 0;
+  public attendanceStatusSeries: ApexNonAxisChartSeries = [];
+  public attendanceStatusPlotOptions: ApexPlotOptions = {
+  pie: {
+    donut: {
+      size: '66%'
+    }
+  }
+};
+  public attendanceStatusChart: ApexChart = { type: 'donut', height: 240 };
+  public attendanceStatusLabels: string[] = ['Present', 'Absent', 'Half Day', 'On Leave'];
+  public attendanceStatusColors: string[] = ['#10b981', '#ef4444', '#052073', '#f59e0b'];
+  public attendanceStatusLegend: ApexLegend = { show: false };
+  public attendanceStatusDataLabels: ApexDataLabels = { enabled: false };
+  public attendanceStatusTooltip: ApexTooltip = {
+    y: { formatter: (val: number) => `${val} employees` }
+  };
+
   // BDE Activity Chart (calls / meetings / deals)
   bdePerformanceSummary: any[] = [];
   public bdeChartSeries: ApexAxisChartSeries = [];
@@ -216,6 +242,7 @@ export class MainComponent implements OnInit {
     this.loadClients();
     this.loadInterviews();
     this.loadPendingLeaves();
+    this.loadUpcomingHolidays();
     this.loadBdePerformanceSummary();
     this.loadBdeKpiAchievement();
     if (this.userRole === 'ba') {
@@ -272,6 +299,14 @@ export class MainComponent implements OnInit {
     if (index === 2) return '🥉';
     return `#${index + 1}`;
   }
+
+    getInitials(name: string): string {
+    if (!name) return '';
+    const parts = name.trim().split(' ');
+    return parts.length > 1
+      ? (parts[0][0] + parts[1][0]).toUpperCase()
+      : parts[0].substring(0, 2).toUpperCase();
+  }
   ngAfterViewInit(): void {
     if (this.followupPaginator) {
       this.followupPaginator.page.subscribe(() => this.updateFollowupPagination());
@@ -294,6 +329,21 @@ export class MainComponent implements OnInit {
       error: (err: any) => console.error('Error fetching pending leaves:', err),
     });
   }
+
+  loadUpcomingHolidays(): void {
+  this.holidayService.getAllHolidays().subscribe({
+    next: (data) => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      this.upcomingHolidays = data
+        .filter(h => new Date(h.date) >= today)
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .slice(0, 3);
+    },
+    error: (err) => console.error('Error fetching holidays:', err),
+  });
+}
+
   updateLeavePagination(event?: any): void {
     if (!this.leavePaginator) return;
     const pageIndex = event?.pageIndex ?? this.leavePaginator.pageIndex ?? 0;
@@ -319,12 +369,20 @@ export class MainComponent implements OnInit {
       next: (data) => {
         this.todayAttendance = data;
         this.updateAttendancePagination();
+        this.computeAttendanceStatusCounts();
         console.log('Today Attendance:', this.todayAttendance);
       },
       error: (err) => {
         console.error('Error fetching today attendance:', err);
       }
     });
+  }
+    computeAttendanceStatusCounts(): void {
+    this.presentCount = this.todayAttendance.filter(r => r.status === 'Present').length;
+    this.absentCount = this.todayAttendance.filter(r => r.status === 'Absent').length;
+    this.halfDayCount = this.todayAttendance.filter(r => r.status === 'Half Day').length;
+    this.leaveCount = this.todayAttendance.filter(r => r.final_status === 'Leave').length;
+    this.attendanceStatusSeries = [this.presentCount, this.absentCount, this.halfDayCount, this.leaveCount];
   }
   loadAllProjectsWithTeams(): void {
     this.dashboardService.getAllTeams().subscribe({

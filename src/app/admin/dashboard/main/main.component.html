@@ -1,23 +1,36 @@
 <section>
   <div class="min-h-screen bg-gray-50 p-4 md:p-6 space-y-6">
-
-<div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-50 via-violet-50/60 to-white px-6 py-6 sm:px-8 sm:py-7">
-  <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,theme(colors.violet.200/40),transparent_60%)]"></div>
-  <div class="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-    <div>
-      <h1 class="text-3xl font-bold text-[#1e1b4b] tracking-tight">Dashboard</h1>
-      <p class="text-sm text-gray-500 mt-1">A quick snapshot of today's activity across your organization.</p>
-      <div class="mt-3 flex gap-1.5">
-        <span class="h-1 w-8 rounded-full bg-violet-600"></span>
-        <span class="h-1 w-8 rounded-full bg-violet-200"></span>
+    <div
+      class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-50 via-violet-50/60 to-white px-6 py-6 sm:px-8 sm:py-7"
+    >
+      <div
+        class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,theme(colors.violet.200/40),transparent_60%)]"
+      ></div>
+      <div
+        class="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+      >
+        <div>
+          <h1 class="text-3xl font-bold text-[#1e1b4b] tracking-tight">
+            Dashboard
+          </h1>
+          <p class="text-sm text-gray-500 mt-1">
+            A quick snapshot of today's activity across your organization.
+          </p>
+          <div class="mt-3 flex gap-1.5">
+            <span class="h-1 w-8 rounded-full bg-violet-600"></span>
+            <span class="h-1 w-8 rounded-full bg-violet-200"></span>
+          </div>
+        </div>
+        <div class="flex flex-col items-end gap-2">
+          <app-breadcrumb
+            [title]="'Dashboard'"
+            [items]="['Home']"
+            [active_item]="'Dashboard'"
+          ></app-breadcrumb>
+          <app-announcement-banner></app-announcement-banner>
+        </div>
       </div>
     </div>
-    <div class="flex flex-col items-end gap-2">
-      <app-breadcrumb [title]="'Dashboard'" [items]="['Home']" [active_item]="'Dashboard'"></app-breadcrumb>
-      <app-announcement-banner></app-announcement-banner>
-    </div>
-  </div>
-</div>
 
     <!-- ── Dashboard Overview ── -->
     <!-- <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 to-violet-500 px-6 py-7 md:px-8 md:py-8 shadow-lg shadow-violet-200">
@@ -30,74 +43,167 @@
     </div> -->
 
     <!-- ── KPI Summary Row ── -->
-    <div class="hr-grid-in grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div
+      class="hr-grid-in grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+    >
+      <div
+        class="kpi-hero bg-violet-900 text-white rounded-3xl shadow-sm hover:shadow-md transition-shadow pl-7 pr-7 py-5 flex flex-col justify-between"
+      >
+        <div class="flex items-start justify-between">
+          <span class="text-base font-medium text-white/80 ml-1"
+            >BDEs with Follow-ups</span
+          >
+          <div
+            class="kpi-hero-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-violet-900"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M7 17L17 7M17 7H8M17 7v9"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="mt-4">
+          <div class="text-metric text-white">
+            {{ todayFollowupsByBDE.length }}
+          </div>
+          <div class="mt-2 text-sm font-semibold text-white/60">
+            As of today
+          </div>
+        </div>
+      </div>
 
-<div class="kpi-hero bg-violet-900 text-white rounded-3xl shadow-sm hover:shadow-md transition-shadow pl-7 pr-7 py-5 flex flex-col justify-between">
-  <div class="flex items-start justify-between">
-    <span class="text-base font-medium text-white/80 ml-1">BDEs with Follow-ups</span>
-    <div class="kpi-hero-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-violet-900">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M7 17L17 7M17 7H8M17 7v9"></path>
-      </svg>
-    </div>
-  </div>
-  <div class="mt-4">
-    <div class="text-metric text-white">{{ todayFollowupsByBDE.length }}</div>
-    <div class="mt-2 text-sm font-semibold text-white/60">As of today</div>
-  </div>
-</div>
+      <div
+        class="bg-white rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow pl-7 pr-7 py-5 flex flex-col justify-between"
+        *ngIf="userRole !== 'ba'"
+      >
+        <div class="flex items-start justify-between">
+          <span class="text-base font-medium text-black/80 ml-1"
+            >Attendance Logged</span
+          >
+          <button
+            class="w-11 h-11 rounded-full border border-violet-200 flex items-center justify-center text-[#052073] hover:bg-gray-50"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M7 17L17 7M17 7H8M17 7v9"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="mt-4">
+          <div class="text-metric text-slate-800">
+            {{ todayAttendance.length }}
+          </div>
+          <div class="mt-2 text-sm font-semibold text-gray-400">
+            Records today
+          </div>
+        </div>
+      </div>
 
-  <div class="bg-white rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow pl-7 pr-7 py-5 flex flex-col justify-between" *ngIf="userRole !== 'ba'">
-  <div class="flex items-start justify-between">
-    <span class="text-base font-medium text-black/80 ml-1">Attendance Logged</span>
-   <button class="w-11 h-11 rounded-full border border-violet-200 flex items-center justify-center text-violet-600 hover:bg-gray-50">
-  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M7 17L17 7M17 7H8M17 7v9"></path>
-      </svg>
-    </button>
-  </div>
-  <div class="mt-4">
-    <div class="text-metric text-slate-800">{{ todayAttendance.length }}</div>
-    <div class="mt-2 text-sm font-semibold text-gray-400">Records today</div>
-  </div>
-</div>
+      <div
+        class="bg-white rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow pl-7 pr-7 py-5 flex flex-col justify-between"
+      >
+        <div class="flex items-start justify-between">
+          <span class="text-base font-medium text-black/80 ml-1"
+            >Upcoming Interviews</span
+          >
+          <button
+            class="w-11 h-11 rounded-full border border-violet-200 flex items-center justify-center text-[#052073] hover:bg-gray-50"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M7 17L17 7M17 7H8M17 7v9"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="mt-4">
+          <div class="text-metric text-slate-800">
+            {{ interviewDataSource.data.length }}
+          </div>
+          <div class="mt-2 text-sm font-semibold text-gray-400">Scheduled</div>
+        </div>
+      </div>
 
-<div class="bg-white rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow pl-7 pr-7 py-5 flex flex-col justify-between">
-  <div class="flex items-start justify-between">
-    <span class="text-base font-medium text-black/80 ml-1">Upcoming Interviews</span>
-    <button class="w-11 h-11 rounded-full border border-violet-200 flex items-center justify-center text-violet-600 hover:bg-gray-50">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M7 17L17 7M17 7H8M17 7v9"></path>
-      </svg>
-    </button>
-  </div>
-  <div class="mt-4">
-    <div class="text-metric text-slate-800">{{ interviewDataSource.data.length }}</div>
-    <div class="mt-2 text-sm font-semibold text-gray-400">Scheduled</div>
-  </div>
-</div>
-
-<div class="bg-white rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow pl-7 pr-7 py-5 flex flex-col justify-between" *ngIf="userRole !== 'ba'">
-  <div class="flex items-start justify-between">
-    <span class="text-base font-medium text-black/80 ml-1">Pending Leaves</span>
-    <button class="w-11 h-11 rounded-full border border-violet-200 flex items-center justify-center text-violet-600 hover:bg-gray-50">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M7 17L17 7M17 7H8M17 7v9"></path>
-      </svg>
-    </button>
-  </div>
-  <div class="mt-4">
-    <div class="text-metric text-slate-800">{{ pendingLeaves.length }}</div>
-    <div class="mt-2 text-sm font-semibold text-emerald-600 font-semibold">Awaiting approval</div>
-  </div>
-</div>
+      <div
+        class="bg-white rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow pl-7 pr-7 py-5 flex flex-col justify-between"
+        *ngIf="userRole !== 'ba'"
+      >
+        <div class="flex items-start justify-between">
+          <span class="text-base font-medium text-black/80 ml-1"
+            >Pending Leaves</span
+          >
+          <button
+            class="w-11 h-11 rounded-full border border-violet-200 flex items-center justify-center text-[#052073] hover:bg-gray-50"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M7 17L17 7M17 7H8M17 7v9"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="mt-4">
+          <div class="text-metric text-slate-800">
+            {{ pendingLeaves.length }}
+          </div>
+          <div
+            class="mt-2 text-sm font-semibold text-emerald-600 font-semibold"
+          >
+            Awaiting approval
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ── BA Leave Balance Card ── -->
-    <div *ngIf="userRole === 'ba' && baLeaveBalance" class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+    <div
+      *ngIf="userRole === 'ba' && baLeaveBalance"
+      class="bg-white rounded-2xl border border-gray-100 shadow-sm"
+    >
       <div class="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
-        <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-900/10 text-violet-900">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <span
+          class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-900/10 text-violet-900"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="16" y1="2" x2="16" y2="6"></line>
             <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -107,102 +213,577 @@
         <h6 class="text-sm font-semibold text-gray-900">My Leave Balance</h6>
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5">
-        <div class="text-center p-4 rounded-xl bg-violet-900/5 border border-violet-900/10">
-          <p class="text-2xl font-bold text-violet-900">{{ baLeaveBalance.remaining_paid_leave ?? 0 }}</p>
+        <div
+          class="text-center p-4 rounded-xl bg-violet-900/5 border border-violet-900/10"
+        >
+          <p class="text-2xl font-bold text-violet-900">
+            {{ baLeaveBalance.remaining_paid_leave ?? 0 }}
+          </p>
           <p class="text-xs text-gray-500 mt-1">Paid Leaves Left</p>
         </div>
-        <div class="text-center p-4 rounded-xl bg-violet-900/5 border border-violet-900/10">
-          <p class="text-2xl font-bold text-violet-900">{{ baLeaveBalance.total_paid_leave ?? 0 }}</p>
+        <div
+          class="text-center p-4 rounded-xl bg-violet-900/5 border border-violet-900/10"
+        >
+          <p class="text-2xl font-bold text-violet-900">
+            {{ baLeaveBalance.total_paid_leave ?? 0 }}
+          </p>
           <p class="text-xs text-gray-500 mt-1">Total Paid</p>
         </div>
-        <div class="text-center p-4 rounded-xl bg-violet-900/5 border border-violet-900/10">
-          <p class="text-2xl font-bold text-violet-900">{{ baLeaveBalance.used_paid_leave ?? 0 }}</p>
+        <div
+          class="text-center p-4 rounded-xl bg-violet-900/5 border border-violet-900/10"
+        >
+          <p class="text-2xl font-bold text-violet-900">
+            {{ baLeaveBalance.used_paid_leave ?? 0 }}
+          </p>
           <p class="text-xs text-gray-500 mt-1">Paid Used</p>
         </div>
-        <div class="text-center p-4 rounded-xl bg-violet-900/5 border border-violet-900/10">
-          <p class="text-2xl font-bold text-violet-900">{{ baLeaveBalance.used_sick_leave ?? 0 }}</p>
+        <div
+          class="text-center p-4 rounded-xl bg-violet-900/5 border border-violet-900/10"
+        >
+          <p class="text-2xl font-bold text-violet-900">
+            {{ baLeaveBalance.used_sick_leave ?? 0 }}
+          </p>
           <p class="text-xs text-gray-500 mt-1">Sick Used</p>
         </div>
       </div>
     </div>
 
-    <!-- ── Today's Follow-ups by BDE ── -->
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-        <div class="flex items-center gap-3">
-          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-900/10 text-violet-900">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+    <!-- ── Today, Attendance, Interviews row ── -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <!-- ── Today's Follow-ups by BDE ── -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+        <div
+          class="flex items-center justify-between px-5 py-4 border-b border-gray-100"
+        >
+          <div class="flex items-center gap-3">
+            <span
+              class="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-900/10 text-[#052073]"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </span>
+            <h6 class="text-base font-semibold text-gray-900">
+              Today's Follow-ups by BDE
+            </h6>
+          </div>
+          <a
+            routerLink="/admin/kpi/bde-analytics"
+            class="flex items-center gap-1 text-sm font-medium text-[#052073] hover:text-violet-700"
+          >
+            View All
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
-          </span>
-          <h6 class="text-sm font-semibold text-gray-900">Today's Follow-ups by BDE</h6>
+          </a>
+        </div>
+
+        <div class="p-4 h-full">
+          <ng-scrollbar track="all" visibility="hover">
+            <div
+              *ngFor="let bde of todayFollowupsByBDE | slice: 0 : 4"
+              class="mb-5 last:mb-0"
+            >
+              <div class="flex justify-between items-center px-1 mb-2">
+                <h6 class="font-medium text-sm text-gray-900">
+                  {{ bde.bde_name }}
+                </h6>
+                <span
+                  class="bg-violet-900/10 text-violet-900 text-xs font-medium px-2.5 py-1 rounded-full"
+                >
+                  {{ bde.followup_count }} Follow-ups
+                </span>
+              </div>
+              <div class="overflow-x-auto rounded-xl border border-gray-100">
+                <table class="min-w-full text-sm">
+                  <thead>
+                    <tr class="bg-gray-50">
+                      <th
+                        class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                      >
+                        Client Name
+                      </th>
+                      <th
+                        class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                      >
+                        Email
+                      </th>
+                      <th
+                        class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                      >
+                        Mobile
+                      </th>
+                      <th
+                        class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                      >
+                        Status
+                      </th>
+                      <th
+                        class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                      >
+                        Follow-up Notes
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      *ngFor="let client of bde.clients"
+                      class="border-t border-gray-50 hover:bg-violet-900/5 transition-colors"
+                    >
+                      <td class="py-2.5 px-4 text-gray-700">
+                        {{ client.fullName }}
+                      </td>
+                      <td class="py-2.5 px-4 text-gray-500">
+                        {{ client.email }}
+                      </td>
+                      <td class="py-2.5 px-4 text-gray-500">
+                        {{ client.mobile || "-" }}
+                      </td>
+                      <td class="py-2.5 px-4 text-gray-700">
+                        {{ client.status }}
+                      </td>
+                      <td class="py-2.5 px-4 text-gray-500">
+                        {{ client.notes }}
+                      </td>
+                    </tr>
+                    <tr
+                      *ngIf="!bde.clients || bde.clients.length === 0"
+                      class="border-t border-gray-50"
+                    >
+                      <td
+                        colspan="5"
+                        class="py-4 px-4 text-center text-gray-400"
+                      >
+                        No client follow-ups available
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="border-t border-gray-100">
+                  <mat-paginator
+                    #followupPaginator
+                    [length]="todayFollowupsByBDE.length"
+                    [pageSize]="5"
+                    [pageSizeOptions]="[2, 5, 10]"
+                    showFirstLastButtons
+                    (page)="updateFollowupPagination()"
+                  >
+                  </mat-paginator>
+                </div>
+              </div>
+            </div>
+          </ng-scrollbar>
+          <div
+            *ngIf="todayFollowupsByBDE.length === 0"
+            class="flex h-full flex-col items-center justify-center pt-6 pb-24 text-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-12 w-12 text-[#05207396] mb-3"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <rect x="5" y="3" width="14" height="18" rx="2" />
+              <path d="M9 7h6M9 11h6M9 15h3" />
+            </svg>
+            <p class="text-sm font-semibold text-gray-700">
+              No follow-ups for today
+            </p>
+            <p class="text-xs text-gray-400 mt-1">
+              Follow-up activities by BDE will appear here once available.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div class="p-4">
-        <ng-scrollbar track="all" visibility="hover">
-          <div *ngFor="let bde of todayFollowupsByBDE" class="mb-5 last:mb-0">
-            <div class="flex justify-between items-center px-1 mb-2">
-              <h6 class="font-medium text-sm text-gray-900">{{ bde.bde_name }}</h6>
-              <span class="bg-violet-900/10 text-violet-900 text-xs font-medium px-2.5 py-1 rounded-full">
-                {{ bde.followup_count }} Follow-ups
-              </span>
-            </div>
-            <div class="overflow-x-auto rounded-xl border border-gray-100">
-              <table class="min-w-full text-sm">
-                <thead>
-                  <tr class="bg-gray-50">
-                    <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Client Name</th>
-                    <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Email</th>
-                    <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Mobile</th>
-                    <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
-                    <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Follow-up Notes</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let client of bde.clients"
-                    class="border-t border-gray-50 hover:bg-violet-900/5 transition-colors">
-                    <td class="py-2.5 px-4 text-gray-700">{{ client.fullName }}</td>
-                    <td class="py-2.5 px-4 text-gray-500">{{ client.email }}</td>
-                    <td class="py-2.5 px-4 text-gray-500">{{ client.mobile || '-' }}</td>
-                    <td class="py-2.5 px-4 text-gray-700">{{ client.status }}</td>
-                    <td class="py-2.5 px-4 text-gray-500">{{ client.notes }}</td>
-                  </tr>
-                  <tr *ngIf="!bde.clients || bde.clients.length === 0" class="border-t border-gray-50">
-                    <td colspan="5" class="py-4 px-4 text-center text-gray-400">No client follow-ups available</td>
-                  </tr>
-                </tbody>
-              </table>
-              <div class="border-t border-gray-100">
-                <mat-paginator #followupPaginator [length]="todayFollowupsByBDE.length" [pageSize]="5"
-                  [pageSizeOptions]="[2, 5, 10]" showFirstLastButtons (page)="updateFollowupPagination()">
-                </mat-paginator>
-              </div>
+      <!-- Today's Attendance -->
+      <div
+        *ngIf="userRole !== 'ba'"
+        class="attendance-card overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm"
+      >
+        <!-- Header -->
+        <div
+          class="flex items-center justify-between gap-4 border-b border-slate-100 px-6 py-4"
+        >
+          <div class="flex min-w-0 items-center gap-3">
+            <span
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-100/80 text-[#052073]"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </span>
+
+            <h6
+              class="truncate text-base font-semibold tracking-tight text-slate-900"
+            >
+              Today's Attendance
+            </h6>
+          </div>
+
+          <a
+            routerLink="/admin/attendance/today"
+            class="flex shrink-0 items-center gap-1 text-sm font-medium text-[#052073] hover:text-violet-700"
+          >
+            View All
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+
+        <!-- Chart + Legend -->
+        <div
+          class="attendance-content grid grid-cols-1 items-center gap-6 px-6 py-7 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] sm:gap-8 sm:px-7"
+        >
+          <!-- Donut chart -->
+          <div class="flex min-w-0 items-center justify-center">
+            <div class="attendance-chart relative h-[220px] w-[220px] shrink-0">
+              <apx-chart
+                *ngIf="todayAttendance.length > 0"
+                [series]="attendanceStatusSeries"
+                [chart]="attendanceStatusChart"
+                [labels]="attendanceStatusLabels"
+                [colors]="attendanceStatusColors"
+                [legend]="attendanceStatusLegend"
+                [dataLabels]="attendanceStatusDataLabels"
+                [tooltip]="attendanceStatusTooltip"
+                [plotOptions]="attendanceStatusPlotOptions"
+                class="block h-full w-full"
+              ></apx-chart>
+
+              <svg
+                *ngIf="todayAttendance.length === 0"
+                viewBox="0 0 200 200"
+                class="h-full w-full"
+                aria-label="No attendance recorded today"
+                role="img"
+              >
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="82"
+                  fill="none"
+                  stroke="#E5E7EB"
+                  stroke-width="16"
+                ></circle>
+              </svg>
+
+            <div
+  class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center -mt-5"
+>
+  <!-- <span class="text-2xl font-bold tracking-tight text-slate-900">
+    {{ presentCount }}/{{ todayAttendance.length }}
+  </span>
+  <span class="mt-1 text-xs font-medium text-slate-400">
+    Present Today
+  </span> -->
+</div>
             </div>
           </div>
-        </ng-scrollbar>
-        <div *ngIf="todayFollowupsByBDE.length === 0" class="text-center text-gray-400 py-6 text-sm">
-          No follow-ups for today
+
+          <!-- Attendance status legend -->
+          <div class="attendance-legend flex min-w-0 flex-col gap-4 ml-10">
+            <div class="flex items-center justify-between gap-4">
+              <span class="flex items-center gap-3 text-base text-slate-600">
+                <span
+                  class="h-3 w-3 shrink-0 rounded-full bg-emerald-500"
+                ></span>
+                Present
+              </span>
+              <span
+                class="min-w-6 text-right text-base font-semibold text-slate-900"
+              >
+                {{ presentCount }}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between gap-4">
+              <span class="flex items-center gap-3 text-base text-slate-600">
+                <span class="h-3 w-3 shrink-0 rounded-full bg-rose-500"></span>
+                Absent
+              </span>
+              <span
+                class="min-w-6 text-right text-base font-semibold text-slate-900"
+              >
+                {{ absentCount }}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between gap-4">
+              <span class="flex items-center gap-3 text-base text-slate-600">
+                <span class="h-3 w-3 shrink-0 rounded-full bg-[#052073]"></span>
+                Half Day
+              </span>
+              <span
+                class="min-w-6 text-right text-base font-semibold text-slate-900"
+              >
+                {{ halfDayCount }}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between gap-4">
+              <span class="flex items-center gap-3 text-base text-slate-600">
+                <span class="h-3 w-3 shrink-0 rounded-full bg-[#f59e0b]"></span>
+                On Leave
+              </span>
+              <span
+                class="min-w-6 text-right text-base font-semibold text-slate-900"
+              >
+                {{ leaveCount }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Upcoming Interviews ── -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+        <div
+          class="flex items-center justify-between px-5 py-4 border-b border-gray-100"
+        >
+          <div class="flex items-center gap-3">
+            <span
+              class="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-900/10 text-[#052073]"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </span>
+            <h6 class="text-base font-semibold text-gray-900">
+              Upcoming Interviews
+            </h6>
+          </div>
+
+          <a
+            routerLink="/admin/interviews"
+            class="flex shrink-0 items-center gap-1 text-sm font-medium text-[#052073] hover:text-violet-700"
+          >
+            View All
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+
+        <div class="p-4">
+          <div
+            *ngIf="paginatedInterviews && paginatedInterviews.length > 0"
+            class="overflow-x-auto rounded-xl border border-gray-100"
+          >
+            <table class="min-w-full text-sm">
+              <thead>
+                <tr class="bg-gray-50">
+                  <th
+                    class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"
+                  >
+                    Candidate Name
+                  </th>
+                  <th
+                    class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"
+                  >
+                    Interviewed By
+                  </th>
+                  <th
+                    class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"
+                  >
+                    Number
+                  </th>
+                  <th
+                    class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"
+                  >
+                    Date
+                  </th>
+                  <th
+                    class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"
+                  >
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let interview of paginatedInterviews | slice: 0 : 4"
+                  class="border-t border-gray-50 hover:bg-violet-900/5 transition-colors"
+                >
+                  <td class="py-2.5 px-4 text-gray-700 whitespace-nowrap">
+                    {{ interview.candidate_name }}
+                  </td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">
+                    {{ interview.hr_name }}
+                  </td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">
+                    {{ interview.candidate_number || "—" }}
+                  </td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">
+                    {{ interview.interview_date | date: "mediumDate" }}
+                  </td>
+                  <td class="py-2.5 px-4">
+                    <span
+                      class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
+                      [ngClass]="{
+                        'bg-emerald-50 text-emerald-700':
+                          interview.status === 'complete',
+                        'bg-amber-50 text-amber-700':
+                          interview.status !== 'complete',
+                      }"
+                    >
+                      {{
+                        interview.status === "complete"
+                          ? "Complete"
+                          : "Upcoming"
+                      }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="border-t border-gray-100">
+              <mat-paginator
+                #interviewPaginator
+                [length]="interviewDataSource.data.length"
+                [pageSize]="5"
+                [pageSizeOptions]="[5, 10, 25]"
+                showFirstLastButtons
+                (page)="updateInterviewPagination()"
+              >
+              </mat-paginator>
+            </div>
+          </div>
+          <div
+            *ngIf="!paginatedInterviews || paginatedInterviews.length === 0"
+            class="flex h-full flex-col items-center justify-center pt-16 text-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-12 w-12 text-amber-200 mb-3"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            <p class="text-sm font-semibold text-gray-700">
+              No interviews scheduled
+            </p>
+            <p class="text-xs text-gray-400 mt-1">
+              Upcoming interviews will appear here.
+            </p>
+          </div>
         </div>
       </div>
     </div>
+    <!-- ── end Today / Attendance / Interviews row ── -->
 
-    <!-- ── Today's Attendance Records ── -->
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm" *ngIf="userRole !== 'ba'">
-      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-        <div class="flex items-center gap-3">
-          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-900/10 text-violet-900">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-          </span>
-          <h6 class="text-sm font-semibold text-gray-900">Today's Attendance Records</h6>
-        </div>
-      </div>
+   <div class="grid grid-cols-1 lg:grid-cols-3 gap-5" *ngIf="userRole !== 'ba'">
+  <div class="lg:col-span-2">
+<!-- ── Pending Leave Requests ── -->
+<div
+  class="bg-white rounded-2xl border border-gray-100 shadow-sm"
+>
+      <div
+  class="flex items-center justify-between px-5 py-4 border-b border-gray-100"
+>
+  <div class="flex items-center gap-3">
+    <span
+      class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-900/10 text-violet-900"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-4 w-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path
+          d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+        ></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="9" y1="15" x2="15" y2="15"></line>
+        <line x1="9" y1="11" x2="13" y2="11"></line>
+      </svg>
+    </span>
+    <h6 class="text-base font-semibold text-gray-900">
+      Pending Leave Requests
+    </h6>
+  </div>
+  <a routerLink="/admin/leaves/leave-requests" class="flex items-center gap-1 text-sm font-medium text-[#052073] hover:text-violet-700">
+    View All
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12h14M12 5l7 7-7 7"/>
+    </svg>
+  </a>
+</div>
 
       <div class="p-4">
         <ng-scrollbar track="all" visibility="hover">
@@ -210,71 +791,117 @@
             <table class="min-w-full text-sm">
               <thead>
                 <tr class="bg-gray-50">
-                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Employee Name</th>
-                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Date</th>
-                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Punch In</th>
-                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Punch Out</th>
-                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Hours</th>
-                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Break</th>
-                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Status</th>
+                  <th
+                    class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"
+                  >
+                    Employee Name
+                  </th>
+                  <th
+                    class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"
+                  >
+                    Leave Type
+                  </th>
+                  <th
+                    class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"
+                  >
+                    Start Date
+                  </th>
+                  <th
+                    class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"
+                  >
+                    End Date
+                  </th>
+                  <th
+                    class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"
+                  >
+                    Days
+                  </th>
+                  <th
+                    class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"
+                  >
+                    Reason
+                  </th>
+                  <th
+                    class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"
+                  >
+                    Status
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let record of paginatedAttendance"
-                  class="border-t border-gray-50 hover:bg-violet-900/5 transition-colors">
-                  <td class="py-2.5 px-4 text-gray-700 whitespace-nowrap">{{ record.fullName }}</td>
-                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ record.date | date:'mediumDate' }}</td>
-                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ record.check_in ? (record.check_in | date:'h:mm:ss a') : '-' }}</td>
-                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ record.check_out ? (record.check_out | date:'h:mm:ss a') : '-' }}</td>
-                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ record.hours ? (record.hours) : '-' }}</td>
-                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ record.break ? (record.break) : '-' }}</td>
-                  <!-- Status -->
-                  <td class="py-2.5 px-4">
-                    <span *ngIf="record.status === 'Present'"
-                      class="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-medium">
-                      {{ record.status }}
-                    </span>
-                    <span *ngIf="record.status === 'Absent'"
-                      class="bg-red-50 text-red-700 px-2.5 py-1 rounded-full text-xs font-medium">
-                      {{ record.status }}
-                    </span>
-                    <!-- Half Day -->
-                    <span *ngIf="record.status === 'Half Day'"
-                      class="bg-orange-50 text-orange-700 px-2.5 py-1 rounded-full text-xs font-medium">
-                      {{ record.status }}
-                    </span>
-                    <span
-                      *ngIf="record.status !== 'Present' && record.status !== 'Absent' && record.status !== 'Leave' && record.status !== 'Half Day'"
-                      class="bg-violet-900/10 text-violet-900 px-2.5 py-1 rounded-full text-xs font-medium">
-                      {{ record.status }}
-                    </span>
-
-                    <span *ngIf="record.final_status === 'Leave'"
-                      class="bg-amber-50 text-amber-700 px-2.5 py-1 ml-2 rounded-full text-xs font-medium">
-                      {{ record.final_status }}
-                    </span>
+                <tr
+                  *ngFor="let leave of pendingLeaves | slice: 0 : 3"
+                  class="border-t border-gray-50 hover:bg-violet-900/5 transition-colors"
+                >
+                  <td class="py-2.5 px-4 text-gray-700 whitespace-nowrap">
+                    {{ leave.employee_name }}
                   </td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">
+                    {{ leave.leave_type }}
+                  </td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">
+                    {{ leave.start_date | date: "mediumDate" }}
+                  </td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">
+                    {{ leave.end_date | date: "mediumDate" }}
+                  </td>
+                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">
+                    {{ leave.total_days }}
+                  </td>
+                  <td
+  class="py-2.5 px-4 min-w-[150px] max-w-[250px] break-words whitespace-normal text-gray-500"
+>
+  {{ leave.reason }}
+</td>
+                  <td class="py-2.5 px-4">
+  <span
+    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold border"
+    [ngClass]="{
+      'bg-amber-50 text-amber-700 border-amber-200':
+        leave.status === 'Pending',
+      'bg-emerald-50 text-emerald-700 border-emerald-200':
+        leave.status === 'Approved',
+      'bg-red-50 text-red-700 border-red-200': leave.status === 'Rejected',
+    }"
+  >
+    {{ leave.status }}
+  </span>
+</td>
                 </tr>
-                <tr *ngIf="!todayAttendance || todayAttendance.length === 0" class="border-t border-gray-50">
-                  <td colspan="7" class="py-4 px-4 text-center text-gray-400">No attendance records for today</td>
+
+                <tr
+                  *ngIf="!pendingLeaves || pendingLeaves.length === 0"
+                  class="border-t border-gray-50"
+                >
+                  <td colspan="7" class="py-4 px-4 text-center text-gray-400">
+                    No pending leave requests
+                  </td>
                 </tr>
               </tbody>
             </table>
-            <div class="border-t border-gray-100">
-              <mat-paginator #attendancePaginator [length]="todayAttendance.length" [pageSize]="5"
-                [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons (page)="updateAttendancePagination()">
+            <!-- <div class="border-t border-gray-100">
+              <mat-paginator
+                #leavePaginator
+                [length]="pendingLeaves.length"
+                [pageSize]="5"
+                [pageSizeOptions]="[5, 10, 25]"
+                showFirstLastButtons
+                (page)="updateLeavePagination()"
+              >
               </mat-paginator>
-            </div>
+            </div> -->
           </div>
         </ng-scrollbar>
-      </div>
+            </div>
     </div>
+  </div>
 
-    <!-- ── Upcoming Interviews ── -->
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+  <div class="lg:col-span-1">
+    <!-- ── Upcoming Holidays ── -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm h-full">
       <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
         <div class="flex items-center gap-3">
-          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-900/10 text-violet-900">
+          <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-900/10 text-[#052073]">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
               <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -282,199 +909,332 @@
               <line x1="3" y1="10" x2="21" y2="10"></line>
             </svg>
           </span>
-          <h6 class="text-sm font-semibold text-gray-900">Upcoming Interviews</h6>
+          <h6 class="text-base font-semibold text-gray-900">Upcoming Holidays</h6>
         </div>
+        <a routerLink="/admin/holidays/all-holidays" class="flex items-center gap-1 text-sm font-medium text-[#052073] hover:text-violet-700">
+          View All
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
       </div>
-
-      <div class="p-4">
-        <div class="overflow-x-auto rounded-xl border border-gray-100">
-          <table class="min-w-full text-sm">
-            <thead>
-              <tr class="bg-gray-50">
-                <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Candidate Name</th>
-                <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Interviewed By</th>
-                <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Number</th>
-                <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Date</th>
-                <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let interview of paginatedInterviews" class="border-t border-gray-50 hover:bg-violet-900/5 transition-colors">
-                <td class="py-2.5 px-4 text-gray-700 whitespace-nowrap">{{ interview.candidate_name }}</td>
-                <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ interview.hr_name }}</td>
-                <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ interview.candidate_number || '—' }}</td>
-                <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ interview.interview_date | date:'mediumDate' }}</td>
-                <td class="py-2.5 px-4">
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" [ngClass]="{
-                      'bg-emerald-50 text-emerald-700': interview.status === 'complete',
-                      'bg-amber-50 text-amber-700': interview.status !== 'complete'
-                    }">
-                    {{ interview.status === 'complete' ? 'Complete' : 'Upcoming' }}
-                  </span>
-                </td>
-              </tr>
-              <tr *ngIf="!paginatedInterviews || paginatedInterviews.length === 0" class="border-t border-gray-50">
-                <td colspan="5" class="py-4 px-4 text-center text-gray-400">No interviews scheduled</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="border-t border-gray-100">
-            <mat-paginator #interviewPaginator [length]="interviewDataSource.data.length" [pageSize]="5"
-              [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons (page)="updateInterviewPagination()">
-            </mat-paginator>
+      <div class="p-4 space-y-3">
+        <div *ngFor="let holiday of upcomingHolidays" class="flex items-center gap-3 bg-violet-900/5 rounded-xl p-3">
+          <div class="flex flex-col items-center justify-center bg-white rounded-lg border border-gray-100 w-12 h-12 shrink-0">
+            <span class="text-base font-bold text-[#052073]">{{ holiday.date | date:'d' }}</span>
+            <span class="text-[11px] text-gray-600 uppercase font-medium">{{ holiday.date | date:'MMM' }}</span>
           </div>
+          <div>
+            <p class="text-base font-semibold text-gray-800">{{ holiday.hName }}</p>
+            <p class="text-sm text-gray-600">{{ holiday.date | date:'EEEE' }}</p>
+          </div>
+        </div>
+        <div *ngIf="upcomingHolidays.length === 0" class="text-center text-gray-400 py-6 text-sm">
+          No upcoming holidays
         </div>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- ── Pending Leave Requests ── -->
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm" *ngIf="userRole !== 'ba'">
-      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-        <div class="flex items-center gap-3">
-          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-900/10 text-violet-900">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="9" y1="15" x2="15" y2="15"></line>
-              <line x1="9" y1="11" x2="13" y2="11"></line>
-            </svg>
-          </span>
-          <h6 class="text-sm font-semibold text-gray-900">Pending Leave Requests</h6>
-        </div>
-      </div>
+<div class="grid grid-cols-1 md:grid-cols-5 gap-5">
+      <div class="md:col-span-3">
+        <!-- ── Projects and Their Teams ── -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+          <div
+            class="flex items-center justify-between px-5 py-4 border-b border-gray-100 cursor-pointer"
+            (click)="projectsExpanded = !projectsExpanded"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-900/10 text-[#052073]"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </span>
+              <div>
+                <h6 class="text-base font-semibold text-gray-900">
+                  Projects and Their Teams
+                </h6>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+  <a
+    routerLink="/admin/projects/allProjects"
+    (click)="$event.stopPropagation()"
+    class="flex items-center gap-1 text-sm font-medium text-[#052073] hover:text-violet-700"
+  >
+    View All
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12h14M12 5l7 7-7 7"/>
+    </svg>
+  </a>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    class="h-4 w-4 text-gray-400 transition-transform"
+    [class.rotate-180]="!projectsExpanded"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M18 15l-6-6-6 6" />
+  </svg>
+</div>
+          </div>
 
-      <div class="p-4">
-        <ng-scrollbar track="all" visibility="hover">
-          <div class="overflow-x-auto rounded-xl border border-gray-100">
-            <table class="min-w-full text-sm">
-              <thead>
-                <tr class="bg-gray-50">
-                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Employee Name</th>
-                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Leave Type</th>
-                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Start Date</th>
-                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">End Date</th>
-                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Days</th>
-                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Reason</th>
-                  <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let leave of pendingLeaves"
-                  class="border-t border-gray-50 hover:bg-violet-900/5 transition-colors">
-                  <td class="py-2.5 px-4 text-gray-700 whitespace-nowrap">{{ leave.employee_name }}</td>
-                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ leave.leave_type }}</td>
-                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ leave.start_date | date:'mediumDate' }}</td>
-                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ leave.end_date | date:'mediumDate' }}</td>
-                  <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ leave.total_days }}</td>
-                  <td class="py-2.5 px-4 min-w-[400px] max-w-[500px] break-words whitespace-normal text-gray-500">
-                    {{ leave.reason }}
-                  </td>
-                  <td class="py-2.5 px-4">
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" [ngClass]="{
-                      'bg-amber-50 text-amber-700': leave.status === 'Pending',
-                      'bg-emerald-50 text-emerald-700': leave.status === 'Approved',
-                      'bg-red-50 text-red-700': leave.status === 'Rejected'
-                    }">
-                      {{ leave.status }}
+          <div *ngIf="projectsExpanded" class="p-4">
+ <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch min-h-[230px]">
+  <div *ngFor="let project of allProjectsWithTeams" class="rounded-xl border border-gray-100 overflow-hidden flex flex-col">
+                <div
+                  class="flex items-center justify-between px-4 py-3 bg-violet-900/5"
+                >
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="flex h-8 w-8 items-center justify-center rounded-md bg-[#052073] text-white"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-3.5 w-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+                        />
+                      </svg>
                     </span>
-                  </td>
-                </tr>
+                    <h4 class="text-sm font-semibold text-gray-900">
+                      {{ project.projectTitle }}
+                    </h4>
+                  </div>
+                  <span
+                    class="bg-white border border-gray-200 text-gray-600 text-xs font-medium px-2.5 py-1 rounded-full"
+                  >
+                    {{ project.team.length }} Member{{
+                      project.team.length === 1 ? "" : "s"
+                    }}
+                  </span>
+                </div>
 
-                <tr *ngIf="!pendingLeaves || pendingLeaves.length === 0" class="border-t border-gray-50">
-                  <td colspan="7" class="py-4 px-4 text-center text-gray-400">No pending leave requests</td>
-                </tr>
-              </tbody>
-            </table>
-            <div class="border-t border-gray-100">
-              <mat-paginator #leavePaginator [length]="pendingLeaves.length" [pageSize]="5"
-                [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons (page)="updateLeavePagination()">
-              </mat-paginator>
+                <div
+                  class="px-4 py-3 space-y-1.5 border-b border-gray-100"
+                  *ngIf="project.team.length > 0"
+                >
+                  <div class="flex items-center gap-2 text-sm text-gray-500">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-3.5 w-3.5 text-[#052073]"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
+                      ></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                    </svg>
+                    {{ project.team[0].department }}
+                  </div>
+                  <div class="flex items-center gap-2 text-sm text-gray-500">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-3.5 w-3.5 text-[#052073]"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                      ></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    {{ project.team[0].address }}
+                  </div>
+                </div>
+
+                               <div class="divide-y divide-gray-50 flex-1">
+                  <div
+                    *ngFor="let member of project.team"
+                    class="flex items-center gap-2.5 px-4 py-3"
+                  >
+                    <span
+                      class="flex h-10 w-10 items-center justify-center rounded-full bg-violet-100 text-[#052073] text-xs font-semibold"
+                    >
+                      {{ getInitials(member.fullName) }}
+                    </span>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-800">
+                        {{ member.fullName }}
+                      </p>
+                      <p class="text-[14px] text-gray-400">
+                        {{ member.email }}
+                      </p>
+                    </div>
+                  </div>
+                  <div *ngIf="!project.team || project.team.length === 0" class="px-4 py-3 text-xs text-gray-400 text-center">
+                    No team members
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="allProjectsWithTeams.length === 0" class="text-center text-gray-400 py-6 text-sm">
+              No projects available
             </div>
           </div>
-        </ng-scrollbar>
-      </div>
-    </div>
-
-    <!-- ── Projects and Their Teams ── -->
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-        <div class="flex items-center gap-3">
-          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-900/10 text-violet-900">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 7h-9"></path>
-              <path d="M14 17H5"></path>
-              <circle cx="17" cy="17" r="3"></circle>
-              <circle cx="7" cy="7" r="3"></circle>
-            </svg>
-          </span>
-          <h6 class="text-sm font-semibold text-gray-900">Projects and Their Teams</h6>
         </div>
       </div>
 
-      <div class="p-4">
-        <ng-scrollbar class="h-[280px]" track="all" visibility="hover">
-          <div class="space-y-5 px-1">
-            <div *ngFor="let project of allProjectsWithTeams">
-              <div class="flex justify-between items-center mb-2">
-                <h6 class="font-medium text-sm text-gray-900">{{ project.projectTitle }}</h6>
-                <span class="bg-violet-900/10 text-violet-900 text-xs font-medium px-2.5 py-1 rounded-full">
-                  {{ project.team.length }} Team Members
-                </span>
-              </div>
-              <div class="overflow-x-auto rounded-xl border border-gray-100">
-                <table class="min-w-full text-sm">
-                  <thead>
-                    <tr class="bg-gray-50">
-                      <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Full Name</th>
-                      <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Email</th>
-                      <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Mobile</th>
-                      <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Department</th>
-                      <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Gender</th>
-                      <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Address</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let member of project.team"
-                      class="border-t border-gray-50 hover:bg-violet-900/5 transition-colors">
-                      <td class="py-2.5 px-4 text-gray-700 whitespace-nowrap">{{ member.fullName }}</td>
-                      <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ member.email }}</td>
-                      <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ member.mobile }}</td>
-                      <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ member.department }}</td>
-                      <td class="py-2.5 px-4 text-gray-500 whitespace-nowrap">{{ member.gender }}</td>
-                      <td class="py-2.5 px-4 min-w-[400px] max-w-[500px] break-words whitespace-normal text-gray-500">
-                        {{ member.address }}
-                      </td>
-                    </tr>
-                    <tr *ngIf="!project.team || project.team.length === 0" class="border-t border-gray-50">
-                      <td colspan="6" class="py-4 px-4 text-center text-gray-400">No team members</td>
-                    </tr>
-                  </tbody>
-                </table>
+      <div class="md:col-span-2">
+        <!-- ── Employee Daily Update ── -->
+        <div
+          class="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col"
+        >
+          <div
+            class="flex items-center justify-between px-5 py-4 border-b border-gray-100"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-900/10 text-[#052073]"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                  ></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="9" y1="15" x2="15" y2="15"></line>
+                  <line x1="9" y1="11" x2="13" y2="11"></line>
+                </svg>
+              </span>
+              <div>
+                <h6 class="text-base font-semibold text-gray-900">
+                  Employee Daily Update
+                </h6>
               </div>
             </div>
+            <a
+              *ngIf="employeeUpdates.length > 0"
+              routerLink="/admin/daily-update"
+              class="text-gray-300 hover:text-violet-600"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </a>
           </div>
-        </ng-scrollbar>
-      </div>
-    </div>
 
-    <!-- ── Employee Daily Update ── -->
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-        <div class="flex items-center gap-3">
-          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-900/10 text-violet-900">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="20" x2="18" y2="10"></line>
-              <line x1="12" y1="20" x2="12" y2="4"></line>
-              <line x1="6" y1="20" x2="6" y2="14"></line>
-            </svg>
-          </span>
-          <h6 class="text-sm font-semibold text-gray-900">Employee Daily Update</h6>
+          <div
+            *ngIf="employeeUpdates.length > 0"
+            class="p-4 flex justify-center items-center flex-1"
+          >
+            <apx-chart
+              [series]="chartSeries"
+              [chart]="chartOptions"
+              [xaxis]="xaxis"
+              [yaxis]="yaxis"
+              [dataLabels]="dataLabels"
+              [stroke]="stroke"
+              [tooltip]="tooltip"
+              [legend]="legend"
+              class="min-h-[280px] w-full text-[black]"
+            ></apx-chart>
+          </div>
+
+          <div
+            *ngIf="employeeUpdates.length === 0"
+            class="flex flex-col items-center justify-center flex-1 px-6 py-10 text-center"
+          >
+            <span
+              class="flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-50 text-[#052073]/50 mb-4"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                ></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="9" y1="13" x2="15" y2="13"></line>
+                <line x1="9" y1="17" x2="15" y2="17"></line>
+              </svg>
+            </span>
+            <p class="text-sm font-semibold text-gray-700">
+              No employee updates yet
+            </p>
+            <p class="text-xs text-gray-400 mt-1 mb-5">
+              Employee daily updates will appear here once they are submitted.
+            </p>
+            <a
+              routerLink="/admin/daily-update"
+              class="inline-flex items-center gap-2 bg-[#052073] hover:bg-violet-800 text-white text-xs font-semibold px-4 py-2.5 rounded-full transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-3.5 w-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+              Ask Your Team to Update
+            </a>
+          </div>
         </div>
-      </div>
-      <div class="p-4 flex justify-center items-center">
-        <apx-chart [series]="chartSeries" [chart]="chartOptions" [xaxis]="xaxis" [yaxis]="yaxis"
-          [dataLabels]="dataLabels" [stroke]="stroke" [tooltip]="tooltip" [legend]="legend"
-          class="min-h-[350px] w-full text-[black]"></apx-chart>
       </div>
     </div>
 
@@ -482,21 +1242,43 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
       <!-- Project Status Summary Card -->
       <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div
+          class="flex items-center justify-between px-5 py-4 border-b border-gray-100"
+        >
           <div class="flex items-center gap-3">
-            <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-900/10 text-violet-900">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <span
+              class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-900/10 text-violet-900"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
                 <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
               </svg>
             </span>
-            <h6 class="text-sm font-semibold text-gray-900">Project Status Summary</h6>
+            <h6 class="text-sm font-semibold text-gray-900">
+              Project Status Summary
+            </h6>
           </div>
         </div>
         <div class="p-4 flex justify-center items-center">
-          <apx-chart [series]="projectStatusSeries" [chart]="projectStatusChart" [labels]="projectStatusLabels"
-            [colors]="projectStatusColors" [legend]="projectStatusLegend" [dataLabels]="projectStatusDataLabels"
-            [tooltip]="projectStatusTooltip" class="w-full min-h-[300px] text-[black]"></apx-chart>
+          <apx-chart
+            [series]="projectStatusSeries"
+            [chart]="projectStatusChart"
+            [labels]="projectStatusLabels"
+            [colors]="projectStatusColors"
+            [legend]="projectStatusLegend"
+            [dataLabels]="projectStatusDataLabels"
+            [tooltip]="projectStatusTooltip"
+            class="w-full min-h-[300px] text-[black]"
+          ></apx-chart>
         </div>
       </div>
 
@@ -515,6 +1297,5 @@
         </div>
       </div> -->
     </div>
-
   </div>
 </section>
