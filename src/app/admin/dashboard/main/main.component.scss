@@ -15,4 +15,16 @@ table.mat-table {
     overflow: hidden;
     max-width: 200px;
 }
+.kpi-hero {
+  background: #4c1d95 !important;
+
+  * {
+    color: #ffffff;
+  }
+
+  .kpi-hero-icon,
+  .kpi-hero-icon * {
+    color: #4c1d95 !important;
+  }
+}
 
