@@ -88,13 +88,13 @@
                     </mat-icon>
                   </td>
                   <td>
-                    <span class="text-gray-800" [ngClass]="{ 'line-through text-gray-400': task.done }">{{ task.title
+                    <span class="text-black" [ngClass]="{ 'line-through text-gray-400': task.done }">{{ task.title
                       }}</span>
                   </td>
-                  <td>
+                  <td class="text-black">
                     {{ getProjectDisplay(task) }}
                   </td>
-                  <td>{{ getemployeeName(task.employee_id) }}</td>
+                  <td class="text-black">{{ getemployeeName(task.employee_id) }}</td>
                   <td>
                     <span class="inline-flex items-center gap-1" [ngClass]="{
                   'text-green-600': task.priority === 'Low',
@@ -109,7 +109,7 @@
                       {{ task.priority }}
                     </span>
                   </td>
-                  <td>{{ task.due_date | date }}</td>
+                  <td class="text-black">{{ task.due_date | date }}</td>
                   <td class="text-center">
                     <button mat-icon-button color="primary" (click)="editTask(task)">
                       <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'"></app-feather-icons>

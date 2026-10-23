@@ -21,32 +21,7 @@
     <div class="p-6 md:p-8">
       <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="space-y-8">
 
-        <!-- ── Section: Bank Details ── -->
-        <div>
-          <div class="flex items-center gap-2 mb-4">
-            <span class="w-1 h-5 bg-gray-400 rounded-full inline-block"></span>
-            <h3 class="text-sm font-bold text-[#00383F] uppercase tracking-wider">Bank Details</h3>
-          </div>
-          <!-- OLD: BDE Account ID & BDE Email Account (not in admin, added fresh here) -->
-          <!-- NEW CODE: Bank details — Bank Name, Account Number, IFSC Code -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Bank Name</mat-label>
-              <input matInput formControlName="bankName" placeholder="e.g. HDFC, SBI, ICICI" />
-              <mat-icon matSuffix class="text-gray-400">account_balance</mat-icon>
-            </mat-form-field>
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Bank Account Number</mat-label>
-              <input matInput formControlName="bankAccountNumber" placeholder="Enter account number" />
-              <mat-icon matSuffix class="text-gray-400">credit_card</mat-icon>
-            </mat-form-field>
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>IFSC Code</mat-label>
-              <input matInput formControlName="ifscCode" placeholder="e.g. HDFC0001234" style="text-transform:uppercase" />
-              <mat-icon matSuffix class="text-gray-400">tag</mat-icon>
-            </mat-form-field>
-          </div>
-        </div>
+        <!-- OLD: Section "Bank Details" (Bank Name, Account Number, IFSC Code) removed from admin add-client -->
 
         <!-- ── Section: Personal Information ── -->
         <div>

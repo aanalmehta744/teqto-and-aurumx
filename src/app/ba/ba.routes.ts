@@ -12,6 +12,10 @@ import { LeaveBalanceComponent } from '../employee/my-leaves/leave-balance/leave
 import { DashboardComponent } from '../employee/dashboard/dashboard.component';
 // ADDED: Holiday component (view-only) for BA
 import { AllHolidayComponent } from '../employee/holidays/all-holidays/all-holidays.component';
+// ADDED: Team view showing members of the BA's own project(s) instead of all employees
+import { MyTeamsComponent } from '../client/myteam/myteam.component';
+// ADDED: Daily Client Notes for BA (moved from BDE side)
+import { DailyNotesComponent } from '../client/daily-notes/daily-notes.component';
 
 export const BA_ROUTE: Route[] = [
   // CHANGED: Was loading admin dashboard routes ('../admin/dashboard/dashboard.routes').
@@ -43,6 +47,16 @@ export const BA_ROUTE: Route[] = [
     path: 'employees',
     loadChildren: () =>
       import('../admin/employees/employees.routes').then((m) => m.ADMIN_EMPLOYEE_ROUTE),
+  },
+  // ADDED: BA "Team" page — shows team members of the BA's own project(s), not all employees
+  {
+    path: 'myteam',
+    component: MyTeamsComponent,
+  },
+  // ADDED: Daily Client Notes for BA (moved from BDE side)
+  {
+    path: 'daily-notes',
+    component: DailyNotesComponent,
   },
   {
     path: 'projects',

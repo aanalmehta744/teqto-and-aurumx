@@ -25,7 +25,15 @@ export class MyTeamsComponent implements OnInit {
   }
 
   loadProjects() {
-    this.projectService.getProjectTeam().subscribe((projects: any[]) => {
+    // NEW CODE: A BA is a team MEMBER of projects (not the client owner), so use the
+    // membership-based source; BDE owns clients, so keep the client-ownership source.
+    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const isBA = String(user.department || '').trim().toLowerCase() === 'ba';
+    const source$ = isBA
+      ? this.projectService.getProjectTeamByMembership()
+      : this.projectService.getProjectTeam();
+
+    source$.subscribe((projects: any[]) => {
       // Group projects by client
       const grouped: any = {};
 

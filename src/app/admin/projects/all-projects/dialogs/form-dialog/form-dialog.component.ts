@@ -14,6 +14,7 @@ import { ProjectService } from '../../core/project.service';
 import Swal from 'sweetalert2';
 import { ClientsService } from 'app/admin/clients/all-clients/clients.service';
 import { EmployeesService } from 'app/admin/employees/allEmployees/employees.service';
+import { DepartmentsService, Department } from 'app/departments/departments.service';
 import { CommonModule } from '@angular/common';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -76,12 +77,28 @@ export class FormDialogComponent implements OnInit {
   editor: Editor = new Editor();
   clients: any[] = []; // Store clients from API
   employees: any[] = []; // Store employees from API
+  projects: any[] = []; // NEW CODE: existing projects, used to hide already-assigned clients
+  departments: Department[] = []; // NEW CODE: departments managed from admin/HR side
+
+  // NEW CODE: Clients not assigned to any OTHER project (current project's own client stays selectable)
+  get availableClients(): any[] {
+    const currentId = this.data?.project?.id;
+    const usedClientIds = new Set(
+      this.projects
+        .filter((p) => String(p.id) !== String(currentId))
+        .map((p) => p.client)
+        .filter((c) => c !== null && c !== undefined && c !== '')
+        .map((c) => String(c))
+    );
+    return this.clients.filter((c) => !usedClientIds.has(String(c.id)));
+  }
   constructor(
     private fb: FormBuilder,
     private projectService: ProjectService,
     private dialogRef: MatDialogRef<FormDialogComponent>,
     private clientsService: ClientsService,
     private employeesService: EmployeesService,
+    private departmentsService: DepartmentsService,
     @Inject(MAT_DIALOG_DATA) public data: any // Injecting data from the parent component
   ) { }
   toolbar: Toolbar = [
@@ -102,7 +119,13 @@ export class FormDialogComponent implements OnInit {
     // Initialize the form
     this.projectForm = this.fb.group({
       projectTitle: [this.data?.project?.projectTitle || '', Validators.required],
-      department: [this.data?.project?.department || '', Validators.required],
+      // NEW CODE: department is multi-select; parse existing comma-separated value into an array
+      department: [
+        this.data?.project?.department
+          ? String(this.data.project.department).split(',').map((d: string) => d.trim()).filter((d: string) => d)
+          : [],
+        Validators.required,
+      ],
       priority: [this.data?.project?.priority || '', Validators.required],
       client: [this.data?.project?.client || '', Validators.required],
       startDate: [this.formatDateDefault(this.data?.project?.startDate) || '', Validators.required],
@@ -118,7 +141,24 @@ export class FormDialogComponent implements OnInit {
     });
     this.getClients(); // Fetch clients from API
     this.getEmployees(); // Fetch employees from API
+    this.getProjects(); // NEW CODE: fetch existing projects to filter out used clients
+    this.getDepartments(); // NEW CODE: fetch admin/HR-managed departments
+  }
 
+  // NEW CODE: Fetch departments added from the admin/HR side
+  getDepartments(): void {
+    this.departmentsService.getAll().subscribe({
+      next: (data) => (this.departments = data || []),
+      error: (error) => console.error('Error fetching departments:', error),
+    });
+  }
+
+  // NEW CODE: Fetch existing projects so already-assigned clients can be hidden
+  getProjects(): void {
+    this.projectService.getAllProjects().subscribe({
+      next: (data) => (this.projects = data || []),
+      error: (error) => console.error('Error fetching projects:', error),
+    });
   }
 
   private formatDateDefault(dateString: string): string {
@@ -150,6 +190,10 @@ export class FormDialogComponent implements OnInit {
       // ✅ Convert team array to a comma-separated string
       if (Array.isArray(formData.team)) {
         formData.team = formData.team.join(',');
+      }
+      // NEW CODE: department is multi-select — store as comma-separated string
+      if (Array.isArray(formData.department)) {
+        formData.department = formData.department.join(',');
       }
       // ✅ Serialize description if ngx-editor writes a doc object
       if (formData.description && typeof formData.description !== 'string') {

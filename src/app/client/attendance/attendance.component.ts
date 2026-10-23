@@ -207,7 +207,8 @@ export class AttendancesComponent
         action: 'details',
       },
       direction: tempDirection,
-      height: '85%',
+      // Let the dialog size to its content instead of a fixed 85% height (removes empty space)
+      maxHeight: '85vh',
       width: '35%',
     });
   }

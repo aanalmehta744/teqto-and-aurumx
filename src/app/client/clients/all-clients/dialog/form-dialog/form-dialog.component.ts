@@ -98,10 +98,7 @@ export class FormDialogComponent implements OnInit {
 
       // OLD: bdeAccountId: [this.clients.bde_account_id || ''],
       // OLD: bdeAccountEmail: [this.clients.bde_account_email || ''],
-      // NEW CODE: Bank details replace BDE account fields
-      bankName: [this.clients.bank_name || ''],
-      bankAccountNumber: [this.clients.bank_account_number || ''],
-      ifscCode: [this.clients.ifsc_code || ''],
+      // OLD: Bank detail controls (bankName, bankAccountNumber, ifscCode) removed from BDE edit dialog
 
       id: [this.clients.id],
       fullName: [this.clients.fullName || '', [Validators.required]],

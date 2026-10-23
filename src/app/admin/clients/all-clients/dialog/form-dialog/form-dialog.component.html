@@ -91,26 +91,7 @@
         </mat-form-field>
       </div> -->
 
-      <!-- NEW CODE: Bank details — Bank Name, Account Number, IFSC Code -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Bank Name</mat-label>
-          <input matInput formControlName="bankName" placeholder="e.g. HDFC, SBI, ICICI" />
-          <mat-icon matSuffix class="text-gray-500">account_balance</mat-icon>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Bank Account Number</mat-label>
-          <input matInput formControlName="bankAccountNumber" placeholder="Enter account number" />
-          <mat-icon matSuffix class="text-gray-500">credit_card</mat-icon>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>IFSC Code</mat-label>
-          <input matInput formControlName="ifscCode" placeholder="e.g. HDFC0001234" style="text-transform:uppercase" />
-          <mat-icon matSuffix class="text-gray-500">tag</mat-icon>
-        </mat-form-field>
-      </div>
+      <!-- OLD: Bank details (Bank Name, Account Number, IFSC Code) removed from admin edit dialog -->
 
       <!-- Row: Full Name & Mobile -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

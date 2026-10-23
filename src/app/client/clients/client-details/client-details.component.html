@@ -34,19 +34,7 @@
                       <!-- OLD: BDE Account ID & BDE Email Account -->
                       <!-- <div class="flex"><dt class="w-40 font-medium text-[#0E264A]">BDE Account ID:</dt><dd class="text-[#7C6D84]">{{ client?.bde_account_id || 'N/A' }}</dd></div> -->
                       <!-- <div class="flex"><dt class="w-40 font-medium text-[#0E264A]">BDE Email Account:</dt><dd class="text-[#7C6D84]">{{ client?.bde_account_email || 'N/A' }}</dd></div> -->
-                      <!-- NEW CODE: Show bank details instead -->
-                      <div class="flex">
-                        <dt class="w-40 font-medium text-[#0E264A]">Bank Name:</dt>
-                        <dd class="text-[#7C6D84]">{{ client?.bank_name || 'N/A' }}</dd>
-                      </div>
-                      <div class="flex">
-                        <dt class="w-40 font-medium text-[#0E264A]">Account Number:</dt>
-                        <dd class="text-[#7C6D84]">{{ client?.bank_account_number || 'N/A' }}</dd>
-                      </div>
-                      <div class="flex">
-                        <dt class="w-40 font-medium text-[#0E264A]">IFSC Code:</dt>
-                        <dd class="text-[#7C6D84]">{{ client?.ifsc_code || 'N/A' }}</dd>
-                      </div>
+                      <!-- OLD: Bank details (Bank Name, Account Number, IFSC Code) removed from BDE client-details -->
                       <div class="flex">
                         <dt class="w-40 font-medium text-[#0E264A]">Mobile:</dt>
                         <dd class="text-[#7C6D84]">{{ client?.mobile || 'N/A' }}</dd>

@@ -29,30 +29,6 @@
           {{ notifCount > 9 ? '9+' : notifCount }}
         </span>
       </button>
-
-      <!-- Backdrop -->
-      <div *ngIf="showNotifPanel" class="fixed inset-0 z-40" (click)="showNotifPanel = false"></div>
-
-      <!-- Notification dropdown -->
-      <div *ngIf="showNotifPanel"
-        class="absolute right-0 top-12 w-80 bg-white shadow-2xl rounded-2xl z-50 border border-violet-100 overflow-hidden">
-        <div class="bg-gradient-to-r from-violet-600 to-violet-500 text-white px-4 py-3 flex justify-between items-center">
-          <span class="text-sm font-semibold">Notifications</span>
-          <button (click)="markAllRead()" class="text-xs text-violet-100 underline hover:text-white">Mark all read</button>
-        </div>
-        <div class="max-h-72 overflow-y-auto">
-          <div *ngFor="let n of notifications"
-            (click)="markRead(n)"
-            class="px-4 py-3 border-b border-gray-100 text-sm hover:bg-violet-50/50 cursor-pointer transition-colors"
-            [class.bg-violet-50]="!n.is_read">
-            <p class="text-gray-800 leading-snug">{{ n.message }}</p>
-            <p class="text-xs text-violet-400 mt-1">{{ n.created_at | date:'MMM d, y, h:mm a' }}</p>
-          </div>
-          <div *ngIf="notifications.length === 0" class="p-5 text-center text-gray-400 text-sm">
-            No new notifications
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Profile avatar button — opens dropdown -->
@@ -89,3 +65,31 @@
 
   </div>
 </nav>
+
+<!-- Notification panel rendered OUTSIDE <nav> so it is positioned against the viewport and
+     is not clipped / trapped by the header's backdrop-blur stacking context. -->
+<ng-container *ngIf="userRole === 'Admin' || userRole === 'Employee'">
+  <!-- Backdrop (click anywhere to close) -->
+  <div *ngIf="showNotifPanel" class="fixed inset-0 z-[998]" (click)="showNotifPanel = false"></div>
+
+  <!-- Dropdown -->
+  <div *ngIf="showNotifPanel" (click)="$event.stopPropagation()"
+    class="notif-panel fixed right-4 top-16 w-80 max-w-[calc(100vw-2rem)] bg-white shadow-2xl rounded-2xl z-[999] border border-violet-100 overflow-hidden">
+    <div class="bg-gradient-to-r from-violet-600 to-violet-500 text-white px-4 py-3 flex justify-between items-center">
+      <span class="text-sm font-semibold">Notifications</span>
+      <button (click)="markAllRead()" class="text-xs text-violet-100 underline hover:text-white">Mark all read</button>
+    </div>
+    <div class="max-h-72 overflow-y-auto">
+      <div *ngFor="let n of notifications"
+        (click)="markRead(n)"
+        class="px-4 py-3 border-b border-gray-100 text-sm hover:bg-violet-50/50 cursor-pointer transition-colors"
+        [class.bg-violet-50]="!n.is_read">
+        <p class="text-gray-800 leading-snug">{{ n.message }}</p>
+        <p class="text-xs text-violet-400 mt-1">{{ n.created_at | date:'MMM d, y, h:mm a' }}</p>
+      </div>
+      <div *ngIf="notifications.length === 0" class="p-5 text-center text-gray-400 text-sm">
+        No new notifications
+      </div>
+    </div>
+  </div>
+</ng-container>

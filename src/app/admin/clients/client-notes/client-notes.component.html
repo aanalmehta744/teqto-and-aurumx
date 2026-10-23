@@ -1,0 +1,78 @@
+<section class="p-4 md:p-6 bg-gray-50 min-h-screen">
+
+  <!-- Breadcrumb -->
+  <div class="mb-5">
+    <app-breadcrumb [title]="'Daily Client Notes'" [items]="['Clients']" [active_item]="'Daily Client Notes'"></app-breadcrumb>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+    <!-- Header + Filters -->
+    <div class="px-6 py-5 border-b border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div>
+        <h2 class="text-[#1B1B2F] text-lg font-semibold leading-tight">Daily Client Notes</h2>
+        <p class="text-gray-400 text-sm mt-0.5">All notes added by the BA team</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <input type="text" [(ngModel)]="filterSearch" (keyup.enter)="loadNotes()"
+          placeholder="Search client, BA or note…"
+          class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-200" />
+        <input type="date" [(ngModel)]="filterDate" (change)="loadNotes()"
+          class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-200" />
+        <button mat-raised-button class="!bg-[#d6d5ea] !shadow-none !text-[#00383F]" (click)="loadNotes()">Search</button>
+        <button mat-stroked-button class="!border-gray-200 !text-gray-500" (click)="clearFilters()">Clear</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead class="bg-gray-50 text-xs font-medium text-gray-400 uppercase tracking-wide">
+          <tr>
+            <th class="px-4 py-3 whitespace-nowrap">Date</th>
+            <th class="px-4 py-3 whitespace-nowrap">Client</th>
+            <th class="px-4 py-3 whitespace-nowrap">Added By (BA)</th>
+            <th class="px-4 py-3 whitespace-nowrap">Mood</th>
+            <th class="px-4 py-3">Note</th>
+            <th class="px-4 py-3">Next Action</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm">
+          <tr *ngFor="let n of paginatedNotes" class="border-b border-gray-50 hover:bg-gray-50/70">
+            <td class="px-4 py-3 whitespace-nowrap text-gray-600">{{ n.note_date | date: 'MMM d, y' }}</td>
+            <td class="px-4 py-3 whitespace-nowrap font-medium text-black">{{ n.client_name || '—' }}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ n.author_name || '—' }}</td>
+            <td class="px-4 py-3 whitespace-nowrap">
+              <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium"
+                [ngClass]="[moodFor(n.mood).bg, moodFor(n.mood).color]">
+                {{ moodFor(n.mood).icon }} {{ moodFor(n.mood).label }}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-gray-700 max-w-md">{{ n.note_text }}</td>
+            <td class="px-4 py-3 text-gray-500 max-w-xs">{{ n.next_action || '—' }}</td>
+          </tr>
+
+          <tr *ngIf="!loading && notes.length === 0">
+            <td colspan="6" class="px-4 py-10 text-center text-gray-400">No notes found.</td>
+          </tr>
+          <tr *ngIf="loading">
+            <td colspan="6" class="px-4 py-10 text-center text-gray-400">Loading…</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="notes.length > pageSize" class="flex items-center justify-center gap-1 py-4">
+      <button class="px-3 py-1.5 rounded-md text-sm border border-gray-200 disabled:opacity-40"
+        [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">Prev</button>
+      <button *ngFor="let p of pageNumbers" (click)="goToPage(p)"
+        class="px-3 py-1.5 rounded-md text-sm border"
+        [ngClass]="p === currentPage ? 'bg-[#00383F] text-white border-[#00383F]' : 'border-gray-200 text-gray-600'">
+        {{ p }}
+      </button>
+      <button class="px-3 py-1.5 rounded-md text-sm border border-gray-200 disabled:opacity-40"
+        [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">Next</button>
+    </div>
+  </div>
+</section>

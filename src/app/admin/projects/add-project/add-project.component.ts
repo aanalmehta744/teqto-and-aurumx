@@ -24,6 +24,7 @@ import Swal from 'sweetalert2';
 import { formatDate } from '@angular/common';
 import { ClientsService } from 'app/admin/clients/all-clients/clients.service';
 import { EmployeesService } from 'app/admin/employees/allEmployees/employees.service';
+import { DepartmentsService, Department } from 'app/departments/departments.service';
 import { CommonModule } from '@angular/common';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { MatChipInputEvent } from '@angular/material/chips';
@@ -105,6 +106,19 @@ export class AddprojectsComponent implements OnInit, OnDestroy {
   selectedFile!: File; // Change from string to File
   clients: any[] = []; // Store clients from API
   employees: any[] = []; // Store employees from API
+  projects: any[] = []; // NEW CODE: existing projects, used to hide already-assigned clients
+  departments: Department[] = []; // NEW CODE: departments managed from admin/HR side
+
+  // NEW CODE: Clients that are not yet assigned to any project
+  get availableClients(): any[] {
+    const usedClientIds = new Set(
+      this.projects
+        .map((p) => p.client)
+        .filter((c) => c !== null && c !== undefined && c !== '')
+        .map((c) => String(c))
+    );
+    return this.clients.filter((c) => !usedClientIds.has(String(c.id)));
+  }
 
   editor: Editor = new Editor(); // Ensure it is always initialized
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
@@ -130,12 +144,14 @@ export class AddprojectsComponent implements OnInit, OnDestroy {
     private projectService: ProjectService,
     private clientsService: ClientsService,
     private employeesService: EmployeesService,
+    private departmentsService: DepartmentsService,
     private router: Router
   ) {
     this.projectForm = this.fb.group({
       // projectID: ['', [Validators.required]],
       projectTitle: ['', [Validators.required]],
-      department: ['', [Validators.required]],
+      // NEW CODE: department holds an array (multiple selection)
+      department: [[], [Validators.required]],
       priority: ['', [Validators.required]],
       client: ['', [Validators.required]],
       // price: ['', [Validators.required]],
@@ -152,6 +168,24 @@ export class AddprojectsComponent implements OnInit, OnDestroy {
     this.editor = new Editor();
     this.getClients(); // Fetch clients from API
     this.getEmployees(); // Fetch employees from API
+    this.getProjects(); // NEW CODE: fetch existing projects to filter out used clients
+    this.getDepartments(); // NEW CODE: fetch admin/HR-managed departments
+  }
+
+  // NEW CODE: Fetch departments added from the admin/HR side
+  getDepartments(): void {
+    this.departmentsService.getAll().subscribe({
+      next: (data) => (this.departments = data || []),
+      error: (error) => console.error('Error fetching departments:', error),
+    });
+  }
+
+  // NEW CODE: Fetch existing projects so already-assigned clients can be hidden
+  getProjects(): void {
+    this.projectService.getAllProjects().subscribe({
+      next: (data) => (this.projects = data || []),
+      error: (error) => console.error('Error fetching projects:', error),
+    });
   }
 
   // Fetch employee list from backend
@@ -206,6 +240,11 @@ export class AddprojectsComponent implements OnInit, OnDestroy {
 
     if (Array.isArray(formData.team)) {
       formData.team = formData.team.join(',');
+    }
+
+    // NEW CODE: department is multi-select — store as comma-separated string
+    if (Array.isArray(formData.department)) {
+      formData.department = formData.department.join(',');
     }
 
     if (formData.description && typeof formData.description !== 'string') {

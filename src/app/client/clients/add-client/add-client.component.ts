@@ -66,6 +66,8 @@ export class AddClientComponent {
   showConnectSource = false;
   // NEW CODE: Controls visibility of platform ID/password fields when checkbox is ticked
   showPlatformFields = false;
+  // NEW CODE: Toggles the platform password visibility (eye icon)
+  hidePlatformPassword = true;
 
   // countries = [
   //   { name: 'India', flag: '🇮🇳', dialCode: '+91' },
@@ -87,22 +89,20 @@ export class AddClientComponent {
     this.clientForm = this.fb.group({
       // OLD: bdeAccountId: [''],
       // OLD: bdeAccountEmail: [''],
-      // NEW CODE: Bank details replace BDE account fields
-      bankName: [''],
-      bankAccountNumber: [''],
-      ifscCode: [''],
+      // OLD: Bank details (bankName, bankAccountNumber, ifscCode) removed from BDA add-client
       fullName: ['', [Validators.required]],
-      mobile: ['', [
-        Validators.required,
-        Validators.pattern('^[0-9]{10}$')
-      ]],
-      email: ['', [Validators.required, Validators.email]],
+      // NEW CODE: Mobile is now optional (no longer required); pattern still validated when provided
+      mobile: ['', [Validators.pattern('^[0-9]{10}$')]],
+      // NEW CODE: Email is now optional (no longer required); format still validated when provided
+      email: ['', [Validators.email]],
       linkedinId: [''],
       websiteLink: [''],
       clientNote: [''],
       country: ['', [Validators.required]],
       prizeTag: ['', [Validators.required]],
       prizeAmount: [''],
+      // NEW CODE: Hours per day — shown/required only when Price Tag = Hourly
+      hoursPerDay: [''],
       clientType: ['', [Validators.required]],
       clientConnectType: ['', [Validators.required]],
       date: ['', [Validators.required]],
@@ -185,6 +185,21 @@ export class AddClientComponent {
       this.clientForm.get('prizeAmount')?.setValue('');
     }
     this.clientForm.get('prizeAmount')?.updateValueAndValidity();
+
+    // NEW CODE: When "Hourly" is selected, require & show "how many hours per day"
+    const hoursCtrl = this.clientForm.get('hoursPerDay');
+    if (selectedTag === 'Hourly') {
+      hoursCtrl?.setValidators([
+        Validators.required,
+        Validators.pattern('^[0-9]*$'),
+        Validators.min(1),
+        Validators.max(24)
+      ]);
+    } else {
+      hoursCtrl?.clearValidators();
+      hoursCtrl?.setValue('');
+    }
+    hoursCtrl?.updateValueAndValidity();
   }
 
   onSubmit() {

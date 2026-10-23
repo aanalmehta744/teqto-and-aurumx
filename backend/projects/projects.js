@@ -384,6 +384,65 @@ router.get("/teambybde/:bdeId", async (req, res) => {
   }
 });
 
+// ✅ GET projects + team for a user who is a TEAM MEMBER (or creator) of the project.
+// Used by the BA "Team" page: a BA is added to a project's team (not the client owner),
+// so teambybde returns nothing — this finds projects where the BA belongs or that they created.
+router.get("/teambymember/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Step 1: Projects where this user is in the team OR created the project.
+    // LEFT JOIN so projects without a client are still returned.
+    const [projects] = await db.query(
+      `SELECT c.*, p.id AS projectId, p.projectTitle, p.client, p.team
+       FROM projects p
+       LEFT JOIN clients c ON p.client = c.id
+       WHERE FIND_IN_SET(?, p.team) > 0 OR p.created_by = ?`,
+      [userId, userId]
+    );
+    if (!projects.length) {
+      return res.json([]);
+    }
+
+    // Step 2: Expand team into employee details
+    const finalProjects = await Promise.all(
+      projects.map(async (project) => {
+        let teamIds = [];
+
+        // Try parsing JSON, else treat as CSV
+        try {
+          teamIds = JSON.parse(project.team);
+        } catch {
+          teamIds = project.team ? project.team.split(",") : [];
+        }
+
+        if (teamIds.length === 0) {
+          return { ...project, team: [] };
+        }
+
+        const [teamMembers] = await db.query(
+          `SELECT id, fullName, role, gender, department, dob, address, mobile, email
+           FROM employees
+           WHERE id IN (?)`,
+          [teamIds]
+        );
+
+        return {
+          ...project,
+          projectId: Number(project.projectId),
+          client: project.client ? Number(project.client) : null,
+          team: teamMembers
+        };
+      })
+    );
+
+    res.json(finalProjects);
+  } catch (error) {
+    console.error("Error fetching member projects/team:", error);
+    res.status(500).json({ error: "Failed to fetch member team data" });
+  }
+});
+
 // GET /api/projects/team-details
 router.get('/team-details', async (req, res) => {
   try {

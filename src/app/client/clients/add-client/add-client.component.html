@@ -36,36 +36,7 @@
           </div>
         </div>
 
-        <!-- ── Section: Bank Details ── -->
-        <div>
-          <div class="flex items-center gap-2 mb-4">
-            <span class="w-1 h-5 bg-gray-400 rounded-full inline-block"></span>
-            <h3 class="text-sm font-semibold text-[#1B1B2F] uppercase tracking-wide">Bank Details</h3>
-          </div>
-          <!-- OLD: BDE Account ID & BDE Email Account -->
-          <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <mat-form-field ...> BDE Account ID </mat-form-field>
-            <mat-form-field ...> BDE Email Account </mat-form-field>
-          </div> -->
-          <!-- NEW CODE: Bank details — Bank Name, Account Number, IFSC Code -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Bank Name</mat-label>
-              <input matInput formControlName="bankName" placeholder="e.g. HDFC, SBI, ICICI" />
-              <mat-icon matSuffix class="text-gray-400">account_balance</mat-icon>
-            </mat-form-field>
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Bank Account Number</mat-label>
-              <input matInput formControlName="bankAccountNumber" placeholder="Enter account number" />
-              <mat-icon matSuffix class="text-gray-400">credit_card</mat-icon>
-            </mat-form-field>
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>IFSC Code</mat-label>
-              <input matInput formControlName="ifscCode" placeholder="e.g. HDFC0001234" style="text-transform:uppercase" />
-              <mat-icon matSuffix class="text-gray-400">tag</mat-icon>
-            </mat-form-field>
-          </div>
-        </div>
+        <!-- OLD: Section "Bank Details" (Bank Name, Account Number, IFSC Code) removed from BDA add-client -->
 
         <!-- ── Section: Connection Details ── -->
         <div>
@@ -101,7 +72,7 @@
         <div>
           <div class="flex items-center gap-2 mb-4">
             <span class="w-1 h-5 bg-gray-400 rounded-full inline-block"></span>
-            <h3 class="text-sm font-semibold text-[#1B1B2F] uppercase tracking-wide">Personal Information</h3>
+            <h3 class="text-sm font-semibold text-[#1B1B2F] uppercase tracking-wide">Personal Information of Client</h3>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <mat-form-field class="w-full" appearance="outline">
@@ -145,7 +116,8 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <mat-form-field class="w-full" appearance="outline">
               <mat-label>Client's Email</mat-label>
-              <input matInput formControlName="email" required>
+              <!-- NEW CODE: Email is optional now (no 'required') -->
+              <input matInput formControlName="email">
               <mat-icon matSuffix class="text-gray-400">alternate_email</mat-icon>
               <mat-error *ngIf="clientForm.get('email')?.hasError('email')">
                 Enter a valid email address.
@@ -232,10 +204,28 @@
             </mat-form-field>
             <mat-form-field *ngIf="showPrizeInput" class="w-full" appearance="outline">
               <mat-label>Price Amount ({{ selectedPrizeTag }})</mat-label>
-              <input matInput formControlName="prizeAmount" type="number" required>
+              <!-- NEW CODE: For Hourly, show gray "Price per hour" placeholder/hint -->
+              <input matInput formControlName="prizeAmount" type="number" required
+                [placeholder]="selectedPrizeTag === 'Hourly' ? 'Price per hour' : ''">
               <mat-icon matSuffix class="text-gray-400">currency_rupee</mat-icon>
+              <mat-hint *ngIf="selectedPrizeTag === 'Hourly'" class="text-gray-400">Price per hour</mat-hint>
               <mat-error *ngIf="clientForm.get('prizeAmount')?.hasError('required')">
                 Price amount is required.
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- NEW CODE: "How many hours per day?" — appears only when Price Tag = Hourly -->
+          <div *ngIf="selectedPrizeTag === 'Hourly'" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <mat-form-field class="w-full" appearance="outline">
+              <mat-label>How many hours per day?</mat-label>
+              <input matInput formControlName="hoursPerDay" type="number" min="1" max="24" placeholder="e.g. 8" required>
+              <mat-icon matSuffix class="text-gray-400">schedule</mat-icon>
+              <mat-error *ngIf="clientForm.get('hoursPerDay')?.hasError('required')">
+                Please enter hours per day.
+              </mat-error>
+              <mat-error *ngIf="clientForm.get('hoursPerDay')?.hasError('min') || clientForm.get('hoursPerDay')?.hasError('max')">
+                Enter a value between 1 and 24.
               </mat-error>
             </mat-form-field>
           </div>
@@ -282,8 +272,15 @@
               </mat-form-field>
               <mat-form-field appearance="outline" class="w-full">
                 <mat-label>Platform Password</mat-label>
-                <input matInput formControlName="platformPassword" type="password" placeholder="Account password" />
-                <mat-icon matSuffix class="text-gray-400">lock</mat-icon>
+                <!-- NEW CODE: Eye icon toggles password visibility -->
+                <input matInput formControlName="platformPassword"
+                  [type]="hidePlatformPassword ? 'password' : 'text'" placeholder="Account password" />
+                <button type="button" mat-icon-button matSuffix
+                  (click)="hidePlatformPassword = !hidePlatformPassword"
+                  [attr.aria-label]="'Toggle password visibility'"
+                  [attr.aria-pressed]="!hidePlatformPassword">
+                  <mat-icon class="text-gray-400">{{ hidePlatformPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
               </mat-form-field>
             </div>
           </div>

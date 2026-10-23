@@ -15,6 +15,8 @@ import { environment } from 'environments/environment';
 })
 export class DailyNotesComponent implements OnInit {
   bdeId: number = 0;
+  // NEW CODE: A BA sees clients of projects they're on (team member/creator), not owned clients
+  isBA = false;
   stats = { total: 0, hot: 0, cold: 0, closed: 0, close_rate: 0 };
   clients: any[] = [];
 
@@ -86,19 +88,24 @@ export class DailyNotesComponent implements OnInit {
   ngOnInit() {
     const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.bdeId = user.id;
+    this.isBA = String(user.department || '').trim().toLowerCase() === 'ba';
     this.filterDate = this.datePipe.transform(new Date(), 'yyyy-MM-dd') || '';
     this.loadDashboard();
   }
 
   loadDashboard() {
-    const params: any = { bde_id: this.bdeId };
+    // NEW CODE: BA uses the member-based dashboard (clients of projects they're on);
+    // BDE keeps the ownership-based dashboard (clients they own).
+    const params: any = this.isBA ? { member_id: this.bdeId } : { bde_id: this.bdeId };
     if (this.filterStatus) params.status = this.filterStatus;
     if (this.filterSearch) params.search = this.filterSearch;
     if (this.filterDate) params.date = this.filterDate;
     if (this.filterTag) params.tag = this.filterTag;
 
+    const endpoint = this.isBA ? 'dashboard-by-member' : 'dashboard';
+
     this.currentPage = 1;
-    this.http.get<any>(`${environment.apiUrl}/client-daily-notes/dashboard`, { params })
+    this.http.get<any>(`${environment.apiUrl}/client-daily-notes/${endpoint}`, { params })
       .subscribe({ next: d => { this.stats = d.stats; this.clients = d.clients; }, error: () => {} });
   }
 

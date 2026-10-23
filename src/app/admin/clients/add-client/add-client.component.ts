@@ -65,10 +65,7 @@ export class AddClientComponent implements OnInit {
 
   constructor(private fb: UntypedFormBuilder, private clientService: ClientsService, private http: HttpClient) {
     this.clientForm = this.fb.group({
-      // NEW CODE: Bank details added to admin add-client form
-      bankName: [''],
-      bankAccountNumber: [''],
-      ifscCode: [''],
+      // OLD: Bank detail controls (bankName, bankAccountNumber, ifscCode) removed from admin add-client
       fullName: ['', [Validators.required]],
       mobile: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],

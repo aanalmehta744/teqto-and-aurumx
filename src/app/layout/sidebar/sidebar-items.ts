@@ -290,6 +290,20 @@ export const ROUTES: RouteInfo[] = [
         department: [],
         submenu: [],
       },
+      {
+        // Admin can view the daily client notes added by BAs
+        path: '/admin/clients/daily-notes',
+        title: 'Daily Client Notes',
+        iconType: '',
+        icon: '',
+        class: 'ml-menu',
+        groupTitle: false,
+        badge: '',
+        badgeClass: '',
+        role: ['Admin'],
+        department: [],
+        submenu: [],
+      },
     ],
   },
 
@@ -1237,20 +1251,6 @@ export const ROUTES: RouteInfo[] = [
     submenu: [],
   },
 
-  {
-    path: '/client/daily-notes',
-    title: 'Daily Client Notes',
-    iconType: 'feather',
-    icon: 'edit-3',
-    class: '',
-    groupTitle: false,
-    badge: '',
-    badgeClass: '',
-    role: ['Employee'],
-    department: ['BDE'],
-    submenu: [],
-  },
-
   // ============================================================
   // BA MODULES
   // role = Employee
@@ -1373,7 +1373,9 @@ export const ROUTES: RouteInfo[] = [
   },
 
   {
-    path: '/ba/employees/allEmployees',
+    // CHANGED: was '/ba/employees/allEmployees' (listed ALL employees).
+    // BA "Team" now shows members of the BA's own project(s) only.
+    path: '/ba/myteam',
     title: 'Team',
     iconType: 'feather',
     icon: 'users',
@@ -1391,6 +1393,21 @@ export const ROUTES: RouteInfo[] = [
     title: 'Daily Update',
     iconType: 'feather',
     icon: 'file-text',
+    class: '',
+    groupTitle: false,
+    badge: '',
+    badgeClass: '',
+    role: ['Employee'],
+    department: ['BA'],
+    submenu: [],
+  },
+
+  {
+    // MOVED: Daily Client Notes now appears right after Daily Update on the BA side.
+    path: '/ba/daily-notes',
+    title: 'Daily Client Notes',
+    iconType: 'feather',
+    icon: 'edit-3',
     class: '',
     groupTitle: false,
     badge: '',

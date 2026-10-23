@@ -56,8 +56,22 @@ export class MyProjectsService extends UnsubscribeOnDestroyAdapter {
     }
 
     const apiUrlWithUserId = `${this.API_URL}/teambybde/${currentUserId}`;
-    
+
     return this.httpClient.get<any[]>(apiUrlWithUserId); // Ensure this returns an observable
+  }
+
+  // NEW CODE: Team based on project membership (for BA — who is added to a project's team,
+  // not the client owner). Returns projects where the user belongs or which they created.
+  getProjectTeamByMembership(): Observable<any[]> {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const currentUserId = currentUser.id;
+
+    if (!currentUserId) {
+      console.error('No logged-in user found.');
+      return new Observable<any[]>();
+    }
+
+    return this.httpClient.get<any[]>(`${this.API_URL}/teambymember/${currentUserId}`);
   }
 
   addMyProjects(myProjects: MyProjects): void {

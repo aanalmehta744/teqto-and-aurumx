@@ -58,18 +58,14 @@ import { MatExpansionModule } from '@angular/material/expansion';
 export class AllclientComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   displayedColumns = [
     'bde_name',
-    // OLD: 'bde_account_id', 'bde_account_email',
-    // NEW CODE: Bank detail columns replace BDE account columns
-    'bank_name',
-    'bank_account_number',
+    // OLD: bank detail columns ('bank_name', 'bank_account_number') removed from admin all-clients
     'name',
     'email',
     'technology',
     'tag',
     'client_type',
     'client_Connect_Type',
-    'last_followup_date',
-    'last_followup_note',
+    // OLD: 'last_followup_date', 'last_followup_note' columns removed from admin all-clients
     'country',
     'mobile',
     'actions',
@@ -452,19 +448,14 @@ export class AllclientComponent extends UnsubscribeOnDestroyAdapter implements O
     // Prepare export data for that BDE only
     const exportData: Partial<TableElement>[] = bde.clients.map((x: any) => ({
       'BDE': x.bde_name,
-      // OLD: 'BDE Account Id': x.bde_account_id || '-', 'BDE Email Account': x.bde_account_email || '-',
-      // NEW CODE: Export bank details instead
-      'Bank Name': x.bank_name || '-',
-      'Bank Account Number': x.bank_account_number || '-',
-      'IFSC Code': x.ifsc_code || '-',
+      // OLD: Bank detail columns removed from admin export
       'Client Name': x.fullName,
       'Mobile': x.mobile,
       'Email': x.email,
       'Technology': x.technology || '-',
       'Client Type': x.client_type || '-',
       'client Connect Type': x.client_Connect_Type || '-',
-      'Last Followup Date': x.last_followup_date || '-',
-      'Last Followup Note': x.last_followup_note || '-',
+      // OLD: Last Followup Date/Note removed from admin export
       'Country': x.country,
       'Address': x.address || '-',
       'Linkedin': x.linkedin_id || '-',
@@ -490,19 +481,14 @@ export class AllclientComponent extends UnsubscribeOnDestroyAdapter implements O
     const exportData: Partial<TableElement>[] =
       this.dataSource.filteredData.map((x) => ({
         BDE: x.bde_name,
-        // OLD: bde_account_id: x.bde_account_id, bde_account_email: x.bde_account_email,
-        // NEW CODE: Export bank details instead
-        Bank_Name: x.bank_name,
-        Bank_Account_Number: x.bank_account_number,
-        IFSC_Code: x.ifsc_code,
+        // OLD: Bank detail columns removed from admin export
         Name: x.fullName,
         Mobile: x.mobile,
         Email: x.email,
         Technolog: x.technology,
         client_type: x.client_type,
         client_Connect_Type: x.client_Connect_Type,
-        last_followup_date: x.last_followup_date,
-        last_followup_note: x.last_followup_note,
+        // OLD: last_followup_date/note removed from admin export
         Country: x.country,
         Address: x.address,
         Linkedin: x.linkedin_id,
@@ -564,17 +550,12 @@ export class ExampleDataSource extends DataSource<Clients> {
           .filter((clients: Clients) => {
             const searchStr = (
               clients.name +
-              // OLD: clients.bde_account_id + clients.bde_account_email +
-              // NEW CODE: Search bank fields instead
-              (clients.bank_name || '') +
-              (clients.bank_account_number || '') +
+              // OLD: Bank fields removed from admin search
               clients.bde_name +
               clients.mobile +
               clients.email +
               clients.client_type +
               clients.client_Connect_Type +
-              clients.last_followup_date +
-              clients.last_followup_note +
               clients.country +
               clients.billing_method +
               clients.technology

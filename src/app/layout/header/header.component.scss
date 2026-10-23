@@ -1,6 +1,10 @@
 /* Header interaction polish. Existing header behavior and dropdown logic remain unchanged. */
 :host {
   display: block;
+  /* Keep the header (and its fixed notification panel) above the routed page content,
+     which gets its own stacking context via will-change/transform animations. */
+  position: relative;
+  z-index: 1000;
 }
 
 nav {
@@ -11,7 +15,7 @@ nav button:hover {
   transform: translateY(-1px);
 }
 
-.notification-container > div:last-child {
+.notif-panel {
   animation: header-panel-in 160ms ease-out both;
   transform-origin: top right;
 }
@@ -22,7 +26,7 @@ nav button:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  nav, nav button, .notification-container > div:last-child {
+  nav, nav button, .notif-panel {
     animation: none !important;
     transition: none !important;
   }

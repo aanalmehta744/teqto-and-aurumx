@@ -57,10 +57,7 @@ export class AllclientComponent
   extends UnsubscribeOnDestroyAdapter
   implements OnInit {
   displayedColumns = [
-    // OLD: 'bde_account_id', 'bde_account_email',
-    // NEW CODE: Bank detail columns replace BDE account columns
-    'bank_name',
-    'bank_account_number',
+    // OLD: bank detail columns ('bank_name', 'bank_account_number') removed from BDE all-clients
     'name',
     'email',
     'technology',
@@ -362,11 +359,7 @@ export class AllclientComponent
     const exportData: Partial<TableElement>[] =
       this.dataSource.filteredData.map((x) => ({
         Name: x.fullName,
-        // OLD: bde_account_id: x.bde_account_id, bde_account_email: x.bde_account_email,
-        // NEW CODE: Export bank details instead
-        Bank_Name: x.bank_name,
-        Bank_Account_Number: x.bank_account_number,
-        IFSC_Code: x.ifsc_code,
+        // OLD: Bank detail columns removed from BDE export
         Mobile: x.mobile,
         Email: x.email,
         Technolog: x.technology,
@@ -428,10 +421,7 @@ export class ExampleDataSource extends DataSource<Clients> {
           .filter((client: Clients) => {
             const searchStr = (
               (client.fullName || '') +
-              // OLD: (client.bde_account_id || '') + (client.bde_account_email || '') +
-              // NEW CODE: Search in bank fields instead
-              (client.bank_name || '') +
-              (client.bank_account_number || '') +
+              // OLD: Bank fields removed from BDE search
               (client.mobile || '') +
               (client.email || '') +
               (client.technology || '') +

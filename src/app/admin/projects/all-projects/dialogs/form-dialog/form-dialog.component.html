@@ -16,12 +16,9 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <mat-form-field class="w-full" appearance="outline">
         <mat-label>Department</mat-label>
-        <mat-select formControlName="department" required>
-          <mat-option value="Designing">Designing</mat-option>
-          <mat-option value="Development">Development</mat-option>
-          <mat-option value="Testing">Testing</mat-option>
-          <mat-option value="Marketing">Marketing</mat-option>
-          <mat-option value="Accounts">Accounts</mat-option>
+        <!-- NEW CODE: multiple departments can be selected; list comes from admin/HR-managed departments -->
+        <mat-select formControlName="department" multiple required>
+          <mat-option *ngFor="let dept of departments" [value]="dept.name">{{ dept.name }}</mat-option>
         </mat-select>
         @if (projectForm.get('department')?.hasError('required')) {
         <mat-error>Department is required</mat-error>
@@ -79,8 +76,9 @@
     <div>
       <mat-form-field class="w-full" appearance="outline">
         <mat-label>Select Client</mat-label>
+        <!-- NEW CODE: only clients not already assigned to another project are shown -->
         <mat-select formControlName="client">
-          <mat-option *ngFor="let client of clients" [value]="client.id">{{ client.fullName }}</mat-option>
+          <mat-option *ngFor="let client of availableClients" [value]="client.id">{{ client.fullName }}</mat-option>
         </mat-select>
       </mat-form-field>
     </div>
