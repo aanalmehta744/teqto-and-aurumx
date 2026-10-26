@@ -233,7 +233,7 @@
     </div>
 
     <!-- ── Today, Attendance, Interviews row ── -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       <!-- ── Today's Follow-ups by BDE ── -->
       <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
         <div
@@ -504,7 +504,7 @@
           </div>
 
           <!-- Attendance status legend -->
-          <div class="attendance-legend flex min-w-0 flex-col gap-4 ml-10">
+          <div class="attendance-legend flex min-w-0 flex-col gap-4">
             <div class="flex items-center justify-between gap-4">
               <span class="flex items-center gap-3 text-base text-slate-600">
                 <span
@@ -1139,11 +1139,11 @@
         </div>
       </div>
 
-    <div class="md:col-span-2">
-  <!-- BDE Leaderboard -->
-  <div
-    class="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col h-full"
-  >
+      <div class="md:col-span-2">
+        <!-- BDE Leaderboard -->
+        <div
+          class="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col h-full overflow-hidden"
+        >
           <div
             class="flex items-center justify-between px-5 py-4 border-b border-gray-100"
           >
@@ -1195,25 +1195,25 @@
             </a>
           </div>
 
-      <div
-  *ngIf="bdeLeaderboard.length > 0"
-  class="px-4 pt-4 pb-8 overflow-hidden flex-1 min-h-0"
->
-  <apx-chart
-    [series]="bdeLeaderboardSeries"
-    [chart]="bdeLeaderboardChart"
-    [xaxis]="bdeLeaderboardXAxis"
-    [yaxis]="bdeLeaderboardYAxis"
-    [dataLabels]="bdeLeaderboardDataLabels"
-    [colors]="bdeLeaderboardColors"
-    [plotOptions]="bdeLeaderboardPlotOptions"
-    [legend]="bdeLeaderboardLegendCfg"
-    [tooltip]="bdeLeaderboardTooltip"
-    class="block w-full"
-    [style.width.%]="100"
-    [style.height.px]="180"
-  ></apx-chart>
-</div>
+          <div
+            *ngIf="bdeLeaderboard.length > 0"
+            class="px-4 pt-4 pb-8 overflow-hidden flex-1 min-h-0"
+          >
+            <apx-chart
+              [series]="bdeLeaderboardSeries"
+              [chart]="bdeLeaderboardChart"
+              [xaxis]="bdeLeaderboardXAxis"
+              [yaxis]="bdeLeaderboardYAxis"
+              [dataLabels]="bdeLeaderboardDataLabels"
+              [colors]="bdeLeaderboardColors"
+              [plotOptions]="bdeLeaderboardPlotOptions"
+              [legend]="bdeLeaderboardLegendCfg"
+              [tooltip]="bdeLeaderboardTooltip"
+              class="block w-full"
+              [style.width.%]="100"
+              [style.height.px]="210"
+            ></apx-chart>
+          </div>
 
           <div
             *ngIf="bdeLeaderboard.length === 0"
