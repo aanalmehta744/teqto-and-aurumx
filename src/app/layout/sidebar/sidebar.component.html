@@ -91,7 +91,7 @@
               <a
                 (click)="navigateOrToggle(subItem)"
                 [routerLink]="!subItem.submenu?.length ? [subItem.path] : null"
-                class="flex items-center gap-2 px-3 py-2 rounded-full text-sm cursor-pointer transition-colors min-w-0 w-full"
+                class="flex items-center gap-2 px-3 py-2 rounded-full !text-sm cursor-pointer transition-colors min-w-0 w-full"
                 [ngClass]="
                   isRouteActive(subItem.path)
                     ? 'bg-[#052073]/10 text-[#052073] font-semibold'
@@ -124,7 +124,7 @@
                 <li *ngFor="let nestedItem of subItem.submenu" class="min-w-0">
                   <a
                     (click)="navigateSubmenu(nestedItem.path)"
-                    class="flex items-center px-3 py-2 rounded-full text-sm cursor-pointer transition-colors truncate"
+                    class="flex items-center px-3 py-2 rounded-full !text-sm cursor-pointer transition-colors truncate"
                     [ngClass]="
                       isRouteActive(nestedItem.path)
                         ? 'bg-[#052073]/10 text-[#052073] font-semibold'

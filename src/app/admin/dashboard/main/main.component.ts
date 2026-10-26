@@ -276,7 +276,7 @@ export class MainComponent implements OnInit {
   public bdeLeaderboardColors: string[] = [];
   public bdeLeaderboardChart: ApexChart = {
     type: 'bar',
-    height: 280,
+    height: '100%',
     toolbar: { show: false },
   };
   public bdeLeaderboardPlotOptions: ApexPlotOptions = {
@@ -304,6 +304,11 @@ export class MainComponent implements OnInit {
   public bdeLeaderboardYAxis: ApexYAxis = { show: false, min: 0, max: 100 };
   public bdeLeaderboardLegendCfg: ApexLegend = { show: false };
   public bdeLeaderboardTooltip: ApexTooltip = {
+    enabled: true,
+    shared: false,
+    intersect: true,
+    theme: 'light',
+    x: { show: true },
     y: { formatter: (val: number) => `${val}% achievement` },
   };
   public bdeLeaderboardChartWidth: number | null = null;

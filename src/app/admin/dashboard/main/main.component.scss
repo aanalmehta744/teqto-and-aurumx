@@ -81,4 +81,19 @@ table.mat-table {
   height: 14px !important;
 }
 
+/* BDE Leaderboard tooltip: white body, navy title with white text */
+::ng-deep .apexcharts-tooltip {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+  border: none !important;
+  box-shadow: 0 8px 24px rgba(5, 32, 115, 0.18) !important;
+}
+
+::ng-deep .apexcharts-tooltip-title {
+  background: #052073 !important;
+  color: #ffffff !important;
+  border-bottom: none !important;
+  font-weight: 600 !important;
+}
+
 

@@ -1104,18 +1104,18 @@
                 <div class="divide-y divide-gray-50 flex-1">
                   <div
                     *ngFor="let member of project.team"
-                    class="flex items-center gap-2.5 px-4 py-3"
+                    class="flex items-center gap-2.5 px-4 py-3 min-w-0"
                   >
                     <span
-                      class="flex h-10 w-10 items-center justify-center rounded-full bg-violet-100 text-[#052073] text-xs font-semibold"
+                      class="flex h-10 w-10 shrink-0 aspect-square items-center justify-center rounded-full bg-violet-100 text-[#052073] text-xs font-semibold"
                     >
                       {{ getInitials(member.fullName) }}
                     </span>
-                    <div>
-                      <p class="text-sm font-semibold text-gray-800">
+                    <div class="min-w-0">
+                      <p class="text-sm font-semibold text-gray-800 truncate">
                         {{ member.fullName }}
                       </p>
-                      <p class="text-[14px] text-gray-400">
+                      <p class="text-[14px] text-gray-400 truncate">
                         {{ member.email }}
                       </p>
                     </div>
@@ -1142,7 +1142,7 @@
       <div class="md:col-span-2">
         <!-- BDE Leaderboard -->
         <div
-          class="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col h-full overflow-hidden"
+          class="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col h-full overflow-visible"
         >
           <div
             class="flex items-center justify-between px-5 py-4 border-b border-gray-100"
@@ -1197,7 +1197,7 @@
 
           <div
             *ngIf="bdeLeaderboard.length > 0"
-            class="px-4 pt-4 pb-8 overflow-hidden flex-1 min-h-0"
+            class="px-4 pt-4 pb-4 overflow-visible flex-1 min-h-0 flex"
           >
             <apx-chart
               [series]="bdeLeaderboardSeries"
@@ -1209,9 +1209,8 @@
               [plotOptions]="bdeLeaderboardPlotOptions"
               [legend]="bdeLeaderboardLegendCfg"
               [tooltip]="bdeLeaderboardTooltip"
-              class="block w-full"
+              class="block w-full h-full"
               [style.width.%]="100"
-              [style.height.px]="210"
             ></apx-chart>
           </div>
 
