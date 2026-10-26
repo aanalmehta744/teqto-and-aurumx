@@ -122,6 +122,7 @@ router.get('/client-stats', async (req, res) => {
         COUNT(CASE WHEN c.client_type = 'Close' THEN 1 END) AS closed,
         COUNT(CASE WHEN c.client_type = 'Hot'   THEN 1 END) AS hot,
         COUNT(CASE WHEN c.client_type = 'Cold'  THEN 1 END) AS cold,
+        COUNT(CASE WHEN c.client_type = 'Completed' THEN 1 END) AS completed,
         COUNT(c.id) AS total
       FROM employees e
       LEFT JOIN clients c ON c.employee_id = e.id

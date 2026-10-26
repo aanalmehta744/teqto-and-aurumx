@@ -6,6 +6,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
+import { dateRangeValidator } from '@shared/validators/date-range.validator';
 import { MatButtonModule } from '@angular/material/button';
 import { FileUploadComponent } from '@shared/components/file-upload/file-upload.component';
 import { MatRadioModule } from '@angular/material/radio';
@@ -161,7 +162,7 @@ export class AddprojectsComponent implements OnInit, OnDestroy {
       status: ['', [Validators.required]],
       description: [''],
       tags: [[]],
-    });
+    }, { validators: dateRangeValidator('startDate', 'endDate') });
 
   }
   ngOnInit(): void {
@@ -223,10 +224,15 @@ export class AddprojectsComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (!this.projectForm.valid) {
+      this.projectForm.markAllAsTouched();
       Swal.fire({
         icon: 'warning',
-        title: 'Incomplete Form!',
-        text: 'Please fill in all required fields.',
+        title: this.projectForm.hasError('dateRangeInvalid')
+          ? 'Invalid Dates!'
+          : 'Incomplete Form!',
+        text: this.projectForm.hasError('dateRangeInvalid')
+          ? 'End date cannot be before the start date.'
+          : 'Please fill in all required fields.',
         confirmButtonColor: '#f39c12',
       });
       return;

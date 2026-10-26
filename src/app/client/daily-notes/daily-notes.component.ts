@@ -17,7 +17,7 @@ export class DailyNotesComponent implements OnInit {
   bdeId: number = 0;
   // NEW CODE: A BA sees clients of projects they're on (team member/creator), not owned clients
   isBA = false;
-  stats = { total: 0, hot: 0, cold: 0, closed: 0, close_rate: 0 };
+  stats = { total: 0, hot: 0, cold: 0, closed: 0, completed: 0, close_rate: 0 };
   clients: any[] = [];
 
   filterStatus = '';
@@ -206,8 +206,9 @@ export class DailyNotesComponent implements OnInit {
   }
 
   statusColor(type: string) {
-    return type === 'Close' ? 'bg-green-100 text-green-700'
-         : type === 'Hot'   ? 'bg-red-100 text-red-700'
+    return type === 'Close'     ? 'bg-green-100 text-green-700'
+         : type === 'Completed' ? 'bg-sky-100 text-sky-700'
+         : type === 'Hot'       ? 'bg-red-100 text-red-700'
          : 'bg-blue-100 text-blue-700';
   }
 }

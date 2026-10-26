@@ -48,7 +48,7 @@ import { HttpClient } from '@angular/common/http';
 export class AddClientComponent implements OnInit {
   clientForm: UntypedFormGroup;
   countryList: { name: string }[] = [];
-  clientTypes: string[] = ['Hot', 'Cold', 'Clause'];
+  clientTypes: string[] = ['Hot', 'Cold', 'Close', 'Completed'];
   prizeTags: string[] = ['Hourly', 'Monthly'];
   showPrizeInput: boolean = false;
   selectedPrizeTag: string = '';

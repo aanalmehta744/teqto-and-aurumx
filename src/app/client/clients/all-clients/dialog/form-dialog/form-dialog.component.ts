@@ -55,7 +55,7 @@ export class FormDialogComponent implements OnInit {
   showPrizeInput = false;
   countryList: { name: string }[] = [];
   clientConnectType: string[] = ['Call', 'Whatsapp', 'Email', 'Linkedin', 'Other'];
-  clientTypes: string[] = ['Hot', 'Cold', 'Close'];
+  clientTypes: string[] = ['Hot', 'Cold', 'Close', 'Completed'];
   prizeTags: string[] = ['Full Time', 'Part Time', 'Hourly', 'Project Based'];
 
   countries: { name: string, flag: string, dialCode: string }[] = [];
@@ -247,6 +247,14 @@ export class FormDialogComponent implements OnInit {
   submit(): void {
     if (this.clientForm.valid) {
       this.confirmAdd();
+    } else {
+      this.clientForm.markAllAsTouched();
+      Swal.fire({
+        icon: 'warning',
+        title: 'Incomplete Form!',
+        text: 'Please fill in all required fields.',
+        confirmButtonColor: '#f39c12',
+      });
     }
   }
 

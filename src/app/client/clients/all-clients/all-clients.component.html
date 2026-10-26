@@ -153,6 +153,7 @@
                 'bg-red-50 text-red-700': row.client_type === 'Hot',
                 'bg-violet-50 text-violet-700': row.client_type === 'Cold',
                 'bg-emerald-50 text-emerald-700': row.client_type === 'Close' || row.client_type === 'Clause',
+                'bg-sky-50 text-sky-700': row.client_type === 'Completed',
                 'bg-gray-100 text-gray-500': !row.client_type
               }" class="inline-block text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">
                 {{ row.client_type || '—' }}

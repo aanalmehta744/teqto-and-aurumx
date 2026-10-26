@@ -65,7 +65,7 @@
 
       <mat-form-field class="w-full" appearance="outline">
         <mat-label>Project End Date</mat-label>
-        <input matInput [matDatepicker]="picker1" formControlName="endDate" required>
+        <input matInput [matDatepicker]="picker1" [min]="projectForm.get('startDate')?.value" formControlName="endDate" required>
         <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
         <mat-datepicker #picker1></mat-datepicker>
         @if (projectForm.get('endDate')?.hasError('required')) {
@@ -73,6 +73,9 @@
         }
       </mat-form-field>
     </div>
+    @if (projectForm.hasError('dateRangeInvalid') && projectForm.get('endDate')?.touched) {
+    <p class="text-red-600 text-sm mb-3">End date cannot be before the start date.</p>
+    }
     <div>
       <mat-form-field class="w-full" appearance="outline">
         <mat-label>Select Client</mat-label>
@@ -118,7 +121,7 @@
 
     <!-- Submit -->
     <div class="flex gap-4">
-      <button class="primary" [disabled]="!projectForm.valid" mat-raised-button color="primary">Submit</button>
+      <button class="primary" type="submit" mat-raised-button color="primary">Submit</button>
       <button mat-raised-button color="warn" type="button" (click)="onNoClick()" tabindex="-1">Cancel</button>
     </div>
 

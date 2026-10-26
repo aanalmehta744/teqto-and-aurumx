@@ -133,14 +133,14 @@ export class AllclientComponent extends UnsubscribeOnDestroyAdapter implements O
     }
   }
 
-  activeClientType: 'All' | 'Cold' | 'Hot' | 'Close' = 'All';
+  activeClientType: 'All' | 'Cold' | 'Hot' | 'Close' | 'Completed' = 'All';
 
   // setClientType(type: 'All' | 'Cold' | 'Hot' | 'Close') {
   //   this.activeClientType = type;
   //   this.applyClientTypeFilter();
   // }
 
-  setClientType(type: 'All' | 'Cold' | 'Hot' | 'Close') {
+  setClientType(type: 'All' | 'Cold' | 'Hot' | 'Close' | 'Completed') {
     this.activeClientType = type;
 
     if (this.groupByBDE) {

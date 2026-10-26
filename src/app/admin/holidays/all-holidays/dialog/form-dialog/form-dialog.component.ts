@@ -76,7 +76,17 @@ export class FormDialogComponent {
   }
 
   submit() {
-    // Empty for now
+    if (this.holidayForm.valid) {
+      this.confirmAdd();
+    } else {
+      this.holidayForm.markAllAsTouched();
+      Swal.fire({
+        icon: 'warning',
+        title: 'Incomplete Form!',
+        text: 'Please fill in all required fields.',
+        confirmButtonColor: '#f39c12',
+      });
+    }
   }
 
   onNoClick(): void {

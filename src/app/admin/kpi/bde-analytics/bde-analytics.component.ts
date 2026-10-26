@@ -44,6 +44,7 @@ export class BdeAnalyticsComponent implements OnInit {
   totalClosed = 0;
   totalHot = 0;
   totalCold = 0;
+  totalCompleted = 0;
   totalClients = 0;
   topBde = '';
 
@@ -69,10 +70,11 @@ export class BdeAnalyticsComponent implements OnInit {
   }
 
   private computeSummary() {
-    this.totalClosed  = this.stats.reduce((s, r) => s + Number(r.closed), 0);
-    this.totalHot     = this.stats.reduce((s, r) => s + Number(r.hot), 0);
-    this.totalCold    = this.stats.reduce((s, r) => s + Number(r.cold), 0);
-    this.totalClients = this.stats.reduce((s, r) => s + Number(r.total), 0);
+    this.totalClosed    = this.stats.reduce((s, r) => s + Number(r.closed), 0);
+    this.totalHot       = this.stats.reduce((s, r) => s + Number(r.hot), 0);
+    this.totalCold      = this.stats.reduce((s, r) => s + Number(r.cold), 0);
+    this.totalCompleted = this.stats.reduce((s, r) => s + Number(r.completed || 0), 0);
+    this.totalClients   = this.stats.reduce((s, r) => s + Number(r.total), 0);
     const top = this.stats[0];
     this.topBde = top ? `${top.bde_name} (${top.closed} closed)` : '—';
   }
@@ -103,9 +105,10 @@ export class BdeAnalyticsComponent implements OnInit {
 
     this.breakdownChartOptions = {
       series: [
-        { name: 'Closed', data: this.stats.map(r => Number(r.closed)) },
-        { name: 'Hot',    data: this.stats.map(r => Number(r.hot)) },
-        { name: 'Cold',   data: this.stats.map(r => Number(r.cold)) },
+        { name: 'Closed',    data: this.stats.map(r => Number(r.closed)) },
+        { name: 'Completed', data: this.stats.map(r => Number(r.completed || 0)) },
+        { name: 'Hot',       data: this.stats.map(r => Number(r.hot)) },
+        { name: 'Cold',      data: this.stats.map(r => Number(r.cold)) },
       ],
       chart: { type: 'bar', height: 350, stacked: false, toolbar: { show: false } },
       plotOptions: { bar: { columnWidth: '55%', borderRadius: 3 } },
@@ -113,7 +116,7 @@ export class BdeAnalyticsComponent implements OnInit {
       xaxis: { categories: names, labels: { style: { colors: '#6b7280', fontSize: '12px' } } },
       yaxis: { labels: { style: { colors: '#6b7280' } } },
       grid: { borderColor: '#f3f4f6' },
-      colors: ['#059669', '#ef4444', '#a855f7'],
+      colors: ['#059669', '#0ea5e9', '#ef4444', '#a855f7'],
       legend: { position: 'top' },
       tooltip: { y: { formatter: (v: number) => `${v} clients` } },
       fill: { opacity: 1 },

@@ -15,6 +15,7 @@ router.get('/dashboard', async (req, res) => {
                 SUM(client_type = 'Hot')   AS hot,
                 SUM(client_type = 'Cold')  AS cold,
                 SUM(client_type = 'Close') AS closed,
+                SUM(client_type = 'Completed') AS completed,
                 ROUND(SUM(client_type = 'Close') * 100.0 / NULLIF(COUNT(*), 0), 1) AS close_rate
             FROM clients WHERE employee_id = ?
         `, [bde_id]);
@@ -72,7 +73,7 @@ router.get('/dashboard-by-member', async (req, res) => {
         const clientIds = projRows.map(r => r.client).filter(Boolean);
 
         if (clientIds.length === 0) {
-            return res.json({ stats: { total: 0, hot: 0, cold: 0, closed: 0, close_rate: 0 }, clients: [] });
+            return res.json({ stats: { total: 0, hot: 0, cold: 0, closed: 0, completed: 0, close_rate: 0 }, clients: [] });
         }
 
         // Stats over just those clients
@@ -82,6 +83,7 @@ router.get('/dashboard-by-member', async (req, res) => {
                 SUM(client_type = 'Hot')   AS hot,
                 SUM(client_type = 'Cold')  AS cold,
                 SUM(client_type = 'Close') AS closed,
+                SUM(client_type = 'Completed') AS completed,
                 ROUND(SUM(client_type = 'Close') * 100.0 / NULLIF(COUNT(*), 0), 1) AS close_rate
             FROM clients WHERE id IN (?)
         `, [clientIds]);

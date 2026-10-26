@@ -98,6 +98,11 @@
                 [class.text-gray-500]="activeClientType !== 'Close'" (click)="setClientType('Close')">
                 Closed
               </button>
+              <button class="px-4 py-1.5 text-sm font-medium transition-all rounded-full"
+                [class.bg-\[\#0b0b88\]]="activeClientType === 'Completed'" [class.text-black]="activeClientType === 'Completed'"
+                [class.text-gray-500]="activeClientType !== 'Completed'" (click)="setClientType('Completed')">
+                Completed
+              </button>
             </div>
           </div>
 
@@ -183,6 +188,7 @@
                 'bg-red-50 text-red-700': row.client_type === 'Hot',
                 'bg-violet-50 text-violet-700': row.client_type === 'Cold',
                 'bg-emerald-50 text-emerald-700': row.client_type === 'Close' || row.client_type === 'Clause',
+                'bg-sky-50 text-sky-700': row.client_type === 'Completed',
                 'bg-gray-100 text-gray-500': !row.client_type
               }" class="inline-block text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">
                 {{row.client_type || '—'}}
@@ -295,6 +301,11 @@
                   [class.text-gray-500]="activeClientType !== 'Close'" (click)="setClientType('Close')">
                   Closed
                 </button>
+                <button class="px-4 py-2 text-sm font-medium transition-all rounded-full"
+                  [class.bg-\[\#0b0b88\]]="activeClientType === 'Completed'" [class.text-black]="activeClientType === 'Completed'"
+                  [class.text-gray-500]="activeClientType !== 'Completed'" (click)="setClientType('Completed')">
+                  Completed
+                </button>
               </div>
             </div>
 
@@ -330,6 +341,7 @@
                       'bg-red-50 text-red-700': client.client_type === 'Hot',
                       'bg-violet-50 text-violet-700': client.client_type === 'Cold',
                       'bg-emerald-50 text-emerald-700': client.client_type === 'Close' || client.client_type === 'Clause',
+                      'bg-sky-50 text-sky-700': client.client_type === 'Completed',
                       'bg-gray-100 text-gray-500': !client.client_type
                     }" class="inline-block text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">
                       {{ client.client_type || '—' }}

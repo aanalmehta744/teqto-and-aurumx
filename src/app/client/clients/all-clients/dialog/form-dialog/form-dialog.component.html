@@ -322,8 +322,7 @@
 
       <!-- Action Buttons -->
       <div class="flex justify-end gap-4 pt-4">
-        <button mat-raised-button color="primary" [disabled]="!clientForm.valid" [mat-dialog-close]="1"
-          (click)="confirmAdd()">
+        <button type="button" mat-raised-button color="primary" (click)="submit()">
           Save
         </button>
         <button mat-raised-button color="warn" type="button" (click)="onNoClick()">

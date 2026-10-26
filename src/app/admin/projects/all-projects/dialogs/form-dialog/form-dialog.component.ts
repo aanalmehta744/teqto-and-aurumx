@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { dateRangeValidator } from '@shared/validators/date-range.validator';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -138,7 +139,7 @@ export class FormDialogComponent implements OnInit {
       ],
       status: [this.data?.project?.status],
       description: [this.data?.project?.description || ''],
-    });
+    }, { validators: dateRangeValidator('startDate', 'endDate') });
     this.getClients(); // Fetch clients from API
     this.getEmployees(); // Fetch employees from API
     this.getProjects(); // NEW CODE: fetch existing projects to filter out used clients
@@ -236,6 +237,18 @@ export class FormDialogComponent implements OnInit {
           }
         });
       }
+    } else {
+      this.projectForm.markAllAsTouched();
+      Swal.fire({
+        icon: 'warning',
+        title: this.projectForm.hasError('dateRangeInvalid')
+          ? 'Invalid Dates!'
+          : 'Incomplete Form!',
+        text: this.projectForm.hasError('dateRangeInvalid')
+          ? 'End date cannot be before the start date.'
+          : 'Please fill in all required fields.',
+        confirmButtonColor: '#f39c12',
+      });
     }
   }
 

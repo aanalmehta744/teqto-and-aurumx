@@ -169,6 +169,151 @@
       </div>
     </div>
 
+    <!-- ── Absent / Leave overview (admin) ── -->
+    <div
+      *ngIf="userRole !== 'ba'"
+      class="grid grid-cols-1 md:grid-cols-3 gap-5"
+    >
+      <!-- Absent Today -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div class="flex items-center gap-3">
+            <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-rose-50 text-rose-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <line x1="17" y1="8" x2="23" y2="14"></line>
+                <line x1="23" y1="8" x2="17" y2="14"></line>
+              </svg>
+            </span>
+            <div>
+              <h6 class="text-base font-semibold text-gray-900">Absent Today</h6>
+              <p class="text-xs text-gray-400">No attendance &amp; no approved leave</p>
+            </div>
+          </div>
+          <span class="bg-rose-50 text-rose-600 text-xs font-semibold px-2.5 py-1 rounded-full">
+            {{ absentEmployees.length }}
+          </span>
+        </div>
+        <div class="p-4 flex-1">
+          <div class="max-h-[208px] overflow-y-auto pr-1 nice-scroll">
+            <div
+              *ngFor="let emp of absentEmployees"
+              class="flex items-center gap-2.5 px-1 py-2"
+            >
+              <span class="flex h-9 w-9 shrink-0 aspect-square items-center justify-center rounded-full bg-rose-100 text-rose-700 text-xs font-semibold">
+                {{ getInitials(emp.fullName) }}
+              </span>
+              <div class="min-w-0">
+                <p class="text-sm font-semibold text-gray-800 truncate">{{ emp.fullName }}</p>
+                <p class="text-xs text-gray-400 truncate">{{ emp.department || '—' }}</p>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="absentEmployees.length === 0" class="text-center text-gray-400 py-8 text-sm">
+            Everyone is present or on approved leave 🎉
+          </div>
+        </div>
+      </div>
+
+      <!-- On Leave Today -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div class="flex items-center gap-3">
+            <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </span>
+            <div>
+              <h6 class="text-base font-semibold text-gray-900">On Leave Today</h6>
+              <p class="text-xs text-gray-400">Approved leave covering today</p>
+            </div>
+          </div>
+          <span class="bg-amber-50 text-amber-600 text-xs font-semibold px-2.5 py-1 rounded-full">
+            {{ onLeaveToday.length }}
+          </span>
+        </div>
+        <div class="p-4 flex-1">
+          <div class="max-h-[208px] overflow-y-auto pr-1 nice-scroll">
+            <div
+              *ngFor="let leave of onLeaveToday"
+              class="flex items-center justify-between gap-2 px-1 py-2"
+            >
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="flex h-9 w-9 shrink-0 aspect-square items-center justify-center rounded-full bg-amber-100 text-amber-700 text-xs font-semibold">
+                  {{ getInitials(leave.employee_name) }}
+                </span>
+                <div class="min-w-0">
+                  <p class="text-sm font-semibold text-gray-800 truncate">{{ leave.employee_name }}</p>
+                  <p class="text-xs text-gray-400 truncate">{{ leave.leave_type }}</p>
+                </div>
+              </div>
+              <span class="shrink-0 text-xs text-gray-500 whitespace-nowrap">
+                till {{ leave.end_date | date: 'MMM d' }}
+              </span>
+            </div>
+          </div>
+          <div *ngIf="onLeaveToday.length === 0" class="text-center text-gray-400 py-8 text-sm">
+            No one is on leave today
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Approved Leaves -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div class="flex items-center gap-3">
+            <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-900/10 text-[#052073]">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 2v4"></path>
+                <path d="M16 2v4"></path>
+                <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                <path d="M3 10h18"></path>
+                <path d="m9 16 2 2 4-4"></path>
+              </svg>
+            </span>
+            <div>
+              <h6 class="text-base font-semibold text-gray-900">Upcoming Leaves</h6>
+              <p class="text-xs text-gray-400">Approved, starting later</p>
+            </div>
+          </div>
+          <span class="bg-violet-900/10 text-[#052073] text-xs font-semibold px-2.5 py-1 rounded-full">
+            {{ upcomingLeaves.length }}
+          </span>
+        </div>
+        <div class="p-4 flex-1">
+          <div class="max-h-[208px] overflow-y-auto pr-1 nice-scroll">
+            <div
+              *ngFor="let leave of upcomingLeaves"
+              class="flex items-center justify-between gap-2 px-1 py-2"
+            >
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="flex h-9 w-9 shrink-0 aspect-square items-center justify-center rounded-full bg-violet-100 text-[#052073] text-xs font-semibold">
+                  {{ getInitials(leave.employee_name) }}
+                </span>
+                <div class="min-w-0">
+                  <p class="text-sm font-semibold text-gray-800 truncate">{{ leave.employee_name }}</p>
+                  <p class="text-xs text-gray-400 truncate">
+                    {{ leave.start_date | date: 'MMM d' }} – {{ leave.end_date | date: 'MMM d' }}
+                  </p>
+                </div>
+              </div>
+              <span class="shrink-0 text-xs font-medium text-[#052073] whitespace-nowrap">
+                {{ daysUntil(leave.start_date) === 1 ? 'Tomorrow' : 'in ' + daysUntil(leave.start_date) + ' days' }}
+              </span>
+            </div>
+          </div>
+          <div *ngIf="upcomingLeaves.length === 0" class="text-center text-gray-400 py-8 text-sm">
+            No upcoming approved leaves
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ── BA Leave Balance Card ── -->
     <div
       *ngIf="userRole === 'ba' && baLeaveBalance"
@@ -1119,6 +1264,13 @@
                         {{ member.email }}
                       </p>
                     </div>
+                    <span
+                      *ngIf="isAbsentToday(member.id)"
+                      class="ml-auto shrink-0 inline-flex items-center gap-1 bg-rose-50 text-rose-600 text-[11px] font-semibold px-2 py-0.5 rounded-full"
+                    >
+                      <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
+                      Absent
+                    </span>
                   </div>
                   <div
                     *ngIf="!project.team || project.team.length === 0"

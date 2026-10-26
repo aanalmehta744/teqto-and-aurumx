@@ -90,6 +90,13 @@ export class MainComponent implements OnInit {
   upcomingHolidays: any[] = [];
   projectsExpanded = true;
 
+  // ── Absent / Leave overview sections ──
+  activeEmployeesList: any[] = [];
+  approvedLeaves: any[] = [];
+  absentEmployees: any[] = [];
+  onLeaveToday: any[] = [];
+  upcomingLeaves: any[] = [];
+
   userRole: string = '';
   baLeaveBalance: any = null;
   private projectStatusMap: { [status: string]: string[] } = {};
@@ -323,6 +330,9 @@ export class MainComponent implements OnInit {
     this.loadInterviews();
     this.loadPendingLeaves();
     this.loadUpcomingHolidays();
+    if (this.userRole !== 'ba') {
+      this.loadActiveEmployees();
+    }
     this.loadBdeLeaderboard();
     this.loadBdePerformanceSummary();
     this.loadBdeKpiAchievement();
@@ -443,9 +453,108 @@ export class MainComponent implements OnInit {
         console.log('Leave request list', data);
         this.pendingLeaves = data.filter((leave) => leave.status === 'Pending');
         this.updateLeavePagination();
+        this.computeLeaveSections(data);
       },
       error: (err: any) => console.error('Error fetching pending leaves:', err),
     });
+  }
+
+  // Load active employees so we can compute who is absent today
+  loadActiveEmployees(): void {
+    this.http.get<any[]>(`${environment.apiUrl}/employees`).subscribe({
+      next: (data) => {
+        this.activeEmployeesList = (data || []).filter(
+          (e) => Number(e.status) === 1,
+        );
+        this.computeAbsentEmployees();
+      },
+      error: (err) => console.error('Error fetching employees:', err),
+    });
+  }
+
+  // Normalize any date value to local midnight for day-level comparisons
+  private atMidnight(value: any): Date | null {
+    if (!value) return null;
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return null;
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  // Split approved leaves into "on leave today" and "upcoming"
+  computeLeaveSections(allLeaves: any[]): void {
+    this.approvedLeaves = (allLeaves || []).filter(
+      (l) => l.status === 'Approved',
+    );
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    this.onLeaveToday = this.approvedLeaves.filter((l) => {
+      const start = this.atMidnight(l.start_date);
+      const end = this.atMidnight(l.end_date);
+      return !!start && !!end && start <= today && end >= today;
+    });
+
+    this.upcomingLeaves = this.approvedLeaves
+      .filter((l) => {
+        const start = this.atMidnight(l.start_date);
+        return !!start && start > today;
+      })
+      .sort(
+        (a, b) =>
+          new Date(a.start_date).getTime() - new Date(b.start_date).getTime(),
+      );
+
+    this.computeAbsentEmployees();
+  }
+
+  // Whole number of days from today until the given date (for "in N days")
+  daysUntil(value: any): number {
+    const target = this.atMidnight(value);
+    if (!target) return 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return Math.round(
+      (target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+    );
+  }
+
+  // Absent today = active employee who is neither present nor on approved leave today
+  computeAbsentEmployees(): void {
+    if (!this.activeEmployeesList.length) {
+      this.absentEmployees = [];
+      return;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // No unplanned absences expected on weekends
+    const day = today.getDay();
+    if (day === 0 || day === 6) {
+      this.absentEmployees = [];
+      return;
+    }
+
+    const presentIds = new Set(
+      this.todayAttendance
+        .filter((r) => r.status === 'Present' || r.status === 'Half Day')
+        .map((r) => Number(r.employee_id)),
+    );
+
+    const onLeaveIds = new Set(
+      this.onLeaveToday.map((l) => Number(l.employee_id)),
+    );
+
+    this.absentEmployees = this.activeEmployeesList.filter(
+      (e) => !presentIds.has(Number(e.id)) && !onLeaveIds.has(Number(e.id)),
+    );
+  }
+
+  // Is a given team member absent today? (used in Projects and Their Teams)
+  isAbsentToday(employeeId: number): boolean {
+    return this.absentEmployees.some((e) => Number(e.id) === Number(employeeId));
   }
 
   loadUpcomingHolidays(): void {
@@ -490,6 +599,7 @@ export class MainComponent implements OnInit {
         this.todayAttendance = data;
         this.updateAttendancePagination();
         this.computeAttendanceStatusCounts();
+        this.computeAbsentEmployees();
         console.log('Today Attendance:', this.todayAttendance);
       },
       error: (err) => {

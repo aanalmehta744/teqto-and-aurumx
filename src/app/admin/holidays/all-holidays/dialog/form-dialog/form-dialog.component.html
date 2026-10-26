@@ -45,7 +45,7 @@
 
       <!-- Action Buttons -->
       <div class="flex justify-end gap-3 pt-2">
-        <button mat-raised-button color="primary" [disabled]="!holidayForm.valid" [mat-dialog-close]="1" (click)="confirmAdd()">
+        <button type="button" mat-raised-button color="primary" (click)="submit()">
           Save
         </button>
         <button mat-raised-button color="warn" type="button" (click)="onNoClick()" tabindex="-1">

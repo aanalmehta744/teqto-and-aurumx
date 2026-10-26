@@ -320,6 +320,123 @@
       <mat-paginator #userAttendancePaginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons></mat-paginator>
     </div>
 
+    <!-- ── Absent / Leave overview (HR) ── -->
+    <div *ngIf="isHR" class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
+      <!-- Absent Today -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div class="flex items-center gap-3">
+            <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-rose-50 text-rose-600">
+              <i class="fas fa-user-slash"></i>
+            </span>
+            <div>
+              <h6 class="text-base font-semibold text-gray-900">Absent Today</h6>
+              <p class="text-xs text-gray-400">No attendance &amp; no approved leave</p>
+            </div>
+          </div>
+          <span class="bg-rose-50 text-rose-600 text-xs font-semibold px-2.5 py-1 rounded-full">
+            {{ absentEmployees.length }}
+          </span>
+        </div>
+        <div class="p-4 flex-1">
+          <div class="max-h-[208px] overflow-y-auto pr-1 nice-scroll">
+            <div *ngFor="let emp of absentEmployees" class="flex items-center gap-2.5 px-1 py-2">
+              <span class="flex h-9 w-9 shrink-0 aspect-square items-center justify-center rounded-full bg-rose-100 text-rose-700 text-xs font-semibold">
+                {{ getInitials(emp.fullName) }}
+              </span>
+              <div class="min-w-0">
+                <p class="text-sm font-semibold text-gray-800 truncate">{{ emp.fullName }}</p>
+                <p class="text-xs text-gray-400 truncate">{{ emp.department || '—' }}</p>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="absentEmployees.length === 0" class="text-center text-gray-400 py-8 text-sm">
+            Everyone is present or on approved leave 🎉
+          </div>
+        </div>
+      </div>
+
+      <!-- On Leave Today -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div class="flex items-center gap-3">
+            <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+              <i class="fas fa-plane-departure"></i>
+            </span>
+            <div>
+              <h6 class="text-base font-semibold text-gray-900">On Leave Today</h6>
+              <p class="text-xs text-gray-400">Approved leave covering today</p>
+            </div>
+          </div>
+          <span class="bg-amber-50 text-amber-600 text-xs font-semibold px-2.5 py-1 rounded-full">
+            {{ onLeaveTodayList.length }}
+          </span>
+        </div>
+        <div class="p-4 flex-1">
+          <div class="max-h-[208px] overflow-y-auto pr-1 nice-scroll">
+            <div *ngFor="let leave of onLeaveTodayList" class="flex items-center justify-between gap-2 px-1 py-2">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="flex h-9 w-9 shrink-0 aspect-square items-center justify-center rounded-full bg-amber-100 text-amber-700 text-xs font-semibold">
+                  {{ getInitials(leave.employee_name) }}
+                </span>
+                <div class="min-w-0">
+                  <p class="text-sm font-semibold text-gray-800 truncate">{{ leave.employee_name }}</p>
+                  <p class="text-xs text-gray-400 truncate">{{ leave.leave_type }}</p>
+                </div>
+              </div>
+              <span class="shrink-0 text-xs text-gray-500 whitespace-nowrap">
+                till {{ leave.end_date | date: 'MMM d' }}
+              </span>
+            </div>
+          </div>
+          <div *ngIf="onLeaveTodayList.length === 0" class="text-center text-gray-400 py-8 text-sm">
+            No one is on leave today
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Approved Leaves -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div class="flex items-center gap-3">
+            <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
+              <i class="fas fa-calendar-alt"></i>
+            </span>
+            <div>
+              <h6 class="text-base font-semibold text-gray-900">Upcoming Leaves</h6>
+              <p class="text-xs text-gray-400">Approved, starting later</p>
+            </div>
+          </div>
+          <span class="bg-violet-50 text-violet-600 text-xs font-semibold px-2.5 py-1 rounded-full">
+            {{ upcomingLeaves.length }}
+          </span>
+        </div>
+        <div class="p-4 flex-1">
+          <div class="max-h-[208px] overflow-y-auto pr-1 nice-scroll">
+            <div *ngFor="let leave of upcomingLeaves" class="flex items-center justify-between gap-2 px-1 py-2">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="flex h-9 w-9 shrink-0 aspect-square items-center justify-center rounded-full bg-violet-100 text-violet-700 text-xs font-semibold">
+                  {{ getInitials(leave.employee_name) }}
+                </span>
+                <div class="min-w-0">
+                  <p class="text-sm font-semibold text-gray-800 truncate">{{ leave.employee_name }}</p>
+                  <p class="text-xs text-gray-400 truncate">
+                    {{ leave.start_date | date: 'MMM d' }} – {{ leave.end_date | date: 'MMM d' }}
+                  </p>
+                </div>
+              </div>
+              <span class="shrink-0 text-xs font-medium text-violet-600 whitespace-nowrap">
+                {{ daysUntil(leave.start_date) === 1 ? 'Tomorrow' : 'in ' + daysUntil(leave.start_date) + ' days' }}
+              </span>
+            </div>
+          </div>
+          <div *ngIf="upcomingLeaves.length === 0" class="text-center text-gray-400 py-8 text-sm">
+            No upcoming approved leaves
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Attendance Table (HR View) -->
     <div class="panel mt-6" *ngIf="isHR">
       <div class="panel-header">

@@ -53,7 +53,7 @@ export class AddClientComponent {
   bdeEmail: string = '';
 
   clientConnectType: string[] = ['Call', 'Whatsapp', 'Email', 'Linkedin', 'Other'];
-  clientTypes: string[] = ['Cold', 'Hot', 'Close'];
+  clientTypes: string[] = ['Cold', 'Hot', 'Close', 'Completed'];
   prizeTags: string[] = ['Full Time', 'Part Time', 'Hourly', 'Project Based'];
   showPrizeInput: boolean = false;
   selectedPrizeTag: string = '';

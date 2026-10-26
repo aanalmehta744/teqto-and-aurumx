@@ -155,7 +155,17 @@ export class FormDialogComponent implements OnInit {
   }
 
   submit() {
-    // emppty stuff
+    if (this.employeesForm.valid) {
+      this.confirmAdd();
+    } else {
+      this.employeesForm.markAllAsTouched();
+      Swal.fire({
+        icon: 'warning',
+        title: 'Incomplete Form!',
+        text: 'Please fill in all required fields.',
+        confirmButtonColor: '#f39c12',
+      });
+    }
   }
   onNoClick(): void {
     this.dialogRef.close();
