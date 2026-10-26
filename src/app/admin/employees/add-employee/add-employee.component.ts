@@ -182,8 +182,20 @@ export class AddEmployeeComponent {
   /**
 * Utility function to format the date for database storage
 */
-  private formatDateForDB(date: any): string | null {
+   private formatDateForDB(date: any): string | null {
     if (!date) return null;
     return formatDate(date, 'yyyy-MM-dd', 'en'); // Format using Angular's formatDate
   }
+
+  getInvalidFields(): string {
+    const invalid: string[] = [];
+    Object.keys(this.docForm.controls).forEach(key => {
+      const control = this.docForm.get(key);
+      if (control && control.invalid) {
+        invalid.push(key);
+      }
+    });
+    return invalid.join(', ');
+  }
 }
+

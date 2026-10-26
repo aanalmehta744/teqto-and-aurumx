@@ -103,7 +103,7 @@ export class AddClientComponent {
       prizeAmount: [''],
       // NEW CODE: Hours per day — shown/required only when Price Tag = Hourly
       hoursPerDay: [''],
-      clientType: ['', [Validators.required]],
+      client_type: ['', Validators.required],
       clientConnectType: ['', [Validators.required]],
       date: ['', [Validators.required]],
       // OLD: platform: [''],

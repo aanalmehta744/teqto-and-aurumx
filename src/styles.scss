@@ -10,6 +10,10 @@
   border-right: none;
 }
 
+html {
+  font-size: 90%;
+}
+
 body {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
@@ -200,7 +204,7 @@ button:not([disabled]):active,
 
 @keyframes hr-page-in {
   from { opacity: 0; transform: translateY(7px); }
-  to { opacity: 1; transform: translateY(0); }
+  to { opacity: 1; transform: none; }
 }
 
 @keyframes hr-menu-in {
@@ -276,14 +280,14 @@ select:focus,
 router-outlet + * {
   display: block;
   animation: hr-route-in 300ms cubic-bezier(.2,.8,.2,1) both;
-  will-change: opacity, transform;
+  will-change: opacity;
 }
 
 /* Opacity + transform only — GPU-composited, no blur/filter, so it stays
    smooth even on pages with large tables or charts. */
 @keyframes hr-route-in {
   from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  to { opacity: 1; transform: none; }
 }
 
 /* Slim, unobtrusive scrollbars across long tables and side panels. */
@@ -416,7 +420,7 @@ router-outlet + * > section > div > *,
 router-outlet + * > section > *,
 router-outlet + * > div > * {
   animation: hr-surface-arrive 420ms cubic-bezier(.2,.8,.2,1) both;
-  will-change: opacity, transform;
+  will-change: opacity;
 }
 
 /* Per-child delay produces the cascade, up to 14 blocks (plenty per screen). */
@@ -430,7 +434,7 @@ router-outlet + * > div > * {
 
 @keyframes hr-surface-arrive {
   from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  to { opacity: 1; transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

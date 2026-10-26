@@ -175,10 +175,10 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <mat-form-field class="w-full" appearance="outline">
               <mat-label>Client Stats</mat-label>
-              <mat-select formControlName="clientType" required>
+              <mat-select formControlName="client_type" required>
                 <mat-option *ngFor="let type of clientTypes" [value]="type">{{ type }}</mat-option>
               </mat-select>
-              <mat-error *ngIf="clientForm.get('clientType')?.hasError('required')">
+              <mat-error *ngIf="clientForm.get('client_type')?.hasError('required')">
                 Select Client Type.
               </mat-error>
             </mat-form-field>

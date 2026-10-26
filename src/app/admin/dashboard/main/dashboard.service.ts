@@ -28,4 +28,10 @@ export class DashboardService {
     const y = year || new Date().getFullYear();
     return this.httpClient.get<any[]>(`${this.API_URL}/bde-kpi-achievement?month=${m}&year=${y}`);
   }
+
+  getBdeClientTargetsAchievement(month?: number, year?: number): Observable<any[]> {
+  const m = month || new Date().getMonth() + 1;
+  const y = year || new Date().getFullYear();
+  return this.httpClient.get<any[]>(`${environment.apiUrl}/bde-client-targets/achievement?month=${m}&year=${y}`);
+} 
 }

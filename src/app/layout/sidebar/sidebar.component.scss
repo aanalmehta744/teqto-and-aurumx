@@ -21,20 +21,6 @@ aside ul a:hover i-feather {
   transform: scale(1.06);
 }
 
-/* Active menu items receive a subtle leading indicator without changing markup. */
-aside ul a.bg-gradient-to-r::before,
-aside ul a.bg-indigo-100::before {
-  content: '';
-  position: absolute;
-  left: -1px;
-  top: 25%;
-  width: 3px;
-  height: 50%;
-  border-radius: 999px;
-  background: currentColor;
-  opacity: .9;
-}
-
 nav a {
   transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
 }
@@ -47,4 +33,7 @@ nav a:active {
   aside, aside ul a, aside ul a i-feather, nav a {
     transition: none !important;
   }
+}
+::ng-deep aside scrollbar-x ,ng-scrollbar-track-wrapper {
+  display: none !important;
 }

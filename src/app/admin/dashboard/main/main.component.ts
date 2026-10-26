@@ -90,7 +90,6 @@ export class MainComponent implements OnInit {
   upcomingHolidays: any[] = [];
   projectsExpanded = true;
 
-
   userRole: string = '';
   baLeaveBalance: any = null;
   private projectStatusMap: { [status: string]: string[] } = {};
@@ -106,7 +105,8 @@ export class MainComponent implements OnInit {
     private http: HttpClient,
     private holidayService: HolidayService,
   ) {
-    this.userRole = this.authService.currentUserValue?.role?.toLowerCase() ?? '';
+    this.userRole =
+      this.authService.currentUserValue?.role?.toLowerCase() ?? '';
   }
 
   // ApexChart variables
@@ -143,8 +143,22 @@ export class MainComponent implements OnInit {
     type: 'donut',
     height: 300,
   };
-  public projectStatusLabels: string[] = ['Active', 'Completed', 'Running', 'Pending', 'NotStarted', 'Canceled'];
-  public projectStatusColors: string[] = ['#1abc9c', '#2ecc71', '#3498db', '#f1c40f', '#9b59b6', '#e74c3c'];
+  public projectStatusLabels: string[] = [
+    'Active',
+    'Completed',
+    'Running',
+    'Pending',
+    'NotStarted',
+    'Canceled',
+  ];
+  public projectStatusColors: string[] = [
+    '#1abc9c',
+    '#2ecc71',
+    '#3498db',
+    '#f1c40f',
+    '#9b59b6',
+    '#e74c3c',
+  ];
   public projectStatusLegend: ApexLegend = {
     position: 'bottom',
   };
@@ -162,59 +176,73 @@ export class MainComponent implements OnInit {
         const status = this.projectStatusLabels[opts.seriesIndex];
         const projects = this.projectStatusMap[status] || [];
         return projects.length
-          ? projects.join(', ')   // show actual projectTitle list
-          : `${val} Projects`;    // fallback
+          ? projects.join(', ') // show actual projectTitle list
+          : `${val} Projects`; // fallback
       },
     },
   };
 
   public clientCountryChart: ApexChart = {
     type: 'bar',
-    height: 300
+    height: 300,
   };
 
   public clientCountrySeries: ApexAxisChartSeries = [];
   public clientCountryXAxis: ApexXAxis = {
     categories: [],
-    title: { text: 'Country' }
+    title: { text: 'Country' },
   };
 
   public clientCountryDataLabels: ApexDataLabels = {
-    enabled: true
+    enabled: true,
   };
 
   public clientCountryTooltip: ApexTooltip = {
     y: {
-      formatter: (val: number) => `${val} Clients`
-    }
+      formatter: (val: number) => `${val} Clients`,
+    },
   };
 
-    // Attendance status donut (Today's Attendance card)
+  // Attendance status donut (Today's Attendance card)
   presentCount = 0;
   absentCount = 0;
   halfDayCount = 0;
   leaveCount = 0;
   public attendanceStatusSeries: ApexNonAxisChartSeries = [];
   public attendanceStatusPlotOptions: ApexPlotOptions = {
-  pie: {
-    donut: {
-      size: '66%'
-    }
-  }
-};
+    pie: {
+      donut: {
+        size: '66%',
+      },
+    },
+  };
   public attendanceStatusChart: ApexChart = { type: 'donut', height: 240 };
-  public attendanceStatusLabels: string[] = ['Present', 'Absent', 'Half Day', 'On Leave'];
-  public attendanceStatusColors: string[] = ['#10b981', '#ef4444', '#052073', '#f59e0b'];
+  public attendanceStatusLabels: string[] = [
+    'Present',
+    'Absent',
+    'Half Day',
+    'On Leave',
+  ];
+  public attendanceStatusColors: string[] = [
+    '#10b981',
+    '#ef4444',
+    '#052073',
+    '#f59e0b',
+  ];
   public attendanceStatusLegend: ApexLegend = { show: false };
   public attendanceStatusDataLabels: ApexDataLabels = { enabled: false };
   public attendanceStatusTooltip: ApexTooltip = {
-    y: { formatter: (val: number) => `${val} employees` }
+    y: { formatter: (val: number) => `${val} employees` },
   };
 
   // BDE Activity Chart (calls / meetings / deals)
   bdePerformanceSummary: any[] = [];
   public bdeChartSeries: ApexAxisChartSeries = [];
-  public bdeChartOptions: ApexChart = { type: 'bar', height: 320, toolbar: { show: false } };
+  public bdeChartOptions: ApexChart = {
+    type: 'bar',
+    height: 320,
+    toolbar: { show: false },
+  };
   public bdeChartXAxis: ApexXAxis = { categories: [] };
   public bdeChartDataLabels: ApexDataLabels = { enabled: true };
   public bdeChartTooltip: ApexTooltip = { shared: true, intersect: false };
@@ -223,15 +251,62 @@ export class MainComponent implements OnInit {
   // BDE KPI Target Achievement Chart (completed / partial / missed)
   bdeKpiAchievement: any[] = [];
   public kpiAchievementSeries: ApexAxisChartSeries = [];
-  public kpiAchievementChart: ApexChart = { type: 'bar', height: 320, stacked: true, toolbar: { show: false } };
+  public kpiAchievementChart: ApexChart = {
+    type: 'bar',
+    height: 320,
+    stacked: true,
+    toolbar: { show: false },
+  };
   public kpiAchievementXAxis: ApexXAxis = { categories: [] };
   public kpiAchievementDataLabels: ApexDataLabels = { enabled: true };
-  public kpiAchievementTooltip: ApexTooltip = { shared: true, intersect: false };
+  public kpiAchievementTooltip: ApexTooltip = {
+    shared: true,
+    intersect: false,
+  };
   public kpiAchievementColors: string[] = ['#10b981', '#f59e0b', '#ef4444'];
   public kpiAchievementLegend: ApexLegend = { position: 'top' };
 
   // Leaderboard
+  // Leaderboard
   bdeLeaderboard: any[] = [];
+
+  // BDE Leaderboard pill-bar chart (replaces Employee Daily Update card)
+  public bdeLeaderboardSeries: ApexAxisChartSeries = [];
+  public bdeLeaderboardXAxis: ApexXAxis = { categories: [] };
+  public bdeLeaderboardColors: string[] = [];
+  public bdeLeaderboardChart: ApexChart = {
+    type: 'bar',
+    height: 280,
+    toolbar: { show: false },
+  };
+  public bdeLeaderboardPlotOptions: ApexPlotOptions = {
+    bar: {
+      borderRadius: 20,
+      borderRadiusApplication: 'around',
+      columnWidth: '45%',
+      distributed: true,
+      dataLabels: {
+        position: 'top',
+      },
+    },
+  };
+  public bdeLeaderboardDataLabels: ApexDataLabels = {
+    enabled: true,
+    offsetY: -20,
+    formatter: (val: number) => `${val}%`,
+    style: { fontSize: '13px', fontWeight: 700, colors: ['#1F2937'] },
+    background: {
+      enabled: false,
+      dropShadow: { enabled: false },
+    },
+    dropShadow: { enabled: false },
+  };
+  public bdeLeaderboardYAxis: ApexYAxis = { show: false, min: 0, max: 100 };
+  public bdeLeaderboardLegendCfg: ApexLegend = { show: false };
+  public bdeLeaderboardTooltip: ApexTooltip = {
+    y: { formatter: (val: number) => `${val}% achievement` },
+  };
+  public bdeLeaderboardChartWidth: number | null = null;
 
   ngOnInit() {
     this.loadFollowupsByBDE();
@@ -243,6 +318,7 @@ export class MainComponent implements OnInit {
     this.loadInterviews();
     this.loadPendingLeaves();
     this.loadUpcomingHolidays();
+    this.loadBdeLeaderboard();
     this.loadBdePerformanceSummary();
     this.loadBdeKpiAchievement();
     if (this.userRole === 'ba') {
@@ -254,10 +330,14 @@ export class MainComponent implements OnInit {
     const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
     const userId = user?.id;
     if (!userId) return;
-    this.http.get<any>(`${environment.apiUrl}/leaveRequests/leave-balance/${userId}`).subscribe({
-      next: (data) => { this.baLeaveBalance = data; },
-      error: (err) => console.error('Error fetching BA leave balance:', err),
-    });
+    this.http
+      .get<any>(`${environment.apiUrl}/leaveRequests/leave-balance/${userId}`)
+      .subscribe({
+        next: (data) => {
+          this.baLeaveBalance = data;
+        },
+        error: (err) => console.error('Error fetching BA leave balance:', err),
+      });
   }
 
   loadBdePerformanceSummary(): void {
@@ -280,16 +360,45 @@ export class MainComponent implements OnInit {
     this.dashboardService.getBdeKpiAchievement().subscribe({
       next: (data) => {
         this.bdeKpiAchievement = data;
-        this.bdeLeaderboard = data; // already sorted by avg_achievement desc from backend
+
         const names = data.map((b: any) => b.bde_name);
         this.kpiAchievementXAxis = { categories: names };
         this.kpiAchievementSeries = [
-          { name: 'Completed (≥100%)', data: data.map((b: any) => b.completed) },
+          {
+            name: 'Completed (≥100%)',
+            data: data.map((b: any) => b.completed),
+          },
           { name: 'Partial (70–99%)', data: data.map((b: any) => b.partial) },
           { name: 'Missed (<70%)', data: data.map((b: any) => b.missed) },
         ];
       },
       error: (err) => console.error('Error loading BDE KPI achievement:', err),
+    });
+  }
+
+  loadBdeLeaderboard(): void {
+    this.dashboardService.getBdeClientTargetsAchievement().subscribe({
+      next: (data) => {
+        // This endpoint isn't pre-sorted — sort by overall % descending ourselves
+        const sorted = [...data].sort(
+          (a, b) => (b.overall ?? 0) - (a.overall ?? 0),
+        );
+        const top5 = sorted.slice(0, 5);
+
+        this.bdeLeaderboard = top5;
+        const scores = top5.map((b: any) => b.overall ?? 0);
+        const max = Math.max(...scores, 1);
+        this.bdeLeaderboardXAxis = {
+          categories: top5.map((b: any) => b.bde_name),
+        };
+        this.bdeLeaderboardSeries = [{ name: 'Achievement', data: scores }];
+        this.bdeLeaderboardColors = scores.map((s) =>
+          s === max ? '#052073' : s > 0 ? '#6D7BB8' : '#E5E7EB',
+        );
+        this.bdeLeaderboardChartWidth =
+          top5.length > 5 ? top5.length * 100 : null;
+      },
+      error: (err) => console.error('Error loading BDE leaderboard:', err),
     });
   }
 
@@ -300,7 +409,7 @@ export class MainComponent implements OnInit {
     return `#${index + 1}`;
   }
 
-    getInitials(name: string): string {
+  getInitials(name: string): string {
     if (!name) return '';
     const parts = name.trim().split(' ');
     return parts.length > 1
@@ -309,10 +418,14 @@ export class MainComponent implements OnInit {
   }
   ngAfterViewInit(): void {
     if (this.followupPaginator) {
-      this.followupPaginator.page.subscribe(() => this.updateFollowupPagination());
+      this.followupPaginator.page.subscribe(() =>
+        this.updateFollowupPagination(),
+      );
     }
     if (this.attendancePaginator) {
-      this.attendancePaginator.page.subscribe(() => this.updateAttendancePagination());
+      this.attendancePaginator.page.subscribe(() =>
+        this.updateAttendancePagination(),
+      );
     }
     if (this.leavePaginator) {
       this.leavePaginator.page.subscribe(() => this.updateLeavePagination());
@@ -322,8 +435,8 @@ export class MainComponent implements OnInit {
     this.ieavesService.getAllLeaves(); // triggers the request
     this.ieavesService.dataChange.subscribe({
       next: (data: any[]) => {
-        console.log("Leave request list", data);
-        this.pendingLeaves = data.filter(leave => leave.status === 'Pending');
+        console.log('Leave request list', data);
+        this.pendingLeaves = data.filter((leave) => leave.status === 'Pending');
         this.updateLeavePagination();
       },
       error: (err: any) => console.error('Error fetching pending leaves:', err),
@@ -331,18 +444,20 @@ export class MainComponent implements OnInit {
   }
 
   loadUpcomingHolidays(): void {
-  this.holidayService.getAllHolidays().subscribe({
-    next: (data) => {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      this.upcomingHolidays = data
-        .filter(h => new Date(h.date) >= today)
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-        .slice(0, 3);
-    },
-    error: (err) => console.error('Error fetching holidays:', err),
-  });
-}
+    this.holidayService.getAllHolidays().subscribe({
+      next: (data) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        this.upcomingHolidays = data
+          .filter((h) => new Date(h.date) >= today)
+          .sort(
+            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+          )
+          .slice(0, 3);
+      },
+      error: (err) => console.error('Error fetching holidays:', err),
+    });
+  }
 
   updateLeavePagination(event?: any): void {
     if (!this.leavePaginator) return;
@@ -361,7 +476,7 @@ export class MainComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error fetching today follow-ups by BDE:', err);
-      }
+      },
     });
   }
   loadTodayAttendance(): void {
@@ -374,15 +489,28 @@ export class MainComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error fetching today attendance:', err);
-      }
+      },
     });
   }
-    computeAttendanceStatusCounts(): void {
-    this.presentCount = this.todayAttendance.filter(r => r.status === 'Present').length;
-    this.absentCount = this.todayAttendance.filter(r => r.status === 'Absent').length;
-    this.halfDayCount = this.todayAttendance.filter(r => r.status === 'Half Day').length;
-    this.leaveCount = this.todayAttendance.filter(r => r.final_status === 'Leave').length;
-    this.attendanceStatusSeries = [this.presentCount, this.absentCount, this.halfDayCount, this.leaveCount];
+  computeAttendanceStatusCounts(): void {
+    this.presentCount = this.todayAttendance.filter(
+      (r) => r.status === 'Present',
+    ).length;
+    this.absentCount = this.todayAttendance.filter(
+      (r) => r.status === 'Absent',
+    ).length;
+    this.halfDayCount = this.todayAttendance.filter(
+      (r) => r.status === 'Half Day',
+    ).length;
+    this.leaveCount = this.todayAttendance.filter(
+      (r) => r.final_status === 'Leave',
+    ).length;
+    this.attendanceStatusSeries = [
+      this.presentCount,
+      this.absentCount,
+      this.halfDayCount,
+      this.leaveCount,
+    ];
   }
   loadAllProjectsWithTeams(): void {
     this.dashboardService.getAllTeams().subscribe({
@@ -394,35 +522,35 @@ export class MainComponent implements OnInit {
     });
   }
   loadEmployeeDailyUpdates(): void {
-    this.dailyUpdateService.getUpdates().subscribe({
+    this.dailyUpdateService.getAllUpdates().subscribe({
       next: (data) => {
         this.employeeUpdates = data;
         this.prepareChartData(data);
-        console.log("Employee dially Update ", this.employeeUpdates);
+        console.log('Employee dially Update ', this.employeeUpdates);
       },
       error: (err) => console.error('Error fetching daily updates:', err),
     });
   }
   loadInterviews(): void {
-
     this.interviewService.getAllInterviews().subscribe({
       next: (interviews: any[]) => {
-        // Only show upcoming interviews.
         const upcoming = (interviews || [])
-          .filter(i => String(i.status || '').toLowerCase() === 'upcoming')
+          .filter((i) => String(i.status || '').toLowerCase() === 'upcoming')
           .sort(
             (a, b) =>
               new Date(a.interview_date).getTime() -
-              new Date(b.interview_date).getTime()
+              new Date(b.interview_date).getTime(),
           );
 
         this.interviewDataSource.data = upcoming;
-        this.updateInterviewPagination();
+        // Dashboard card only previews a few rows (slice pipe in template) —
+        // no live paginator needed here, same pattern as Follow-ups/Leave Requests.
+        this.paginatedInterviews = upcoming;
       },
       error: (err) => console.error('Error fetching interviews:', err),
     });
-
   }
+
   updateInterviewPagination(): void {
     if (!this.interviewPaginator) return;
     const pageIndex = this.interviewPaginator.pageIndex || 0;
@@ -450,33 +578,22 @@ export class MainComponent implements OnInit {
   }
 
   prepareChartData(data: any[]) {
-    // Group by employee_id and date (convert ISO date string to just date part)
     const grouped: { [employeeId: string]: { [date: string]: number } } = {};
     const employeeNames: { [id: string]: string } = {};
-
-    // You probably want to map employee_id to employee_name (simplified here)
-    // If you have an employee list, fetch names or keep in memory for mapping
-    // For demo, let's assume employee_id = employee name as string
     data.forEach((entry) => {
-      // const date = new Date(entry.update_date).toISOString().split('T')[0];
       const date = formatDate(entry.update_date, 'yyyy-MM-dd', 'en-IN');
-
-      // formatDate(item.update_date, 'yyyy-MM-dd', 'en-IN')
       const empId = entry.employee_name?.toString?.() ?? 'Unknown';
-
 
       if (!grouped[empId]) grouped[empId] = {};
       if (!grouped[empId][date]) grouped[empId][date] = 0;
       grouped[empId][date]++;
 
-      // Store employee name mapping if you have it
       employeeNames[empId] = `${empId}`;
     });
 
-    // Extract all dates sorted
     const allDates = new Set<string>();
     Object.values(grouped).forEach((dateMap) =>
-      Object.keys(dateMap).forEach((d) => allDates.add(d))
+      Object.keys(dateMap).forEach((d) => allDates.add(d)),
     );
     const sortedDates = Array.from(allDates).sort();
 
@@ -505,7 +622,7 @@ export class MainComponent implements OnInit {
       Completed: 'Completed',
       Running: 'Running',
       Pending: 'Pending',
-      'Not Started': 'Not Started',  // 👈 map backend "NotStarted" to "Not Started"
+      'Not Started': 'Not Started',
       Canceled: 'Canceled',
     };
 
@@ -513,33 +630,37 @@ export class MainComponent implements OnInit {
     const statusCounts: { [key: string]: number } = {};
     this.projectStatusMap = {};
 
-    statusLabels.forEach(status => {
+    statusLabels.forEach((status) => {
       statusCounts[status] = 0;
       this.projectStatusMap[status] = [];
     });
 
-    projects.forEach(project => {
+    projects.forEach((project) => {
       const rawStatus = project.status?.trim();
-      // find the display label that matches backend value
-      const status = Object.entries(statusMap).find(([label, apiVal]) => apiVal === rawStatus)?.[0];
+      const status = Object.entries(statusMap).find(
+        ([label, apiVal]) => apiVal === rawStatus,
+      )?.[0];
 
       if (status) {
         statusCounts[status]++;
-        this.projectStatusMap[status].push(project.projectTitle || 'Unnamed Project');
+        this.projectStatusMap[status].push(
+          project.projectTitle || 'Unnamed Project',
+        );
       }
     });
 
     this.projectStatusLabels = statusLabels;
-    this.projectStatusSeries = statusLabels.map(status => statusCounts[status]);
+    this.projectStatusSeries = statusLabels.map(
+      (status) => statusCounts[status],
+    );
   }
-
 
   loadClients(): void {
     this.clientsService.getAllClients().subscribe({
       next: (data) => {
         this.allClients = data;
-        console.log('All Clients:', this.allClients); // Also fixed log typo
-        this.prepareClientCountryChart(data); // ✅ Correct method to call
+        console.log('All Clients:', this.allClients);
+        this.prepareClientCountryChart(data);
       },
       error: (err) => console.error('Error fetching clients:', err),
     });
@@ -547,7 +668,7 @@ export class MainComponent implements OnInit {
   prepareClientCountryChart(clients: any[]): void {
     const countryCount: { [key: string]: number } = {};
 
-    clients.forEach(client => {
+    clients.forEach((client) => {
       const country = client.country?.trim() || 'Unknown';
       countryCount[country] = (countryCount[country] || 0) + 1;
     });
@@ -556,9 +677,8 @@ export class MainComponent implements OnInit {
     this.clientCountrySeries = [
       {
         name: 'Clients',
-        data: Object.values(countryCount)
-      }
+        data: Object.values(countryCount),
+      },
     ];
   }
-
 }

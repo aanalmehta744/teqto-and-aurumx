@@ -1,158 +1,290 @@
 <!-- ── Full sidebar: ONLY on laptop / PC (≥ 1024px) ── -->
-<aside *ngIf="!isMobileView"
+<aside
+  *ngIf="!isMobileView"
   class="h-full flex flex-col transition-all duration-300 bg-white text-gray-800 border-r border-gray-100 shadow-sm static z-50 overflow-x-hidden"
-  (mouseenter)="mouseHover()" (mouseleave)="mouseOut()">
-
+  (mouseenter)="mouseHover()"
+  (mouseleave)="mouseOut()"
+>
   <!-- Scrollable menu -->
   <div class="flex-1 overflow-hidden">
-    <ng-scrollbar [style.height]="listMaxHeight + 'px'" visibility="hover" horizontal="never">
-      <ul class="flex flex-col gap-1 p-3 w-full max-w-full">
-
+    <ng-scrollbar
+      [style.height]="listMaxHeight + 'px'"
+      visibility="hover"
+      track="vertical"
+    >
+      <ul class="flex flex-col gap-1.5 pl-2 pr-4 py-4 w-full max-w-full">
         <!-- Main sidebar items -->
         <li *ngFor="let sidebarItem of sidebarItems" class="min-w-0">
-
           <!-- Group title -->
-          <div *ngIf="sidebarItem.groupTitle && (!isCollapsed || isHovered)"
-            class="px-3 pt-4 pb-1 text-[11px] font-semibold text-violet-400 uppercase tracking-wider truncate">
+          <div
+            *ngIf="sidebarItem.groupTitle && (!isCollapsed || isHovered)"
+            class="px-3 pt-5 pb-2 text-[11px] font-bold text-[#052073]/50 uppercase tracking-wider truncate"
+          >
             {{ sidebarItem.title | translate }}
           </div>
 
           <!-- Menu link / toggle -->
-          <a *ngIf="!sidebarItem.groupTitle" (click)="navigateOrToggle(sidebarItem)"
-            [routerLink]="(!sidebarItem.submenu?.length && !sidebarItem.newTab) ? [sidebarItem.path] : null"
-            class="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 min-w-0 w-full"
-            [ngClass]="isRouteActive(sidebarItem.path) ? 'bg-gradient-to-r from-violet-600 to-violet-500 text-white shadow-md shadow-violet-200' : 'text-slate-600 hover:bg-violet-50 hover:text-violet-600'">
-            <i-feather [name]="sidebarItem.icon" class="h-[18px] w-[18px] shrink-0"
-              [ngClass]="isRouteActive(sidebarItem.path) ? 'text-white' : 'text-slate-400 group-hover:text-violet-600'"></i-feather>
-            <span class="text-sm font-medium truncate min-w-0" *ngIf="!isCollapsed || isHovered">{{ sidebarItem.title | translate }}</span>
-            <span *ngIf="sidebarItem.submenu?.length && (!isCollapsed || isHovered)"
-              class="ml-auto shrink-0 transform transition-transform duration-200 text-gray-400"
-              [class.rotate-90]="sidebarItem.isOpen">
+          <a
+            *ngIf="!sidebarItem.groupTitle"
+            (click)="navigateOrToggle(sidebarItem)"
+            [routerLink]="
+              !sidebarItem.submenu?.length && !sidebarItem.newTab
+                ? [sidebarItem.path]
+                : null
+            "
+            class="group flex items-center gap-3 px-3.5 py-2.5 rounded-full cursor-pointer transition-all duration-200 min-w-0 w-full"
+            [ngClass]="
+              isRouteActive(sidebarItem.path)
+                ? 'bg-[#052073] text-white shadow-md shadow-[#052073]/20'
+                : 'text-slate-600 hover:bg-[#052073]/5 hover:text-[#052073]'
+            "
+          >
+            <i-feather
+              [name]="sidebarItem.icon"
+              class="h-[18px] w-[18px] shrink-0"
+              [ngClass]="
+                isRouteActive(sidebarItem.path)
+                  ? 'text-white'
+                  : 'text-slate-400 group-hover:text-[#052073]'
+              "
+            ></i-feather>
+            <span
+              class="text-sm font-semibold truncate min-w-0"
+              *ngIf="!isCollapsed || isHovered"
+              >{{ sidebarItem.title | translate }}</span
+            >
+            <span
+              *ngIf="sidebarItem.submenu?.length && (!isCollapsed || isHovered)"
+              class="ml-auto shrink-0 transform transition-transform duration-200"
+              [ngClass]="
+                isRouteActive(sidebarItem.path)
+                  ? 'text-white/70'
+                  : 'text-gray-400'
+              "
+              [class.rotate-90]="sidebarItem.isOpen"
+            >
               <i-feather name="chevron-right" class="h-3.5 w-3.5"></i-feather>
             </span>
-            <span *ngIf="sidebarItem.badge && (!isCollapsed || isHovered)" [ngClass]="sidebarItem.badgeClass"
-              class="ml-auto shrink-0 text-[11px] font-semibold px-2 py-0.5 rounded-full">
+            <span
+              *ngIf="sidebarItem.badge && (!isCollapsed || isHovered)"
+              [ngClass]="
+                isRouteActive(sidebarItem.path)
+                  ? 'bg-white text-[#052073]'
+                  : sidebarItem.badgeClass
+              "
+              class="ml-auto shrink-0 text-[11px] font-bold px-2 py-0.5 rounded-full"
+            >
               {{ sidebarItem.badge }}
             </span>
           </a>
 
           <!-- Submenu -->
-          <ul *ngIf="sidebarItem.submenu?.length && sidebarItem.isOpen && (!isCollapsed || isHovered)"
-            class="ml-6 mt-1 space-y-1 border-l border-violet-100 pl-3 min-w-0">
+          <ul
+            *ngIf="
+              sidebarItem.submenu?.length &&
+              sidebarItem.isOpen &&
+              (!isCollapsed || isHovered)
+            "
+            class="ml-6 mt-1 space-y-1 border-l border-[#052073]/15 pl-3 min-w-0"
+          >
             <li *ngFor="let subItem of sidebarItem.submenu" class="min-w-0">
-
-              <a (click)="navigateOrToggle(subItem)" [routerLink]="!subItem.submenu?.length ? [subItem.path] : null"
-                class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm cursor-pointer transition-colors min-w-0 w-full"
-                [ngClass]="isRouteActive(subItem.path) ? 'bg-violet-100 text-violet-700 font-semibold' : 'text-slate-500 hover:bg-violet-50 hover:text-violet-600'">
-                <span class="truncate min-w-0">{{ subItem.title | translate }}</span>
-                <span *ngIf="subItem.submenu?.length" class="ml-auto shrink-0 transform transition-transform duration-200 text-gray-400"
-                  [class.rotate-90]="subItem.isOpen">
-                  <i-feather name="chevron-right" class="h-3.5 w-3.5"></i-feather>
+              <a
+                (click)="navigateOrToggle(subItem)"
+                [routerLink]="!subItem.submenu?.length ? [subItem.path] : null"
+                class="flex items-center gap-2 px-3 py-2 rounded-full text-sm cursor-pointer transition-colors min-w-0 w-full"
+                [ngClass]="
+                  isRouteActive(subItem.path)
+                    ? 'bg-[#052073]/10 text-[#052073] font-semibold'
+                    : 'text-slate-500 hover:bg-[#052073]/5 hover:text-[#052073]'
+                "
+              >
+                <span class="truncate min-w-0">{{
+                  subItem.title | translate
+                }}</span>
+                <span
+                  *ngIf="subItem.submenu?.length"
+                  class="ml-auto shrink-0 transform transition-transform duration-200 text-gray-400"
+                  [class.rotate-90]="subItem.isOpen"
+                >
+                  <i-feather
+                    name="chevron-right"
+                    class="h-3.5 w-3.5"
+                  ></i-feather>
                 </span>
               </a>
 
-              <ul *ngIf="subItem.submenu?.length && subItem.isOpen && (!isCollapsed || isHovered)" class="ml-4 mt-1 space-y-1 min-w-0">
+              <ul
+                *ngIf="
+                  subItem.submenu?.length &&
+                  subItem.isOpen &&
+                  (!isCollapsed || isHovered)
+                "
+                class="ml-4 mt-1 space-y-1 min-w-0"
+              >
                 <li *ngFor="let nestedItem of subItem.submenu" class="min-w-0">
-                  <a (click)="navigateSubmenu(nestedItem.path)"
-                    class="flex items-center px-3 py-2 rounded-lg text-sm cursor-pointer transition-colors truncate"
-                    [ngClass]="isRouteActive(nestedItem.path) ? 'bg-violet-100 text-violet-700 font-semibold' : 'text-slate-500 hover:bg-violet-50 hover:text-violet-600'">
+                  <a
+                    (click)="navigateSubmenu(nestedItem.path)"
+                    class="flex items-center px-3 py-2 rounded-full text-sm cursor-pointer transition-colors truncate"
+                    [ngClass]="
+                      isRouteActive(nestedItem.path)
+                        ? 'bg-[#052073]/10 text-[#052073] font-semibold'
+                        : 'text-slate-500 hover:bg-[#052073]/5 hover:text-[#052073]'
+                    "
+                  >
                     {{ nestedItem.title | translate }}
                   </a>
                 </li>
               </ul>
-
             </li>
           </ul>
         </li>
-
       </ul>
     </ng-scrollbar>
   </div>
 
   <!-- Footer: profile (above logout) -->
-  <div class="border-t border-violet-100 p-3 space-y-1">
-
-    <div class="flex items-center gap-3 px-3 py-2.5 rounded-xl min-w-0 cursor-pointer bg-gradient-to-r from-violet-50 to-violet-50 hover:from-violet-100 hover:to-violet-100 transition-colors"
-         (click)="goToProfile()" *ngIf="!isCollapsed || isHovered">
-      <img [src]="getProfileImgUrl()" class="h-9 w-9 rounded-full object-contain shrink-0 ring-2 ring-white" alt="User Image" />
+  <div class="border-t border-gray-100 p-3 space-y-1">
+    <div
+      class="flex items-center gap-3 px-3 py-2.5 rounded-2xl min-w-0 cursor-pointer bg-[#052073] hover:bg-[#052073]/90 transition-colors"
+      (click)="goToProfile()"
+      *ngIf="!isCollapsed || isHovered"
+    >
+      <img
+        [src]="getProfileImgUrl()"
+        class="h-9 w-9 rounded-full object-contain shrink-0 ring-2 ring-white"
+        alt="User Image"
+      />
       <div class="min-w-0">
-        <div class="text-sm font-semibold text-slate-800 truncate">{{ userFullName }}</div>
-        <div class="text-xs text-violet-500 truncate">{{ userType }}</div>
+        <div class="text-sm font-semibold text-white truncate">
+          {{ userFullName }}
+        </div>
+        <div class="text-xs text-white/70 truncate">{{ userType }}</div>
       </div>
     </div>
 
-    <div class="flex justify-center py-2 cursor-pointer" (click)="goToProfile()" *ngIf="isCollapsed && !isHovered">
-      <img [src]="getProfileImgUrl()" class="h-9 w-9 rounded-full object-cover ring-2 ring-violet-100 hover:ring-violet-400 transition-all" alt="User Image" />
+    <div
+      class="flex justify-center py-2 cursor-pointer"
+      (click)="goToProfile()"
+      *ngIf="isCollapsed && !isHovered"
+    >
+      <img
+        [src]="getProfileImgUrl()"
+        class="h-9 w-9 rounded-full object-cover ring-2 ring-[#052073]/15 hover:ring-[#052073]/40 transition-all"
+        alt="User Image"
+      />
     </div>
 
-    <a (click)="logout()"
-      class="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-colors">
+    <a
+      (click)="logout()"
+      class="flex items-center gap-3 px-3.5 py-2.5 rounded-full cursor-pointer text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+    >
       <i-feather name="log-out" class="h-[18px] w-[18px] shrink-0"></i-feather>
-      <span class="text-sm font-medium truncate" *ngIf="!isCollapsed || isHovered">Log out</span>
+      <span
+        class="text-sm font-medium truncate"
+        *ngIf="!isCollapsed || isHovered"
+        >Log out</span
+      >
     </a>
-
   </div>
-
 </aside>
 
-
-<!-- ── Mobile bottom nav: all mobile / tablet (< 1024px) ── -->
-<!-- pb safe-area keeps the bar above the iPhone home indicator / gesture bar -->
-<nav *ngIf="isMobileView"
+<nav
+  *ngIf="isMobileView"
   class="fixed bottom-0 left-0 right-0 z-[9999] bg-white/95 backdrop-blur-md border-t border-violet-100 shadow-[0_-4px_20px_-4px_rgba(124,58,237,0.2)]"
-  style="padding-bottom: env(safe-area-inset-bottom);">
-
-  <!-- Single hold-to-reveal label, centered above the bar (outside the scroll area
-       so it is never clipped by the horizontal scroll container). -->
-  <div *ngIf="pressedTitleKey"
-    class="absolute -top-9 left-1/2 -translate-x-1/2 bg-gradient-to-r from-violet-600 to-violet-500 text-white text-[11px] font-medium px-3 py-1 rounded-lg whitespace-nowrap shadow-lg z-10 pointer-events-none">
+  style="padding-bottom: env(safe-area-inset-bottom)"
+>
+  <div
+    *ngIf="pressedTitleKey"
+    class="absolute -top-9 left-1/2 -translate-x-1/2 bg-gradient-to-r from-violet-600 to-violet-500 text-white text-[11px] font-medium px-3 py-1 rounded-lg whitespace-nowrap shadow-lg z-10 pointer-events-none"
+  >
     {{ pressedTitleKey | translate }}
   </div>
 
   <!-- Scrollable icon row (all role-based items) -->
   <div class="h-16 flex items-center gap-1 px-2 overflow-x-auto hide-scrollbar">
+    <!-- Nav items (icons only; tap navigates, hold shows the name) -->
+    <a
+      *ngFor="let item of bottomNavItems; trackBy: trackByPath"
+      (click)="onNavClick(item)"
+      (touchstart)="onHoldStart(item.title)"
+      (touchend)="onHoldEnd()"
+      (touchmove)="onHoldEnd()"
+      (mousedown)="onHoldStart(item.title)"
+      (mouseup)="onHoldEnd()"
+      (mouseleave)="onHoldEnd()"
+      (contextmenu)="$event.preventDefault()"
+      class="relative flex flex-col items-center justify-center w-16 shrink-0 h-14 rounded-xl transition-all cursor-pointer select-none no-underline"
+      [ngClass]="
+        isBottomNavActive(item.path)
+          ? 'bg-violet-50 text-violet-600'
+          : 'text-slate-400 active:text-violet-600'
+      "
+    >
+      <i-feather
+        [name]="item.icon"
+        class="h-[22px] w-[22px] pointer-events-none"
+        [ngClass]="
+          isBottomNavActive(item.path) ? 'text-violet-600' : 'text-slate-400'
+        "
+      >
+      </i-feather>
+      <!-- Active dot indicator -->
+      <span
+        *ngIf="isBottomNavActive(item.path)"
+        class="mt-1 w-1 h-1 rounded-full bg-violet-600"
+      >
+      </span>
+    </a>
 
-  <!-- Nav items (icons only; tap navigates, hold shows the name) -->
-  <a *ngFor="let item of bottomNavItems; trackBy: trackByPath"
-    (click)="onNavClick(item)"
-    (touchstart)="onHoldStart(item.title)" (touchend)="onHoldEnd()" (touchmove)="onHoldEnd()"
-    (mousedown)="onHoldStart(item.title)" (mouseup)="onHoldEnd()" (mouseleave)="onHoldEnd()"
-    (contextmenu)="$event.preventDefault()"
-    class="relative flex flex-col items-center justify-center w-16 shrink-0 h-14 rounded-xl transition-all cursor-pointer select-none no-underline"
-    [ngClass]="isBottomNavActive(item.path) ? 'bg-violet-50 text-violet-600' : 'text-slate-400 active:text-violet-600'">
-    <i-feather [name]="item.icon"
-      class="h-[22px] w-[22px] pointer-events-none"
-      [ngClass]="isBottomNavActive(item.path) ? 'text-violet-600' : 'text-slate-400'">
-    </i-feather>
-    <!-- Active dot indicator -->
-    <span *ngIf="isBottomNavActive(item.path)"
-      class="mt-1 w-1 h-1 rounded-full bg-violet-600">
-    </span>
-  </a>
+    <!-- Profile icon -->
+    <a
+      (click)="onNavClick({ path: 'employee-profile', type: 'profile' })"
+      (touchstart)="onHoldStart('Profile')"
+      (touchend)="onHoldEnd()"
+      (touchmove)="onHoldEnd()"
+      (mousedown)="onHoldStart('Profile')"
+      (mouseup)="onHoldEnd()"
+      (mouseleave)="onHoldEnd()"
+      (contextmenu)="$event.preventDefault()"
+      class="relative flex flex-col items-center justify-center w-16 shrink-0 h-14 rounded-xl cursor-pointer transition-all select-none"
+      [ngClass]="
+        currentRoute?.includes('employee-profile')
+          ? 'text-violet-600'
+          : 'text-gray-400'
+      "
+    >
+      <img
+        [src]="getProfileImgUrl()"
+        class="w-7 h-7 rounded-full object-cover pointer-events-none"
+        [ngClass]="
+          currentRoute?.includes('employee-profile')
+            ? 'ring-2 ring-violet-400'
+            : ''
+        "
+      />
+      <span
+        *ngIf="currentRoute?.includes('employee-profile')"
+        class="mt-1 w-1 h-1 rounded-full bg-violet-600"
+      >
+      </span>
+    </a>
 
-  <!-- Profile icon -->
-  <a (click)="onNavClick({ path: 'employee-profile', type: 'profile' })"
-    (touchstart)="onHoldStart('Profile')" (touchend)="onHoldEnd()" (touchmove)="onHoldEnd()"
-    (mousedown)="onHoldStart('Profile')" (mouseup)="onHoldEnd()" (mouseleave)="onHoldEnd()"
-    (contextmenu)="$event.preventDefault()"
-    class="relative flex flex-col items-center justify-center w-16 shrink-0 h-14 rounded-xl cursor-pointer transition-all select-none"
-    [ngClass]="currentRoute?.includes('employee-profile') ? 'text-violet-600' : 'text-gray-400'">
-    <img [src]="getProfileImgUrl()"
-      class="w-7 h-7 rounded-full object-cover pointer-events-none"
-      [ngClass]="currentRoute?.includes('employee-profile') ? 'ring-2 ring-violet-400' : ''" />
-    <span *ngIf="currentRoute?.includes('employee-profile')"
-      class="mt-1 w-1 h-1 rounded-full bg-violet-600">
-    </span>
-  </a>
-
-  <!-- Logout icon -->
-  <a (click)="onNavClick({ path: 'logout', type: 'logout' })"
-    (touchstart)="onHoldStart('Log out')" (touchend)="onHoldEnd()" (touchmove)="onHoldEnd()"
-    (mousedown)="onHoldStart('Log out')" (mouseup)="onHoldEnd()" (mouseleave)="onHoldEnd()"
-    (contextmenu)="$event.preventDefault()"
-    class="relative flex flex-col items-center justify-center w-16 shrink-0 h-14 rounded-xl cursor-pointer text-gray-400 active:text-red-500 transition-all select-none">
-    <i-feather name="log-out" class="h-[22px] w-[22px] pointer-events-none"></i-feather>
-  </a>
-
+    <!-- Logout icon -->
+    <a
+      (click)="onNavClick({ path: 'logout', type: 'logout' })"
+      (touchstart)="onHoldStart('Log out')"
+      (touchend)="onHoldEnd()"
+      (touchmove)="onHoldEnd()"
+      (mousedown)="onHoldStart('Log out')"
+      (mouseup)="onHoldEnd()"
+      (mouseleave)="onHoldEnd()"
+      (contextmenu)="$event.preventDefault()"
+      class="relative flex flex-col items-center justify-center w-16 shrink-0 h-14 rounded-xl cursor-pointer text-gray-400 active:text-red-500 transition-all select-none"
+    >
+      <i-feather
+        name="log-out"
+        class="h-[22px] w-[22px] pointer-events-none"
+      ></i-feather>
+    </a>
   </div>
 </nav>
